@@ -40,11 +40,54 @@ TBD
 A set of validators is selected from the beacon committee to become IL committee for `slot N`.
 
 - **`Slot N`, `t=0 to 8s`**: After processing the block for `slot N` and confirming it as the head, each IL committee member of `slot N` constructs a local inclusion list based on the head and their view of the public mempool, then broadcasts it over the P2P network.
-- **`Slot N`, `t=9s`**: IL committee members freeze their view of a set of local inclusion lists and no longer produce new ones.
-- **`Slot N`, `t=9 to 11s`**: IL committee members continue forwarding the local inclusion lists they are aware of but ignore any new ones. The block proposer and attesters of `slot N+1` continue listening to gossiped local inclusion lists. To ensure none are omitted, the block proposer can request for any missing local inclusion lists from a specific IL committee member via an RPC endpoint, for example, at `t=10s`.
-- **`Slot N`, `t=11s`**: The block proposer freezes its local inclusion lists view and IL committee members stop gossiping.
+- **`Slot N`, `t=9s`**: IL committee members freeze their view of a set of local ILs and no longer produce new ones.
+- **`Slot N`, `t=9 to 11s`**: IL committee members continue forwarding the local ILs they are aware of but ignore any new ones. The block proposer and attesters of `slot N+1` continue listening to gossiped local inclusion lists. To ensure none are omitted, the block proposer can request for any missing local inclusion lists from a specific IL committee member via an RPC endpoint, for example, at `t=10s`.
+- **`Slot N`, `t=11s`**: The block proposer freezes its local ILs view and IL committee members stop gossiping.
 - **`Slot N+1`, `t=0s`**: The block proposer broadcasts `block B` for `slot N+1` with an execution payload that satisfies the IL constraints.
 - **`Slot N+1`, `t=4s`**: The attesters accept `block B` only if it includes all transactions from the local inclusion lists, or if any missing transactions cannot be appended to the end of the execution payload, or if the block is full.
+
+#### Role and participants
+
+##### IL Committee Members
+
+- **`Slot N`, `t=0 to 8s`**:
+IL committee members construct their local ILs and broadcast them over the P2P network after processing the block for slot `N` and confirming it as the head. If no block is received by `t=7s`, they should run `get_head` and build and release their local ILs based on their node’s canonical head.
+
+By default, local ILs are built by selecting raw transactions from the public mempool, ordered by priority fees, up to the local IL’s maximum size in bits (e.g., 8 kb per local IL). Additional rules can be optionally applied to maximize CR, such as prioritizing valid transactions that have been pending in the mempool the longest.
+
+##### Nodes
+
+- **`Slot N`, `t=0 to 8s`**:
+Nodes receive local ILs from the P2P network and only forward and cache those that pass the CL P2P validation rules.
+
+- **`Slot N`, `t=9s`**:, IL freeze deadline:
+Nodes freeze their local ILs view, stop forwarding and caching new local ILs.
+
+---
+
+# CL P2P Validation Rules:
+
+1. The number of transactions in the local IL does not exceed the maximum gas limit allowed.
+2. The slot of the local IL matches the current slot. Local ILs not matching the current slot should be ignored.
+3. The parent hash of the IL is recognized.
+4. The IL is received before the local IL freeze deadline (e.g., 9s) into the slot.
+5. Received two or fewer local ILs from this IL committee member (see Local IL equivocation section below).
+6. The local IL is correctly signed by the validator.
+7. The validator is part of the IL committee.
+
+---
+
+##### Proposer
+
+- **`Slot N`, `t=11s`**:
+The proposer freezes its view of local ILs and asks the EL to update its execution payload by adding transactions from its view (the exact timings will be defined after running some tests/benchmarks). Optionally, an RPC endpoint can be added to allow the proposer to request the missing local ILs from its peers (e.g., by committee index).
+
+- **`Slot N+1`, `t=0s`**:
+The proposer broadcasts its block with the up-to-date execution payload satisfying IL transactions over the P2P network.
+
+##### Attesters
+- **`Slot N+1`, `t=0 to 4s`**:
+Attesters monitor the P2P network for the proposer’s block. Upon detecting the block, they check whether all transactions from their cached local ILs are included in the proposer’s execution payload. The `Valid` function verifies if the execution payload satisfies IL validity conditions either when all transactions are present or when any missing transactions are found to be invalid when appended to the end of the payload. In these cases, attesters use the EL to conduct `nonce` and `balance` checks and verify the validity of missing transactions.
 
 ## Rationale
 
@@ -68,13 +111,11 @@ The block builder or proposer of `slot N+1` cannot construct a canonical block w
 
 ### Block Construction Time
 
-It is important to ensure there is enough time between the local inclusion list freeze deadline (`t=9s` of `slot N`) and the moment at which the block producer has to broadcast `block B`, so that there is enough time to update `block B`'s execution payload according to the observed IL constraints.
+It is important to ensure there is enough time between the local inclusion list freeze deadline (`t=9s` of `slot N`) and the moment at which the block producer has to broadcast `block B`, so that the proposer has enough time see all available local ILs and update `block B`'s execution payload accordingly.
 
 ### IL Equivocation
 
-Since the local inclusion lists from the IL committee are all different and FOCIL does not introduce any single actor with sole responsibility, it seems infeasible to aggregate local inclusion lists while satisfying the aforementioned core properties. A malicious IL committee member may equivocate their local inclusion list.
-
-To mitigate local inclusion list equivocation, FOCIL introduces a new P2P network rule that allows forwarding up to two local inclusion lists per IL committee member. If the block proposer or attesters detect two different local inclusion lists sent by the same IL committee member, they should ignore all local inclusion lists from that member. In the worst case, the bandwidth of the local inclusion list gossip subnet can at most double.
+To mitigate local inclusion list equivocation, FOCIL introduces a new P2P network rule that allows forwarding up to two local ILs per IL committee member. If the block proposer or attesters detect two different local inclusion lists sent by the same IL committee member, they should ignore all local inclusion lists from that member. In the worst case, the bandwidth of the local inclusion list gossip subnet can at most double.
 
 <!--
   All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
