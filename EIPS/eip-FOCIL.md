@@ -11,12 +11,15 @@ created: 2024-07-??
 ---
 
 ## Abstract
-Implement a robust mechanism to preserve Ethereum’s censorship resistance and chain neutrality properties by guaranteeing timely transaction inclusion. 
 
-FOCIL is built in three simple steps:
-	- In each slot, a set of validators is selected to become IL committee members. Each member gossips one local inclusion list according to their subjective view of the mempool.
-	- The block proposer collects and aggregates available local inclusion lists into a concise aggregate, which is included in its block.
-	- The attesters evaluate the quality of the aggregate given their own view of the gossiped local lists to ensure the block proposer accurately reports the available local lists.
+Implement a robust mechanism to preserve Ethereum’s censorship resistance and chain neutrality properties by guaranteeing timely transaction inclusion.
+
+FOCIL is built in a few simple steps:
+
+- In each slot, a set of validators is selected to become IL committee members. Each member gossips one local inclusion list according to their subjective view of the mempool.
+- The proposer and all attesters of the next slot monitor, forward and collect available local inclusion lists.
+- The proposer includes transactions from all collected local ILs in its block before broadcasting it to the rest of the network.
+- Attesters only vote for the proposer's block if it includes transactions from local inclusion lists they collected.
 
 ## Motivation
 
@@ -26,34 +29,32 @@ FOCIL is a simple committee-based design improving upon previous IL mechanisms o
 
 ## Specification
 
-### Consensus layer
+### Execution Layer
 
-#### High-level overview
+TBD
+
+### Consensus Layer
 
 #### Timeline
 
-A set of validators is selected from the beacon committee to become IL committee members for `slot N`.
+A set of validators is selected from the beacon committee to become IL committee for `slot N`.
 
-- **`Slot N`, `t=6`**: The IL committee of `slot N+1` releases local ILs, knowing the contents of `block N`. Local ILs are sets of full transactions pending in the public mempool.
-- **`Slot N`, `t=9`**: Local IL freeze deadline, after which all attesters of `slot N+1` lock their view of the observed local ILs. The `slot N+1` proposer broadcasts a signed IL aggregate constructed by deduplicating and taking the union of transactions from collected local ILs. Every IL aggregate (`from_address`, `gas_limit`) is associated with a `bitlist` field indicating which IL committee member included a given transaction.
-- **`Slot N+1`, `t=0`**: The block producer of `slot N+1` releases its `block B`, which contains both the payload and the IL aggregate.
-- **`Slot N+1`, `t=4`**: The attesters of `slot N+1` vote on `block B`. `Block B` is considered valid if:
-  - The IL aggregate included in `block B` corresponds to the attesters' local view of available local ILs and is the same IL aggregate broadcast during `slot N`
-  - The IL aggregate entries are satisfied by payload transactions
+- **`Slot N`, `t=0 to 8s`**: After processing the block for `slot N` and confirming it as the head, each IL committee member of `slot N` constructs a local inclusion list based on the head and their view of the public mempool, then broadcasts it over the P2P network.
+- **`Slot N`, `t=9s`**: IL committee members freeze their view of a set of local inclusion lists and no longer produce new ones.
+- **`Slot N`, `t=9 to 11s`**: IL committee members continue forwarding the local inclusion lists they are aware of but ignore any new ones. The block proposer and attesters of `slot N+1` continue listening to gossiped local inclusion lists. To ensure none are omitted, the block proposer can request for any missing local inclusion lists from a specific IL committee member via an RPC endpoint, for example, at `t=10s`.
+- **`Slot N`, `t=11s`**: The block proposer freezes its local inclusion lists view and IL committee members stop gossiping.
+- **`Slot N+1`, `t=0s`**: The block proposer broadcasts `block B` for `slot N+1` with an execution payload that satisfies the IL constraints.
+- **`Slot N+1`, `t=4s`**: The attesters accept `block B` only if it includes all transactions from the local inclusion lists, or if any missing transactions cannot be appended to the end of the execution payload, or if the block is full.
 
 ## Rationale
 
-#### Core properties:
-- Committee-based: FOCIL relies on a committee of multiple validators, rather than a single proposer, to construct and broadcast 
-inclusion lists. This approach imposes stricter constraints on creating the aggregate list and significantly reduces the surface for bribing and extortion attacks. For instance, instead of bribing a single party to exclude a particular transaction from the IL, attackers would instead need to bribe the entire IL committee, substantially increasing the cost of such attacks.
-- Fork-choice enforced: By including the IL aggregate in `block B`, satisfying its entries by including the corresponding transactions in the payload becomes a new block validity condition enforced by all attesters. This allows reliance on a large set of participants to check the IL and block validity and addresses concerns around IL equivocation in EIP-7547. In FOCIL, an IL equivocation would result in a block equivocation, which is a known, slashable offense from the protocol's perspective.
-- Same-slot: By having FOCIL run in parallel with block building during `slot N−1`, we can impose constraints on `block B` by including transactions submitted during the same slot in local ILs. This property implies that a transaction in the IL aggregate can’t be invalidated because of a transaction in the previous block, which represents a strict improvement over forward IL designs like EIP-7547. Same-slot censorship resistance might also prove particularly useful for time-sensitive transactions that might be censored for MEV reasons.
-- Conditional and anywhere-in-block: Transactions satisfying entries in the IL aggregate share blockspace with the payload can only be included if the block isn’t full (i.e., has reached the gas limit) and can be ordered arbitrarily by the block producer. These choices were made to reduce the risk of sophisticated block producers using side channels to circumvent an overly rigid mechanism, imposing a specific order, or strictly limiting the size of the IL.
-
-#### Main FOCIL Functions:
-- `Agg`: This function takes a set of local ILs as input and produces an IL aggregate as output. The IL aggregate is a set of entries (`from_address`, `gas_limit`, `bitlist`). The _i_th value in the `bitlist` indicates whether the corresponding entry  (`from_address`, `gas_limit`) was included in the local IL of the _i_th committee member. This function also removes any local ILs invalidated by others and outputs the union of the remaining entries, each with its respective bitlist. 
-- `Eval`: `Slot N` attesters assess the quality of the IL aggregate included in `block B` by using the `Eval` function. This function takes as input the set of local ILs observed before the freeze deadline by the attester and a list of local ILs used by the block producer to produce the IL aggregate. It outputs whether the IL aggregate was constructed correctly. First, it checks whether the aggregate IL was constructed using almost all of the local ILs according to the attester's view, allowing for the exclusion of at most a fixed amount, denoted by Δ. Then, it checks whether the  IL aggregate was constructed using the list of local ILs used by the block producer and the `Agg` function.
-- `Valid`: This function  takes the execution payload and the corresponding IL aggregate as inputs, and encodes whether the IL aggregate conforms to core IL properties defined in the above section (e.g., conditional, anywhere-in-block, etc..). 
+### Core properties:
+- Committee-based: FOCIL relies on a committee of multiple validators, rather than a single proposer, to construct and broadcast local inclusion lists. This approach significantly reduces the surface for bribery and extortion attacks and strengthens censorship resistance as the cost of censorship increases with the size of IL committee.
+- Fork-choice enforced: FOCIL incorporates the force-inclusion mechanism into the fork-choice rule, an integral component of the consensus process, thereby preventing any actor from bypassing the system. Attesters vote only for blocks that include transactions from a set of local inclusion lists provided by the IL committee and that satisfy the IL constraints. Any block failing to meet these criteria is deemed invalid.
+- Same-slot: With FOCIL running in parallel with the block building process for `slot N+1` during `slot N`, the constraints imposed on `block B` for `slot N+1` can include transactions submitted during `slot N`. This represents a strict improvement over forward IL designs like EIP-7547, where the forward property introduced a 1-slot delay. Same-slot censorship resistance could prove particularly beneficial for time-sensitive transactions that might be censored for MEV reasons.
+- Conditional inclusion: FOCIL adopts conditional inclusion, accepting blocks that may lack some transactions from the local inclusion lists if they cannot append the transactions to the end of the block or if they are full.
+- Anywhere-in-block: FOCIL is unopinionated about the placement of transactions from the local inclusion lists within a block. This reduces incentives for sophisticated actors to use side channels to bypass the mechanism. Combined with conditional inclusion, this flexibility makes the emergence of off-protocol markets even less attractive.
+- No incentive mechanism: While FOCIL relies on altruistic validators, the participation of even a few validators can strengthen the protocol's censorship resistance to a great extent.
 
 ## Backwards Compatibility
 
@@ -63,13 +64,17 @@ This EIP introduces backward incompatible changes to the block validation rule s
 
 ### Consensus Liveness
 
-The builder or proposer of slot `n+1` cannot construct a canonical block without seeing local ILs and the IL aggregate broadcast during slot `n`. This implies the block producer (e.g., a proposer or a proposer builder pair needs to be sufficiently peered with the IL committee members. The parameter Δ also needs to be set to prevent liveness issues from accidental disparities between the proposer view and attesters' views.
+The block builder or proposer of `slot N+1` cannot construct a canonical block without seeing local inclusion lists broadcast during `slot N`. This implies the block producer (e.g., a proposer or a proposer builder pair) needs to be sufficiently peered with the IL committee members. 
 
 ### Block Construction Time
 
-It is important to ensure there is enough time between the local IL freeze deadline (`t=9` during slot `n`) and the moment at which the block producer has to broadcast `block B` including the IL aggregate, so that:
-- There is enough time to update `block B`'s execution payload according to the IL aggregate constraints.
-- The proposer has enough time to collect and include all local ILs before broadcasting the IL aggregate.
+It is important to ensure there is enough time between the local inclusion list freeze deadline (`t=9s` of `slot N`) and the moment at which the block producer has to broadcast `block B`, so that there is enough time to update `block B`'s execution payload according to the observed IL constraints.
+
+### IL Equivocation
+
+Since the local inclusion lists from the IL committee are all different and FOCIL does not introduce any single actor with sole responsibility, it seems infeasible to aggregate local inclusion lists while satisfying the aforementioned core properties. A malicious IL committee member may equivocate their local inclusion list.
+
+To mitigate local inclusion list equivocation, FOCIL introduces a new P2P network rule that allows forwarding up to two local inclusion lists per IL committee member. If the block proposer or attesters detect two different local inclusion lists sent by the same IL committee member, they should ignore all local inclusion lists from that member. In the worst case, the bandwidth of the local inclusion list gossip subnet can at most double.
 
 <!--
   All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
