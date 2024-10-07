@@ -48,13 +48,6 @@ This also allows to build new core standards more conveniently, for example, [EI
 
 Contract MUST be added to the state trie with the key being the keccak256 hash of the contract's bytecode if it is not already present and if the contract dit not call `SELFDESTRUCT` opcode.
 
-## Rationale
-
-**Bytecode over Addresses**: Bytecode is deterministic and can be verified on-chain, while addresses are opaque and mutable.
-
-**EIP not ERC**: This EIP is proposed as a core standard, as it enables global index by default, abstracts developers from need to maintain the index, and can be used as a dependency for other EIPs.
-
-**Do not re-index**: There is small, yet non-zero probability of hash collision attack. Disallowing updates to indexed location of bytecode coupes with this.
 
 ## Example Usage
 
@@ -64,6 +57,14 @@ function getContractAddress(bytes32 codehash) public view returns (address) {
     return contractAddress;
 }
 ```
+
+## Rationale
+
+**Bytecode over Addresses**: Bytecode is deterministic and can be verified on-chain, while addresses are opaque and mutable.
+
+**EIP not ERC**: This EIP is proposed as a core standard, as it enables global index by default, abstracts developers from need to maintain the index, and can be used as a dependency for other EIPs.
+
+**Do not re-index**: There is small, yet non-zero probability of hash collision attack. Disallowing updates to indexed location of bytecode coupes with this.
 
 ## Security Considerations
 
