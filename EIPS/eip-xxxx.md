@@ -30,7 +30,7 @@ For developers relying on extensive code reuse, bytecode referencing protects ag
 
 For decentralized application (dApp) developers, a code index can save gas costs by allowing them to reference existing codebase instead of redeploying them, optimizing resource usage. This can be useful for dApps that rely on extensive re-use of same codebase as own dependencies.
 
-This also allows to build new EIPs more conveniently, for example, EIP7702 can use it as dependency, to allow users who want to set up one-time code on their EOAs by referring to `GETCONTRACT` instead of uploading the code itself or having to figure out where was the required code deployed.
+This also allows to build new core standards more conveniently, for example, EIP7702 can use it as dependency, to allow users who want to set up one-time code on their EOAs by referring to `GETCONTRACT` instead of uploading the code itself or having to figure out where was the required code deployed.
 
 ## Specification
 
