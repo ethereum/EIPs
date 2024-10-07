@@ -28,9 +28,9 @@ Additionally, bytecode referencing allows whitelist contracts before deployment,
 
 For developers relying on extensive code reuse, bytecode referencing protects against malicious changes that can occur with address-based referencing through proxies. This builds long-term trust chains extending to end-user applications.
 
-For decentralized application (dApp) developers, a code index can save gas costs by allowing them to reference existing codebases instead of redeploying them, optimizing resource usage. This can be useful for dApps that rely on extensive re-use of same codebase as own dependencies.
+For decentralized application (dApp) developers, a code index can save gas costs by allowing them to reference existing codebase instead of redeploying them, optimizing resource usage. This can be useful for dApps that rely on extensive re-use of same codebase as own dependencies.
 
-This also allows to build new EIPs more conviniently, for example, EIP7702 can use it as dependency, to allow users who want to set up one-time code on their EOAs by referring to `GETCONTRACT` instead of uploading the code itself or having to figure out where was the required code deployed.
+This also allows to build new EIPs more conveniently, for example, EIP7702 can use it as dependency, to allow users who want to set up one-time code on their EOAs by referring to `GETCONTRACT` instead of uploading the code itself or having to figure out where was the required code deployed.
 
 ## Specification
 
