@@ -3,7 +3,7 @@ eip: eip-xxxx
 title: GETCONTRACT opcode
 description: Global byte code accessing by it's hash
 author: Tim Pechersky (@peersky)
-discussions-to: https://eips.ethereum.org/EIPS/eip-7744
+discussions-to: https://ethereum-magicians.org/t/erc-7744-code-index/20569/11
 status: Draft
 type: Standards Track
 category: Core
@@ -11,6 +11,8 @@ created: 2024-10-07
 ---
 
 # Abstract
+
+Initially proposed in erc track, this EIP is now moved to core track, discussion kept in the same thread as they are related and can be seen as exclusive.
 
 This is a proposal to add a new opcode, `GETCONTRACT`. The `GETCONTRACT` opcode would return the code by it's hash.
 
