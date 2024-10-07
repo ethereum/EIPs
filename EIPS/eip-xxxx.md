@@ -14,7 +14,7 @@ created: 2024-10-07
 
 Initially proposed in erc track, this EIP is now moved to core track, discussion kept in the same thread as they are related and can be seen as exclusive.
 
-This is a proposal to add a new opcode, `GETCONTRACT`. The `GETCONTRACT` opcode would return the code by it's hash.
+This is a proposal to add a new opcode, `GETCONTRACT`. The `GETCONTRACT` opcode would return the address containing the bytecode by it's hash.
 
 # Motivation
 
