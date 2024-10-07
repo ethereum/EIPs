@@ -1,7 +1,7 @@
 ---
 eip: eip-xxxx
-title: Addition of GETCONTRACT opcode
-description: Contract byte code accessing by it's hash
+title: GETCONTRACT opcode
+description: Global byte code accessing by it's hash
 author: Tim Pechersky (@peersky)
 discussions-to: https://eips.ethereum.org/EIPS/eip-7744
 status: Draft
