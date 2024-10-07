@@ -10,13 +10,13 @@ category: Core
 created: 2024-10-07
 ---
 
-# Abstract
+## Abstract
 
 Initially proposed in erc track, this EIP is now moved to core track, discussion kept in the same thread as they are related and can be seen as exclusive.
 
 This is a proposal to add a new opcode, `GETCONTRACT`. The `GETCONTRACT` opcode would return the address containing the bytecode by it's hash.
 
-# Motivation
+## Motivation
 
 Content addressing by it's hash is a common pattern in database design. It allows to store and retrieve data by it's unique footprint in the storage. This pattern is widely used in the industry and it allows to abstract from actual storage location and allows to reuse the same bytecode in multiple contracts.
 
@@ -46,10 +46,31 @@ This also allows to build new core standards more conveniently, for example, [EI
 * **Stack Effects:** Pops 1 item, pushes 1 item.
 * **Error Handling:**  If the `codehash` is invalid or the bytecode retrieval encounters an error, the instruction will revert.
 
-### Example Usage
+Contract MUST be added to the state trie with the key being the keccak256 hash of the contract's bytecode if it is not already present and if the contract dit not call `SELFDESTRUCT` opcode.
+
+## Rationale
+
+**Bytecode over Addresses**: Bytecode is deterministic and can be verified on-chain, while addresses are opaque and mutable.
+
+**EIP not ERC**: This EIP is proposed as a core standard, as it enables global index by default, abstracts developers from need to maintain the index, and can be used as a dependency for other EIPs.
+
+**Do not re-index**: There is small, yet non-zero probability of hash collision attack. Disallowing updates to indexed location of bytecode coupes with this.
+
+## Example Usage
 
 ```solidity
 function getContractAddress(bytes32 codehash) public view returns (address) {
     address contractAddress = GETCONTRACT(codehash);
     return contractAddress;
 }
+```
+
+## Security Considerations
+
+**Malicious Code**: The index does NOT guarantee the safety or functionality of indexed contracts. Users MUST exercise caution and perform their own due diligence before interacting with indexed contracts.
+
+**Storage contents of registered contracts**: The index only refers to the bytecode of the contract, not the storage contents. This means that the contract state is not indexed and may change over time.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
