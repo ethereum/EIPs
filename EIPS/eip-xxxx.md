@@ -49,7 +49,7 @@ This also allows to build new core standards more conveniently, for example, [EI
 Contract MUST be added to the state trie with the key being the keccak256 hash of the contract's bytecode if it is not already present and if the contract dit not call `SELFDESTRUCT` opcode.
 
 
-## Example Usage
+### Example Usage
 
 ```solidity
 function getContractAddress(bytes32 codehash) public view returns (address) {
