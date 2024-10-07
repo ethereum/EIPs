@@ -3,7 +3,7 @@ eip: eip-xxxx
 title: GETCONTRACT opcode
 description: Global byte code accessing by it's hash
 author: Tim Pechersky (@peersky)
-discussions-to: https://ethereum-magicians.org/t/erc-7744-code-index/20569/11
+discussions-to: https://ethereum-magicians.org/t/erc-7744-code-index/20569
 status: Draft
 type: Standards Track
 category: Core
