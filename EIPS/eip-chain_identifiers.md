@@ -1,7 +1,7 @@
 ---
 title: On-chain registration of chain identifiers
 description: <Description is one full (short) sentence>
-author: Marco Stronati <marco@stronati.org>, Jeff Lau <jeff-lau@live.com>
+author: Marco Stronati (@paracetamolo), Jeff Lau <jeff-lau@live.com>
 discussions-to: https://ethereum-magicians.org/t/on-chain-registration-of-chain-identifiers/21299
 status: Draft
 type: Meta
@@ -10,12 +10,12 @@ created: 2024-09-26
 
 ## Abstract
 
-This ERC proposes to derive chain identifiers as a digest of their chain name (and other information) and to use ENS to map chain names to identifiers in place of the centralized [list on GitHub](https://github.com/ethereum-lists/chains).
+This ERC proposes to derive chain identifiers as a digest of their chain name (and other information) and to use ENS to map chain names to identifiers in place of the centralized [list on GitHub](https://github.com/ethereum-lists/chains/blob/master/README.md).
 A solution to support existing chain identifiers that were not derived following this ERC is also proposed.
 
 ## Motivation
 
-The mapping between chain names and identifiers, such as `Mainnet -> 0x1`, is currently maintained in a centralized [list on GitHub](https://github.com/ethereum-lists/chains).
+The mapping between chain names and identifiers, such as `Mainnet -> 0x1`, is currently maintained in a centralized [list on GitHub](https://github.com/ethereum-lists/chains/blob/master/README.md).
 However this solution has two main shortcomings:
 - It does not scale with the growing number of L2s.
 - The list maintainers are a single point of failure.
@@ -53,7 +53,7 @@ where:
 
 ### Chain name resolution
 
-Any ENS name can resolve to a chain identifier as specified in [ENSIP-11](https://docs.ens.domains/ensip/11). The name should resolve to a record containing not only the chain identifier, but also all the optional information necessary to verify the identifier.
+Any ENS name can resolve to a chain identifier see [ENS address-encoder](https://github.com/ensdomains/address-encoder/blob/master/README.md). The name should resolve to a record containing not only the chain identifier, but also all the optional information necessary to verify the identifier.
 
 For example the chain name `rollup` can be converted to a chain identifier on Mainnet by resolving:
 ```
