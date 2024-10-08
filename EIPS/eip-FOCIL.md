@@ -35,6 +35,63 @@ TBD
 
 ### Consensus Layer
 
+The full consensus changes can be found in the following Github repository. They are split between: 
+
+- [Beacon Chain](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/beacon-chain.md) changes.
+- [Fork choice](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/fork-choice.md) changes.
+- [P2P](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/p2p-interface.md) changes.
+- [Honest validator guide](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/validator.md) changes.
+- [Fork logic](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/fork.md) changes.
+- [Execution API](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/engine-api.md) changes.
+
+#### Beacon chain changes
+
+##### Preset
+
+| Name | Value |
+| - | - |
+| `DOMAIN_IL_COMMITTEE`       | `DomainType('0x0C000000')`  |
+| `IL_COMMITTEE_SIZE` | `uint64(2**4)` (=16)  |
+| `MAX_TRANSACTIONS_PER_INCLUSION_LIST` |  `uint64(1)` #TODO: Placeholder | 
+
+##### New containers
+
+```python
+class LocalInclusionList(Container):
+    slot: Slot
+    validator_index: ValidatorIndex
+    parent_root: Root
+    parent_hash: Hash32
+    transactions: List[Transaction, MAX_TRANSACTIONS_PER_INCLUSION_LIST]
+```
+
+```python
+class SignedLocalInclusionList(Container):
+    message: LocalInclusionList
+    signature: BLSSignature
+```
+
+##### Engine caller changes
+
+- Notify new payload is modified by new argument `inclusionListTransactions` for `engine_NewPayloadV5`
+
+#### Engine API changes
+
+- Updated `engine_newPayloadV5` to pass `inclusionListTransactions` to the EL for running the `Validate` function
+- New `engine_updateBlockWithInclusionListV1` to pass `inclusionListTransactions` to the EL, updating the current block to include IL transactions
+- New `engine_getInclusionListV1` for the EL to retrieve, sign, and release a list of IL transactions
+
+#### Fork choice changes
+
+- Cache IL transactions observed over gossip before the cutoff
+- If more than one IL transaction is observed from the same party, remove the IL transaction from the cache
+- Fork choice head retrieval is based on the `Validate` function being satisfied by the EL
+  
+#### P2P changes
+
+- A new global topic for broadcasting `SignedInclusionList` objects
+- A new RPC topic for request `SignedInclusionList` based on IL committee index
+
 #### Roles and participants
 
 ##### IL Committee Members
