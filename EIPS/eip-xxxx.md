@@ -1,5 +1,5 @@
 ---
-eip: eip-xxxx
+eip: 7784
 title: GETCONTRACT opcode
 description: Global byte code accessing by it's hash
 author: Tim Pechersky (@peersky)
