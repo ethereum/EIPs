@@ -53,7 +53,7 @@ A set of validators is selected from the beacon committee to become IL committee
 - **`Slot N`, `t=0 to 8s`**:
 IL committee members construct their local ILs and broadcast them over the P2P network after processing the block for slot `N` and confirming it as the head. If no block is received by `t=7s`, they should run `get_head` and build and release their local ILs based on their node’s canonical head.
 
-By default, local ILs are built by selecting raw transactions from the public mempool, ordered by priority fees, up to the local IL’s maximum size in bits (e.g., 8 kb per local IL). Additional rules can be optionally applied to maximize CR, such as prioritizing valid transactions that have been pending in the mempool the longest.
+By default, local ILs are built by selecting raw transactions from the public mempool, ordered by priority fees, up to the local IL’s maximum size in bits (e.g., 8 KB per local IL). Additional rules can be optionally applied to maximize CR, such as prioritizing valid transactions that have been pending in the mempool the longest.
 
 ##### Nodes
 
