@@ -37,6 +37,8 @@ TBD
 
 #### Roles and participants
 
+This section outlines the workflow of FOCIL, detailing the roles and responsibilities of various participants, including IL committee members, nodes, proposers, and attesters.
+
 ##### IL Committee Members
 
 - **`Slot N`, `t=0 to 8s`**:
