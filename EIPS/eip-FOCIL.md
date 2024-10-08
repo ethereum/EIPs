@@ -77,15 +77,15 @@ class SignedLocalInclusionList(Container):
 
 #### Engine API changes
 
-- Updated `engine_newPayloadV5` to pass `inclusionListTransactions` to the EL for running the `Validate` function
+- Updated `engine_newPayloadV5` to pass `inclusionListTransactions` to the EL for running the `Valid` function
 - New `engine_updateBlockWithInclusionListV1` to pass `inclusionListTransactions` to the EL, updating the current block to include IL transactions
 - New `engine_getInclusionListV1` for the EL to retrieve, sign, and release a list of IL transactions
 
 #### Fork choice changes
 
-- Cache IL transactions observed over gossip before the cutoff
-- If more than one IL transaction is observed from the same party, remove the IL transaction from the cache
-- Fork choice head retrieval is based on the `Validate` function being satisfied by the EL
+- Cache IL transactions observed over gossip before the freeze deadline
+- If more than one local IL is observed from the same IL committee member, remove the local IL from the cache
+- Fork choice head retrieval is based on the `Valid` function being satisfied by the EL
   
 #### P2P changes
 
