@@ -52,7 +52,7 @@ The full consensus changes can be found in the following Github repository. They
 | - | - |
 | `DOMAIN_IL_COMMITTEE`       | `DomainType('0x0C000000')`  |
 | `IL_COMMITTEE_SIZE` | `uint64(2**4)` (=16)  |
-| `MAX_TRANSACTIONS_PER_INCLUSION_LIST` |  `uint64(1)` #TODO: Placeholder | 
+| `MAX_BYTES_PER_INCLUSION_LIST` |  `uint64(2**13)` (=8192) | 
 
 ##### New containers
 
