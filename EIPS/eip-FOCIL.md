@@ -41,7 +41,7 @@ A set of validators is selected from the beacon committee to become IL committee
 
 - **`Slot N`, `t=0 to 8s`**: After processing the block for `slot N` and confirming it as the head, each IL committee member of `slot N` constructs a local inclusion list based on the head and their view of the public mempool, then broadcasts it over the P2P network.
 - **`Slot N`, `t=9s`**: IL committee members freeze their view of a set of local ILs and no longer produce new ones.
-- **`Slot N`, `t=9 to 11s`**: IL committee members continue forwarding the local ILs they are aware of but ignore any new ones. The block proposer and attesters of `slot N+1` continue listening to gossiped local inclusion lists. To ensure none are omitted, the block proposer can request for any missing local inclusion lists from a specific IL committee member via an RPC endpoint, for example, at `t=10s`.
+- **`Slot N`, `t=9 to 11s`**: IL committee members continue forwarding the local ILs they are aware of but ignore any new ones. The block proposer and attesters of `slot N+1` continue listening to gossiped local ILs. To ensure none are omitted, the block proposer can request for any missing local ILs from its peer via an RPC endpoint, for example, at `t=10s`.
 - **`Slot N`, `t=11s`**: The block proposer freezes its local ILs view and IL committee members stop gossiping.
 - **`Slot N+1`, `t=0s`**: The block proposer broadcasts `block B` for `slot N+1` with an execution payload that satisfies the IL constraints.
 - **`Slot N+1`, `t=4s`**: The attesters accept `block B` only if it includes all transactions from the local inclusion lists, or if any missing transactions cannot be appended to the end of the execution payload, or if the block is full.
