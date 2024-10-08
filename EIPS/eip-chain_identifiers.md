@@ -2,7 +2,7 @@
 title: On-chain registration of chain identifiers
 description: <Description is one full (short) sentence>
 author: Marco Stronati <marco@stronati.org>, Jeff Lau <jeff-lau@live.com>
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/on-chain-registration-of-chain-identifiers/21299
 status: Draft
 type: Meta
 created: 2024-09-26
