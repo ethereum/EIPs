@@ -46,7 +46,7 @@ A set of validators is selected from the beacon committee to become IL committee
 - **`Slot N+1`, `t=0s`**: The block proposer broadcasts `block B` for `slot N+1` with an execution payload that satisfies the IL constraints.
 - **`Slot N+1`, `t=4s`**: The attesters accept `block B` only if it includes all transactions from the local inclusion lists, or if any missing transactions cannot be appended to the end of the execution payload, or if the block is full.
 
-#### Role and participants
+#### Roles and participants
 
 ##### IL Committee Members
 
