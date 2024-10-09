@@ -1,5 +1,4 @@
 ---
-eip: <to be assigned> 
 title: On-chain registration of chain identifiers
 description: <Description is one full (short) sentence>
 author: Marco Stronati (@paracetamolo), Jeff Lau <jeff-lau@live.com>
