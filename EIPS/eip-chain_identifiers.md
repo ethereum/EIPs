@@ -1,7 +1,7 @@
 ---
-eip: <to be assigned>
+eip:
 title: On-chain registration of chain identifiers
-description: Derive chain identifiers by hashing their chain name and use ENS to map chain names to these identifiers, replacing the centralized GitHub list.
+description: Derive chain identifiers by hashing their chain name and use ENS to map chain names to these identifiers
 author: Marco Stronati (@paracetamolo), Jeff Lau <jeff-lau@live.com>
 discussions-to: https://ethereum-magicians.org/t/on-chain-registration-of-chain-identifiers/21299
 status: Draft
