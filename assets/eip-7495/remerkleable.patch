@@ -37,25 +37,24 @@ index 5971925..0483095 100644
  class Container(_ContainerBase):
      _field_indices: Dict[str, int]
 diff --git a/remerkleable/core.py b/remerkleable/core.py
-index cac08d9..6dac545 100644
+index cac08d9..91e89ed 100644
 --- a/remerkleable/core.py
 +++ b/remerkleable/core.py
-@@ -238,6 +238,9 @@ class BackedView(View):
-         out._hook = hook
-         return out
-
-+    def __init__(self, *args, **kwargs):
-+        self.check_backing()
-+
-     def get_backing(self) -> Node:
-         return self._backing
-
-@@ -247,6 +250,9 @@ class BackedView(View):
+@@ -247,6 +247,18 @@ class BackedView(View):
          if self._hook is not None:
              self._hook(self)
 
 +    def check_backing(self):
 +        pass
++
++    @classmethod
++    def from_base(cls: Type[BackedV], value) -> BackedV:
++        res = cls(backing=value.get_backing())
++        res.check_backing()
++        return res
++
++    def to_base(self, cls: Type[BackedV]) -> BackedV:
++        return cls(backing=self.get_backing())
 +
 
  BV = TypeVar('BV', bound="BasicView")
