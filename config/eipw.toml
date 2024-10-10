@@ -126,6 +126,7 @@ sections = [
     "Reference Implementation",
     "Security Considerations",
     "Copyright",
+    "Patents",
 ]
 
 [lints.preamble-re-description-erc-dash]
