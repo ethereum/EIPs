@@ -63,6 +63,9 @@ class TransactionType(uint8):
 class ChainId(uint64):
     pass
 
+class GasAmount(uint64):
+    pass
+
 class FeePerGas(uint256):
     pass
 
@@ -95,7 +98,7 @@ class TransactionPayload(StableContainer[MAX_TRANSACTION_PAYLOAD_FIELDS]):
 
     nonce: Optional[uint64]
     max_fees_per_gas: Optional[FeesPerGas]
-    gas: Optional[uint64]
+    gas: Optional[GasAmount]
     to: Optional[ExecutionAddress]
     value: Optional[uint256]
     input_: Optional[ByteList[MAX_CALLDATA_SIZE]]
@@ -128,7 +131,7 @@ class RlpLegacyTransactionPayload(Profile[TransactionPayload]):
     chain_id: Optional[ChainId]
     nonce: uint64
     max_fees_per_gas: BasicFeesPerGas
-    gas: uint64
+    gas: GasAmount
     to: Optional[ExecutionAddress]
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
@@ -142,7 +145,7 @@ class RlpAccessListTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
     nonce: uint64
     max_fees_per_gas: BasicFeesPerGas
-    gas: uint64
+    gas: GasAmount
     to: Optional[ExecutionAddress]
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
@@ -157,7 +160,7 @@ class RlpFeeMarketTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
     nonce: uint64
     max_fees_per_gas: BasicFeesPerGas
-    gas: uint64
+    gas: GasAmount
     to: Optional[ExecutionAddress]
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
@@ -173,7 +176,7 @@ class RlpBlobTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
     nonce: uint64
     max_fees_per_gas: BlobFeesPerGas
-    gas: uint64
+    gas: GasAmount
     to: ExecutionAddress
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
@@ -200,7 +203,7 @@ class RlpSetCodeTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
     nonce: uint64
     max_fees_per_gas: BasicFeesPerGas
-    gas: uint64
+    gas: GasAmount
     to: ExecutionAddress
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
