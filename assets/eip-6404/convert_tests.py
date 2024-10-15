@@ -102,7 +102,7 @@ tests = [
 for test in tests:
     tx = upgrade_rlp_transaction_to_ssz(test.rlp_tx_bytes)
 
-    stable_tx = Transaction(backing=tx.get_backing())
+    stable_tx = tx.to_base(Transaction)
     assert identify_transaction_profile(stable_tx) is test.tx_profile
     assert stable_tx.encode_bytes() == test.ssz_tx_bytes
 
@@ -113,7 +113,9 @@ for test in tests:
 
     assert secp256k1_recover_signer(tx.signature.secp256k1, test.sig_hash) == test.from_
     assert [
-        secp256k1_recover_signer(auth.signature.secp256k1, compute_auth_hash(
-            identify_authorization_profile(auth)(backing=auth.get_backing())))
+        secp256k1_recover_signer(
+            auth.signature.secp256k1,
+            compute_auth_hash(identify_authorization_profile(auth).from_base(auth)),
+        )
         for auth in getattr(tx.payload, 'authorization_list', [])
     ] == test.authorities

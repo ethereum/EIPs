@@ -233,7 +233,7 @@ def identify_authorization_profile(auth: Authorization) -> Type[Profile]:
 def identify_transaction_profile(tx: Transaction) -> Type[Profile]:
     if tx.payload.type_ == SET_CODE_TX_TYPE:
         for auth in tx.payload.authorization_list or []:
-            auth = identify_authorization_profile(auth)(backing=auth.get_backing())
+            auth = identify_authorization_profile(auth).from_base(auth)
             if not isinstance(auth, RlpSetCodeAuthorization):
                 raise Exception(f'Unsupported authorization in Set Code RLP transaction: {tx}')
         return RlpSetCodeTransaction
