@@ -53,12 +53,69 @@ We make the following changes to the engine API:
 
 ### Consensus Layer
 
-#### Roles and participants
+The full consensus changes can be found in the following Github repository. They are split between: 
+
+- [Beacon Chain](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/beacon-chain.md) changes.
+- [Fork choice](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/fork-choice.md) changes.
+- [P2P](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/p2p-interface.md) changes.
+- [Honest validator guide](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/validator.md) changes.
+- [Fork logic](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/fork.md) changes.
+- [Execution API](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/engine-api.md) changes.
+
+#### Beacon chain changes
+
+##### Preset
+
+| Name | Value |
+| - | - |
+| `DOMAIN_IL_COMMITTEE`       | `DomainType('0x0C000000')`  |
+| `IL_COMMITTEE_SIZE` | `uint64(2**4)` (=16)  |
+| `MAX_BYTES_PER_INCLUSION_LIST` |  `uint64(2**13)` (=8192) | 
+
+##### New containers
+
+```python
+class LocalInclusionList(Container):
+    slot: Slot
+    validator_index: ValidatorIndex
+    parent_root: Root
+    parent_hash: Hash32
+    transactions: List[Transaction, MAX_TRANSACTIONS_PER_INCLUSION_LIST]
+```
+
+```python
+class SignedLocalInclusionList(Container):
+    message: LocalInclusionList
+    signature: BLSSignature
+```
+
+##### Engine caller changes
+
+- Notify new payload is modified by new argument `inclusionListTransactions` for `engine_NewPayloadV5`
+
+#### Engine API changes
+
+- Updated `engine_newPayloadV5` to pass `inclusionListTransactions` to the EL for running the `Valid` function
+- New `engine_updateBlockWithInclusionListV1` to pass `inclusionListTransactions` to the EL, updating the current block to include IL transactions
+- New `engine_getInclusionListV1` for the EL to retrieve, sign, and release a list of IL transactions
+
+#### Fork choice changes
+
+- Cache IL transactions observed over gossip before the freeze deadline
+- If more than one local IL is observed from the same IL committee member, remove the local IL from the cache
+- Fork choice head retrieval is based on the `Valid` function being satisfied by the EL
+  
+#### P2P changes
+
+- A new global topic for broadcasting `SignedInclusionList` objects
+- A new RPC topic for request `SignedInclusionList` based on IL committee index
+
+#### Roles And Participants
 
 ##### IL Committee Members
 
 - **`Slot N`, `t=0 to 8s`**:
-IL committee members construct their local ILs and broadcast them over the P2P network after processing the block for slot `N` and confirming it as the head. If no block is received by `t=7s`, they should run `get_head` and build and release their local ILs based on their node’s canonical head.
+IL committee members construct their local ILs and broadcast them over the P2P network after processing the block for `slot N` and confirming it as the head. If no block is received by `t=7s`, they should run `get_head` and build and release their local ILs based on their node’s canonical head.
 
 By default, local ILs are built by selecting raw transactions from the public mempool, ordered by priority fees, up to the local IL’s maximum size in bits (e.g., 8 KB per local IL). Additional local rules can be optionally applied to maximize censorship resistance, such as prioritizing valid transactions that have been pending in the mempool the longest.
 
@@ -70,26 +127,11 @@ Nodes receive local ILs from the P2P network and only forward and cache those th
 - **`Slot N`, `t=9s`**:, IL freeze deadline:
 Nodes freeze their local ILs view, stop forwarding and caching new local ILs.
 
----
-
-# CL P2P Validation Rules:
-
-1. The number of transactions in the local IL does not exceed the maximum gas limit allowed.
-2. The slot of the local IL matches the current slot. Local ILs not matching the current slot should be ignored.
-3. The parent hash of the IL is recognized.
-4. The IL is received before the local IL freeze deadline (e.g., `t=9s`) into the slot.
-5. Received two or fewer local ILs from this IL committee member (see Local IL equivocation section below).
-6. The local IL is correctly signed by the validator.
-7. The validator is part of the IL committee.
-8. The size of a local IL does not exceed the maximum size allowed (e.g., 8 KB).
-
----
-
 ##### Proposer
-- **`Slot N`, `t=0 to 11s`**: The proposer receives local ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules.
+- **`Slot N`, `t=0 to 11s`**: The proposer receives local ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the proposer to request the missing local ILs from its peers (e.g., by committee index at `t=10s`).
 
 - **`Slot N`, `t=11s`**:
-The proposer freezes its view of local ILs and asks the EL to update its execution payload by adding transactions from its view (the exact timings will be defined after running some tests/benchmarks). Optionally, an RPC endpoint can be added to allow the proposer to request the missing local ILs from its peers (e.g., by committee index).
+The proposer freezes its view of local ILs and asks the EL to update its execution payload by adding transactions from its view (the exact timings will be defined after running some tests/benchmarks).
 
 - **`Slot N+1`, `t=0s`**:
 The proposer broadcasts its block with the up-to-date execution payload satisfying IL transactions over the P2P network.
@@ -98,9 +140,20 @@ The proposer broadcasts its block with the up-to-date execution payload satisfyi
 - **`Slot N+1`, `t=0 to 4s`**:
 Attesters monitor the P2P network for the proposer’s block. Upon detecting it, they verify whether all transactions from their cached local ILs are included in the proposer’s execution payload. The `Valid` function, based on the frozen view of the local ILs from `t=9s` in the previous slot, checks if the execution payload satisfies IL validity conditions. This is done either by confirming that all transactions are present or by determining if any missing transactions are invalid when appended to the end of the payload. In such cases, attesters use the EL to perform nonce and balance checks to validate the missing transactions and check whether there is enough space in the block to include the transaction(s).
 
+#### CL P2P Validation Rules
+
+1. The number of transactions in the local IL does not exceed the maximum gas limit allowed.
+2. The slot of the local IL matches the current slot. Local ILs not matching the current slot should be ignored.
+3. The parent hash of the IL is recognized.
+4. The local IL is received before the local IL freeze deadline (e.g., `t=9s`) into the slot.
+5. Received two or fewer local ILs from this IL committee member (see IL equivocation section below).
+6. The local IL is correctly signed by the validator.
+7. The validator is part of the IL committee.
+8. The size of a local IL does not exceed the maximum size allowed (e.g., 8 KB).
+
 ## Rationale
 
-### Core properties:
+### Core Properties
 - Committee-based: FOCIL relies on a committee of multiple validators, rather than a single proposer, to construct and broadcast local inclusion lists. This approach significantly reduces the surface for bribery and extortion attacks and strengthens censorship resistance.
 - Fork-choice enforced: FOCIL incorporates the force-inclusion mechanism into the fork-choice rule, an integral component of the consensus process, thereby preventing any actor from bypassing the system. Attesters vote only for blocks that include transactions from a set of local inclusion lists provided by the IL committee and that satisfy the IL constraints. Any block failing to meet these criteria is deemed invalid.
 - Same-slot: With FOCIL running in parallel with the block building process for `slot N+1` during `slot N`, the constraints imposed on `block B` for `slot N+1` can include transactions submitted during `slot N`. This represents a strict improvement over forward IL designs like EIP-7547, where the forward property introduced a 1-slot delay.
