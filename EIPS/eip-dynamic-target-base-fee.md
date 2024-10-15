@@ -12,7 +12,7 @@ requires: 7623, 7742, 7778
 
 ## Abstract
 
-This EIP proposes to modify the EIP-1559 mechanism to make the target block size and blob count adjust dynamically. This adjustment will target a specific price for a simple transfer on L1 (in the case of target block size) and on L2 (in the case of target blob count).
+This EIP proposes to modify the EIP-1559 mechanism to make the target block gas and blob count adjust dynamically. This adjustment will target a specific price for a simple transfer on L1 (in the case of target block gas) and on L2 (in the case of target blob count).
 
 ## Motivation
 
@@ -31,12 +31,12 @@ Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoot
 
 ### Dynamic targeting
 
-The target block size and blob count change each epoch based on the mean transaction cost over the previous epoch. The cost of L2 transaction can be estimated using the minimum theoretical compressed size of a basic transfer.
+The target block gas and blob count change each epoch based on the mean transaction cost over the previous epoch. The cost of L2 transaction can be estimated using the minimum theoretical compressed size of a basic transfer.
 
 Calculating targets:
 
 ```python
-nextEpochTargetBlockSize = min(MAX_BLOCK_SIZE, 8 * (((targetL1TxCost - meanL1TxCost) / 21000) - 1) * previousTargetBlockSize)
+nextEpochTargetBlockGas = min(MAX_BLOCK_SIZE, 8 * (((targetL1TxCost - meanL1TxCost) / 21000) - 1) * previousTargetBlockGas)
 L2_TX_SIZE = L2_TX_COMPRESSED_SIZE / 125000
 meanL2TxCost = average(L2_TX_SIZE * blobCost)
 nextEpochBlobCount = min(MAX_BLOB_COUNT, round(8 * (((targetL2TxCost - meanL2TxCost) / L2_TX_SIZE) - 1) * previousTargetBlobCount))
