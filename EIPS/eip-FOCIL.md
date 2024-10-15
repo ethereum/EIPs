@@ -157,16 +157,6 @@ The block producer (i.e., a proposer or a proposer builder pair) of `slot N+1` c
 
 To mitigate local inclusion list equivocation, FOCIL introduces a new P2P network rule that allows forwarding up to two local ILs per IL committee member. If the proposer or attesters detect two different local inclusion lists sent by the same IL committee member, they should ignore all local inclusion lists from that member. In the worst case, the bandwidth of the local inclusion list gossip subnet can at most double.
 
-<!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-TBD
-
 ## Copyright
 
 Copyright and related rights waived via [CC0](../LICENSE.md).
