@@ -49,7 +49,7 @@ We make the following changes to the engine API:
 
 - Add `engine_getInclusionList` endpoint to retrieve an inclusion list from the `ExecutionEngine`
 - Modify `engine_newPayload` endpoint to include a parameter for the aggregate inclusion list determined by the validator
-- Modify `notify_forkchoiceUpdated` endpoint to include a field in the payload attributes for the aggregate inclusion list determined by the validator
+- Modify `engine_forkchoiceUpdated` endpoint to include a field in the payload attributes for the aggregate inclusion list determined by the validator
 
 ### Consensus Layer
 
