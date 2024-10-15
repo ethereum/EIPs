@@ -31,7 +31,25 @@ FOCIL is a simple committee-based design improving upon previous IL mechanisms o
 
 ### Execution Layer
 
-TBD
+On the execution layer, the block validity conditions are extended such that, after all of the transactions in the block have been executed, we attempt to execute each valid transaction in the inclusion list that was not present in the block.
+If one of those transactions executes sucessfully, then the block is invalid.
+
+Let `B` denote the current block.
+Let `S` denote the execution state following the execution of the last transaction in `B`.
+
+For each transaction `T` in the inclusion list, perform the following:
+
+1. Check whether `T` is present in `B`. If `T` is present, then continue to the next transaction.
+1. Validate `T`. If `T` is invalid, then continue to the next transaction.
+1. Execute `T` on state `S`. Assert that the execution of `T` fails.
+
+Note that we do not need to reset the state to `S`, since the only way for a transaction to alter the state is for it to execute sucessfully, in which case the block is invalid, and so the block will not be applied to the state.
+
+We make the following changes to the engine API:
+
+- Add `engine_getInclusionList` endpoint to retrieve an inclusion list from the `ExecutionEngine`
+- Modify `engine_newPayload` endpoint to include a parameter for the aggregate inclusion list determined by the validator
+- Modify `engine_forkchoiceUpdated` endpoint to include a field in the payload attributes for the aggregate inclusion list determined by the validator
 
 ### Consensus Layer
 
