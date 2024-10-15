@@ -18,7 +18,7 @@ This EIP proposes to modify the EIP-1559 mechanism to make the target block size
 
 Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoothing out short term spikes. This means that the de facto capacity is much lower than the maxiumum capacity, as in practice gas prices would rise exponentially as the maximum capacity is reached. A dynamic target adjusts to longer term changes in demand, which has benefits in two cases:
 - When demand is high the target increases, allowing throughput to increase without exorbitant gas fees.
-- When demand is low compared to maximum capacity (for example after a large increase in blob count), the protocol can still receive revenue without undercharging for blockspace or blobspace.
+- When demand is low compared to maximum capacity (for example after a large increase in blob count), the target decreases so that the protocol can still receive revenue without undercharging for blockspace or blobspace.
 
 ## Specification
 
