@@ -61,7 +61,7 @@ Each epoch, validators can submit a vote for the target L1 and L2 transaction co
 
 ### Voting
 
-Validators voting on a target fee for transactions allows for a stable, neutral index to track. An alternative approach could be to target some arbitrary constant cost for a transaction in ETH, but this risks fees becoming too high in the event of an increase in the value of ETH. Yet another approach would be to track a target cost in fiat, but introducing ETH price oracles into the protocol could be an attack vector. In practice the community may reach rough consensus on a reasonable fiat cost to target, and validator votes would serve as a credibly neutral oracle.
+Validators voting on a desired transaction cost could be a credibly neutral index to track. An alternative approach could be to target some arbitrary constant cost for a transaction in ETH, but this risks fees becoming too high in the event of an increase in the value of ETH. Yet another approach would be to track a target cost in fiat, but introducing ETH price oracles into the protocol could be an attack vector. In practice the community may reach rough consensus on a reasonable fiat cost to target, and validator votes would serve as a credibly neutral oracle.
 
 ## Backwards Compatibility
 
