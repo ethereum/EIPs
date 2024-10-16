@@ -60,7 +60,6 @@ The full consensus changes can be found in the following Github repository. They
 - [P2P](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/p2p-interface.md) changes.
 - [Honest validator guide](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/validator.md) changes.
 - [Fork logic](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/fork.md) changes.
-- [Execution API](https://github.com/terencechain/consensus-specs/blob/ae2cf0e1285a0ca64dd339fb84551d4af20280e6/specs/_features/focil/engine-api.md) changes.
 
 #### Beacon chain changes
 
@@ -88,16 +87,6 @@ class SignedLocalInclusionList(Container):
     message: LocalInclusionList
     signature: BLSSignature
 ```
-
-##### Engine caller changes
-
-- Notify new payload is modified by new argument `inclusionListTransactions` for `engine_NewPayloadV5`
-
-#### Engine API changes
-
-- Updated `engine_newPayloadV5` to pass `inclusionListTransactions` to the EL for running the `Valid` function
-- New `engine_updateBlockWithInclusionListV1` to pass `inclusionListTransactions` to the EL, updating the current block to include IL transactions
-- New `engine_getInclusionListV1` for the EL to retrieve, sign, and release a list of IL transactions
 
 #### Fork choice changes
 
