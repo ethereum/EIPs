@@ -1,7 +1,7 @@
 ---
 title: Committee-based, Fork-choice enforced Inclusion Lists (FOCIL)
 description: Allow a committee of validators to force-include a set of transactions in every block
-author: Thomas Thiery <thomas.thiery@ethereum.org>, Francesco D'Amato <francesco.damato@ethereum.org>, Julian Ma <julian.ma@ethereum.org>, Barnabé Monnot <barnabe.monnot@ethereum.org>, Terence Tsao <ttsao@offchainlabs.com>, Jacob Kaufmann <jacob.kaufmann@ethereum.org>, Jihoon Son <jihoonsong.dev@gmail.com>
+author: Thomas Thiery <thomas.thiery@ethereum.org>, Francesco D'Amato <francesco.damato@ethereum.org>, Julian Ma <julian.ma@ethereum.org>, Barnabé Monnot <barnabe.monnot@ethereum.org>, Terence Tsao <ttsao@offchainlabs.com>, Jacob Kaufmann <jacob.kaufmann@ethereum.org>, Jihoon Song <jihoonsong.dev@gmail.com>
 
 discussions-to: <URL>
 status: Draft
