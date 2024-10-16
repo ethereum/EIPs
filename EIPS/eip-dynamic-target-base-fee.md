@@ -48,7 +48,7 @@ nextEpochTargetBlockGas = min(MAX_BLOCK_GAS, previousEpochTargetBlockGas + (targ
 
 BLOB_SIZE = 125000
 meanL2TxCost = average(blobCostsForLastEpoch) * L2_TX_COMPRESSED_SIZE / BLOB_SIZE
-l2TxCostDiff =  meanL2TxCost - targetL2TxCost
+l2TxCostDiff = meanL2TxCost - targetL2TxCost
 targetBlobCountDirection = -1 if l2TxCostDiff < -L2_TX_COST_CHANGE_MARGIN else (1 if l2TxCostDiff > L2_TX_COST_CHANGE_MARGIN else 0)
 nextEpochBlobCount = min(MAX_BLOB_COUNT, previousEpochTargetBlobCount + (targetBlobCountDirection * TARGET_BLOB_COUNT_CHANGE_RATE))
 ```
