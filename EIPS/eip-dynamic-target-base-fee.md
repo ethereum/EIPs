@@ -29,24 +29,28 @@ Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoot
 | `FORK_TIMESTAMP` | TBD |
 | `TARGET_BLOCK_GAS_CHANGE_RATE` | TBD |
 | `TARGET_BLOB_COUNT_CHANGE_RATE` | `1` |
+| `L1_TX_COST_CHANGE_MARGIN` | TBD |
+| `L2_TX_COST_CHANGE_MARGIN` | TBD |
 | `L2_TX_COMPRESSED_SIZE` | `23` |
 
 ### Dynamic targeting
 
-The target block gas and blob count change each epoch based on the mean transaction cost over the previous epoch. The cost of an L2 transaction can be estimated using the minimum theoretical compressed size of a basic transfer.
+The target block gas and blob count change each epoch based on the mean transaction cost over the previous epoch. If the average tx cost exceeds the desired amount beyond some margin then the target is increased; likewise if it is below the desired amount by some margin the target will decrease. The cost of an L2 transaction can be estimated using the minimum theoretical compressed size of a basic transfer.
 
 Calculating targets:
 
 ```python
 L1_TX_SIZE = 21000
 meanL1TxCost = average(gasCostsForTxsLastEpoch) * L1_TX_SIZE
-increaseTargetBlockGas = targetL1TxCost <= meanL1TxCost
-nextEpochTargetBlockGas = min(MAX_BLOCK_GAS, previousEpochTargetBlockGas + (TARGET_BLOCK_GAS_CHANGE_RATE if increaseTargetBlockGas else -TARGET_BLOCK_GAS_CHANGE_RATE))
+l1TxCostDiff = meanL1TxCost - targetL1TxCost
+targetBlockGasDirection = -1 if l1TxCostDiff < -L1_TX_COST_CHANGE_MARGIN else (1 if l1TxCostDiff > L1_TX_COST_CHANGE_MARGIN else 0)
+nextEpochTargetBlockGas = min(MAX_BLOCK_GAS, previousEpochTargetBlockGas + (targetBlockGasDirection * TARGET_BLOCK_GAS_CHANGE_RATE))
 
 BLOB_SIZE = 125000
 meanL2TxCost = average(blobCostsForLastEpoch) * L2_TX_COMPRESSED_SIZE / BLOB_SIZE
-increaseTargetBlobCount = targetL2TxCost <= meanL2TxCost
-nextEpochBlobCount = min(MAX_BLOB_COUNT, previousEpochTargetBlobCount + (TARGET_BLOB_COUNT_CHANGE_RATE if increaseTargetBlobCount else -TARGET_BLOB_COUNT_CHANGE_RATE))
+l2TxCostDiff =  meanL2TxCost - targetL2TxCost
+targetBlobCountDirection = -1 if l2TxCostDiff < -L2_TX_COST_CHANGE_MARGIN else (1 if l2TxCostDiff > L2_TX_COST_CHANGE_MARGIN else 0)
+nextEpochBlobCount = min(MAX_BLOB_COUNT, previousEpochTargetBlobCount + (targetBlobCountDirection * TARGET_BLOB_COUNT_CHANGE_RATE))
 ```
 
 ### Voting
