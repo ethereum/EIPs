@@ -12,11 +12,11 @@ requires: 7623, 7742, 7778
 
 ## Abstract
 
-This EIP proposes to modify the EIP-1559 mechanism to make the target block gas and blob count adjust dynamically. This adjustment will target a specific price for a simple transfer on L1 (in the case of target block gas) and on L2 (in the case of target blob count). The price target will be set each epoch through validators voting.
+This EIP proposes to modify the EIP-1559 mechanism to make the target block gas and blob count adjust dynamically. This adjustment will target a constant price in ETH for a simple transfer on L1 (in the case of target block gas) and on L2 (in the case of target blob count).
 
 ## Motivation
 
-Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoothing out short term spikes. This means that the de facto capacity is much lower than the maxiumum capacity, as in practice gas prices would rise exponentially as the maximum capacity is reached. A dynamic target adjusts to longer term changes in demand, which has benefits in two cases:
+Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoothing out short term spikes. This means that the de facto capacity is much lower than the maxiumum capacity, as in practice gas prices would rise exponentially as the maximum capacity is reached. Instead of targeting an arbitrary capacity, dynamic targeting optimises for affordable and consistent transaction costs. A dynamic target adjusts to longer term changes in demand, which has benefits in two cases:
 - When demand is high the target increases, allowing throughput to increase without exorbitant gas fees.
 - When demand is low compared to maximum capacity (for example after a large increase in blob count), the target decreases so that the protocol can still receive revenue without undercharging for blockspace or blobspace.
 
@@ -29,6 +29,8 @@ Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoot
 | `FORK_TIMESTAMP` | TBD |
 | `TARGET_BLOCK_GAS_CHANGE_RATE` | TBD |
 | `TARGET_BLOB_COUNT_CHANGE_RATE` | `1` |
+| `L1_TX_COST_TARGET` | TBD |
+| `L2_TX_COST_TARGET` | TBD |
 | `L1_TX_COST_CHANGE_MARGIN` | TBD |
 | `L2_TX_COST_CHANGE_MARGIN` | TBD |
 | `L2_TX_COMPRESSED_SIZE` | `23` |
@@ -42,26 +44,24 @@ Calculating targets:
 ```python
 L1_TX_SIZE = 21000
 meanL1TxCost = average(gasCostsForTxsLastEpoch) * L1_TX_SIZE
-l1TxCostDiff = meanL1TxCost - targetL1TxCost
+l1TxCostDiff = meanL1TxCost - L1_TX_COST_TARGET
 targetBlockGasDirection = -1 if l1TxCostDiff < -L1_TX_COST_CHANGE_MARGIN else (1 if l1TxCostDiff > L1_TX_COST_CHANGE_MARGIN else 0)
 nextEpochTargetBlockGas = min(MAX_BLOCK_GAS, previousEpochTargetBlockGas + (targetBlockGasDirection * TARGET_BLOCK_GAS_CHANGE_RATE))
 
 BLOB_SIZE = 125000
 meanL2TxCost = average(blobCostsForLastEpoch) * L2_TX_COMPRESSED_SIZE / BLOB_SIZE
-l2TxCostDiff = meanL2TxCost - targetL2TxCost
+l2TxCostDiff = meanL2TxCost - L2_TX_COST_TARGET
 targetBlobCountDirection = -1 if l2TxCostDiff < -L2_TX_COST_CHANGE_MARGIN else (1 if l2TxCostDiff > L2_TX_COST_CHANGE_MARGIN else 0)
 nextEpochBlobCount = min(MAX_BLOB_COUNT, previousEpochTargetBlobCount + (targetBlobCountDirection * TARGET_BLOB_COUNT_CHANGE_RATE))
 ```
 
-### Voting
-
-Each epoch, validators can submit a vote for the target L1 and L2 transaction costs that will be used in calculations for the next epoch. Votes can be hidden with ZK-proofs. The resulting target is the average of all votes weighted by relative stake. (todo: add details to this part).
-
 ## Rationale
 
-### Voting
+### Constant target tx cost
 
-Validators voting on a desired transaction cost could be a credibly neutral index to track. An alternative approach could be to target some arbitrary constant cost for a transaction in ETH, but this risks fees becoming too high in the event of an increase in the value of ETH. Yet another approach would be to track a target cost in fiat, but introducing ETH price oracles into the protocol could be an attack vector. In practice the community may reach rough consensus on a reasonable fiat cost to target, and validator votes would serve as a credibly neutral oracle.
+A constant transaction cost target can keep transaction costs for end users affordable. Volatility in the price of ETH would affect affordability, but is unlikely to be significant compared to normal fluctuations in gas costs due to spikes in activity. In future the costs could be adjusted in the case of changes in the order of magnitude of ETH price.
+
+An alternative approach would be to track a target transaction cost in fiat, but chosing a specific fiat currency is not credibly neutral, and introducing ETH price oracles into the protocol could be an attack vector. Yet another alternative could be to have validators vote on the target price, but they may have conflicts of interest (for example if they are blobspace consumers) so again this is not credibly neutral.
 
 ## Backwards Compatibility
 
