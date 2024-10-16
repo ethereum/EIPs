@@ -3,6 +3,7 @@ from remerkleable.basic import uint8, uint16, uint32, uint64
 from remerkleable.bitfields import Bitvector
 from remerkleable.complex import Container, List
 from stable_container import Profile, StableContainer
+import pytest
 
 class Shape(StableContainer[4]):
     side: Optional[uint16]
@@ -52,37 +53,30 @@ square_root = ShapeRepr(
 ).hash_tree_root()
 shapes = [Shape(side=0x42, color=1, radius=None)]
 squares = [Square(side=0x42, color=1)]
-squares.extend(list(Square(backing=shape.get_backing()) for shape in shapes))
-shapes.extend(list(Shape(backing=shape.get_backing()) for shape in shapes))
-shapes.extend(list(Shape(backing=square.get_backing()) for square in squares))
-squares.extend(list(Square(backing=square.get_backing()) for square in squares))
+squares.extend(list(Square.from_base(shape) for shape in shapes))
+shapes.extend(list(Shape(
+    side=shape.side, radius=shape.radius, color=shape.color
+) for shape in shapes))
+shapes.extend(list(square.to_base(Shape) for square in squares))
+squares.extend(list(Square(side=square.side, color=square.color) for square in squares))
 assert len(set(shapes)) == 1
 assert len(set(squares)) == 1
 assert all(shape.encode_bytes() == square_bytes_stable for shape in shapes)
 assert all(square.encode_bytes() == square_bytes_profile for square in squares)
 assert (
-    Square(backing=Shape.decode_bytes(square_bytes_stable).get_backing()) ==
+    Square.from_base(Shape.decode_bytes(square_bytes_stable)) ==
     Square.decode_bytes(square_bytes_profile)
 )
 assert all(shape.hash_tree_root() == square_root for shape in shapes)
 assert all(square.hash_tree_root() == square_root for square in squares)
-try:
+with pytest.raises(Exception):
     circle = Circle(side=0x42, color=1)
-    assert False
-except:
-    pass
 for shape in shapes:
-    try:
-        circle = Circle(backing=shape.get_backing())
-        assert False
-    except:
-        pass
+    with pytest.raises(Exception):
+        circle = Circle.from_base(shape)
 for square in squares:
-    try:
-        circle = Circle(backing=square.get_backing())
-        assert False
-    except:
-        pass
+    with pytest.raises(Exception):
+        circle = Circle.from_base(square.to_base(Shape))
 for shape in shapes:
     shape.side = 0x1337
 for square in squares:
@@ -98,23 +92,17 @@ assert len(set(squares)) == 1
 assert all(shape.encode_bytes() == square_bytes_stable for shape in shapes)
 assert all(square.encode_bytes() == square_bytes_profile for square in squares)
 assert (
-    Square(backing=Shape.decode_bytes(square_bytes_stable).get_backing()) ==
+    Square.from_base(Shape.decode_bytes(square_bytes_stable)) ==
     Square.decode_bytes(square_bytes_profile)
 )
 assert all(shape.hash_tree_root() == square_root for shape in shapes)
 assert all(square.hash_tree_root() == square_root for square in squares)
 for square in squares:
-    try:
+    with pytest.raises(Exception):
         square.radius = 0x1337
-        assert False
-    except:
-        pass
 for square in squares:
-    try:
+    with pytest.raises(Exception):
         square.side = None
-        assert False
-    except:
-        pass
 
 # Circle tests
 circle_bytes_stable = bytes.fromhex("06014200")
@@ -128,37 +116,30 @@ modified_shape.side = None
 modified_shape.radius = 0x42
 shapes = [Shape(side=None, color=1, radius=0x42), modified_shape]
 circles = [Circle(radius=0x42, color=1)]
-circles.extend(list(Circle(backing=shape.get_backing()) for shape in shapes))
-shapes.extend(list(Shape(backing=shape.get_backing()) for shape in shapes))
-shapes.extend(list(Shape(backing=circle.get_backing()) for circle in circles))
-circles.extend(list(Circle(backing=circle.get_backing()) for circle in circles))
+circles.extend(list(Circle.from_base(shape) for shape in shapes))
+shapes.extend(list(Shape(
+    side=shape.side, radius=shape.radius, color=shape.color
+) for shape in shapes))
+shapes.extend(list(circle.to_base(Shape) for circle in circles))
+circles.extend(list(Circle(radius=circle.radius, color=circle.color) for circle in circles))
 assert len(set(shapes)) == 1
 assert len(set(circles)) == 1
 assert all(shape.encode_bytes() == circle_bytes_stable for shape in shapes)
 assert all(circle.encode_bytes() == circle_bytes_profile for circle in circles)
 assert (
-    Circle(backing=Shape.decode_bytes(circle_bytes_stable).get_backing()) ==
+    Circle.from_base(Shape.decode_bytes(circle_bytes_stable)) ==
     Circle.decode_bytes(circle_bytes_profile)
 )
 assert all(shape.hash_tree_root() == circle_root for shape in shapes)
 assert all(circle.hash_tree_root() == circle_root for circle in circles)
-try:
+with pytest.raises(Exception):
     square = Square(radius=0x42, color=1)
-    assert False
-except:
-    pass
 for shape in shapes:
-    try:
-        square = Square(backing=shape.get_backing())
-        assert False
-    except:
-        pass
+    with pytest.raises(Exception):
+        square = Square.from_base(shape)
 for circle in circles:
-    try:
-        square = Square(backing=circle.get_backing())
-        assert False
-    except:
-        pass
+    with pytest.raises(Exception):
+        square = Square.from_base(circle.to_base(Shape))
 
 # SquarePair tests
 square_pair_bytes_stable = bytes.fromhex("080000000c0000000342000103690001")
@@ -181,16 +162,18 @@ square_pairs = [SquarePair(
     shape_1=Square(side=0x42, color=1),
     shape_2=Square(side=0x69, color=1),
 )]
-square_pairs.extend(list(SquarePair(backing=pair.get_backing()) for pair in shape_pairs))
-shape_pairs.extend(list(ShapePair(backing=pair.get_backing()) for pair in shape_pairs))
-shape_pairs.extend(list(ShapePair(backing=pair.get_backing()) for pair in square_pairs))
-square_pairs.extend(list(SquarePair(backing=pair.get_backing()) for pair in square_pairs))
+square_pairs.extend(list(SquarePair.from_base(pair) for pair in shape_pairs))
+shape_pairs.extend(list(ShapePair(
+    shape_1=pair.shape_1, shape_2=pair.shape_2) for pair in shape_pairs))
+shape_pairs.extend(list(pair.to_base(ShapePair) for pair in square_pairs))
+square_pairs.extend(list(SquarePair(
+    shape_1=pair.shape_1, shape_2=pair.shape_2) for pair in square_pairs))
 assert len(set(shape_pairs)) == 1
 assert len(set(square_pairs)) == 1
 assert all(pair.encode_bytes() == square_pair_bytes_stable for pair in shape_pairs)
 assert all(pair.encode_bytes() == square_pair_bytes_profile for pair in square_pairs)
 assert (
-    SquarePair(backing=ShapePair.decode_bytes(square_pair_bytes_stable).get_backing()) ==
+    SquarePair.from_base(ShapePair.decode_bytes(square_pair_bytes_stable)) ==
     SquarePair.decode_bytes(square_pair_bytes_profile)
 )
 assert all(pair.hash_tree_root() == square_pair_root for pair in shape_pairs)
@@ -217,16 +200,18 @@ circle_pairs = [CirclePair(
     shape_1=Circle(radius=0x42, color=1),
     shape_2=Circle(radius=0x69, color=1),
 )]
-circle_pairs.extend(list(CirclePair(backing=pair.get_backing()) for pair in shape_pairs))
-shape_pairs.extend(list(ShapePair(backing=pair.get_backing()) for pair in shape_pairs))
-shape_pairs.extend(list(ShapePair(backing=pair.get_backing()) for pair in circle_pairs))
-circle_pairs.extend(list(CirclePair(backing=pair.get_backing()) for pair in circle_pairs))
+circle_pairs.extend(list(CirclePair.from_base(pair) for pair in shape_pairs))
+shape_pairs.extend(list(ShapePair(
+    shape_1=pair.shape_1, shape_2=pair.shape_2) for pair in shape_pairs))
+shape_pairs.extend(list(pair.to_base(ShapePair) for pair in circle_pairs))
+circle_pairs.extend(list(CirclePair(
+    shape_1=pair.shape_1, shape_2=pair.shape_2) for pair in circle_pairs))
 assert len(set(shape_pairs)) == 1
 assert len(set(circle_pairs)) == 1
 assert all(pair.encode_bytes() == circle_pair_bytes_stable for pair in shape_pairs)
 assert all(pair.encode_bytes() == circle_pair_bytes_profile for pair in circle_pairs)
 assert (
-    CirclePair(backing=ShapePair.decode_bytes(circle_pair_bytes_stable).get_backing()) ==
+    CirclePair.from_base(ShapePair.decode_bytes(circle_pair_bytes_stable)) ==
     CirclePair.decode_bytes(circle_pair_bytes_profile)
 )
 assert all(pair.hash_tree_root() == circle_pair_root for pair in shape_pairs)
@@ -237,45 +222,26 @@ shape = Shape(side=None, color=1, radius=None)
 shape_bytes = bytes.fromhex("0201")
 assert shape.encode_bytes() == shape_bytes
 assert Shape.decode_bytes(shape_bytes) == shape
-try:
+with pytest.raises(Exception):
     shape = Square.decode_bytes(shape_bytes)
-    assert False
-except:
-    pass
-try:
+with pytest.raises(Exception):
     shape = Circle.decode_bytes(shape_bytes)
-    assert False
-except:
-    pass
 shape = Shape(side=0x42, color=1, radius=0x42)
 shape_bytes = bytes.fromhex("074200014200")
 assert shape.encode_bytes() == shape_bytes
 assert Shape.decode_bytes(shape_bytes) == shape
-try:
+with pytest.raises(Exception):
     shape = Square.decode_bytes(shape_bytes)
-    assert False
-except:
-    pass
-try:
+with pytest.raises(Exception):
     shape = Circle.decode_bytes(shape_bytes)
-    assert False
-except:
-    pass
-try:
+with pytest.raises(Exception):
     shape = Shape.decode_bytes("00")
-    assert False
-except:
-    pass
-try:
+with pytest.raises(Exception):
     square = Square(radius=0x42, color=1)
-    assert False
-except:
-    pass
-try:
+with pytest.raises(Exception):
     circle = Circle(side=0x42, color=1)
-    assert False
-except:
-    pass
+with pytest.raises(Exception):
+    square = Square.from_base(Circle(radius=0x42, color=1).to_base(Shape))
 
 # Surrounding container tests
 class ShapeContainer(Container):
@@ -310,6 +276,59 @@ assert container.hash_tree_root() == ShapeContainerRepr(
         active_fields=Bitvector[4](False, True, True, False),
     ),
 ).hash_tree_root()
+
+# Nested surrounding container tests
+shapes = List[Circle, 5](Circle(radius=0x42, color=1))
+assert List[Circle, 5].from_base(shapes.to_base(List[Shape, 5])) == shapes
+with pytest.raises(Exception):
+    shapes = List[Square, 5].from_base(shapes.to_base(List[Shape, 5]))
+
+shapes = Vector[Circle, 1](Circle(radius=0x42, color=1))
+assert Vector[Circle, 1].from_base(shapes.to_base(Vector[Shape, 1])) == shapes
+with pytest.raises(Exception):
+    shapes = Vector[Square, 1].from_base(shapes.to_base(Vector[Shape, 1]))
+
+class ShapeContainer(Container):
+    shape: Shape
+
+class SquareContainer(Container):
+    shape: Square
+
+class CircleContainer(Container):
+    shape: Circle
+
+shape = CircleContainer(shape=Circle(radius=0x42, color=1))
+assert CircleContainer.from_base(shape.to_base(ShapeContainer)) == shape
+with pytest.raises(Exception):
+    shape = SquareContainer.from_base(shape.to_base(ShapeContainer))
+
+class ShapeStableContainer(StableContainer[1]):
+    shape: Optional[Shape]
+
+class SquareStableContainer(StableContainer[1]):
+    shape: Optional[Square]
+
+class CircleStableContainer(StableContainer[1]):
+    shape: Optional[Circle]
+
+shape = CircleStableContainer(shape=Circle(radius=0x42, color=1))
+assert CircleStableContainer.from_base(shape.to_base(ShapeStableContainer)) == shape
+with pytest.raises(Exception):
+    shape = SquareStableContainer.from_base(shape.to_base(ShapeStableContainer))
+
+class NestedShapeContainer(Container):
+    item: ShapeContainer
+
+class NestedSquareContainer(Container):
+    item: SquareContainer
+
+class NestedCircleContainer(Container):
+    item: CircleContainer
+
+shape = NestedCircleContainer(item=CircleContainer(shape=Circle(radius=0x42, color=1)))
+assert NestedCircleContainer.from_base(shape.to_base(NestedShapeContainer)) == shape
+with pytest.raises(Exception):
+    shape = NestedSquareContainer.from_base(shape.to_base(NestedShapeContainer))
 
 # basic container
 class Shape1(StableContainer[4]):
