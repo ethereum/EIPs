@@ -12,7 +12,7 @@ requires: 7623, 7742, 7778
 
 ## Abstract
 
-This EIP proposes to modify the EIP-1559 mechanism to make the target block gas and blob count adjust dynamically. This adjustment will target a specific price for a simple transfer on L1 (in the case of target block gas) and on L2 (in the case of target blob count).
+This EIP proposes to modify the EIP-1559 mechanism to make the target block gas and blob count adjust dynamically. This adjustment will target a specific price for a simple transfer on L1 (in the case of target block gas) and on L2 (in the case of target blob count). The price target will be set each epoch through validators voting.
 
 ## Motivation
 
@@ -33,7 +33,7 @@ Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoot
 
 ### Dynamic targeting
 
-The target block gas and blob count change each epoch based on the mean transaction cost over the previous epoch. The cost of L2 transaction can be estimated using the minimum theoretical compressed size of a basic transfer.
+The target block gas and blob count change each epoch based on the mean transaction cost over the previous epoch. The cost of an L2 transaction can be estimated using the minimum theoretical compressed size of a basic transfer.
 
 Calculating targets:
 
