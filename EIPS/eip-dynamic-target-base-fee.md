@@ -27,6 +27,8 @@ Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoot
 | Parameter | Value |
 | - | - |
 | `FORK_TIMESTAMP` | TBD |
+| `TARGET_BLOCK_GAS_CHANGE_RATE` | TBD |
+| `TARGET_BLOB_COUNT_CHANGE_RATE` | `1` |
 | `L2_TX_COMPRESSED_SIZE` | `23` |
 
 ### Dynamic targeting
@@ -36,10 +38,15 @@ The target block gas and blob count change each epoch based on the mean transact
 Calculating targets:
 
 ```python
-nextEpochTargetBlockGas = min(MAX_BLOCK_SIZE, 8 * (((targetL1TxCost - meanL1TxCost) / 21000) - 1) * previousTargetBlockGas)
-L2_TX_SIZE = L2_TX_COMPRESSED_SIZE / 125000
-meanL2TxCost = average(L2_TX_SIZE * blobCost)
-nextEpochBlobCount = min(MAX_BLOB_COUNT, round(8 * (((targetL2TxCost - meanL2TxCost) / L2_TX_SIZE) - 1) * previousTargetBlobCount))
+L1_TX_SIZE = 21000
+meanL1TxCost = average(gasCostsForTxsLastEpoch) * L1_TX_SIZE
+increaseTargetBlockGas = targetL1TxCost <= meanL1TxCost
+nextEpochTargetBlockGas = min(MAX_BLOCK_GAS, previousEpochTargetBlockGas + (TARGET_BLOCK_GAS_CHANGE_RATE if increaseTargetBlockGas else -TARGET_BLOCK_GAS_CHANGE_RATE))
+
+BLOB_SIZE = 125000
+meanL2TxCost = average(blobCostsForLastEpoch) * L2_TX_COMPRESSED_SIZE / BLOB_SIZE
+increaseTargetBlobCount = targetL2TxCost <= meanL2TxCost
+nextEpochBlobCount = min(MAX_BLOB_COUNT, previousEpochTargetBlobCount + (TARGET_BLOB_COUNT_CHANGE_RATE if increaseTargetBlobCount else -TARGET_BLOB_COUNT_CHANGE_RATE))
 ```
 
 ### Voting
