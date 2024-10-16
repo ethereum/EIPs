@@ -61,7 +61,7 @@ nextEpochBlobCount = min(MAX_BLOB_COUNT, previousEpochTargetBlobCount + (targetB
 
 A constant transaction cost target can keep transaction costs for end users affordable. Volatility in the price of ETH would affect affordability, but is unlikely to be significant compared to normal fluctuations in gas costs due to spikes in activity. In future the costs could be adjusted in the case of changes in the order of magnitude of ETH price.
 
-An alternative approach would be to track a target transaction cost in fiat, but chosing a specific fiat currency is not credibly neutral, and introducing ETH price oracles into the protocol could be an attack vector. Yet another alternative could be to have validators vote on the target price, but they may have conflicts of interest (for example if they are blobspace consumers) so again this is not credibly neutral.
+An alternative approach would be to track a target transaction cost in fiat, but chosing a specific fiat currency is not credibly neutral, and introducing exchange rate oracles into the protocol could be an attack vector. Yet another alternative could be to have validators vote on the target price, but they may have conflicts of interest (for example if they are blobspace consumers) so again this is not credibly neutral.
 
 ## Backwards Compatibility
 
