@@ -32,7 +32,7 @@ FOCIL is a simple committee-based design improving upon previous IL mechanisms o
 ### Execution Layer
 
 On the execution layer, the block validity conditions are extended such that, after all of the transactions in the block have been executed, we attempt to execute each valid transaction in the inclusion list that was not present in the block.
-If one of those transactions executes sucessfully, then the block is invalid.
+If one of those transactions executes successfully, then the block is invalid.
 
 Let `B` denote the current block.
 Let `S` denote the execution state following the execution of the last transaction in `B`.
@@ -90,14 +90,14 @@ class SignedLocalInclusionList(Container):
 
 #### Fork choice changes
 
-- Cache IL transactions observed over gossip before the freeze deadline
-- If more than one local IL is observed from the same IL committee member, remove the local IL from the cache
-- Fork choice head retrieval is based on the `Valid` function being satisfied by the EL
+- Cache local ILs observed over gossip before the local IL freeze deadline.
+- If more than one local IL is observed from the same IL committee member, remove all local ILs from the member from the cache.
+- Fork choice head retrieval is based on the `Valid` function being satisfied by the EL.
   
 #### P2P changes
 
-- A new global topic for broadcasting `SignedInclusionList` objects
-- A new RPC topic for request `SignedInclusionList` based on IL committee index
+- A new global topic for broadcasting `SignedInclusionList` objects.
+- A new RPC topic for request `SignedInclusionList` based on IL committee index.
 
 #### Roles And Participants
 
@@ -106,14 +106,14 @@ class SignedLocalInclusionList(Container):
 - **`Slot N`, `t=0 to 8s`**:
 IL committee members construct their local ILs and broadcast them over the P2P network after processing the block for `slot N` and confirming it as the head. If no block is received by `t=7s`, they should run `get_head` and build and release their local ILs based on their node’s canonical head.
 
-By default, local ILs are built by selecting raw transactions from the public mempool, ordered by priority fees, up to the local IL’s maximum size in bits (e.g., 8 KB per local IL). Additional local rules can be optionally applied to maximize censorship resistance, such as prioritizing valid transactions that have been pending in the mempool the longest.
+  By default, local ILs are built by selecting raw transactions from the public mempool, ordered by priority fees, up to the local IL’s maximum size in bits (e.g., 8 KB per local IL). Additional local rules can be optionally applied to maximize censorship resistance, such as prioritizing valid transactions that have been pending in the mempool the longest.
 
 ##### Nodes
 
 - **`Slot N`, `t=0 to 9s`**:
 Nodes receive local ILs from the P2P network and only forward and cache those that pass the CL P2P validation rules.
 
-- **`Slot N`, `t=9s`**:, IL freeze deadline:
+- **`Slot N`, `t=9s`**:, The local IL freeze deadline:
 Nodes freeze their local ILs view, stop forwarding and caching new local ILs.
 
 ##### Proposer
@@ -158,11 +158,11 @@ This EIP introduces backward incompatible changes to the block validation rule s
 
 ### Consensus Liveness
 
-The block producer (i.e., a proposer or a proposer builder pair) of `slot N+1` cannot construct a canonical block without first receiving the local inclusion lists broadcast during `slot N`. This means that the block producer must be well-connected to the IL committee members to ensure timely access to these inclusion lists. Additionally, there must be sufficient time between the local inclusion list freeze deadline (`t=9s` of `slot N`) and the moment the block producer must broadcast `block B` to the rest of the network. This buffer allows the block producer to gather all available local ILs and update the execution payload of `block B` accordingly.
+The block producer (i.e., a proposer or a proposer builder pair) of `slot N+1` cannot construct a canonical block without first receiving the local ILs broadcast during `slot N`. This means that the block producer must be well-connected to the IL committee members to ensure timely access to these inclusion lists. Additionally, there must be sufficient time between the local IL freeze deadline (`t=9s` of `slot N`) and the moment the block producer must broadcast `block B` to the rest of the network. This buffer allows the block producer to gather all available local ILs and update the execution payload of `block B` accordingly.
 
 ### IL Equivocation
 
-To mitigate local inclusion list equivocation, FOCIL introduces a new P2P network rule that allows forwarding up to two local ILs per IL committee member. If the proposer or attesters detect two different local inclusion lists sent by the same IL committee member, they should ignore all local inclusion lists from that member. In the worst case, the bandwidth of the local inclusion list gossip subnet can at most double.
+To mitigate local IL equivocation, FOCIL introduces a new P2P network rule that allows forwarding up to two local ILs per IL committee member. If the proposer or attesters detect two different local ILs sent by the same IL committee member, they should ignore all local ILs from that member. In the worst case, the bandwidth of the local IL gossip subnet can at most double.
 
 ## Copyright
 
