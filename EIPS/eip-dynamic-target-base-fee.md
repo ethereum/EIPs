@@ -7,18 +7,22 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2024-10-15
-requires: 7623, 7742, 7778
+requires: 7742
 ---
 
 ## Abstract
 
-This EIP proposes to modify the EIP-1559 mechanism to make the target block gas and blob count adjust dynamically. This adjustment will target a constant price in ETH for a simple transfer on L1 (in the case of target block gas) and on L2 (in the case of target blob count).
+This EIP proposes to make the target blob count adjust dynamically up to a safe maximum target. This adjustment will target a constant price in ETH for blobs, aiming for consistent costs for L2 transactions.
 
 ## Motivation
 
-Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoothing out short term spikes. This means that the de facto capacity is much lower than the maxiumum capacity, as in practice gas prices would rise exponentially as the maximum capacity is reached. Instead of targeting an arbitrary capacity, dynamic targeting optimises for affordable and consistent transaction costs. A dynamic target adjusts to longer term changes in demand, which has benefits in two cases:
-- When demand is high the target increases, allowing throughput to increase without exorbitant gas fees.
-- When demand is low compared to maximum capacity (for example after a large increase in blob count), the target decreases so that the protocol can still receive revenue without undercharging for blockspace or blobspace.
+Ethereum currently uses a target of 50% capacity for blob count, with EIP-1559 smoothing out short term spikes and pushing average throughput towards the target. A dynamic target is orthogonal to EIP-1559, tweaking the target itself over a longer timescale to aim for some desired transaction cost.
+
+Having a static target has a disadvantage the target may be higher than the actual demand, so the protocol undercharges for block or blob space. This decreases the amount of fees burned, negatively affecting the price of ETH and total network security.
+
+As an example consider what would happen if there was a large increase in max blob count due to DAS implementation, but the target remains at 50%. It is unlikely that demand would immediately jump to anywhere near the target, and so for months or years the protocol would effectively charge nothing for L2 transactions. With a dynamic target, the target blob count would drop until the cost of blobspace for an L2 transaction approximated some affordable constant value. In this way, some fees are still burned by the protocol, but new L2s are not discouraged from using Ethereum blobspace, knowing that the target will increase in response to an increase in demand and blob fees will remain reasonably consisent.
+
+While the max blob count, and max target are hard constraints based on resource utilisation limits, setting the target itself is far more subjective. Rather than core developers tweaking the target, a dynamic target optimising for constant transaction costs is a more credibly neutral option.
 
 ## Specification
 
@@ -27,41 +31,39 @@ Ethereum currently uses an arbitrary target of 50% capacity, with EIP-1559 smoot
 | Parameter | Value |
 | - | - |
 | `FORK_TIMESTAMP` | TBD |
-| `TARGET_BLOCK_GAS_CHANGE_RATE` | TBD |
 | `TARGET_BLOB_COUNT_CHANGE_RATE` | `1` |
-| `L1_TX_COST_TARGET` | TBD |
-| `L2_TX_COST_TARGET` | TBD |
-| `L1_TX_COST_CHANGE_MARGIN` | TBD |
-| `L2_TX_COST_CHANGE_MARGIN` | TBD |
-| `L2_TX_COMPRESSED_SIZE` | `23` |
+| `MAX_TARGET_BLOB_COUNT` | 3 |
+| `BLOB_COST_CHANGE_MARGIN` | TBD |
+| `TARGET_BLOB_COST` | TBD |
 
 ### Dynamic targeting
 
-The target block gas and blob count change each epoch based on the mean transaction cost over the previous epoch. If the average tx cost exceeds the desired amount beyond some margin then the target is increased; likewise if it is below the desired amount by some margin the target will decrease. The cost of an L2 transaction can be estimated using the minimum theoretical compressed size of a basic transfer.
+The target blob count changes each epoch based on the mean blob cost over the previous epoch. If the average cost exceeds the desired amount beyond some margin then the target is increased; likewise if it is below the desired amount by some margin the target will decrease. The target can increase up to some cap that is deemed to be a safe average throughput for the network.
 
 Calculating targets:
 
 ```python
-L1_TX_SIZE = 21000
-meanL1TxCost = average(gasCostsForTxsLastEpoch) * L1_TX_SIZE
-l1TxCostDiff = meanL1TxCost - L1_TX_COST_TARGET
-targetBlockGasDirection = -1 if l1TxCostDiff < -L1_TX_COST_CHANGE_MARGIN else (1 if l1TxCostDiff > L1_TX_COST_CHANGE_MARGIN else 0)
-nextEpochTargetBlockGas = min(MAX_BLOCK_GAS, previousEpochTargetBlockGas + (targetBlockGasDirection * TARGET_BLOCK_GAS_CHANGE_RATE))
-
-BLOB_SIZE = 125000
-meanL2TxCost = average(blobCostsForLastEpoch) * L2_TX_COMPRESSED_SIZE / BLOB_SIZE
-l2TxCostDiff = meanL2TxCost - L2_TX_COST_TARGET
-targetBlobCountDirection = -1 if l2TxCostDiff < -L2_TX_COST_CHANGE_MARGIN else (1 if l2TxCostDiff > L2_TX_COST_CHANGE_MARGIN else 0)
-nextEpochBlobCount = min(MAX_BLOB_COUNT, previousEpochTargetBlobCount + (targetBlobCountDirection * TARGET_BLOB_COUNT_CHANGE_RATE))
+meanBlobCost = average(blobCostsForLastEpoch)
+blobCostDiff = meanBlobCost - TARGET_BLOB_COST
+targetBlobCountDirection = -1 if blobCostDiff < -BLOB_COST_CHANGE_MARGIN else (1 if blobCostDiff > BLOB_COST_CHANGE_MARGIN else 0)
+nextEpochBlobCount = min(MAX_TARGET_BLOB_COUNT, previousEpochTargetBlobCount + (targetBlobCountDirection * TARGET_BLOB_COUNT_CHANGE_RATE))
 ```
+
+## Reference Implementation
+
+todo
 
 ## Rationale
 
 ### Constant target tx cost
 
-A constant transaction cost target can keep transaction costs for end users affordable. Volatility in the price of ETH would affect affordability, but is unlikely to be significant compared to normal fluctuations in gas costs due to spikes in activity. In future the costs could be adjusted in the case of changes in the order of magnitude of ETH price.
+A constant blob cost target can keep L2 transaction costs for end users affordable. Volatility in the price of ETH would affect affordability, but is unlikely to be significant compared to normal fluctuations in gas costs due to spikes in activity. In future the costs could be adjusted in the case of changes in the order of magnitude of ETH price.
 
 An alternative approach would be to track a target transaction cost in fiat, but chosing a specific fiat currency is not credibly neutral, and introducing exchange rate oracles into the protocol could be an attack vector. Yet another alternative could be to have validators vote on the target transaction cost, but they may have conflicts of interest (for example if they are blobspace consumers) so again this is not credibly neutral.
+
+### Target gas limit
+
+The same logic could be applied to the target gas limit, but generally blockspace is in high demand so the target should be set to the maximum safe amount. A dynamic target is unlikely to have a significant effect.
 
 ## Backwards Compatibility
 
@@ -73,7 +75,7 @@ todo
 
 ## Security Considerations
 
-The average block size MAY increase up to the maximum. This is why [EIP-7623](./eip-7623.md) and [EIP-7778](./eip-7888.md) are required to reduce the maximum block size to a safe amount.
+todo
 
 ## Copyright
 
