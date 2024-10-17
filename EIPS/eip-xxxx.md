@@ -1,0 +1,72 @@
+---
+
+eip: xxxx  
+title: Parameter Recommendations for Controlled Gas Limit Increase Strategy  
+description: Suggests specific parameters for the controlled gas limit increase strategy introduced in EIP-7783, including starting block number, initial gas limit, rate of increase, and gas limit cap.  
+author: Giulio Rebuffo (@Giulio2002)
+discussions-to: TBD
+status: Draft  
+type: Informational  
+created: 2024-10-18  
+---
+
+This EIP proposes specific parameters for the controlled gas limit increase strategy outlined in EIP-7783, including block number to start the increase, initial gas limit, rate of increase per block, and gas limit cap.
+
+## **Abstract**
+
+EIP-7784 provides parameter recommendations for implementing the controlled gas limit increase strategy in EIP-7783.
+
+## **Motivation**
+
+The motivation for EIP-7784 is to define practical and balanced parameters for Ethereum's gas limit increase strategy to achieve predictable and stable network scaling. While EIP-7783 defines the mechanism, EIP-7784 establishes the values needed for its implementation based on real-world conditions.
+
+## **Specification**
+
+### **Proposed Parameters**
+
+The parameters for the controlled gas limit increase strategy are:
+
+- **Block Number Start (`blockNumStart`)**: `21792420`  
+  The block number at which the gas limit increase begins. this is february 7, 2024.
+  
+- **Initial Gas Limit (`initialGasLimit`)**: `30_000_000`  
+  The initial gas limit at `blockNumStart` represents the current default gas limit of the Ethereum network, set to 30 million gas.
+
+- **Rate of Increase (`r`)**: `18`  
+  The gas limit will increase by 18 gas per block. This results in a slow growth rate culminating to reaching the cap in approximately 18 months.
+
+- **Gas Limit Cap (`gasLimitCap`)**: `90_000_000`  
+  The maximum gas limit is capped at 90 million gas, ensuring that the gas limit will not increase indefinitely and will prevent the network from being overwhelmed by excessively large blocks.
+
+## **Rationale**
+
+### **Starting Block Number**
+
+The chosen block number (`21792420`) provides ample time to discuss and implement the gas limit increase strategy, additionally, it allows to happen with or slightly before the pectra hard fork.
+  
+### **Initial Gas Limit**
+
+The initial gas limit is set to match the current default gas limit of `30_000_000`.
+  
+### **Rate of Increase**
+
+A rate of `18` gas per block is chosen to triple the gas limit in approximately 18 months. This gradual increase allows the network to scale predictably while giving the ecosystem time to adjust to larger block sizes.
+
+### **Gas Limit Cap**
+
+- The gas limit cap of `90_000_000` provides a safeguard against the gas limit growing beyond what the network can safely handle.
+
+## **Backwards Compatibility**
+
+These parameters do not require any protocol changes or hard forks. They are fully backward compatible with the current Ethereum network architecture.
+
+## **Security Considerations**
+
+- The gradual nature of the gas limit increase prevents sudden surges in block size that could destabilize the network.
+- The cap on the gas limit ensures that blocks do not become excessively large, which could lead to performance degradation or DOS vulnerabilities.
+- Validators retain the ability to make adjustments to the gas limit in response to potential network attacks or performance issues.
+
+## **Copyright**
+
+Copyright and related rights waived via CC0 1.0 Universal.
+
