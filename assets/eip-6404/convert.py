@@ -26,7 +26,7 @@ def upgrade_rlp_transaction_to_ssz(tx_bytes: bytes):
                 max_priority_fees_per_gas=BasicFeesPerGas(
                     regular=tx.max_priority_fee_per_gas,
                 ),
-                authorization_list=[Authorization(backing=RlpSetCodeAuthorization(
+                authorization_list=[RlpSetCodeAuthorization(
                     payload=RlpSetCodeAuthorizationPayload(
                         magic=SET_CODE_TX_MAGIC,
                         chain_id=auth.chain_id if auth.chain_id != 0 else None,
@@ -36,7 +36,7 @@ def upgrade_rlp_transaction_to_ssz(tx_bytes: bytes):
                     signature=Secp256k1ExecutionSignature(
                         secp256k1=secp256k1_pack(auth.r, auth.s, auth.y_parity),
                     ),
-                ).get_backing()) for auth in tx.authorization_list],
+                ).to_base(Authorization) for auth in tx.authorization_list],
             ),
             signature=Secp256k1ExecutionSignature(
                 secp256k1=secp256k1_pack(tx.r, tx.s, tx.y_parity),
