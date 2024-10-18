@@ -84,10 +84,10 @@ Let `S` denote the execution state following the execution of the last transacti
 For each transaction `T` in ILs, perform the following:
 
 1. Check whether `T` is present in `B`. If `T` is present, then continue to the next transaction.
-1. Validate `T` against `S`. If `T` is invalid, then continue to the next transaction.
-1. Execute `T` on state `S`. Assert that the execution of `T` fails.
+2. Validate `T` against `S`. If `T` is invalid, then continue to the next transaction.
+3. Execute `T` on state `S`. Assert that the execution of `T` fails.
 
-Note that we do not need to reset the state to `S`, since the only way for a transaction to alter the state is for it to execute sucessfully, in which case the block is invalid, and so the block will not be applied to the state.
+If `B` is full, the process terminates. Also note that we do not need to reset the state to `S`, since the only way for a transaction to alter the state is for it to execute sucessfully, in which case the block is invalid, and so the block will not be applied to the state.
 
 We make the following changes to the engine API:
 
@@ -147,7 +147,7 @@ class SignedInclusionList(Container):
 
 ### Core Properties
 - Committee-based: FOCIL relies on a committee of multiple validators, rather than a single proposer, to construct and broadcast ILs. This approach significantly reduces the surface for bribery and extortion attacks and strengthens censorship resistance.
-- Fork-choice enforced: FOCIL incorporates the force-inclusion mechanism into the fork-choice rule, an integral component of the consensus process, thereby preventing any actor from bypassing the system. Attesters vote only for blocks that include transactions from a set of ILs provided by the IL committee and that satisfy the IL constraints. Any block failing to meet these criteria is deemed invalid.
+- Fork-choice enforced: FOCIL incorporates the force-inclusion mechanism into the fork-choice rule, an integral component of the consensus process, thereby preventing any actor from bypassing the system. Attesters vote only for blocks that include transactions from a set of ILs provided by the IL committee and that satisfy the IL constraints. Any block failing to meet these criteria will not be voted on by the attesters, and therefore cannot be canonical.
 - Same-slot: With FOCIL running in parallel with the block building process for `slot N+1` during `slot N`, the constraints imposed on `block B` for `slot N+1` can include transactions submitted during `slot N`. This represents a strict improvement over forward IL designs like EIP-7547, where the forward property introduced a 1-slot delay.
 - Conditional inclusion: FOCIL adopts conditional inclusion, accepting blocks that may lack some transactions from ILs if they cannot append the transactions to the end of the block or if they are full.
 - Anywhere-in-block: FOCIL is unopinionated about the placement of transactions from ILs within a block. This reduces incentives for sophisticated actors to use side channels to bypass the mechanism. Combined with conditional inclusion, this flexibility makes the emergence of off-protocol markets even less attractive.
