@@ -45,13 +45,13 @@ IL committee members construct their ILs and broadcast them over the P2P network
 - **`Slot N`, `t=0 to 9s`**:
 Nodes receive ILs from the P2P network and only forward and cache those that pass the CL P2P validation rules.
 
-- **`Slot N`, `t=9s`**:, The IL freeze deadline: Nodes freeze their ILs view, stop caching new ILs in memory. After the deadline, nodes continue to forward ILs to their peers according according to the same CL P2P validation rules. However, they record the timestamps when they receive each IL, so that later they only use ILs that were received before the freeze deadline (i.e., with timestamps earlier than `t=9s`).
+- **`Slot N`, `t=9s`**: IL freeze deadline. At this point, nodes freeze their IL view and stop caching new ILs in memory. After the deadline, nodes continue forwarding ILs to peers following the CL P2P validation rules, but they discard any new local ILs received after the deadline (`t=9s`) and keep only minimal information (i.e., the number of ILs forwarded per committee member) to forward according to the rules.
 
-#### Proposer
-- **`Slot N`, `t=0 to 11s`**: The block producer (i.e., a proposer or a proposer builder pair) receive ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the proposer to request missing ILs from its peers (e.g., by committee index at `t=10s`).
+#### Block Producer
+- **`Slot N`, `t=0 to 11s`**: The block producer (i.e., a proposer or a proposer builder pair) receive ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the block producer to request missing ILs from its peers (e.g., by committee index at `t=10s`).
 
 - **`Slot N`, `t=11s`**:
-The proposer freezes its view of ILs and asks the EL to update its execution payload by adding transactions from its view (the exact timings will be defined after running some tests/benchmarks).
+The block producer freezes its view of ILs and asks the EL to update its execution payload by adding transactions from its view (the exact timings will be defined after running some tests/benchmarks).
 
 - **`Slot N+1`, `t=0s`**:
 The proposer broadcasts its block with the up-to-date execution payload satisfying IL transactions over the P2P network.
