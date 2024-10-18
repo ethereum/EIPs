@@ -48,7 +48,7 @@ Nodes receive ILs from the P2P network and only forward and cache those that pas
 - **`Slot N`, `t=9s`**:, The IL freeze deadline: Nodes freeze their ILs view, stop caching new ILs in memory. After the deadline, nodes continue to forward ILs to their peers according according to the same CL P2P validation rules. However, they record the timestamps when they receive each IL, so that later they only use ILs that were received before the freeze deadline (i.e., with timestamps earlier than `t=9s`).
 
 #### Proposer
-- **`Slot N`, `t=0 to 11s`**: Builders, including the proposer itself, receive ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the proposer to request missing ILs from its peers (e.g., by committee index at `t=10s`).
+- **`Slot N`, `t=0 to 11s`**: The block producer (i.e., a proposer or a proposer builder pair) receive ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the proposer to request missing ILs from its peers (e.g., by committee index at `t=10s`).
 
 - **`Slot N`, `t=11s`**:
 The proposer freezes its view of ILs and asks the EL to update its execution payload by adding transactions from its view (the exact timings will be defined after running some tests/benchmarks).
@@ -166,6 +166,19 @@ The block producer (i.e., a proposer or a proposer builder pair) of `slot N+1` c
 ### IL Equivocation
 
 To mitigate IL equivocation, FOCIL introduces a new P2P network rule that allows forwarding up to two ILs per IL committee member. If the proposer or attesters detect two different ILs sent by the same IL committee member, they should ignore all ILs from that member. In the worst case, the bandwidth of the IL gossip subnet can at most double.
+
+### Payload Construction
+
+The block producer, responsible for constructing the execution payload, must ensure that the IL is satisfied. A naive way to do so would be to build an initial payload in whatever way the builder desires, then execute the following algorithm:
+
+1. Sequentially check validity of any yet-to-be-included IL tx against the post-state. If none is found, payload building is over.
+2. If one is found, append it to the end of the payload and update the post-state. Go back to step 1.
+
+The issue with this simple approach is that, given a set of `n` IL transactions, one might end up needing to do `n + (n-1) + (n-2) + ...` validity checks, so `O(n^2)`. For example, the `n`th tx might be valid while all others are not, but its execution sends balance to the sender of the `(n-1)`th tx, making it valid, and in turn, the `(n-1)`th sends balance to the sender of the `(n-2)`th tx, etc.
+
+To efficiently ensure that all valid IL txs have been included in the payload, builders can adopt a simple strategy: prior to building the payload, they store the `nonce` and `balance` of all Externally Owned Accounts (EOAs) involved in IL transactions. As they construct the payload, builders track these EOAs, maintaining and updating each EOA's `nonce` and `balance` whenever changes occur—specifically, when the `nonce` increments (indicating that a transaction from that EOA has been executed) or when the `balance` changes without a `nonce` increment (e.g., after an Account Abstraction (AA) transaction has interacted with that EOA). 
+
+This tracking allows builders to verify IL transaction validity in real-time, enabling them to add transactions sequentially until all remaining transactions are either invalid because the nonce or balance of the associated EOA does not change or cannot be included due to insufficient gas. This approach minimizes overhead by keeping track only of the state changes that are relevant to the validity of IL txs.
 
 ## Copyright
 
