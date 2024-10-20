@@ -16,17 +16,17 @@ This EIP introduces a new `GAS2ETH` opcode that enables the direct conversion of
 
 ## Motivation
 
-This EIP is based on the premise that smart contract authors and compiler teams should be compensated for their contributions. Moreover, their compensation should scale with the usage of their contracts. A widely used and popular contract offers significant value to its users through its functionality and to the network by driving demand for blockspace — Ethereum's core purpose. Consequently, this increased demand also benefits miners and validators, who are rewarded for executing these contracts.
+This EIP is based on the premise that smart contract authors and compiler teams should be compensated for their contributions. Moreover, their compensation should scale with the usage of their contracts. A widely used and popular contract offers significant value to its users through its functionality and to the network by driving demand for blockspace — Ethereum's _raison d'être_. This increased demand also benefits miners and validators, who are rewarded for executing these contracts.
 
-Monetizing smart contracts in a scalable manner remains a challenging task. This difficulty is evident from the diverse array of monetization strategies employed across various smart contracts — ranging from fee structures to the issuance of tokens with complex "tokenomics".
+Monetizing smart contracts in a scalable manner remains challenging at the time of this writing. This difficulty is evident from existence of many different monetization strategies employed across various smart contracts — ranging from fee structures to the issuance of tokens with "tokenomics" of varying levels of complexity.
 
-Introducing the `GAS2ETH` opcode offers contract authors a novel approach to achieving their monetization objectives. By leveraging gas/mana charges, they integrate smoothly with an established user experience that is both familiar and understood by users. The proposed instruction ensures that existing transaction creation and processing tools remain unchanged. Moreover, by charging gas/mana, contract authors align economically with network activity; they benefit from higher compensation during periods of intense network usage and receive less when activity is low. This alignment helps harmonize the incentives of smart contract authors, validators, and the broader network.
+Introducing the `GAS2ETH` opcode offers contract authors a new way to achieve their monetization objectives. By charging gas, they integrate with an established user experience that is both familiar and understood by users. The proposed instruction ensures that existing transaction creation and processing tools remain unchanged. Moreover, by charging gas, contract authors align economically with network activity; they benefit from higher compensation during periods of intense network usage and receive less when activity is low. This helps align the incentives of smart contract authors, validators, and the broader network.
 
 ## Specification
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-A new opcode is introduced, `GAS2ETH` (`0x2f`), which:
+A new opcode is introduced, `GAS2ETH` (`0xFC`), which:
 
 - Pops two values from the stack: `addr` then `gas_amount`. If there are fewer than two values on the stack, the calling context should fail with stack underflow.
 - Deducts `gas_amount` from the current calling context.
@@ -47,9 +47,9 @@ Note that the [`EXTCALL`](./eip-7069.md) EIP eliminates the extra gas cost for v
 
 ## Rationale
 
-- `GAS2ETH` vs. pro-rata: The pro-rata model incentivizes inflating contract gas usage to increase fees artificially. In contrast, this proposal empowers contract authors to charge their desired amount directly, eliminating the need for unnecessary gas consumption.
-- Target address vs. increasing contract balance: Using a target address provides greater flexibility, enabling contract authors to write more modular code and separate the concerns of fee collection from contract functionality. This approach allows the contract to designate a specific recipient for fees without necessarily granting them direct withdrawal access. For instance, the contract may intentionally avoid including any mechanism for the fee recipient to withdraw funds directly, ensuring a clearer separation of roles and responsibilities.
-- Charging gas instead of ETH: Charging ETH directly can complicate the user experience and prevents contract authors from benefiting directly from fluctuations in gas demand.
+- `GAS2ETH` vs. pro-rata: The pro-rata model incentivizes inflating contract gas usage to artificially increase fees. In contrast, this proposal allows contract authors to charge their desired amount directly, eliminating the need for unnecessary gas consumption.
+- Target address vs. simply increasing balance of the currently executing contract: Using a target address is more flexible, enabling contract authors to write more modular code and separate the concerns of fee collection from contract functionality. For instance, the contract may want to designate a specific recipient for fees without necessarily granting them direct withdrawal access.
+- Charging gas instead of ETH: Charging ETH directly complicates the user experience and prevents contract authors from participate in fluctuations in gas demand directly.
 
 ## Backwards Compatibility
 
