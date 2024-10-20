@@ -1,7 +1,7 @@
 ---
 title: `GAS2ETH` opcode
 description: Introduces a new opcode, `GAS2ETH`, to convert gas/mana to ETH
-author: Charles Cooper (@charles-cooper)
+author: Charles Cooper (@charles-cooper), Pascal Caversaccio (@pcaversaccio)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
