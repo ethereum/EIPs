@@ -43,7 +43,7 @@ Requests for typed data signatures via JSON-RPC (`eth_signTypedData`) or client 
 
 These new properties are used along the the existing ones, i.e., `types`, `primaryType`, `domain`, and `message`.
 
-The data returned in response to the request MAY be of any size, and in the absence of `signingDomains` it MUST be treated opaquely as the type of the signature is not known.
+The signature returned in response to the request MAY be of any size, and in the absence of `signingDomains` it MUST be treated opaquely as the type of the signature is not known.
 
 ### `signingDomains`
 
