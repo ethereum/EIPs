@@ -36,7 +36,7 @@ This ERC addresses this by allowing dapps to communicate the types of signatures
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-Requests for typed data signatures via JSON-RPC or client libraries are extended with the following properties:
+Requests for typed data signatures via JSON-RPC (`eth_signTypedData`) or client libraries are extended with the following properties:
 
 - `signingDomains`
 - `authMethods`
