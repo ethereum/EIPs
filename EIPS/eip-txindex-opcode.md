@@ -15,11 +15,9 @@ This EIP proposes to add a new opcode that returns the index of the transaction 
 
 ## Motivation
 
-The new opcode aims to better support encrypted mempools in the protocol. In order to be secure, the validity of a transaction sent to an encrypted mempool should be tied to its correct inclusion by a proposer. This means that the transaction should only be valid if it is included at the correct slot, and the correct index within a block according to the encrypted mempool's ordering rules. This can be enforced in two ways:
-- Enshrinement: a block will not be valid if it does not include encrypted mempool transactions in the correct order.
-- Smart contract: encrypted mempool transactions invoke a smart contract that enforces inclusion in the correct order. If a single transaction is not included correctly, then all encrypted mempool transactions are invalidated.
+The new opcode aims to improve support for encrypted mempools. In order to be secure, the validity of encrypted mempool transactions should be tied to the inclusion of all transactions by a proposer in the correct slot, and following the ordering rules. If these rules are not enshrined as block validity conditions then they can be enforced by a smart contract.
 
-This proposal enables smart contract solutions to check their own transaction index, so they can enforce inclusion at the correct index. These out-of-protocol smart contract solutions could be used for experimentation until a design appropriate for enshrinement in protocol is agreed upon.
+This proposal enables smart contract solutions to check their own transaction index, so they can enforce inclusion at the correct index. These out-of-protocol solutions could be used for experimentation until a design appropriate for enshrinement is agreed upon.
 
 ## Specification
 
@@ -29,6 +27,7 @@ Following the yellow paper spec, it should be considered part of `W_base` for ga
 
 ## Rationale
 
+<!-- TODO -->
 TBD
 
 ## Backwards Compatibility
@@ -37,11 +36,12 @@ No backward compatibility issues found.
 
 ## Test Cases
 
-TBD
+N/A
 
 ## Security Considerations
 
-TBD
+<!-- TODO -->
+Needs discussion.
 
 ## Copyright
 
