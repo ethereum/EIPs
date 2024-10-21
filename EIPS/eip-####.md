@@ -2,7 +2,7 @@
 title: Verifiable logs
 description: Scheme to make the eth_getLogs response verifiable
 author: Etan Kissling (@etan-status), Gajinder Singh (@g11tech), Vitalik Buterin (@vbuterin)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-verifiable-logs/21424
 status: Draft
 type: Standards Track
 category: Core
