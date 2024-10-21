@@ -118,3 +118,13 @@ Needs discussion.
 ## Copyright
 
 Copyright and related rights waived via [CC0](../LICENSE.md).
+
+## Patents
+
+<!--
+  This section is optional, unless the authors know (or suspect) a patent may be infringed by this proposal.
+
+  A patent waiver is mandatory should the authors know (or suspect) that the proposal may infringe on any patents. The waiver must be granted from the patent holder (or a sublicensee), be perpetual and irrevocable, and allow unrestricted implementation of the standard. Draft proposals may omit the patent waiver.
+
+ TODO: Remove this comment before submitting.
+-->

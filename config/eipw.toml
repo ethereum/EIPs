@@ -133,6 +133,7 @@ sections = [
     "Reference Implementation",
     "Security Considerations",
     "Copyright",
+    "Patents",
 ]
 
 [lints.markdown-rel-links]
