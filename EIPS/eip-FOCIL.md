@@ -28,6 +28,7 @@ In an effort to shield the Ethereum validator set from centralizing forces, the 
 FOCIL is a simple committee-based design improving upon previous IL mechanisms or block co-creation proposals and addressing issues related to bribing/extortion attacks, IL equivocation, account abstraction (AA) and transaction invalididation.
 
 ## High-level Overview
+<img width="956" alt="Screenshot 2024-10-21 at 14 30 18" src="https://github.com/user-attachments/assets/306e4a07-f059-4510-a45c-ed3de7aec781">
 
 ### Roles And Participants
 
