@@ -1,4 +1,5 @@
 ---
+eip: 7792
 title: Verifiable logs
 description: Scheme to make the eth_getLogs response verifiable
 author: Etan Kissling (@etan-status), Gajinder Singh (@g11tech), Vitalik Buterin (@vbuterin)
