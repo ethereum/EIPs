@@ -1,4 +1,5 @@
 ---
+eip: 7791
 title: `GAS2ETH` opcode
 description: Introduces a new opcode, `GAS2ETH`, to convert gas/mana to ETH
 author: Charles Cooper (@charles-cooper), Pascal Caversaccio (@pcaversaccio)
