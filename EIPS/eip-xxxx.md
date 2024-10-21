@@ -1,0 +1,147 @@
+---
+title: EIP-712 Extensions for Account Abstraction
+description: Improvements for EIP-712 to support smart contract accounts.
+author: Francisco Giordano (@frangio)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Interface
+created: 2024-10-08
+requires: EIP-712
+---
+
+## Abstract
+
+This EIP improves on EIP-712 signatures to better support smart contract accounts by 1) introducing signing domains as a way to prevent replay attacks when private keys are shared across accounts, and 2) allowing dapps and wallets to coordinate on the method that will be used to authenticate the signature.
+
+## Motivation
+
+### Signing Domains
+
+Standards like ERC-1271 and ERC-6492 give smart contract accounts (SCAs) the ability to produce signatures that an application can authenticate without knowledge of the abstract rules of the account. This is an important primitive for applications, as the account owner is able to authorize a third-party to act on its behalf without interacting with the chain.
+
+Smart contract accounts may be "owned" by cryptographic keys whose signatures are used to authorize the use of the account. There is not necessarily a one-to-one mapping between keys and accounts, because a single key may control multiple accounts, so care must be taken to prevent replay attacks across them. This is done by binding a signature to a particular account.
+
+EIP-712 introduced a scheme where signatures can be bound to a verifying domain, which corresponds to the protocol contract that will authenticate a signature. Reusing this mechanism to additionally bind a signature to the domain of the smart contract account runs into a large amount of complexity and attack surface (see ERC-7739), as well as yet unresolved issues with account composability (SCAs that control other SCAs). This EIP introduces *signing domains* in addition to verifying domains to natively enable wallets to generate smart contract account signatures with replay protection.
+
+### Authentication Methods
+
+ERC-1271 is a minimal and very general interface that has been very effective. It requires the contract code to be already deployed by the time the signature needs to be authenticated, so ERC-6492 extends ERC-1271 to support that use case. In the future additional methods may need to be developed.
+
+Support for these methods across protocols is currently lacking and is a major pain point for the Account Abstraction roadmap. Where ERC-1271 is supported, it is not necessarily used uniformly, in particular some contracts attempt `ECRECOVER` prior to invoking `isValidSignature` while others do the opposite, which will result in very different semantics post EIP-7702.
+
+This ERC addresses this by allowing dapps to communicate the types of signatures a protocol's contracts support, i.e., which authentication methods will be used, and in what order.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+Requests for typed data signatures via JSON-RPC or client libraries are extended with the following properties:
+
+- `signingDomains`
+- `authMethods`
+
+These new properties are used along the the existing ones, i.e., `types`, `primaryType`, `domain`, and `message`.
+
+The data returned in response to the request MAY be of any size, and in the absence of `signingDomains` it MUST be treated opaquely as the type of the signature is not known.
+
+### `signingDomains`
+
+This property is an array of the chain of smart contract accounts that the signature is on behalf of, listed from "closest" to "furthest".
+
+Each member of the array is an object with the following keys:
+
+- `types`: An object with the same format as EIP-712 `types` with at least an `EIP712Domain` key.
+- `domain`: An object that matches the type `EIP712Domain` described in `types`.
+
+For example: 
+
+1. A dapp requests an EIP-712 signature to a connected account via JSON-RPC. `signingDomains` is empty or undefined.
+2. The connected account is a multisig, so it requests EIP-712 signatures from its signers, appending the domain of the multisig to `signingDomains`, which is now an array of length 1.
+3. One of the signers uses a smart contract account controlled by an ECDSA key held in a hardware wallet, so their wallet requests an EIP-712 signature from the hardware wallet, appending the domain of the smart contract account to `signingDomains`, which is now an array of length 2.
+4. The signer verifies the contents of the signature in their hardware wallet. They are able to see that they are signing a message intended for a particular dapp domain, on behalf of their smart contract account (closest signing domain), as a member of the multisig (furthest signing domain).
+
+#### Encoding of data to be signed
+
+In the presence of `signingDomains` the account should encode the message to be signed according to the following recursive procedure:
+
+- `encodeForSigningDomains(signingDomainSeparators : [𝔹²⁵⁶], verifyingDomainSeparator : 𝔹²⁵⁶, message : 𝕊) =`
+  - If `signingDomainSeparators = [first, ...others]`: `"\x19\x02" ‖ first ‖ encodeForSigningDomains(others, verifyingDomainSeparator, message)`
+  - If `signingDomainSeparators = []`: `encode(domainSeparator, message)`, where `encode` is defined by EIP-712.
+
+`signingDomainSeparators` is the array of hashes of the domains included in `signingDomains`, in the same order, computed according to EIP-712's `hashStruct`.
+
+### `authMethods`
+
+This property is an array of supported signature authentication methods, listed in the order that the verifying domain tries them.
+
+Each member of the array is an object with the following keys:
+
+- `id`: An string that identifies the method. It may be one of:
+    - `ECDSA`: ECDSA signatures by Externally Owned Accounts.
+    - `ERC-{n}`: A standard type of signature specified by an ERC. `n` must not be padded with zeros.
+- `parameters` (optional): An array of method-specific parameters.
+
+### JSON Schema
+
+```javascript
+{
+  type: 'object',
+  properties: {
+    types: {$ref: '#/$defs/EIP712Types'},
+    primaryType: {type: 'string'},
+    domain: {type: 'object'},
+    message: {type: 'object'},
+    signingDomains: {
+      type: 'array',
+      items: {$ref: '#/$defs/EIP712Types'}
+    }
+    authMethods: {
+      type: 'array',
+      items: {
+        type: 'object',
+        id: {type: 'string'},
+        parameters: {type: 'array'},
+        required: ['id'],
+      },
+    }
+  },
+  required: ['types', 'primaryType', 'domain', 'message'],
+  $defs: {
+    EIP712Types: {
+      type: 'object',
+      properties: {
+        EIP712Domain: {type: 'array'},
+      },
+      additionalProperties: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            name: {type: 'string'},
+            type: {type: 'string'}
+          },
+          required: ['name', 'type']
+        }
+      },
+      required: ['EIP712Domain']
+    }
+  }
+}
+```
+
+## Rationale
+
+TODO
+
+## Backwards Compatibility
+
+TODO
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
