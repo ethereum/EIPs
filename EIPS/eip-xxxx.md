@@ -57,8 +57,8 @@ Each member of the array is an object with the following keys:
 For example: 
 
 1. A dapp requests an EIP-712 signature to a connected account via JSON-RPC. `signingDomains` is empty or undefined.
-2. The connected account is a multisig, so it requests EIP-712 signatures from its signers, appending the domain of the multisig to `signingDomains`, which is now an array of length 1.
-3. One of the signers uses a smart contract account controlled by an ECDSA key held in a hardware wallet, so their wallet requests an EIP-712 signature from the hardware wallet, appending the domain of the smart contract account to `signingDomains`, which is now an array of length 2.
+2. The connected account is a multisig, so it requests EIP-712 signatures from its signers, prepending the domain of the multisig to `signingDomains`, which is now an array of length 1.
+3. One of the signers uses a smart contract account controlled by an ECDSA key held in a hardware wallet, so their wallet requests an EIP-712 signature from the hardware wallet, prepending the domain of the smart contract account to `signingDomains`, which is now an array of length 2.
 4. The signer verifies the contents of the signature in their hardware wallet. They are able to see that they are signing a message intended for a particular dapp domain, on behalf of their smart contract account (closest signing domain), as a member of the multisig (furthest signing domain).
 
 #### Encoding of data to be signed
