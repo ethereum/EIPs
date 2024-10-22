@@ -3,6 +3,7 @@ title: dApp Security Policy Standard
 description: Defines a document standard for defining the expected on-chain behavior of a dApp frontend.
 author: Bernard Wagner (bernard-wagner)
 status: Draft
+discussions-to: https://ethereum-magicians.org/t/dapp-security-policy/21431
 type: Meta
 created: 2024-10-22
 ---
