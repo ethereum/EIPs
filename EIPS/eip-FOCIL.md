@@ -30,6 +30,8 @@ FOCIL is a simple committee-based design improving upon previous IL mechanisms o
 ## High-level Overview
 <img width="956" alt="Screenshot 2024-10-21 at 14 30 18" src="https://github.com/user-attachments/assets/306e4a07-f059-4510-a45c-ed3de7aec781">
 
+![FOCIL diagram](../assets/eip-FOCIL/diagram_FOCIL.png)
+
 ### Roles And Participants
 
 This section outlines the workflow of FOCIL, detailing the roles and responsibilities of various participants, including IL committee members, nodes, proposers, and attesters.
