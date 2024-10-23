@@ -43,11 +43,16 @@ IL committee members construct their ILs and broadcast them over the P2P network
   By default, ILs are built by selecting raw transactions from the public mempool, ordered by priority fees, up to the IL’s maximum size in bits (e.g., 8 KB per IL). Additional rules can be optionally applied to maximize censorship resistance, such as prioritizing valid transactions that have been pending in the mempool the longest.
 
 #### Nodes
+- **`Slot N`, `t=0 to 9s`**: Nodes receive ILs from the P2P network and store (1) all new ILs that pass the CL P2P validation rules, and any evidence of IL equivocation by committee members (i.e., if multiple ILs are received from the same committee member).
 
-- **`Slot N`, `t=0 to 9s`**:
-Nodes receive ILs from the P2P network and only forward and cache those that pass the CL P2P validation rules.
+- **`Slot N`, `t=9s`**: IL freeze deadline. At this point, nodes freeze their IL view and stop caching new ILs in memory.
 
-- **`Slot N`, `t=9s`**: IL freeze deadline. At this point, nodes freeze their IL view and stop caching new ILs in memory. After the deadline, nodes continue forwarding ILs to peers following the CL P2P validation rules, but they discard any new local ILs received after the deadline (`t=9s`) and keep only minimal information (i.e., the number of ILs forwarded per committee member) to forward according to the rules.
+- **`Slot N`, `t=9s` to `Slot N+1`, `t=4s`**: After the IL freeze deadline, nodes:
+  1. Do not store new ILs received after the deadline.
+  2. Continue forwarding ILs to peers following the CL P2P validation rules.
+  3. Record any evidence of IL equivocation that occurs after the freeze deadline.
+
+After the attestation deadline of **`Slot N+1`, `t=4s`**, nodes ignore any new ILs related to the previous slot's IL committee, and stop recording equivocation evidence for the previous slot's ILs.
 
 #### Block Producer
 - **`Slot N`, `t=0 to 11s`**: The block producer (i.e., a proposer or a proposer builder pair) receive ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the block producer to request missing ILs from its peers (e.g., by committee index at `t=10s`).
