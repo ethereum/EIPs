@@ -1,13 +1,12 @@
 ---
 title: <BLOB Data and Rollup Operator Rewards>
 description: <A proposal to reward rollup operators for submitting BLOB data to L1>
-author: <Ryo Ha(@sopia19910), Khajiev Nizomjon(@khajievN)>
-discussions-to: <URL>
+author: <Ryo Ha (sopia19910@gmail.com),Khajiev Nizomjon(nizom7812@gmail.com),seongsu Kim(oiool@naver.com)>
+discussions-to:
 status: Draft
 type: <Standards Track>
-category: <Core> # Only required for Standards Track. Otherwise, remove this field.
+category: <Core> 
 created: <2024-10-23>
-requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
 ---
 
 ## Abstract
