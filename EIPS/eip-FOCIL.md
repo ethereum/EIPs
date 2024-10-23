@@ -71,8 +71,8 @@ Attesters monitor the P2P network for the proposer’s block. Upon detecting it,
 
 When validators receive ILs from the P2P network, they perform a series of validation checks before forwarding or caching them. These rules protect against Denial-of-Service (DoS) attacks by (1) limiting ILs' byte size and (2) restricting IL proposals to a small committee of IL committee members, thereby tightly bounding the main resource consumed by the propagation of ILs. Consumption of other relevant resources, such as verification time, is minimal because the only nontrivial check performed on IL propagation is signature verification. At this stage, there is no EL verification of the transactions within ILs. This means that ILs are allowed to contain any transactions—valid or invalid—since validators do not perform EL-side checks. This design choice is intended to avoid additional computational overhead.
 
-1. The slot of the IL matches the current slot. ILs not matching the current slot should be ignored.
-2. The parent hash of the IL is recognized.
+1. The slot of the IL matches the current or previous slot.
+2. The root of the IL committee referenced in the IL matches the expected IL committee root for the current or previous slot.
 3. Received two or fewer ILs from this IL committee member (see IL equivocation section below).
 4. The IL is correctly signed by the validator.
 5. The validator is part of the IL committee.
