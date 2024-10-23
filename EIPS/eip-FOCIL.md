@@ -25,7 +25,7 @@ FOCIL is built in a few simple steps:
 
 In an effort to shield the Ethereum validator set from centralizing forces, the right to build blocks has been auctioned off to specialized entities known as builders. Over the past year, this has resulted in a few sophisticated builders dominating the network’s block production. Economies of scale have further entrenched their position, making it increasingly difficult for new entrants to gain significant market share. A direct consequence of centralized block production is a deterioration of the network’s censorship resistance properties. In contrast, 90% of the more decentralized and heterogeneous validator set is not engaging in censorship. This has driven research toward ways that allow validators to impose constraints on block construction by force-including transactions in the blocks. These efforts recently culminated in the first practical implementation of forward ILs, [EIP-7547](./eip-7547.md), being considered for inclusion in the upcoming Pectra fork. However, some concerns were raised about the specific mechanism proposed in EIP-7547, leading to its rejection. 
 
-FOCIL is a simple committee-based design improving upon previous IL mechanisms or block co-creation proposals and addressing issues related to bribing/extortion attacks, IL equivocation, account abstraction (AA) and transaction invalididation.
+FOCIL is a simple committee-based design improving upon previous IL mechanisms or block co-creation proposals and addressing issues related to bribing/extortion attacks, IL equivocation, account abstraction (AA) and transaction invalidation.
 
 ## High-level Overview
 
@@ -42,17 +42,17 @@ IL committee members construct their ILs and broadcast them over the P2P network
 
   By default, ILs are built by selecting raw transactions from the public mempool, ordered by priority fees, up to the IL’s maximum size in bits (e.g., 8 KB per IL). Additional rules can be optionally applied to maximize censorship resistance, such as prioritizing valid transactions that have been pending in the mempool the longest.
 
-#### Nodes
-- **`Slot N`, `t=0 to 9s`**: Nodes receive ILs from the P2P network and store (1) all new ILs that pass the CL P2P validation rules, and any evidence of IL equivocation by committee members (i.e., if multiple ILs are received from the same committee member).
+#### Validators
+- **`Slot N`, `t=0 to 9s`**: Validators receive ILs from the P2P network and store (1) all new ILs that pass the CL P2P validation rules, and any evidence of IL equivocation by committee members (i.e., if multiple ILs are received from the same committee member).
 
-- **`Slot N`, `t=9s`**: IL freeze deadline. At this point, nodes freeze their IL view and stop caching new ILs in memory.
+- **`Slot N`, `t=9s`**: IL freeze deadline. At this point, validators freeze their IL view and stop caching new ILs in memory.
 
-- **`Slot N`, `t=9s` to `Slot N+1`, `t=4s`**: After the IL freeze deadline, nodes:
+- **`Slot N`, `t=9s` to `Slot N+1`, `t=4s`**: After the IL freeze deadline, validators:
   1. Do not store new ILs received after the deadline.
   2. Continue forwarding ILs to peers following the CL P2P validation rules.
   3. Record any evidence of IL equivocation that occurs after the freeze deadline.
 
-After the attestation deadline of **`Slot N+1`, `t=4s`**, nodes ignore any new ILs related to the previous slot's IL committee, and stop recording equivocation evidence for the previous slot's ILs.
+After the attestation deadline of **`Slot N+1`, `t=4s`**, validators ignore any new ILs related to the previous slot's IL committee, and stop recording equivocation evidence for the previous slot's ILs.
 
 #### Block Producer
 - **`Slot N`, `t=0 to 11s`**: The block producer (i.e., a proposer or a proposer builder pair) receive ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the block producer to request missing ILs from its peers (e.g., by committee index at `t=10s`).
@@ -65,11 +65,11 @@ The proposer broadcasts its block with the up-to-date execution payload satisfyi
 
 #### Attesters
 - **`Slot N+1`, `t=0 to 4s`**:
-Attesters monitor the P2P network for the proposer’s block. Upon detecting it, they verify whether all transactions from their cached ILs are included in the proposer’s execution payload. The `Valid` function, based on the frozen view of the ILs from `t=9s` in the previous slot, checks if the execution payload satisfies IL validity conditions. This is done either by confirming that all transactions are present or by determining if any missing transactions are invalid when appended to the end of the payload. In such cases, attesters use the EL to perform nonce and balance checks to validate the missing transactions and check whether there is enough space in the block to include the transaction(s).
+Attesters monitor the P2P network for the proposer’s block. Upon detecting it, they verify whether all transactions from their stored ILs are included in the proposer’s execution payload. The `Valid` function, based on the frozen view of the ILs from `t=9s` in the previous slot, checks if the execution payload satisfies IL validity conditions. This is done either by confirming that all transactions are present or by determining if any missing transactions are invalid when appended to the end of the payload. In such cases, attesters use the EL to perform nonce and balance checks to validate the missing transactions and check whether there is enough space in the block to include the transaction(s).
 
 #### CL P2P Validation Rules
 
-When nodes receive ILs from the P2P network, they perform a series of validation checks before forwarding or caching them. These rules protect against Denial-of-Service (DoS) attacks by (1) limiting ILs' byte size and (2) restricting IL proposals to a small committee of IL committee members, thereby tightly bounding the main resource consumed by the propagation of ILs. Consumption of other relevant resources, such as verification time, is minimal because the only nontrivial check performed on IL propagation is signature verification. At this stage, there is no EL verification of the transactions within ILs. This means that ILs are allowed to contain any transactions—valid or invalid—since nodes do not perform EL-side checks. This design choice is intended to avoid additional computational overhead.
+When validators receive ILs from the P2P network, they perform a series of validation checks before forwarding or caching them. These rules protect against Denial-of-Service (DoS) attacks by (1) limiting ILs' byte size and (2) restricting IL proposals to a small committee of IL committee members, thereby tightly bounding the main resource consumed by the propagation of ILs. Consumption of other relevant resources, such as verification time, is minimal because the only nontrivial check performed on IL propagation is signature verification. At this stage, there is no EL verification of the transactions within ILs. This means that ILs are allowed to contain any transactions—valid or invalid—since validators do not perform EL-side checks. This design choice is intended to avoid additional computational overhead.
 
 1. The slot of the IL matches the current slot. ILs not matching the current slot should be ignored.
 2. The parent hash of the IL is recognized.
@@ -128,8 +128,7 @@ The full consensus changes can be found in the following Github repository. They
 class InclusionList(Container):
     slot: Slot
     validator_index: ValidatorIndex
-    parent_root: Root
-    parent_hash: Hash32
+    inclusion_list_committee_root: Root
     transactions: List[Transaction, MAX_TRANSACTIONS_PER_INCLUSION_LIST]
 ```
 
@@ -141,8 +140,8 @@ class SignedInclusionList(Container):
 
 #### Fork choice changes
 
-- Cache ILs observed over gossip before the IL freeze deadline.
-- If more than one IL is observed from the same IL committee member, remove all ILs from the member from the cache.
+- Store ILs observed over gossip before the IL freeze deadline.
+- If more than one IL is observed from the same IL committee member, remove all ILs from the member from the store.
 - Fork choice head retrieval is based on the `Valid` function being satisfied by the EL.
   
 #### P2P changes
