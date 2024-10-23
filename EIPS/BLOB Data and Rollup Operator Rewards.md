@@ -1,0 +1,48 @@
+---
+title: <BLOB Data and Rollup Operator Rewards>
+description: <A proposal to reward rollup operators for submitting BLOB data to L1>
+author: <Ryo Ha(@sopia19910), Khajiev Nizomjon(@khajievN)>
+discussions-to: <URL>
+status: Draft
+type: <Standards Track>
+category: <Core> # Only required for Standards Track. Otherwise, remove this field.
+created: <2024-10-23>
+requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+---
+
+## Abstract
+
+This proposal designs a system that rewards rollup operators for using BLOB data and DATA TX. The goal is to allow rollup operators to submit data processed on Layer 2 (L2) to Layer 1 (L1) and receive economic incentives, thereby improving the network's scalability and efficiency.
+
+## Motivation
+
+Rollups play an important role in improving Ethereum's scalability, but there is currently no clear reward mechanism for rollup operators. This proposal suggests using BLOB data and DATA TX to create a reward system for rollup operators, aiming to promote network activation and mitigate the centralization issue in Ethereum staking. By providing rewards based on L2 consensus, this system can encourage more participants and strengthen decentralization.
+
+## Specification
+
+1. BLOB Data Usage: Rollup operators store large-scale data in BLOB space and submit it to L1 for verification.
+2. Reward Mechanism: Once the data is successfully submitted and verified, rollup operators are rewarded with L1 coins (ETH).
+3. DATA TX: The transaction that transfers the data is processed by the rollup protocol, and the result is reflected in L1, where the final reward is granted.
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+## Rationale
+
+Rollup operators handle many transactions and large amounts of data, supporting the scalability and stability of the network. By providing a clear reward system for operators processing large-scale data using BLOBs, more participation can be encouraged, promoting the decentralization of the Ethereum network. This will allow the network to handle larger transaction volumes and maximize efficiency.
+
+TBD
+
+## Backwards Compatibility
+
+BLOB data, introduced through EIP-4844, is a new method for efficiently storing large-scale data. This proposal aims to extend that system by providing rewards to rollup operators, thereby enhancing network performance. By facilitating efficient data processing and rewards between L1 and L2, the proposal seeks to improve the network’s scalability and efficiency.
+No backward compatibility issues found.
+
+## Security Considerations
+
+The reward mechanism must be based on accurate verification, with clear rules to prevent fraudulent activity. Rollup operators submitting incorrect data should not receive rewards, and the reliability and accuracy of the data must be ensured.
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
