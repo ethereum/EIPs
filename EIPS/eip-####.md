@@ -84,9 +84,9 @@ SSZ serialization, generalized indices, as well as semantics of individual objec
 
 Certain SHA-256-512 hashes of 512 bit data may collide with regular SHA-256 hashes of shorter data. For example:
 
-- Any common 44-bit prefix: `COMMON_PREFIX := 0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738`
-- `SHA-256-512(COMMON_PREFIX ++ 0x80 ++ 0x00000000000001b8) == 0x2fe741af801cc238602ac0ec6a7b0c3a8a87c7fc7d7f02a3fe03d1c12eac4d8f`
-- `SHA-256(COMMON_PREFIX) == 2fe741af801cc238602ac0ec6a7b0c3a8a87c7fc7d7f02a3fe03d1c12eac4d8f`
+- Any common 440-bit prefix: `COMMON_PREFIX := 0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233343536`
+- `SHA-256-512(COMMON_PREFIX ++ 0x80 ++ 0x00000000000001b8) == 463eb28e72f82e0a96c0a4cc53690c571281131f672aa229e0d45ae59b598b59`
+- `SHA-256(COMMON_PREFIX) == 463eb28e72f82e0a96c0a4cc53690c571281131f672aa229e0d45ae59b598b59`
 
 Because SSZ has never hashed data with sizes different from 512 bits, SSZ hashes based on SHA-256 do not collide with hashes based on SHA-256-512.
 
