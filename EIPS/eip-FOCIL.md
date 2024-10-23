@@ -64,7 +64,7 @@ The block producer freezes its view of ILs and asks the EL to update its executi
 The proposer broadcasts its block with the up-to-date execution payload satisfying IL transactions over the P2P network.
 
 #### Attesters
-- **`Slot N+1`, `t=0 to 4s`**:
+- **`Slot N+1`, `t=4s`**:
 Attesters monitor the P2P network for the proposer’s block. Upon detecting it, they verify whether all transactions from their stored ILs are included in the proposer’s execution payload. The `Valid` function, based on the frozen view of the ILs from `t=9s` in the previous slot, checks if the execution payload satisfies IL validity conditions. This is done either by confirming that all transactions are present or by determining if any missing transactions are invalid when appended to the end of the payload. In such cases, attesters use the EL to perform nonce and balance checks to validate the missing transactions and check whether there is enough space in the block to include the transaction(s).
 
 #### CL P2P Validation Rules
