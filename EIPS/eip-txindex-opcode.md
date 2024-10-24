@@ -1,0 +1,48 @@
+---
+title: TXINDEX opcode
+description: Opcode to get index of transaction within block
+author: Marc Harvey-Hill (@Marchhill), Ahmad Bitar (@smartprogrammer93)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-10-17
+---
+
+## Abstract
+
+This EIP proposes to add a new opcode that returns the index of the transaction being executed within the current block.
+
+## Motivation
+
+The new opcode aims to improve support for encrypted mempools. In order to be secure, the validity of encrypted mempool transactions should be tied to the inclusion of all transactions by a proposer in the correct slot, and following the ordering rules. If these rules are not enshrined as block validity conditions then they can be enforced by a smart contract.
+
+This proposal enables smart contract solutions to check their own transaction index, so they can enforce inclusion at the correct index. These out-of-protocol solutions could be used for experimentation until a design appropriate for enshrinement is agreed upon.
+
+## Specification
+
+The instruction `TXINDEX` is introduced at `TBD`. The opcode pushes the transaction index as 4 byte uint in big endian encoding to the top of the stack. 
+
+Following the yellow paper spec, it should be considered part of `W_base` for gas pricing.
+
+## Rationale
+
+<!-- TODO -->
+TBD
+
+## Backwards Compatibility
+
+No backward compatibility issues found.
+
+## Test Cases
+
+N/A
+
+## Security Considerations
+
+<!-- TODO -->
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
