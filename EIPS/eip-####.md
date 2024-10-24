@@ -2,7 +2,7 @@
 title: Double speed for hash_tree_root
 description: Double the performance of hash_tree_root by customizing SHA-256
 author: Etan Kissling (@etan-status)
-discussions-to: https://ethereum-magicians.org/t/eip-double-speed-for-hash-tree-root/21447
+discussions-to: https://ethereum-magicians.org/t/eip-7797-double-speed-for-hash-tree-root/21447
 status: Draft
 type: Standards Track
 category: Core
