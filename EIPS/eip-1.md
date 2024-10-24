@@ -77,7 +77,7 @@ The following is the standardization process for all EIPs in all tracks:
 
 **Draft** - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.
 
-**Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
+**Review** - An EIP Author marks an EIP as ready for and requesting Peer Review. If applicable, a patent waiver is required (see below.)
 
 **Last Call** - This is the final review window for an EIP before moving to `Final`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
 
@@ -109,6 +109,7 @@ Each EIP should have the following parts:
 - Reference Implementation *(optional)* - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all EIPs.
 - Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 - Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](../LICENSE.md).`
+- Patent Waiver *(optional)* - A patent waiver is mandatory should the authors know (or suspect) that the proposal may infringe on any patents. The waiver must be granted from the patent holder (or a sublicensee), be perpetual and irrevocable, and allow unrestricted implementation of the standard. Draft proposals may omit the patent waiver.
 
 ## EIP Formats and Templates
 
