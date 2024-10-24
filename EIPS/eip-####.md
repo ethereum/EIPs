@@ -1,4 +1,5 @@
 ---
+eip: 7797
 title: Double speed for hash_tree_root
 description: Double the performance of hash_tree_root by customizing SHA-256
 author: Etan Kissling (@etan-status)
