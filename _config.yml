@@ -69,5 +69,7 @@ exclude:
   
 include:
   - LICENSE
+  - eips-queue
+  - ercs-queue
 
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
