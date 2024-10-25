@@ -45,12 +45,12 @@ IL committee members construct their ILs and broadcast them over the P2P network
 #### Validators
 - **`Slot N`, `t=0 to 9s`**: Validators receive ILs from the P2P network and store (1) all new ILs that pass the CL P2P validation rules, and any evidence of IL equivocation by committee members (i.e., if multiple ILs are received from the same committee member).
 
-- **`Slot N`, `t=9s`**: IL freeze deadline. At this point, validators freeze their IL view and stop caching new ILs in memory.
+- **`Slot N`, `t=9s`**: View freeze deadline. At this point, validators freeze their IL view and stop caching new ILs in memory.
 
-- **`Slot N`, `t=9s` to `Slot N+1`, `t=4s`**: After the IL freeze deadline, validators:
+- **`Slot N`, `t=9s` to `Slot N+1`, `t=4s`**: After the view freeze deadline, validators:
   1. Do not store new ILs received after the deadline.
   2. Continue forwarding ILs to peers following the CL P2P validation rules.
-  3. Record any evidence of IL equivocation that occurs after the freeze deadline.
+  3. Record any evidence of IL equivocation that occurs after the view freeze deadline.
 
 After the attestation deadline of **`Slot N+1`, `t=4s`**, validators ignore any new ILs related to the previous slot's IL committee, and stop recording equivocation evidence for the previous slot's ILs.
 
@@ -140,7 +140,7 @@ class SignedInclusionList(Container):
 
 #### Fork choice changes
 
-- Store ILs observed over gossip before the IL freeze deadline.
+- Store ILs observed over gossip before the view freeze deadline.
 - If more than one IL is observed from the same IL committee member, remove all ILs from the member from the store.
 - Fork choice head retrieval is based on the `Valid` function being satisfied by the EL.
   
@@ -167,7 +167,7 @@ This EIP introduces backward incompatible changes to the block validation rule s
 
 ### Consensus Liveness
 
-The block producer (i.e., a proposer or a proposer builder pair) of `slot N+1` cannot construct a canonical block without first receiving the ILs broadcast during `slot N`. This means that the block producer must be well-connected to the IL committee members to ensure timely access to these inclusion lists. Additionally, there must be sufficient time between the IL freeze deadline (`t=9s` of `slot N`) and the moment the block producer must broadcast `block B` to the rest of the network. This buffer allows the block producer to gather all available ILs and update the execution payload of `block B` accordingly.
+The block producer (i.e., a proposer or a proposer builder pair) of `slot N+1` cannot construct a canonical block without first receiving the ILs broadcast during `slot N`. This means that the block producer must be well-connected to the IL committee members to ensure timely access to these inclusion lists. Additionally, there must be sufficient time between the view freeze deadline (`t=9s` of `slot N`) and the moment the block producer must broadcast `block B` to the rest of the network. This buffer allows the block producer to gather all available ILs and update the execution payload of `block B` accordingly.
 
 ### IL Equivocation
 
