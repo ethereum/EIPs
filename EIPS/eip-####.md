@@ -2,7 +2,7 @@
 title: System logs
 description: Per-block logs without associated transactions
 author: Etan Kissling (@etan-status), Gajinder Singh (@g11tech)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-system-logs/21497
 status: Draft
 type: Standards Track
 category: Core
