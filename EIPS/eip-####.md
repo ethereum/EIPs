@@ -40,7 +40,7 @@ A log SHALL be appended to the system logs list to reflect this credit of priori
 | Field | Value |
 | - | - |
 | `address` | `0xfffffffffffffffffffffffffffffffffffffffe` ([`SYSTEM_ADDRESS`](./eip-4788.md)) |
-| `topics[0]` | `0x5dfe9c0fd3043bb299f97cfece428f0396cf8b7890c525756e4ea5c0ff7d61b2`<br />(`keccak256('PriorityRewards(address,uint256)')`) |
+| `topics[0]` | `0x5dfe9c0fd3043bb299f97cfece428f0396cf8b7890c525756e4ea5c0ff7d61b2` (`keccak256('PriorityRewards(address,uint256)')`) |
 | `topics[1]` | `to` address (zero prefixed to fill uint256) |
 | `data` | `amount` in Wei (big endian uint256) |
 
@@ -51,7 +51,7 @@ A log SHALL be appended to the system logs list on every [EIP-4895](./eip-4895.m
 | Field | Value |
 | - | - |
 | `address` | `0xfffffffffffffffffffffffffffffffffffffffe` ([`SYSTEM_ADDRESS`](./eip-4788.md)) |
-| `topics[0]` | `0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65`<br />(`keccak256('Withdrawal(address,uint256)')`) |
+| `topics[0]` | `0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65` (`keccak256('Withdrawal(address,uint256)')`) |
 | `topics[1]` | `to` address (zero prefixed to fill uint256) |
 | `data` | `amount` in Wei (big endian uint256) |
 
@@ -62,7 +62,7 @@ A log SHALL be appended to the system logs list when generating genesis blocks f
 | Field | Value |
 | - | - |
 | `address` | `0xfffffffffffffffffffffffffffffffffffffffe` ([`SYSTEM_ADDRESS`](./eip-4788.md)) |
-| `topics[0]` | `0xba2f6409ffd24dd4df8e06be958ed8c1706b128913be6e417989c74969b0b55a`<br />(`keccak256('Genesis(address,uint256)')`) |
+| `topics[0]` | `0xba2f6409ffd24dd4df8e06be958ed8c1706b128913be6e417989c74969b0b55a` (`keccak256('Genesis(address,uint256)')`) |
 | `topics[1]` | `to` address (zero prefixed to fill uint256) |
 | `data` | `amount` in Wei (big endian uint256) |
 
