@@ -142,7 +142,7 @@ class SignedInclusionList(Container):
 
 - Store ILs observed over gossip before the view freeze deadline.
 - If more than one IL is observed from the same IL committee member, remove all ILs from the member from the store.
-- Fork choice head retrieval is based on the `Valid` function being satisfied by the EL.
+- The beacon block from the current slot is only attested to if the `Valid` function is satisfied, based on all stored ILs from non equivocators.
   
 #### P2P changes
 
