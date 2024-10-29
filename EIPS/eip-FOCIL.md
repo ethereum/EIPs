@@ -141,7 +141,7 @@ class SignedInclusionList(Container):
 #### Fork choice changes
 
 - Store ILs observed over gossip before the view freeze deadline.
-- If more than one IL is observed from the same IL committee member, remove all ILs from the member from the store.
+- If more than one IL is observed from the same IL committee member, mark the committee member as an equivocator and ignore any further ILs from them.
 - The beacon block from the current slot is only attested to if the `Valid` function is satisfied, based on all stored ILs from non equivocators.
   
 #### P2P changes
