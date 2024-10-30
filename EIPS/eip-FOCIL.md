@@ -33,7 +33,7 @@ FOCIL is a simple committee-based design improving upon previous IL mechanisms o
 
 ### Roles And Participants
 
-This section outlines the workflow of FOCIL, detailing the roles and responsibilities of various participants, including IL committee members, nodes, proposers, and attesters.
+This section outlines the workflow of FOCIL, detailing the roles and responsibilities of various participants, including IL committee members, validators, proposers, and attesters.
 
 #### IL Committee Members
 
@@ -45,21 +45,20 @@ IL committee members construct their ILs and broadcast them over the P2P network
 #### Validators
 - **`Slot N`, `t=0 to 9s`**: Validators receive ILs from the P2P network and store (1) all new ILs that pass the CL P2P validation rules, and any evidence of IL equivocation by committee members (i.e., if multiple ILs are received from the same committee member).
 
-- **`Slot N`, `t=9s`**: View freeze deadline. At this point, validators freeze their IL view and stop caching new ILs in memory.
-
-- **`Slot N`, `t=9s` to `Slot N+1`, `t=4s`**: After the view freeze deadline, validators:
+- **`Slot N`, `t=9s` to `Slot N+1`, `t=4s`**: After the view freeze deadline at `t=9s`, validators:
   1. Do not store new ILs received after the deadline.
   2. Continue forwarding ILs to peers following the CL P2P validation rules.
   3. Record any evidence of IL equivocation that occurs after the view freeze deadline.
 
 After the attestation deadline of **`Slot N+1`, `t=4s`**, validators ignore any new ILs related to the previous slot's IL committee, and stop recording equivocation evidence for the previous slot's ILs.
 
-#### Block Producer
-- **`Slot N`, `t=0 to 11s`**: The block producer (i.e., a proposer or a proposer builder pair) receive ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the block producer to request missing ILs from its peers (e.g., by committee index at `t=10s`).
+#### Builder
+- **`Slot N`, `t=0 to 11s`**: The builder (i.e., a proposer doing local block building or an external builder) receive ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the builder to request missing ILs from its peers (e.g., by committee index at `t=10s`).
 
 - **`Slot N`, `t=11s`**:
-The block producer freezes its view of ILs and asks the EL to update its execution payload by adding transactions from its view (the exact timings will be defined after running some tests/benchmarks).
+The builder freezes its view of ILs and asks the EL to update its execution payload by adding transactions from its view (the exact timings will be defined after running some tests/benchmarks).
 
+#### Proposer
 - **`Slot N+1`, `t=0s`**:
 The proposer broadcasts its block with the up-to-date execution payload satisfying IL transactions over the P2P network.
 
