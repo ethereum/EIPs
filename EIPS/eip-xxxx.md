@@ -1,13 +1,13 @@
 ---
 eip: xxxx
-title: eth/70 - Sharded Blocks with Extended Protocol
+title: eth/70 - Sharded Blocks Protocol
 description: Replaces block range with a bitlist representing 1-million-block spans in the handshake, with probabilistic shard retention
 author: Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>, Giulio Rebuffo (@Giulio2002)
-discussions-to: https://ethereum-magicians.org/t/eip-eth-70-available-blocks-extended-protocol-handshake/16188
+discussions-to: 
 status: Draft
 type: Standards Track
 category: Networking
-created: 2023-10-21
+created: 2024-10-30
 requires: 7642
 ---
 
