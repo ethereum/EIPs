@@ -1,4 +1,5 @@
 ---
+eip: 7799
 title: System logs
 description: Per-block logs without associated transactions
 author: Etan Kissling (@etan-status), Gajinder Singh (@g11tech)
