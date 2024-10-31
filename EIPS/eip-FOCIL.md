@@ -43,7 +43,7 @@ IL committee members construct their ILs and broadcast them over the P2P network
   By default, ILs are built by selecting raw transactions from the public mempool, ordered by priority fees, up to the IL’s maximum size in bits (e.g., 8 KB per IL). Additional rules can be optionally applied to maximize censorship resistance, such as prioritizing valid transactions that have been pending in the mempool the longest.
 
 #### Validators
-- **`Slot N`, `t=0 to 9s`**: Validators receive ILs from the P2P network and store (1) all new ILs that pass the CL P2P validation rules, and any evidence of IL equivocation by committee members (i.e., if multiple ILs are received from the same committee member).
+- **`Slot N`, `t=0 to 9s`**: Validators receive ILs from the P2P network and store (1) all new ILs that pass the CL P2P validation rules, and (2) any evidence of IL equivocation by committee members (i.e., if multiple ILs are received from the same committee member).
 
 - **`Slot N`, `t=9s` to `Slot N+1`, `t=4s`**: After the view freeze deadline at `t=9s`, validators:
   1. Do not store new ILs received after the deadline.
@@ -103,7 +103,7 @@ We make the following changes to the engine API:
 
 ### Consensus Layer
 
-The full consensus changes can be found in the following Github repository. They are split between: 
+The full consensus changes can be found in the following GitHub repository. They are split between: 
 
 - [Beacon Chain](https://github.com/terencechain/consensus-specs/blob/6056b69ea1215c3dff6042da2b0a8563347be645/specs/_features/focil/beacon-chain.md) changes.
 - [Fork choice](https://github.com/terencechain/consensus-specs/blob/6056b69ea1215c3dff6042da2b0a8563347be645/specs/_features/focil/fork-choice.md) changes.
