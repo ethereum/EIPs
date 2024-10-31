@@ -12,22 +12,23 @@ created: 2024-10-??
 
 ## Abstract
 
-Implement a robust mechanism to preserve Ethereum’s censorship resistance and chain neutrality properties by guaranteeing timely transaction inclusion.
+Implement a robust mechanism to preserve Ethereum’s censorship resistance properties by guaranteeing timely transaction inclusion.
 
-FOCIL is built in a few simple steps:
+FOCIL (**Fo**rk-choice enforced **I**nclusion **L**ists) is built in a few simple steps:
 
-- In each slot, a set of validators is selected to become IL committee members. Each member gossips one inclusion list (IL) according to their subjective view of the mempool.
-- The proposer and all attesters of the next slot monitor, forward and collect available ILs.
+- In each slot, a set of validators is selected as inclusion list (IL) committee members. Each member gossips one IL according to their subjective view of the mempool.
+- The proposer and all attesters of the next slot monitor, store and forward available ILs.
 - The proposer includes transactions from all collected ILs in its block before broadcasting it to the rest of the network.
-- Attesters only vote for the proposer's block if it includes transactions from ILs they collected.
+- Attesters only vote for the proposer's block if it includes transactions from all stored ILs.
 
 ## Motivation
 
-In an effort to shield the Ethereum validator set from centralizing forces, the right to build blocks has been auctioned off to specialized entities known as builders. This has led to a few sophisticated builders dominating block production, leading to a deterioration of the network’s censorship resistance properties. To address this issue, research has focused on improving Ethereum's transaction inclusion guarantees by enabling validators to impose constraints on builders. This is achieved by force-including transactions in blocks via inclusion lists.
-
-FOCIL is a simple, committee-based, and fork-choice enforced inclusion list (IL) design that improves upon previous IL mechanisms and block co-creation proposals. It addresses issues related to bribing/extortion attacks, IL equivocation, account abstraction (AA), and transaction invalidation.
+In an effort to shield the Ethereum validator set from centralizing forces, the right to build blocks has been auctioned off to specialized entities known as *builders*. This has led to a few sophisticated builders dominating block production, leading to a deterioration of the network’s censorship resistance properties. To address this issue, research has focused on improving Ethereum's transaction inclusion guarantees by enabling validators to impose constraints on builders. This is achieved by force-including transactions in blocks via ILs.
 
 ## High-level Overview
+
+FOCIL is a committee-based, fork-choice enforced inclusion list (IL) design that improves upon previous IL mechanisms and block co-creation proposals. It addresses issues related to bribing/extortion attacks, IL equivocation, account abstraction (AA), and transaction invalidation.
+
 ![FOCIL diagram](../assets/eip-FOCIL/diagram_FOCIL.png)
 
 ### Roles And Participants
