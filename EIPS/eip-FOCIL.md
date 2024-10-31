@@ -23,7 +23,7 @@ FOCIL is built in a few simple steps:
 
 ## Motivation
 
-In an effort to shield the Ethereum validator set from centralizing forces, the right to build blocks has been auctioned off to specialized entities known as builders. Over the past year, this has resulted in a few sophisticated builders dominating the network’s block production. Economies of scale have further entrenched their position, making it increasingly difficult for new entrants to gain significant market share. A direct consequence of centralized block production is a deterioration of the network’s censorship resistance properties. In contrast, 90% of the more decentralized and heterogeneous validator set is not engaging in censorship. This has driven research toward ways that allow validators to impose constraints on block construction by force-including transactions in the blocks. These efforts recently culminated in the first practical implementation of forward ILs, [EIP-7547](./eip-7547.md), being considered for inclusion in the upcoming Pectra fork. However, some concerns were raised about the specific mechanism proposed in EIP-7547, leading to its rejection. 
+In an effort to shield the Ethereum validator set from centralizing forces, the right to build blocks has been auctioned off to specialized entities known as builders. Over the past year, this has resulted in a few sophisticated builders dominating the network’s block production. Economies of scale have further entrenched their position, making it increasingly difficult for new entrants to gain significant market share. A direct consequence of centralized block production is a deterioration of the network’s censorship resistance properties. This has driven research toward ways that allow validators to impose constraints on block construction by force-including transactions in the blocks. These efforts recently culminated in the first practical implementation of forward ILs, [EIP-7547](./eip-7547.md), being considered for inclusion in the upcoming Pectra fork. However, some concerns were raised about the specific mechanism proposed in EIP-7547, leading to its rejection. 
 
 FOCIL is a simple committee-based design improving upon previous IL mechanisms or block co-creation proposals and addressing issues related to bribing/extortion attacks, IL equivocation, account abstraction (AA) and transaction invalidation.
 
@@ -53,7 +53,7 @@ IL committee members construct their ILs and broadcast them over the P2P network
 After the attestation deadline of **`Slot N+1`, `t=4s`**, validators ignore any new ILs related to the previous slot's IL committee, and stop recording equivocation evidence for the previous slot's ILs.
 
 #### Builder
-- **`Slot N`, `t=0 to 11s`**: The builder (i.e., a proposer doing local block building or an external builder) receive ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the builder to request missing ILs from its peers (e.g., by committee index at `t=10s`).
+- **`Slot N`, `t=0 to 11s`**: The builder (i.e., a proposer doing local block building or an external builder) receives ILs from the P2P network, forwarding and caching those that pass the CL P2P validation rules. Optionally, an RPC endpoint can be added to allow the builder to request missing ILs from its peers (e.g., by committee index at `t=10s`).
 
 - **`Slot N`, `t=11s`**:
 The builder freezes its view of ILs and asks the EL to update its execution payload by adding transactions from its view (the exact timings will be defined after running some tests/benchmarks).
@@ -64,7 +64,7 @@ The proposer broadcasts its block with the up-to-date execution payload satisfyi
 
 #### Attesters
 - **`Slot N+1`, `t=4s`**:
-Attesters monitor the P2P network for the proposer’s block. Upon detecting it, they verify whether all transactions from their stored ILs are included in the proposer’s execution payload, except for ILs whose sender has equivocated. The `Valid` function, based on the frozen view of the ILs from `t=9s` in the previous slot, checks if the execution payload satisfies IL validity conditions. This is done either by confirming that all transactions are present or by determining if any missing transactions are invalid when appended to the end of the payload. In such cases, attesters use the EL to perform nonce and balance checks to validate the missing transactions and check whether there is enough space in the block to include the transaction(s).
+Attesters monitor the P2P network for the proposer’s block. Upon detecting it, they verify whether all transactions from their stored ILs are included in the proposer’s execution payload, except for ILs whose sender has equivocated. Based on their frozen view of the ILs from `t=9s` in the previous slot, attesters check if the execution payload satisfies IL conditions. This is done either by confirming that all transactions are present or by determining if any missing transactions are invalid when appended to the end of the payload. In such cases, attesters use the EL to perform nonce and balance checks to validate the missing transactions and check whether there is enough space in the block to include the transaction(s).
 
 #### CL P2P Validation Rules
 
@@ -141,7 +141,7 @@ class SignedInclusionList(Container):
 
 - Store ILs observed over gossip before the view freeze deadline.
 - If more than one IL is observed from the same IL committee member, mark the committee member as an equivocator and ignore any further ILs from them.
-- The beacon block from the current slot is only attested to if the `Valid` function is satisfied, based on all stored ILs from non equivocators.
+- The beacon block from the current slot is only attested to if it satisfies IL conditions, based on all stored ILs from non equivocators.
   
 #### P2P changes
 
@@ -156,7 +156,7 @@ class SignedInclusionList(Container):
 - Same-slot: With FOCIL running in parallel with the block building process for `slot N+1` during `slot N`, the constraints imposed on `block B` for `slot N+1` can include transactions submitted during `slot N`. This represents a strict improvement over forward IL designs like EIP-7547, where the forward property introduced a 1-slot delay.
 - Conditional inclusion: FOCIL adopts conditional inclusion, accepting blocks that may lack some transactions from ILs if they cannot append the transactions to the end of the block or if they are full.
 - Anywhere-in-block: FOCIL is unopinionated about the placement of transactions from ILs within a block. This reduces incentives for sophisticated actors to use side channels to bypass the mechanism. Combined with conditional inclusion, this flexibility makes the emergence of off-protocol markets even less attractive.
-- No incentive mechanism: FOCIL does not provide explicit rewards for IL committee members participating in the mechanism. We believe that the added complexity of implementing a transaction fee system for FOCIL is not justified. Instead, we rely on altruistic behavior, as FOCIL requires only `1/n` IL committee members to act honestly for the mechanism to function as intended.
+- No incentive mechanism: FOCIL does not provide explicit rewards for IL committee members participating in the mechanism. We believe that the added complexity of implementing a transaction fee system for FOCIL is not justified. Instead, we rely on altruistic behavior, as FOCIL requires only `1/n` IL committee members to act honestly for the mechanism to work as intended.
 
 ## Backwards Compatibility
 
