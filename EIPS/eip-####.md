@@ -2,7 +2,7 @@
 title: SSZ Execution blocks
 description: Migration of execution blocks to SSZ
 author: Etan Kissling (@etan-status), Gajinder Singh (@g11tech)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-ssz-execution-blocks/21580
 status: Draft
 type: Standards Track
 category: Core
