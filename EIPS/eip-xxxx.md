@@ -1,9 +1,9 @@
 ---
-eip: [tbd]
+eip: 7808
 title: Reserve Tx-Type Range for RIPs
 description: Reserve transaction type range for use by the RIP process
 author: Carl Beekhuizen (@carlbeek), Yoav Weiss (@yoavw), Ansgar Dietrichs (@adietrichs)
-discussions-to: https://ethereum-magicians.org/t/eip-78xx-reserve-tx-type-range-for-rips/21587
+discussions-to: https://ethereum-magicians.org/t/eip-7808-reserve-tx-type-range-for-rips/21587
 status: Draft
 type: Meta
 requires: 2718
