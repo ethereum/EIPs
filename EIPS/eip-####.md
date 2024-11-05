@@ -1,6 +1,6 @@
 ---
 eip: 7807
-title: SSZ Execution blocks
+title: SSZ execution blocks
 description: Migration of execution blocks to SSZ
 author: Etan Kissling (@etan-status), Gajinder Singh (@g11tech)
 discussions-to: https://ethereum-magicians.org/t/eip-ssz-execution-blocks/21580
