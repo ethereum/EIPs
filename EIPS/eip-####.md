@@ -1,4 +1,5 @@
 ---
+eip: 7807
 title: SSZ Execution blocks
 description: Migration of execution blocks to SSZ
 author: Etan Kissling (@etan-status), Gajinder Singh (@g11tech)
