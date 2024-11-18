@@ -17,17 +17,17 @@ Introduce a new EVM instruction to [EOF1](./eip-7692.md) that allows smart contr
 
 ## Motivation
 
-Many onchain applications involve creating multiple instances of the same code at different location. These applications ofter rely on clones, or proxies, to reduce the deployment costs.
+Many on-chain applications involve creating multiple instances of the same code at different locations. These applications often rely on clones, or proxies, to reduce deployment costs.
 
-Clones, such as the one described in ERC-1167 are minimal pieces of code that contain the target address directly in the code. That makes them extremelly light, but prevents any form of reconfiguration (upgradability).
+Clones, such as the one described in ERC-1167 are minimal pieces of code that contain the target address directly in the code. That makes them extremely light but prevents any form of reconfiguration (upgradability).
 
-Upgradeable proxies differ from clones in that they read the implementation' address from storage. This makes them more versatile but also more expensive to use.
+Upgradeable proxies differ from clones in that they read the implementation's address from storage. This makes them more versatile but also more expensive to use.
 
-In both cases delegating the received calls to an implementation using evm code comes with some downsides:
-- the calldata must be copied to memory defore performing the delegate call
-- clones and proxy written in EOF do not support delegation to an implementation written in legacy evm code, and are thus limited or possibly dangerous. This encourages the continued use of legacy evm code.
+In both cases delegating the received calls to an implementation using EVM code comes with some downsides:
+- Calldata must be copied to memory before performing the delegate call
+- Clones and proxy written in EOF do not support delegation to an implementation written in legacy EVM code, and are thus limited or possibly dangerous. This encourages the continued use of legacy EVM code.
 
-EIP-7702 introduces a new type of object that has the expected behavior: designator. These object are designed to be instanciated at the address of EOA's, but the same behavior could be re-used to implement clones at the protocol level. Using designator for this usecase provides upgradeability without the need for storage lookups if the contract calling the `CREATE_DELEGATE` allows it. It also removes any issue related to code version incompatibilities.
+EIP-7702 introduces a new type of object that has the expected behavior: designator. These objects are designed to be instantiated at the address of EOA's, but the same behavior could be re-used to implement clones at the protocol level. Using designators for this use-case provides upgradeability without the need for storage lookups if the contract calling the `CREATE_DELEGATE` allows it. It also removes any issue related to code version incompatibilities.
 
 ## Specification
 
@@ -47,7 +47,7 @@ Executing this instruction does the following:
     * Similarly to EIP-7702, if `target` is `0x0000000000000000000000000000000000000000` do not write the designation. Clear the code at `location` and reset the `location`'s code hash to the empty hash `0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470`.
 8. push `location` onto the stack
 
-The designator created at `location` behaves identically to the those created by EIP-7702
+The designator created at `location` behaves identically to those created by EIP-7702.
 
 ### Parameters
 
@@ -60,33 +60,33 @@ The designator created at `location` behaves identically to the those created by
 
 ### Gas cost
 
-The execution of the `CREATE_DELEGATE` instruction involves less moving pieces than what EIP-7702 gas costs account for:
+The execution of the `CREATE_DELEGATE` instruction involves fewer moving pieces than what EIP-7702 gas costs account for:
 
 - there is no signature recovery
 - there is no dedicated calldata that must be accounted for that is not already paid for at the transaction level
 - there is no nonce update
 
-Therefore, the cost of executing this instruction could possibly be way lower than EIP-7702. Number of EIP-7702 are reused for simplicity. They are lower than `CREATE` or `CREATE2` operations, making the use of this instruction competitive for the intended usecases.
+Therefore, the cost of executing this instruction could be lower than EIP-7702. Numbers from EIP-7702 are reused for simplicity. They are lower than `CREATE` or `CREATE2` operations, making the use of this instruction competitive for the intended use-cases.
 
-## Backwards Compatibility
+## Backward Compatibility
 
 TODO
 
 ## Security Considerations
 
-### Delegators upgrades & deletion
+### Delegator upgrades & deletion
 
-Reusing EIP-7702 behavior, including clearing the code if location is 0, result in the ability to upgrade or even "remove" the created designator. This process is controled (and can be restricted) by the factory (the contract that calls `CREATE_DELEGATE`). Some factory will add checks that prevent re-executing `CREATE_DELEGATE` with a salt that was already used, making the create designator immutable. Other may allow access-restricted upgrades, but prevent deletion. In any case, guarantees about the lifecycle of the designator created using `CREATE_DELEGATE` are provided by the contracts that call it and not by the protocol.
+Reusing EIP-7702 behavior, including clearing the code if the target is 0, results in the ability to upgrade or even "remove" the created designator. This process is controlled (and can be restricted) by the factory (the contract that calls `CREATE_DELEGATE`). Some factories will add checks that prevent re-executing `CREATE_DELEGATE` with a salt that was already used, making the create designator immutable. Others may allow access-restricted upgrades, but prevent deletion. In any case, guarantees about the lifecycle of the designator created using `CREATE_DELEGATE` are provided by the contracts that call it and not by the protocol.
 
-### Delegators chaining
+### Delegator chaining
 
-As documented in EIP-7702, designator chains or loop is are not resolved. This means that unlike clones, chaining is an issue. This is something developper are used to, as chaining proxy can often results in trange behaviors, including infinite delegation loops.
+As documented in EIP-7702, designator chains or loops are not resolved. This means that, unlike clones, chaining is an issue. This is however something developpers are used to, as chaining proxy can result in strange behaviors, including infinite delegation loops.
 
-Factories may want to protect against this risk by veryfing that the `target` doesn't contain a designator. This can be achieved using a legacy contract helper that has access to `EXTCODEHASH`. It could also be done using other forms of introspection such as an `ACCOUNT_TYPE` instruction.
+Factories may want to protect against this risk by verifying that the `target` doesn't contain a designator. This can be achieved using a legacy contract helper that has access to `EXTCODEHASH`. It could also be done using other forms of introspection such as an `ACCOUNT_TYPE` instruction.
 
 ### Front running initialization
 
-Unlike EIP-7702 signature, which can be included in any transaction, and can thus lead to initialization front-running if the implementation doesn't check the authenticity of the initialization parameters, `CREATE_DELEGATION` is executed by a smart contract that can execute the initialization logic atomically, just after the delegation is created. This process is well known of developpers that initilize clones and proxyes just after creation.
+Unlike EIP-7702 signature, which can be included in any transaction, and can thus lead to initialization front-running if the implementation doesn't check the authenticity of the initialization parameters, `CREATE_DELEGATION` is executed by a smart contract that can execute the initialization logic atomically, just after the delegation is created. This process is well-known to developers that initialize clones and proxies just after creation.
 
 ## Copyright
 
