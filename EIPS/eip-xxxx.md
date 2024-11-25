@@ -2,7 +2,7 @@ eip: 7825
 title: Transaction Gas Limit Cap
 description: Introduce a protocol-level cap on the maximum gas used by a transaction to 30 million.  
 author: Giulio Rebuffo (@Giulio2002)  
-discussions-to: [Insert discussion forum link here]  
+discussions-to: https://ethereum-magicians.org/t/eip-7825-transaction-gas-limit-cap/21848
 status: Draft  
 type: Standards Track  
 category: Core  
