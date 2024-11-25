@@ -1,5 +1,5 @@
-eip: xxxx  
-title: Transaction Gas Limit Cap  
+eip: 7825  
+title: Transaction Gas Limit Cap
 description: Introduce a protocol-level cap on the maximum gas used by a transaction to 30 million.  
 author: Giulio Rebuffo (@Giulio2002)  
 discussions-to: [Insert discussion forum link here]  
