@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: 7814
 title: Introspection precompiles
 description: Introspection precompiles that expose the current block context to the EVM
 author: Brecht Devos (@Brechtpd)
