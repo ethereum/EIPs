@@ -39,9 +39,9 @@ The 64 kb limit is over 2x of existing limit, while it is not a significant incr
 
 A further increase can be proposed with applying these changes to EOF.
 
-This increase still fits within the gas schedule, limiting the size to less than what gas limits allow.  In [EIP-170](./eip-170.md) the gas limit was first set "by setting the cap at a value slightly higher than what is feasible with current gas limits." At that time the gas limit had not exceeded 5 Million Gas. 
+This increase still fits within the gas schedule, limiting the size to less than what gas limits allow.  In [EIP-170](./eip-170.md) the gas limit was first set "by setting the cap at a value slightly higher than what is feasible with current gas limits." At that time the gas limit had not exceeded 5M gas.
 
-A simple analysis shows contract deployements for 64KiB contracts to be between 14 and 16 million gas, roughly close to the current 15M target.
+A simple analysis shows contract deployements for 64KiB contracts to be between 14M and 16M gas, roughly close to the current 15M target.
 
 |                     |    Cancun |   This EIP |    30m Gas | Max Initcode |
 |---------------------|----------:|-----------:|-----------:|-------------:|
