@@ -29,7 +29,7 @@ Storage cost is already paid per contract byte.
 
 [EIP-170](./eip-170.md) specifies `MAX_CODE_SIZE` as 24576 bytes, and [EIP-3860](./eip-3860.md) specifies `MAX_INITCODE_SIZE` as `2 * MAX_CODE_SIZE` (49152 bytes).
 
-<!-- if profiling analysis shows we need to charge more for EOF analysis, this is where we can specify it.  Either globally or for 0xef00 contracs -->
+<!-- TODO: if profiling analysis shows we need to charge more for EOF analysis, this is where we can specify it.  Either globally or for 0xef00 contracs -->
 
 Starting `FORK_BLOCK`, for EOF initcode/code (code starting with the `0xEF 0x00` bytes) the limit is changed:`MAX_CODE_SIZE` is set to 65536 bytes (64 KiB). This means `MAX_INITCODE_SIZE` becomes 131072 bytes (128 KiB).
 
