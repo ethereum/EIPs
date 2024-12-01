@@ -1,7 +1,7 @@
 ---
 eip: nnnn
 title: Contract size limit increase for EOF
-description: Raise the limit for only EOF contracts to 64k
+description: Raise the limit for only EOF contracts to 64 KiB
 author: Alex Beregszaszi (@axic), Danno Ferrin (@shemnon)
 discussions-to: 
 status: Draft
@@ -13,7 +13,7 @@ requires: 170, 3540, 3860
 
 ## Abstract
 
-Revise the contract size limit for EOF contracts to be 64 kb instead of the existing 24 kb limit. Legacy contracts are unaffected.
+Revise the contract size limit for EOF contracts to be 64 KiB instead of the existing 24 KiB limit. Legacy contracts are unaffected.
 
 ## Motivation
 
@@ -31,19 +31,19 @@ Storage cost is already paid per contract byte.
 
 <!-- if profiling analysis shows we need to charge more for EOF analysis, this is where we can specify it.  Either globally or for 0xef00 contracs -->
 
-Starting `FORK_BLOCK`, for EOF initcode/code (code starting with the `0xEF 0x00` bytes) the limit is changed:`MAX_CODE_SIZE` is set to 65536 bytes (64 kb). This means `MAX_INITCODE_SIZE` becomes 131072 bytes (128 kb).
-    
+Starting `FORK_BLOCK`, for EOF initcode/code (code starting with the `0xEF 0x00` bytes) the limit is changed:`MAX_CODE_SIZE` is set to 65536 bytes (64 KiB). This means `MAX_INITCODE_SIZE` becomes 131072 bytes (128 KiB).
+
 ## Rationale
 
-The 64 kb limit is over 2x of existing limit, while it is not a significant increase, it is the realistic increase given the limitations of initcode. In EOF deployment the to-be-deployed code is stored as a section ("subcontainer"), which has a size limit of 64 kb, therefore it is not possible to deploy larger contracts without introducing a large or variable-length-encoded size field.
+The 64 KiB limit is over 2x of existing limit, while it is not a significant increase, it is the realistic increase given the limitations of initcode. In EOF deployment the to-be-deployed code is stored as a section ("subcontainer"), which has a size limit of 64 KiB, therefore it is not possible to deploy larger contracts without introducing a large or variable-length-encoded size field.
 
 A further increase can be proposed with applying these changes to EOF.
 
 This increase still fits within the gas schedule, limiting the size to less than what gas limits allow.  In [EIP-170](./eip-170.md) the gas limit was first set "by setting the cap at a value slightly higher than what is feasible with current gas limits." At that time the gas limit had not exceeded 5M gas.
 
-A simple analysis shows contract deployements for 64KiB contracts to be between 14M and 16M gas, roughly close to the current 15M target.
+A simple analysis shows contract deployements for 64 KiB contracts to be between 14M and 16M gas, roughly close to the current 15M target.
 
-|                     |    Cancun |   This EIP |    30m Gas | Max Initcode |
+|                     |    Cancun |   This EIP |    30M Gas | Max Initcode |
 |---------------------|----------:|-----------:|-----------:|-------------:|
 | **Initcode bytes**  |       200 |        200 |        200 |       65,536 |
 | **Deployed Bytes**  |    24,576 |     65,536 |    137,656 |       65,536 |
@@ -58,7 +58,7 @@ A simple analysis shows contract deployements for 64KiB contracts to be between 
 |                     |           |            |            |              |
 | **Total Cost**      | 5,484,437 | 14,364,565 | 30,000,181 |   15,462,210 |
 
-Note that the Max 30m Gas contract size of 135 KiB is outside the limits of what is proposed in this EIP and is included to show what it would take to exceed current gas limits.
+Note that the Max 30M gas contract size of 135 KiB is outside the limits of what is proposed in this EIP and is included to show what it would take to exceed current gas limits.
 
 <!-- https://docs.google.com/spreadsheets/d/1C2dd5sVnZNKXOpRknHhxt6MnTTN50c3b9d6ZU2rvqDQ/edit?usp=sharing -->
 
