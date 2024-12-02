@@ -1,5 +1,5 @@
 ---
-eip: nnnn
+eip: 7830
 title: Contract size limit increase for EOF
 description: Raise the limit for only EOF contracts to 64 KiB
 author: Alex Beregszaszi (@axic), Danno Ferrin (@shemnon)
@@ -17,7 +17,7 @@ Revise the contract size limit for EOF contracts to be 64 KiB instead of the exi
 
 ## Motivation
 
-The contract size limit is was introduced as a measure against DoS attacks. `JUMPDEST`-analysis os required for legacy contracts, and many of the algorithms performing it are not linear and/or have unknown unknowns. This is one of the reasons for the hesitance of a limit increase.
+The contract size limit was introduced as a measure against DoS attacks. `JUMPDEST`-analysis is required for legacy contracts, and many of the algorithms performing it are not linear and/or have unknown unknowns. This is one of the reasons for the hesitance of a limit increase.
 
 For contract developers the limit poses annoying problems, given modern contracts with good error reporting would consume more space. They are forced to work with workarounds, like "libraries" (using `DELEGATECALL`), splitting an application across regular contracts (and `CALL`-ing across), or working with proxies (e.g. the "diamond pattern"). All these solutions have resulted in suboptimal patterns, bugs in deployed contracts, and loss of funds.
 
