@@ -1,0 +1,74 @@
+---
+eip: 7825
+title: Transaction Gas Limit Cap
+description: Introduce a protocol-level cap on the maximum gas used by a transaction to 30 million.
+author: Giulio Rebuffo (@Giulio2002)
+discussions-to: https://ethereum-magicians.org/t/eip-7825-transaction-gas-limit-cap/21848
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-11-23
+---
+
+## Abstract
+
+This proposal introduces a protocol-level cap on the maximum gas usage per transaction to 30 million gas. By implementing this limit, Ethereum can enhance its resilience against certain DoS vectors, improve network stability, and provide more predictability to transaction processing costs, especially in the context of increasing the Gas Limit.
+
+## Motivation
+
+Currently, transactions can theoretically consume up to the entire block gas limit, which poses several risks:
+
+1. **DoS Attacks**: A single transaction consuming most or all of the block gas can result in uneven load distribution and impact network stability.  
+2. **State Bloat Risks**: High-gas transactions often result in larger state changes, increasing the burden on nodes and exacerbating the Ethereum state growth problem.  
+3. **Validation Overhead**: High-gas transactions can lead to longer block verification times, negatively impacting user experience and network decentralization.
+
+By limiting individual transactions to a maximum of 30 million gas, we aim to:
+
+- Reduce the risks of single-transaction DoS attacks.  
+- Promote fairer gas allocation across transactions within a block.  
+- Ensure better synchronization among nodes by mitigating extreme block validation times.
+
+## Specification
+
+### Gas Cap
+
+- Enforce a protocol-level maximum of **30 million gas** for any single transaction.  
+- This cap applies regardless of the block gas limit set by miners or validators.  
+- Transactions specifying gas limits higher than 30 million gas will be rejected with an appropriate error code (e.g., `MAX_GAS_LIMIT_EXCEEDED`).  
+
+### Changes to EVM Behavior
+
+1. **Txpool Validation**: During transaction validation, if the `gasLimit` specified by the sender exceeds 30 million, the transaction is invalidated (not included in the txpool). 
+2. **Block Validation**: As part of block validation before processing, any block having a transaction with `gasLimit` > 30 million is deemed invalid and rejected.
+
+### Protocol Adjustment
+
+- The `GAS_LIMIT` parameter for transactions will be capped in client implementations at 30 million.  
+- This cap is **independent** of the block gas limit, which can still exceed this value.  
+
+## Rationale
+
+### Why 30 Million?
+
+The proposed cap of 30 million gas is based on the typical size of Ethereum blocks today, which often range between 30-40 million gas. This value is large enough to allow complex transactions, such as contract deployments and advanced DeFi interactions, while still reserving space for other transactions within a block.
+
+### Compatibility with Current Gas Dynamics
+
+- **Backward Compatibility**: Transactions with gas usage below 30 million remain unaffected. Existing tooling and dApps need only minor updates to enforce the new cap.
+- **Impact on Validators**: Validators can continue to process blocks with a gas limit exceeding 30 million, provided individual transactions adhere to the cap.
+
+
+## Backwards Compatibility
+
+This change is **not backward-compatible** with transactions that specify gas limits exceeding 30 million. Transactions with such high limits will need to be split into smaller operations. This adjustment is expected to impact a minimal number of users and dApps, as most transactions today fall well below the proposed cap.
+
+## Security Considerations
+
+1. **DoS Mitigation**: A fixed cap reduces the risk of DoS attacks caused by excessively high-gas transactions.  
+2. **Block Verification Stability**: By capping individual transactions, the validation of blocks becomes more predictable and uniform.  
+3. **Edge Cases**: Certain highly complex transactions, such as large contract deployments, may require re-architecting to fit within the 30 million gas cap.
+
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).  
