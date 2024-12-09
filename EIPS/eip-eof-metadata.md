@@ -77,7 +77,7 @@ The strucure and the encoding of the `metadata_section` is not defined by this E
 
 The `metadata_section` in the `body`, as well as the `kind_metadata` and `metadata_size` fields in the `header`, are OPTIONAL. The `data_section` can change in its size and content during deployment, therefore it needs to be REQUIRED, even if the data is empty. The `metadata_section` is not expected to change during the deployment.
 
-The reason for placing the `metadata_section` before the `data_section`, and assigning `kind_metadata` the value `0x05` (and not `0x04`) is to make it easier for the existing EOF tooling adapt the changes. Additionally, if the `metadata_section` was placed before the `data_section`, changes to the `data_section` in deploy time would cause the `metadata_section` to shift. By placing the `metadata_section` before, this could be mitigated.
+The reason for placing the `metadata_section` before the `data_section`, and assigning `kind_metadata` the value `0x05` (and not `0x04`) is to make it easier for the existing EOF tooling adapt the changes. Additionally, if the `metadata_section` was placed after the `data_section`, changes to the `data_section` in deploy time would cause the `metadata_section` to shift. By placing the `metadata_section` before, this could be mitigated.
 
 ## Backwards Compatibility
 
