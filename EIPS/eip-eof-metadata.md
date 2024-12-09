@@ -1,5 +1,5 @@
 ---
-eip: xxx
+eip: 7834
 title: Separate Metadata Section for EOF
 description: Introduce a new separate metadata section to the EOF
 author: Kaan Uzdogan (@kuzdogan), Marco Castignoli (@marcocastignoli), Manuel Wedler (@manuelwedler)
