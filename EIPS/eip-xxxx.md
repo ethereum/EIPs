@@ -2,7 +2,7 @@
 eip: xxxx
 title: Unified Network Configuration
 description: Execution Layer to fetch network parameters from Consensus Layer
-author: Barnabas Busa (@barnabasbusa), Parithosh Jayanthi (@parithosh)
+author: Barnabas Busa ([@barnabasbusa](https://github.com/barnabasbusa)), Parithosh Jayanthi ([@parithosh](https://github.com/parithosh)), Toni Wahrstätter ([@nerolation](https://github.com/nerolation))
 discussions-to:
 status: Draft
 type: Standards Track
@@ -87,9 +87,11 @@ Some parameters must be calculated rather than directly copied:
 Worst case scenario:
 Max Gas limit = `gossip_max_size` * `cost of zero-byte calldata`
 Max Gas limit = 10 * 2**20 * 4 == 41,943,040
+Suggested gas limit = `0.75 * Max Gas limit`
+Node operators can set the gas limit to `0.9 * Max Gas limit`
 
 Future fork examples:
-Max Gas limit Osaka = gossip_max_size_fulu * 4
+Max Gas limit Osaka = `gossip_max_size_fulu * 4`
 
 ### Error Handling
 
@@ -105,7 +107,7 @@ This design:
 1. Makes the CL's config.yaml the single source of truth for network configuration.
 2. Allows for future extension of synchronized parameters.
 3. Easily extendable to include new one-off parameters without passing constant parameters in the engine API.
-4. Gas limit can be adjusted at fork transitions to ensure proper testing and validation before deployment.
+4. Max Gas limit can be adjusted at fork transitions to ensure proper testing and validation before deployment.
 
 The retry mechanism ensures the EL will eventually get configuration even if the CL is not immediately available at startup.
 
