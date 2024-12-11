@@ -1,7 +1,7 @@
 ---
 eip: xxxx
-title: Unified Layer Configuration Protocol
-description: Protocol for Execution Layer to fetch network parameters from Consensus Layer
+title: Unified Network Configuration
+description: Execution Layer to fetch network parameters from Consensus Layer
 author: Barnabas Busa (@barnabasbusa), Parithosh Jayanthi (@parithosh)
 discussions-to:
 status: Draft
@@ -85,11 +85,11 @@ Some parameters must be calculated rather than directly copied:
 
 ### Formula
 Worst case scenario:
-Gas limit = `gossip_max_size` * `cost of zero-byte calldata`
-Gas limit max = 10 * 2**20 * 4 == 41,943,040
+Max Gas limit = `gossip_max_size` * `cost of zero-byte calldata`
+Max Gas limit = 10 * 2**20 * 4 == 41,943,040
 
 Future fork examples:
-Gas limit Osaka = gossip_max_size_fulu * 4
+Max Gas limit Osaka = gossip_max_size_fulu * 4
 
 ### Error Handling
 
