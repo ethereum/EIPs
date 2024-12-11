@@ -2,7 +2,7 @@
 eip: xxxx
 title: Unified Network Configuration
 description: Execution Layer to fetch network parameters from Consensus Layer
-author: Barnabas Busa ([@barnabasbusa](https://github.com/barnabasbusa)), Parithosh Jayanthi ([@parithosh](https://github.com/parithosh)), Toni Wahrstätter ([@nerolation](https://github.com/nerolation))
+author: Barnabas Busa (@barnabasbusa), Parithosh Jayanthi (@parithosh), Toni Wahrstätter (@nerolation)
 discussions-to:
 status: Draft
 type: Standards Track
@@ -85,12 +85,17 @@ Some parameters must be calculated rather than directly copied:
 
 ### Formula
 Worst case scenario:
+
 Max Gas limit = `gossip_max_size` * `cost of zero-byte calldata`
-Max Gas limit = 10 * 2**20 * 4 == 41,943,040
+
+Max Gas limit = `10 * 2**20 * 4` == `41,943,040`
+
 Suggested gas limit = `0.75 * Max Gas limit`
+
 Node operators can set the gas limit to `0.9 * Max Gas limit`
 
 Future fork examples:
+
 Max Gas limit Osaka = `gossip_max_size_fulu * 4`
 
 ### Error Handling
@@ -98,8 +103,7 @@ Max Gas limit Osaka = `gossip_max_size_fulu * 4`
 1. If the CL is unreachable, the EL must continue retrying, and should not start processing blocks until configuration is received.
 2. If received parameters are invalid, the EL must reject them and retry fetching configuration.
 3. The EL may log all configuration related errors for debugging.
-
-
+4. The EL may retry to fetch the configuration periodically. This would enable CL only changes to be triggered without needing to restart the EL.
 ## Rationale
 
 This design:
@@ -117,10 +121,10 @@ This EIP is backwards compatible as clients can fall back to existing manual con
 
 ## Security Considerations
 
-1. The EL must validate all received configuration values
-2. The connection between EL and CL must be authenticated
-3. Invalid configuration must not cause the EL to start with unsafe parameters
-4. The retry mechanism must not create DOS vectors
+1. The EL must validate all received configuration values.
+2. The connection between EL and CL must be authenticated.
+3. Invalid configuration must not cause the EL to start with unsafe parameters.
+4. The retry mechanism must not create DOS vectors.
 
 ## Copyright
 
