@@ -2,7 +2,7 @@
 title: Add blob schedule to execution client configuration files
 description: Include a per-fork schedule of max and target blob counts in client configuration files
 author: lightclient (@lightclient)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/add-blob-schedule-to-execution-client-configuration-files/22182
 status: Draft
 type: Standards Track
 category: Core
