@@ -1,5 +1,5 @@
 ---
-eip: xxxx
+eip: 7839
 title: Unified Network Configuration
 description: Execution Layer to fetch network parameters from Consensus Layer
 author: Barnabas Busa (@barnabasbusa), Parithosh Jayanthi (@parithosh), Toni Wahrstätter (@nerolation)
