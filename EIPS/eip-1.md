@@ -21,7 +21,7 @@ For Ethereum implementers, EIPs are a convenient way to track the progress of th
 
 There are three types of EIP:
 
-- A **Standards Track EIP** describes any change that affects most or all Ethereum implementations, such as—a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Standards Track EIPs consist of three parts—a design document, an implementation, and (if warranted) an update to the [reference implementation](https://github.com/ethereum/execution-specs/) and [formal specification](https://github.com/ethereum/yellowpaper). Furthermore, Standards Track EIPs can be broken down into the following categories:
+- A **Standards Track EIP** describes any change that affects most or all Ethereum implementations, such as—a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Standards Track EIPs consist of three parts—a design document, an implementation, and (if warranted) an update to the [reference implementation](https://github.com/ethereum/execution-specs) and [formal specification](https://github.com/ethereum/yellowpaper). Furthermore, Standards Track EIPs can be broken down into the following categories:
   - **Core**: improvements requiring a consensus fork (e.g. [EIP-5](./eip-5.md), [EIP-101](./eip-101.md)), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (eg. the miner/node strategy changes 2, 3, and 4 of [EIP-86](./eip-86.md)).
   - **Networking**: includes improvements around [devp2p](https://github.com/ethereum/devp2p/blob/readme-spec-links/rlpx.md) ([EIP-8](./eip-8.md)) and [Light Ethereum Subprotocol](https://github.com/ethereum/devp2p/blob/master/caps/les.md), as well as proposed improvements to network protocol specifications of [whisper](https://github.com/ethereum/go-ethereum/issues/16013#issuecomment-364639309) and [swarm](https://github.com/ethereum/go-ethereum/pull/2959).
   - **Interface**: includes improvements around language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html).
@@ -49,7 +49,7 @@ REVERT (0xfe)
 
 Parties involved in the process are you, the champion or *EIP Author*, the [*EIP Editors*](#eip-editors), and the [*Ethereum Core Developers*](https://github.com/ethereum/pm).
 
-Before you begin writing a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be rejected based on prior research. It is thus recommended to open a discussion thread on the [Ethereum Magicians forum](https://ethereum-magicians.org/) to do this.
+Before you begin writing a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be rejected based on prior research. It is thus recommended to open a discussion thread on the [Ethereum Magicians forum](https://ethereum-magicians.org) to do this.
 
 Once the idea has been vetted, your next responsibility will be to present (by means of an EIP) the idea to the reviewers and all interested parties, invite editors, developers, and the community to give feedback on the aforementioned channels. You should try and gauge whether the interest in your EIP is commensurate with both the work involved in implementing it and how many parties will have to conform to it. For example, the work required for implementing a **Core** EIP will be much greater than for an ERC and the EIP will need sufficient interest from the Ethereum client teams. Negative community feedback will be taken into consideration and may prevent your EIP from moving past the Draft stage.
 
@@ -63,7 +63,7 @@ The AllCoreDevs call serves as a way for client implementers to do three things.
 
 These calls generally result in a "rough consensus" around what EIPs should be implemented. This "rough consensus" rests on the assumptions that EIPs are not contentious enough to cause a network split and that they are technically sound.
 
-:warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that the [Ethereum Magicians forum](https://ethereum-magicians.org/) thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
+:warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that the [Ethereum Magicians forum](https://ethereum-magicians.org) thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
 
 *In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea.*
 
@@ -116,7 +116,7 @@ EIPs should be written in [markdown](https://github.com/adam-p/markdown-here/wik
 
 ## EIP Header Preamble
 
-Each EIP must begin with an [RFC 822] style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
+Each EIP must begin with an [RFC 822] style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter). The headers must appear in the following order.
 
 `eip`: *EIP number*
 
@@ -172,7 +172,7 @@ At least one author must use a GitHub username, in order to get notified on chan
 
 While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed.
 
-The preferred discussion URL is a topic on the [Ethereum Magicians Forum](https://ethereum-magicians.org/). The URL cannot point to Github pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
+The preferred discussion URL is a topic on the [Ethereum Magicians Forum](https://ethereum-magicians.org). The URL cannot point to Github pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
 
 ### `type` header
 
@@ -297,12 +297,12 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 Links to a W3C "Recommendation" status specification may be included using normal markdown syntax. For example, the following link would be allowed:
 
 ```markdown
-[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918)
 ```
 
 Which renders as:
 
-[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918)
 
 Permitted W3C recommendation URLs MUST anchor to a specification in the technical reports namespace with a date, and so MUST match this regular expression:
 
@@ -315,12 +315,12 @@ Permitted W3C recommendation URLs MUST anchor to a specification in the technica
 Links to WHATWG specifications may be included using normal markdown syntax, such as:
 
 ```markdown
-[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0)
 ```
 
 Which renders as:
 
-[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0)
 
 Permitted WHATWG specification URLs must anchor to a specification defined in the `spec` subdomain (idea specifications are not allowed) and to a commit snapshot, and so must match this regular expression:
 
