@@ -184,7 +184,7 @@ The `category` header specifies the EIP's category. This is required for standar
 
 ### `created` header
 
-The `created` header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
+The `created` header records the date that the EIP was assigned a number. Both headers should be in the format of ISO 8601 (yyyy-mm-dd).
 
 ### `requires` header
 
