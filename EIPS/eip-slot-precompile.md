@@ -20,7 +20,7 @@ It is currently possible to calculate the slot number from the block timestamp. 
 
 ### Encrypted Mempools
 
-Like [EIP-7793](), this precompile aims to improve support for encrypted mempools. In order to be secure, the validity of encrypted mempool transactions should be tied to the inclusion of all transactions by a proposer in the correct slot. This rule can be enforced by a smart contract.
+This precompile aims to improve support for encrypted mempools. In order to be secure, the validity of encrypted mempool transactions should be tied to the inclusion of all transactions by a proposer in the correct slot. This rule can be enforced by a smart contract using this precompile.
 
 ## Specification
 
