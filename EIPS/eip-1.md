@@ -65,7 +65,7 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 :warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that the [Ethereum Magicians forum](https://ethereum-magicians.org) thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
 
-*In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea.*
+_In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea._
 
 ### EIP Process
 
@@ -89,7 +89,7 @@ A pull request moving an EIP from **Last Call** to **Final** SHOULD contain no c
 
 **Stagnant** - Any EIP in **Draft** or **Review** or **Last Call** if inactive for a period of 6 months or greater is moved to **Stagnant**. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to **Draft** or its earlier status. If not resurrected, a proposal may stay forever in this status.
 
->*EIP Authors are notified of any algorithmic change to the status of their EIP*
+> _EIP Authors are notified of any algorithmic change to the status of their EIP_
 
 **Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
 
