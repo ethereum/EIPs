@@ -144,7 +144,7 @@ Each EIP must begin with an [RFC 822] style header preamble, preceded and follow
 
 Headers that permit lists must separate elements with commas.
 
-Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
+Headers requiring dates will always do so in the format of [RFC 3339]'s `full-date` (yyyy-mm-dd).
 
 ### `author` header
 
@@ -184,7 +184,7 @@ The `category` header specifies the EIP's category. This is required for _Standa
 
 ### `created` header
 
-The `created` header records the date that the EIP was assigned a number. Both headers should be in the format of ISO 8601 (yyyy-mm-dd).
+The `created` header records the date that the EIP was assigned a number. Both headers should be in the format of [RFC 3339]'s `full-date` (yyyy-mm-dd).
 
 ### `requires` header
 
@@ -569,9 +569,9 @@ When referring to an EIP with a `category` of _ERC_, it must be written in the h
 
 ### RFC 2119 and RFC 8174
 
-EIPs are encouraged to follow [RFC 2119](https://www.ietf.org/rfc/rfc2119.html) and [RFC 8174](https://www.ietf.org/rfc/rfc8174.html) for terminology and to insert the following at the beginning of the Specification section:
+EIPs are encouraged to follow [RFC 2119] and [RFC 8174] for terminology and to insert the following at the beginning of the Specification section:
 
-> The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+> The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119] and [RFC 8174].
 
 ## History
 
@@ -581,4 +581,7 @@ This document was derived heavily from [Bitcoin's BIP-0001](https://github.com/b
 
 Copyright and related rights waived via [CC0](../LICENSE.md).
 
-[RFC 822]: https://www.ietf.org/rfc/rfc822.txt
+[RFC 822]: https://www.rfc-editor.org/rfc/rfc822
+[RFC 3339]: https://www.rfc-editor.org/rfc/rfc3339
+[RFC 2119]: https://www.ietf.org/rfc/rfc2119
+[RFC 8174]: https://www.ietf.org/rfc/rfc8174
