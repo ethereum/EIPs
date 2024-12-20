@@ -27,9 +27,9 @@ There are three types of EIP:
   - **Interface**: includes improvements around language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html).
   - **ERC**: application-level standards and conventions, including contract standards such as token standards ([ERC-20](./eip-20.md)), name registries ([ERC-137](./eip-137.md)), URI schemes, library/package formats, and wallet formats.
 
-- A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
+- A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process—especially the EIP process itself. Examples include procedures, guidelines, and changes to decision-making processes.
 
-- An **Informational EIP** describes an Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.
+- An **Informational EIP** describes an Ethereum design issue, hardfork, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs (at the risk of forking the chain) or follow their advice.
 
 It is highly recommended that a single EIP contain a single key proposal or new idea. The more focused the EIP, the more successful it tends to be. A change to one client doesn't require an EIP; a change that affects multiple clients, or defines a standard for multiple apps to use, does.
 
