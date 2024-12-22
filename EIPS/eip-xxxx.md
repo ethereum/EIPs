@@ -1,0 +1,143 @@
+---
+title: On-chain upgrade signaling
+description: Allows participants to indicate readiness for a client upgrade when producing blocks
+author: William Entriken (@fulldecent)
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-on-chain-upgrade-signaling/22306
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-12-22
+---
+
+## Abstract
+
+This proposal adds a mechanism for clients to signal their willingness for a protocol upgrade by embedding a "vote" indicator in newly mined blocks in `extraData`. A future fork activation block occurs only if enough blocks within a specified window are signaled as "for" the upgrade.
+
+## Motivation
+
+Currently upgrades to Ethereum Mainnet happen by decree from Ethereum Foundation as announced on the Ethereum.org blog. This changes it to consent from network participants.
+
+## Specification
+
+Network participants that support a given software upgrade will indicate this support by including specific bytes in the `extraData` field of every block they create.
+
+### The magic string
+
+When an upgrade is proposed, the person who announces the upgrade must specify the _upgrade magic string_. This shall be the SHA-256 hash of a feature-complete client software implementing the new version.
+
+### Verification
+
+Network participants shall study this new version of the software and decide if they would support an upgrade.
+
+### Acceptance
+
+If network participants would like to indicate support for the new version, they will include part of the _upgrade magic string_ in their `extraHash` blocks.
+
+Specifically the high-order 128 bits of their `extraHash` shall be set to the high-order 128 bits of the _upgrade magic string_.
+
+### Upgrade
+
+Future upgrade proposals (what are often called "hard fork EIPs") shall specify an upgrade window and threshold:
+
+- `VOTING_WINDOW_BEGIN` the first block (inclusive) to count votes
+- `VOTING_WINDOW_END` the last block (inclusive) to count votes
+- `MAGIC_STRING` the complete 256-bit magic string, i.e. the hash of the software of the reference implementation
+- `REQUIRED_APPROVALS` the minimum number of approvals necessary for upgrade
+
+The difference (`VOTING_WINDOW_END` - `VOTING_WINDOW_BEGIN` ) must be strictly greater than 14400 (about 2 days) and should be chosen to support sufficient time to advertise upgrades to the community.
+
+The required approvals must be strictly greater than 50% of the number of blocks in the voting window. But it should be much higher such as 90% or more.
+
+After `VOTING_WINDOW_END` is created, it is said the upgrade was successful if sufficient approvals were made; otherwise the upgrade failed.
+
+Block `VOTING_WINDOW_END` + 1 and later use the new software if and only if the upgrade was successful.
+
+For proof of work networks and other scenarios, please note that it is possible that one fork will approve the upgrade and the other will not. Still, this specification applies: block (`VOTING_WINDOW_END` + 1) shall be created according the rules of the software that is chosen based on the voting window.
+
+Note: just because `VOTING_WINDOW_END` + 1 is producing blocks according to the new software specification, this does not mean that this specific block must be different that the old software. For example, the new software may specify that changes in block creation do not start until some other time. Or perhaps there was some other change that did not result in a change to the blocks but just some other change was introduced.
+
+## Rationale
+
+### Community direction
+
+Since The Merge, it is no longer possible to "fork" Ethereum Mainnet. Because validators must stake valuable assets to participate in the network any validator who is acting rationally must choose any software change decision based on what they think everybody else will do. If they expect 95% or more participants to make an upgrade, they should upgrade. If they expect 5% or less participants to make an upgrade they should not make the upgrade. For numbers in between, there is some threshold where a validator will have a better expected outcome from turning off their computer rather than risk participating in an uncertain upgrade. Note: turning off a validator incurs a small penalty, but running the wrong software version slashes 100% of your staked Ether (currently 16 ETH per share).
+
+Currently all software change decisions are decreed from Ethereum Foundation. The Ethereum project and community does not have an official mission statement or vision, but this proposal asserts that the Ethereum community would wish Ethereum Mainnet to be a community-directed project. The current management of software change decisions are antithetical to that wish.
+
+This EIP moves decisions and signaling of changes to the community participants.
+
+Please note that the role of Ethereum Foundation does not change much in this respect. It can still involve in client development, and announcing changes. The difference is that Ethereum Foundation blog would use new language:
+
+```diff
+- The Ethereum network will be undergoing a scheduled network upgrade
++ Ethereum Foundation proposes clients to upgrade and asks you to act now
+```
+
+### Decentralization
+
+Currently, with Ethereum Foundation responsible for building (directly), deploying (indirectly) and marketing (directly) the Ethereum Mainnet software, there is a strong sense of centralization.
+
+This creates a unique risk related to securities rules in various jurisdictions.
+
+During the upgrade to proof of stake, Ether could start being used to generate a staking fee. In our community (this proposal asserts) we understand that this generated fee is direct payment for providing a real and valuable staking service. Regulators see this fungible commodity asset that generates more of its own kind at a fixed ratio proportional to time, and they may fail the understand the unique service provided by each validator. They may think it is a security. In fact, after The Merge, the United States Securities and Exchange Commission sent letters requesting details of the authors of the EIP for staking rewards (see: Coinbase Wells Notice and lawsuit).
+
+There are many details which this margin is too narrow to contain. But the thrust of this concern is that blockchains have been treated specially by specific rule interpretations on the basis that they are "decentralized networks" with no specific entity controlling them. Bitcoin is often cited as a clear example of meeting this criteria. Let's not leave any confusion about Ethereum Mainnet.
+
+### `blockHash`
+
+[TO DISCUSS]
+
+An alternative approach would be to add a separate `software` field to blocks. This would be a full SHA-256 hash of the reference implementation of consensus software.
+
+Benefit: it will be easier to alert if an unexpected upgrade is happening
+
+Bad thing: it is a bigger change
+
+### Window
+
+Counting votes within a sliding window provides real-time on-chain feedback about readiness.
+
+The fork only triggers after after successful completion of the window.
+
+## Backwards Compatibility
+
+### Trademark
+
+Ethereum Foundation (Stiftung Ethereum), Zug, Switzerland is the owner of the trademark "Ethereum". This means Ethereum Foundation is empowered to stop other people from using this name in commerce.
+
+This means that if you propose a fork of Ethereum Mainnet, and it is successful, but Ethereum Foundation disagrees with that change, then Ethereum Foundation could sue you and prevent you from referring to that thing as "Ethereum". See also "unique risk related to securities rules" above. 
+
+It has not disclamed this power, it has not participated in [an issue specifically asking](https://github.com/ethereum/ethereum-org-website/issues/11752) about trademark enforcement of forks and it did not respond to comments the author of this EIP asked to its official press contact.
+
+To implement this EIP, it will be necessary for Ethereum Foundation to make, substantially, this statement:
+
+> Ethereum Foundation (Stiftung Ethereum), Zug, Switzerland, as the proper owner of the Ethereum trademark, hereby commits forever and irrevokably, and as a covenant to its successors and assigns, and to any successors or assigns of the trademark, that we will not assert trademark rights against any person who, acting in good faith, will use "Ethereum Mainnet" making reference to the then-current software and network descending from the software and network now known as Ethereum Mainnet at block number XXXXXXXXXXX and following the upgrade rules of EIP-XXXX.
+
+### [EIP-2124](./eip-2124.md)
+
+EIP-2124 creates a mechanism to communicate software versions between nodes. However this does not allow to signal willingness before an upgrade. And it does not allow specify actually what software is being upgraded to.
+
+## Test Cases
+
+TO DO
+
+## Reference Implementation
+
+TO DO
+
+## Security Considerations
+
+Any upgrade that achieves less than 100% participation will harm validators that did not participate.
+
+[TO DISCUSS] Using `extraData` does not provide notification to validators that are not participating if an unexpected upgrade is happening.
+
+[TO THINK THROUGH] Careful and intentional choice of overlapping competitive upgrades could result in multiple networks achieving 50% and successful upgrades.
+
+[TO THINK THROUGH] An upgrade with a very long time period could prevent other upgrades from being proposed.
+
+[TO THINK THROUGH] Since the four voting parameters are germane inside the new software reference implementation itself, network participants not doing sufficient due diligence could be confused or tricked into to thinking the upgrade has happened when actully it did not (they though 99% votes were required, 98% came, but actually the software sasys 95% are required).
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
