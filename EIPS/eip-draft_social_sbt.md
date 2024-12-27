@@ -1,7 +1,7 @@
 ---
 title: Social SBT
 description: Social SBT, A Soul-Bound Token Standard for DAO Governance
-author: Ali Bertay SOLAK (<alibertay@gmail.com>)
+author: Ali Bertay SOLAK (@alibertay)
 status: Draft
 type: Standards Track
 category: ERC
