@@ -1,6 +1,6 @@
 ---
-eip: draft
-title: Social SBT, A Soul-Bound Token Standard for DAO Governance
+title: Social SBT
+description: Social SBT, A Soul-Bound Token Standard for DAO Governance
 author: Ali Bertay SOLAK (<alibertay@gmail.com>)
 status: Draft
 type: Standards Track
