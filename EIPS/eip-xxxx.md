@@ -1,0 +1,109 @@
+---
+eip: XXXX
+title: OpPS - Opcode Per Second
+description: Opcodes Per Second is an additional factor for assessing EVM implementation performance.
+author: sirawt (@MASDXI)
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-opps-opcode-per-second/22179
+status: Draft
+category: Information
+created: 2024-12-12
+---
+
+## Abstract
+Introduces an enhanced approach for evaluating Ethereum Virtual Machine (`EVM`) performance by adding Opcode Per Second (`OpPS`) as a third performance metric. While `TPS` and `GPS` provide important insights into throughput and resource usage, they do not fully capture the complexity and efficiency of smart contract execution. The inclusion of `OpPS` adds a more granular perspective, allowing for a more comprehensive analysis of the computational workload within transactions. This approach helps to better differentiate between lightweight and computationally intensive operations, enabling more accurate `EVM` implementation performance assessments.
+
+## Motivation  
+`TPS` and `GPS` are commonly used to assess the throughput and resource consumption of smart contracts. However, these metrics have significant limitations. TPS only measures transaction count, and GPS measures gas consumption without accounting for the operational complexity of each transaction. These metrics fail to capture the diversity and intensity of operations, such as storage writes or contract creation. By introducing `OpPS`, we gain a more detailed view of the computational workload, allowing for a better understanding of contract performance and enabling a more balanced assessment of both optimized and non-optimized contracts.
+
+## Specification  
+
+### Transaction Per Second (TPS)  
+Measuring the performance with `TPS`, might not suitable for smart contract transaction due to the transaction may do many operation sequences, so there are a lot of factors or elements that can influence the number of transactions per second, For example, consider smart contract transactions—performance can vary depending on the implementation used, whether it is optimized, or if it was compiled via Yul/IR.
+
+### Gas Per Second (GPS)  
+Measuring performance with `GPS` is more insightful than the `TPS`, as it provides a more objective measure of computational resource usage.
+However, `GPS` also has its limitations. Each transaction can consume a varying amount of gas based on the opcodes used—some transactions may involve IO-heavy operations, while others may not. It's still can be debatable when you take a closer look at the `gasUsed` number alongside the number of transactions that packed inside each block.
+
+### Opcode Per Second (OpPS)
+Measuring performance with of `OpPS`, offering a granular view of operational workload. By focusing on opcode execution, this metric complements `TPS` and `GPS`, highlighting the efficiency of operations regardless of gas cost or transaction volume. For instance, high `OpPS` with low gas consumption may indicate efficient execution using lightweight operations.
+
+### Tricky code for creating gas-intensive but low-workload
+``` Solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+/**
+ * @title Squeeze
+ * @dev Contract to demonstrate functions that are gas-intensive but perform minimal meaningful work.
+ */
+contract Squeeze {
+
+    /**
+     * @dev Performs repeated memory store operations.
+     * @param n The number of iterations to execute.
+     */
+    function squeezeMem(uint n) external {
+        assembly {
+            let i := 0
+            for { } lt(i, n) { } {
+                i := add(i, 1)
+                mstore(0x20, n) // Store 'n' in memory repeatedly.
+            }
+        }
+    }
+
+    /**
+     * @dev Performs arithmetic operations with exponential calculations to increase gas usage.
+     * @param n The number of iterations to execute.
+     */
+    function squeezeArith(uint n) external {
+        assembly {
+            let i := 0
+            for { } lt(i, n) { } {
+                i := add(i, 1)
+                // Perform a gas-intensive operation: exponentiation.
+                mstore(0x20, exp(mload(0x20), 0xff))
+            }
+        }
+    }
+}
+```
+
+### IO-heavy operations
+According to [EIP-150](./eip-150.md) the following opcodes are categorized as I/O-heavy.  
+`BALANCE`, `EXTCODESIZE`, `EXTCODECOPY`, `SLOAD`, `CALL`, `CALLCODE`, and `DELEGATECALL`
+
+### Not in [EIP-150](./eip-150.md) but considered IO-heavy
+`SSTORE`, `CREATE`, `STATICALL`, and `CREATE2`  
+
+*Other EVM-based and Layer 2 (L2) networks may implement modified versions of the EVM, which could introduce I/O-heavy opcodes not listed here.*
+
+### Performance Metrics Analysis: TPS, GPS, and OpPS
+
+| **TPS**  | **GPS**  | **OpPS** | **Description**                                                                              |
+| -------- | -------- | -------- | -------------------------------------------------------------------------------------------- |
+| **High** | **Low**  | **High** | Many transactions with high opcode count but low gas consumption, using cheap opcodes.       |
+| **Low**  | **High** | **High** | Few transactions executing many cheap opcodes, leading to higher gas usage.                  |
+| **High** | **High** | **Low**  | Many transactions using fewer but gas-intensive opcodes like `SSTORE` or `CALL`.             |
+| **Low**  | **Low**  | **High** | Few transactions with high opcode count but minimal gas consumption, efficient operations.   |
+| **High** | **Low**  | **Low**  | Many transactions use very few opcodes, resulting in low gas usage.                        |
+| **Low**  | **Low**  | **Low**  | Few transactions with minimal opcode usage and low gas consumption, often trivial or idle.   |
+| **High** | **High** | **High** | Many transactions with high gas usage and high opcode counts, indicating intensive workload. |
+| **Low**  | **High** | **Low**  | Few transactions consuming high gas but executing a few expensive opcodes.       |
+
+## Rationale
+
+While `TPS` and `GPS` are useful for measuring basic transaction throughput and resource consumption, they do not provide a comprehensive view of the efficiency or complexity of the operations executed within those transactions. These metrics alone cannot differentiate between simple, lightweight operations and more computationally intensive tasks that may be present in a contract's execution. By incorporating `OpPS` into the performance analysis, we gain a more nuanced understanding of the underlying workload, enabling a clearer distinction between varying levels of operational complexity. This additional factor helps to ensure a more accurate and complete evaluation of the `EVM` implementation performance.  
+
+## Backwards Compatibility  
+
+No backward compatibility issues found.  
+
+## Security Considerations 
+
+### Biased Results
+Relying on a single metric TPS, GPS, or OpPS for performance analysis may lead to biased.  
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
