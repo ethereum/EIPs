@@ -20,13 +20,13 @@ Introduce a new binary state tree, intended to replace the hexary patricia trees
 
 Ethereum's long-term goal is to allow blocks to be proved with validity proof so that chain verification is as simple and fast as possible. One of the most challenging parts of achieving that goal is proving the state of the tree, which is required for EVM execution.
 
-The current MPT design isn’t friendly for validity proofs for many reasons, such as using RLP for node encoding, Keccak as a hashing function, being a “tree of trees”, and not including accounts code as part of the state.
+The current Merkle-Patricia Trie (MPT) design isn’t friendly for validity proofs for many reasons, such as using RLP for node encoding, Keccak as a hashing function, being a “tree of trees”, and not including accounts code as part of the state.
 
-Apart from requiring a state tree design that is friendly for block validity proofs, it’s also important to have fast and small regular Merkle proofs when the amount of state to prove is small. This is useful not only for Ethereum users but also for supporting future protocol needs in a stateless world.
+Apart from requiring a state tree design that is friendly for block validity proofs, it’s also important to have fast and small regular Merkle proofs when the amount of state to prove is small. This is useful not only for Ethereum users but also for supporting future protocol needs in a stateless world (e.g: inclusion lists).
 
 Regarding these regular Merkle proofs in an MPT, since it’s a hexary tree, their size is quite big on average and in worst-case scenarios. Given a 2^32 size tree, the expected size for proving a single branch is `15 * 32 * log_16(2^32) = 3840`. From a worst-case block perspective, if 30M gas is used to access only a single byte of different account codes since this code isn’t chunkified, we’d need `30M/2400*(5*480+24k)=330MB`.
 
-A binary tree has a good balance between out-of-circuit and in-circuit proving. Since the tree arity is two, this reduces regular Merkle proofs (i.e., `# sibilings * log_arity(N)` for arity 2 is better than for arity 16). Moreover, we propose switching from Keccak to Blake3, which has proven security and is more amenable to modern proving systems.
+A binary tree has a good balance between out-of-circuit and in-circuit proving. Since the tree arity is two, this reduces the size of regular Merkle proofs (i.e., `# sibilings * log_arity(N)` for arity 2 is better than for arity 16). Moreover, we propose switching from Keccak to Blake3, which has proven security and is more amenable to modern proving systems.
 
 ## Specification
 
@@ -34,7 +34,7 @@ The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL N
 
 ### Notable changes from the hexary structure
 
-- The account and storage tries are merged into a single tree.
+- The account and storage tries are merged into a single trie.
 - RLP is no longer used.
 - The account’s code is chunked and included in the tree.
 - Account data (e.g., balance, nonce, first storage slots, first code-chunks) is co-located in the tree to reduce branch openings.
@@ -69,12 +69,10 @@ class StemNode:
     def set_value(self, index: int, value: bytes):
         self.values[index] = value
 
-
 class InternalNode:
     def __init__(self):
         self.left = None
         self.right = None
-
 
 class BinaryTree:
     def __init__(self):
@@ -168,7 +166,7 @@ Merkelize each node type as follows:
 
 Below is an implementation of these rules:
 
-```python!
+```python
 def _hash(self, data):
     if data in (None, b"\x00" * 64):
         return b"\x00" * 32
@@ -216,7 +214,7 @@ The account stem (green `account` node) contains accounts basic data, first 64-s
 | STEM_SUBTREE_WIDTH    | 256     |
 | MAIN_STORAGE_OFFSET   | 256**31 |
 
-_It’s a required invariant that `STEM_SUBTREE_WIDTH > CODE_OFFSET > HEADER_STORAGE_OFFSET` and that `HEADER_STORAGE_OFFSET` is greater than the leaf keys. Additionally, `MAIN_STORAGE_OFFSET` must be a power of `STEM_SUBTREE_WIDTH`._
+_It’s a required invariant that `STEM_SUBTREE_WIDTH > CODE_OFFSET > HEADER_STORAGE_OFFSET` and that `HEADER_STORAGE_OFFSET` is greater than the leaf keys. Additionally, `MAIN_STORAGE_OFFSET` MUST be a power of `STEM_SUBTREE_WIDTH`._
 
 Note that addresses are always passed around as an `Address32`. To convert existing addresses to `Address32`, prepend with 12 zero bytes:
 
@@ -257,9 +255,9 @@ An account's `version`, `balance`, `nonce`, and `code_size` fields are packed wi
 
 Bytes `1..4` are reserved for future use.
 
-The current layout and encoding allow for an extension of `code_size` to 4 bytes without changing the account version. The goal of packing these fields together in a basic-data leaf, is to reduce gas costs since we only need one branch opening compared with usual 3 or 4 if the fields aren't packed. This also simplifies witness generation.
+The current layout and encoding allow for an extension of `code_size` to 4 bytes without changing the account version. The goal of packing these fields together in a basic-data leaf is to reduce gas costs, since we only need one branch opening compared with usual 3 or 4 if the fields aren't packed. This also simplifies witness generation.
 
-When any account header field is set, the `version` field is also set to zero. The `codehash` and `code_size` fields are set upon contract or EoA creation.
+When any account header field is set, the `version` field is also set to zero. The `codehash` and `code_size` fields are set upon contract or EOA creation.
 
 ### Code
 
@@ -332,7 +330,7 @@ Described in [EIP-4762](https://eips.ethereum.org/EIPS/eip-4762).
 
 ## Rationale
 
-This EIP defines a new  Binary Tree that starts empty. Only new state changes are stored in the tree. The MPT continues to exist but is frozen. This sets the stage for a future hard fork that migrates the MPT data to this Binary Tree ([EIP-7748](https://eips.ethereum.org/EIPS/eip-7748)).
+This EIP defines a new Binary Tree that starts empty. Only new state changes are stored in the tree. The MPT continues to exist but is frozen. This sets the stage for a future hard fork that migrates the MPT data to this Binary Tree ([EIP-7748](https://eips.ethereum.org/EIPS/eip-7748)).
 
 ### Single tree design
 
@@ -344,7 +342,7 @@ The proposal uses a single-layer tree structure with 32-byte keys and values for
 
 ### SNARK friendliness and Post-Quantum security
 
-The proposed design should consider the usual complexity, performance, and efficiency for out-of-circuit implementations (i.e. EL clients) and in-circuit ones for generating proofs in SNARKs.
+The proposed design should consider the usual complexity, performance, and efficiency for out-of-circuit implementations (i.e. EL clients) and in-circuit ones for generating proofs in ZK circuits.
 
 The tree design structure tries to be simple, by not having complex branching rules. For example, in contrast with the MPT, we avoid extension nodes injected in the middle of branches. Also, RLP encoding was removed since it adds unnecessary complexity. Although complexity can be managed more easily in out-of-circuit implementations, it's valuable to help circuit implementations be as simple as possible to avoid proving overhead.
 
@@ -356,11 +354,11 @@ The most important factor in the design is the cryptographic hash function used 
 
 Poseidon2 was considered to perform well in the first two points, but further research is still needed to ensure its security.
 
-Due to recent progress in the quantum computing field, expert estimations consider that they can become real in the 2030s. Other alternatives, such as Verkle Trees, introduce a new cryptography stack to the protocol, which relies on elliptic curves that aren't post-quantum secure. This makes the current tree proposal attractive since it only depends on hash functions, which are still safe in this new paradigm.
+Due to recent progress in the quantum computing field, experts estimations consider that they can become real in the 2030s. NIST suggests stop using ECC by 2030 too. Other alternatives, such as Verkle Trees, introduce a new cryptography stack to the protocol, which relies on elliptic curves that aren't post-quantum secure. This makes the current tree proposal attractive since it only depends on hash functions, which are still safe in this new paradigm. 
 
 Moreover, there has been impressive progress in proving systems, which indicates that we could be close to achieving the required performance for creating pre-state & post-state proofs fast enough. This last point is crucial since the main advantage of Verkle Trees was having proofs that are small and fast to generate.
 
-Finally, the current state tree proposal will probably be the final state tree used in the protocol, compared with Verkle Trees, which should eventually be replaced again with a post-quantum secure version.
+Finally, the current state tree proposal will probably be the final state tree used in the protocol, compared with Verkle Trees, which would eventually need to be replaced by a post-quantum secure alternative.
 
 ### Arity-2
 
@@ -379,11 +377,11 @@ Actual branch lengths might be slightly larger than this due to uneven distribut
 
 ### Tree depth
 
-The tree design attempts to be as simple as possible considering both out-of-circuit and circuit implementations, while satisfying our proving hashes throughput constraints.
+The tree design attempts to be as simple as possible considering both out-of-circuit and circuit implementations, while satisfying our throughput constraints on proving hashes.
 
-The proposed design avoids a full 248-bit depth as it would happen in a SMT. Since we don't use arithmetic hashes (e.g: Poseidon2), this is required to be agressive in avoiding hashing load in proving systems which today is quite tight on throughput in commodity hardware. There're some tricks that could be used to mitigate this, but this also adds extra complexity to the spec.
+The proposed design avoids a full 248-bit depth as it would happen in a Sparse Merkle Tree (SMT). Since we don't use arithmetic hashes (e.g. Poseidon2), this is required to be aggressive in avoiding hashing load in proving systems which today is quite tight on throughput in commodity hardware. There are some tricks that could be used to mitigate this, but this also adds extra complexity to the spec.
 
-Moreover, we could push this further trying to introduce extension nodes in middle of paths as done in MPT, but this also adds complexity that might not worth it considering the tree should be quite balanced.
+Moreover, we could push this further trying to introduce extension nodes in middle of paths as done in a MPT, but this also adds complexity that might not worth it considering the tree should be quite balanced.
 
 ### State-expiry
 
@@ -391,12 +389,12 @@ State-expiry strategies such as [EIP-7736](https://eips.ethereum.org/EIPS/eip-77
 
 ## **Backwards Compatibility**
 
-The main backward-compatibility-breaking changes are:
+The main breaking changes are:
 
 - (1) Gas costs for code chunk access can have an impact on applications’ economic viability
 - (2) Tree structure change makes in-EVM proofs of historical state no longer work
 
-(1) can be mitigated by increasing the gas limit while implementing this EIP, reducing the risk that applications will no longer work due to transaction gas usage rising above the block gas limit.
+(1) can be mitigated by increasing the gas limit while implementing this EIP, allowing the same economic viability for applications.
 
 ## **Test Cases**
 
@@ -404,7 +402,7 @@ TODO
 
 ## **Reference Implementation**
 
-A Python reference implementation can be found in `github.com/jsign/binary-tree-spec`.
+[Python reference implementation](https://hackmd.io/@jsign/verkle-code-mainnet-chunking-analysis).
 
 ## **Security Considerations**
 
