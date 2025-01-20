@@ -43,7 +43,7 @@ The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL N
 
 The proposed Binary Tree stores key-value entries where both the key and value are 32 bytes. The first 31-bytes of the key define the entry stem, and the last byte is the subindex in that stem. If two keys have the same stem, they live in the same “big branch” — this co-locates groups of 256 keys (i.e: keys with the same first 31-bytes).
 
-![Image](https://github.com/user-attachments/assets/8137de4f-7cf2-4d6e-a4b3-d66f2c549dac)
+![Image](../assets/eip-XXX/diagram2.png)
 (More details about the purple/orange part in the "Tree embedding" section)
 
 We can distinguish four node types:
@@ -201,7 +201,7 @@ Instead of a two-layer structure like the MPT, we will embed all information int
 
 The following is a big picture of what we'll continue to describe in the rest of this section:
 
-![Image](https://github.com/user-attachments/assets/6d5e6056-2fa7-44c0-ba75-ac77bd6c91c7)
+![Image](../assets/eip-XXX/diagram1.png)
 
 The account stem (green `account` node) contains accounts basic data, first 64-storage slots, and first 128-code chunks. This co-location of data allows to have in single stem branch data that is usually accessed together. The rest of storage slots and code-chunks are spread into groups of 256 values in the rest of the tree -- this is also done for convenience since slots/code-chunks that are close together will share the same stem branch.
 
@@ -387,7 +387,7 @@ Moreover, we could push this further trying to introduce extension nodes in midd
 
 State-expiry strategies such as [EIP-7736](https://eips.ethereum.org/EIPS/eip-7736) could still be applied, requiring a change in the design. One potential solution is adding a field the `StemNode` with `epoch` as described in the mentioned EIP. Another alternative is to use 247-bits for the stem, and have two subtrees `StemValuesNode`, which would correspond to the current 256-values, and `StemMetaNode` which is also a 256-subtree that can be used to store arbitrary stem metadata.
 
-## **Backwards Compatibility**
+## Backwards Compatibility
 
 The main breaking changes are:
 
