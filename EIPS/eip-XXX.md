@@ -22,7 +22,7 @@ Ethereum's long-term goal is to allow blocks to be proved with validity proof so
 
 The current Merkle-Patricia Trie (MPT) design isn’t friendly for validity proofs for many reasons, such as using RLP for node encoding, Keccak as a hashing function, being a “tree of trees”, and not including accounts code as part of the state.
 
-Apart from requiring a state tree design that is friendly for block validity proofs, it’s also important to have fast and small regular Merkle proofs when the amount of state to prove is small. This is useful not only for Ethereum users but also for supporting future protocol needs in a stateless world (e.g: inclusion lists).
+Apart from requiring a state tree design that is friendly for block validity proofs, it’s also important to have fast and small regular Merkle proofs when the amount of state to prove is small. This is useful not only for the application layer but also for supporting future protocol needs in a stateless world (e.g: inclusion lists).
 
 Regarding these regular Merkle proofs in an MPT, since it’s a hexary tree, their size is quite big on average and in worst-case scenarios. Given a 2^32 size tree, the expected size for proving a single branch is `15 * 32 * log_16(2^32) = 3840`. From a worst-case block perspective, if 30M gas is used to access only a single byte of different account codes since this code isn’t chunkified, we’d need `30M/2400*(5*480+24k)=330MB`.
 
