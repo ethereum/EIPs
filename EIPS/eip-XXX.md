@@ -225,7 +225,7 @@ def old_style_address_to_address32(address: Address) -> Address32:
 
 ### Header values
 
-These are the positions in the tree at which block header fields of an account are stored.
+These are the positions in the tree at which header fields of an account are stored.
 
 ```python
 def tree_hash(inp: bytes) -> bytes32:
