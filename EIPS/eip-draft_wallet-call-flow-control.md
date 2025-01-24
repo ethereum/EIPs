@@ -13,7 +13,7 @@ requires: 5792
 
 ## Abstract
 
-This proposal extends [EIP-5792](./eip-5792.md) to allow dapps to downgrade their required atomicity guarantees and control the behaviour after a failed/reverted call. It introduces the batch-scope concept of `strict` vs. `loose` atomicity, where a `strict` batch remains atomic in the face of chain reorgs and a `loose` batch does not; and the per-call ability to continue after a failed/reverted call (`continue`) or stop processing (`halt`.)
+This proposal extends [EIP-5792](./eip-5792.md) to allow dapps to downgrade their required atomicity guarantees and control the behaviour after a failed/reverted call. It introduces the batch-scope concept of `strict` vs. `loose` atomicity, where a `strict` batch remains atomic in the face of chain reorgs and a `loose` batch does not; and the per-call ability to continue after a failed/reverted call (`continue`) or stop processing (`halt`).
 
 ## Motivation
 
@@ -175,7 +175,7 @@ a call fails.
 
 #### Critical Calls
 
-A critical call is a call the causes the entire batch to rollback on failure,
+A critical call is a call that causes the entire batch to rollback on failure,
 and correspondingly a non-critical call does not. Specifically, a critical call
 has a call-scope `on-failure` of `rollback` (or no `on-failure` present),
 while non-critical calls have either `halt` or `continue`.
@@ -192,12 +192,12 @@ rolled back.)
 
 Loose atomicity, on the other hand, is a weaker guarantee. In the event of a
 block reorg, any number of calls from the batch MAY appear on chain (possibly
-interspersed with other transactions.) If there are no block reorgs, loose
+interspersed with other transactions). If there are no block reorgs, loose
 atomicity MUST provide the same guarantees as strict.
 
 The none level of atomicity only provides the guarantee that the calls appear on
 chain in the order they are in the batch. Any number of calls from the batch
-MAY appear on chain (possibly interspersed with other transactions.)
+MAY appear on chain (possibly interspersed with other transactions).
 
 ### Behaviour
 
@@ -405,7 +405,7 @@ the call may be executed successfully eventually.
 ###### `200` Confirmed
 
 Status `200` MUST NOT be returned if any calls in the batch failed (including
-batch rollback, and the `on-failure` modes `halt`/`continue`.)
+batch rollback, and the `on-failure` modes `halt`/`continue`).
 
 ###### `207` Partial Success
 
