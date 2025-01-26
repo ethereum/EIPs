@@ -1,0 +1,147 @@
+---
+title: Hardware and Bandwidth Recommendations for Validators and Full Nodes
+description: System recommendations for Validators and Full nodes
+author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+discussions-to: <URL>
+status: Draft
+type: Informational
+created: 2025-01-26
+requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+---
+
+## Abstract
+
+This proposal specifies hardware and bandwidth requirements for full nodes and validators. Validators are split into attesters and proposers. The resource heavy component of proposing a block is creating it and broadcasting the necessary data needed to ensure that other attesters view the block as valid. We use the "block builder" to further emphasize this.
+
+## Motivation
+
+Clear system specifications are crucial for:
+
+- Ensuring meaningful benchmark comparisons across different implementations
+- Enabling informed decision-making about protocol upgrades and their hardware implications
+- Providing clear guidance for node operators with respects to the future
+
+Without a shared understanding of target hardware specifications:
+
+- Benchmark results lose significance due to inconsistent testing environments
+- Decision-making becomes challenging for implementation choices, as performance characteristics are heavily hardware dependent
+- Network participants lack clear guidance for hardware investments
+
+## Specification
+
+### Recommended hardware and bandwidth specifications
+
+| Node type | Storage | RAM | CPU Cores | CPU Single Thread/Multithread rating | Download/Upload speed |
+| -------- | -------- | -------- | --------| -------- |--------|
+| Full node     | 4TB     | 32GB    | 4 cores/8 threads  | 1000 / 3000 | 50 Mbps / 15 Mbps |
+| Attester      | 4TB     | 32GB    | 8 cores/16 threads | 3500 / 25000 | 50 Mbps / 25 Mbps |
+| Block builder | 4TB     | 32GB    | 8 cores/16 threads | 3500 / 25000 |  100 Mbps / 50 Mbps |
+
+### Recommended Prebuilds (Attester and Block builder)
+
+#### Minisforum UM790 Pro
+
+We recommend the Minisforum UM790 Pro with the following modifications:
+
+- Minisforum UM790 Pro
+- 8 cores
+- 16 threads
+- The barebones model will need to be updated to include 32GB RAM and 4TB storage
+- CPU Rating
+  - Single Thread: 3903
+  - Multithread: 30367
+
+#### ASUS NUC 14 Pro
+
+- 16 cores (6 performance + 8 efficiency cores + 2 Low power efficiency cores)
+- 22 threads
+- CPU Rating
+  - Single Thread: 3520
+  - Multithread: 25158
+
+### Recommended Prebuild (Full node)
+
+#### Raspberry Pi 5
+
+- 4 core
+- 4 threads
+- CPU Rating
+  - Single thread: 1487
+  - Multithred: 3428
+
+## Rationale
+
+### Storage
+
+For storage, we recommend the following SSDs:
+
+- Kingston KC3000
+- Kingston Fury Renegade
+- Samsung 990 Pro
+- Seagate Firecuda 530
+- Teamgroup MP44
+- WD Black SN850X
+
+In particular, we recommend purchasing NVMe M.2 instead of SATA as NVMe has higher throughput.
+
+As of January 2025, the storage requirements for all node types are dominated by the need to store block history.
+A 2TB disk can be used, however this is not recommended due to the rate of history growth and the uncertainty as to when EIP4444 will be complete.
+
+### RAM
+
+RAM/memory is dominated by state cache. As of January 2025, it is possible to run a full node with 16GB of RAM, however this has been known to not work with all combinations of EL and CL clients in the past.
+We therefore recommend 32GB.
+
+### Bandwidth
+
+- Statista states that as of January 2024:
+  - The global average download for broadband is 92 Mbps and the global average upload is 43 Mpbs.
+  - The global average download for mobile is 50 Mbps and 11 Mbps
+- GSMA report showing the state of mobile internet connectivity in 2024 shows that:
+  - The mobile upload speeds in Higher Income Countries (HIC) is about 18 Mbps
+  - The global average mobile download is 48 Mbps.
+
+Although most users will be using fixed broadband as opposed to mobile broadband. We include the mobile broadband figures as a way to approximate lower bounds.
+
+#### Block builders
+
+For validators that want to build blocks locally, we recommend global bandwidth figures inline with the global average for fixed broadband: 100 Mbps download and 50 Mbps upload.
+
+*If a block builder does not have the required bandwidth, we recommend that they build a block that is partially full and or one that includes less blobs.*
+
+#### Attesters
+
+For attesters, we recommend: 50 Mbps download and 25 Mbps upload.
+
+The minimum value recorded to work as of January 2025 has been ~15 Mbps. This was recorded in simulations done by Eth panda ops where 40% of the network had Gigabit connections and the other 60% had 15 Mbps upload.
+
+The minimum value could be lower than this and is highly dependent on your network topology.
+For example, if you are connected to peers whom have gigabit connections, but you yourself have subpar bandwidth, it may be sufficient for you to only send your data to the first peer and in the time it takes you to send data to your mesh, the first peer might have seeded the network.
+
+The 25 Mbps was chosen as a buffer to account for these miscellaneous factors that are harder to predict for.
+
+#### Validators using mev-boost
+
+The recommendation for validators using mev-boost is the same as the recommendations for attesters.
+
+#### Full nodes
+
+For full nodes, whom want to follow the tip of the chain, we recommend 50 Mbps download and 15 Mbps upload.
+
+Full nodes currently participate in sampling, however since they are not latency sensitive like attesters and block builders, we can lower their upload bandwidth requirement.
+
+The download requirement is kept the same, so that they are able to follow the chain at the same speed as an attester.
+
+Note: A full node will still be able to operate at significantly lower bandwidth requirements, however depending on the variance they may be at least a slot behind the chain.
+
+## Backwards Compatibility
+
+This EIP is informational and requires no protocol changes. We recommend that future EIPs include an assessment of their impact on these hardware requirements.
+
+## Security Considerations
+
+N/A
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
