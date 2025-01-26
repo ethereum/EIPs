@@ -133,7 +133,7 @@ Full nodes currently participate in sampling, however since they are not latency
 
 The download requirement is kept the same, so that they are able to follow the chain at the same speed as an attester.
 
-Note: A full node will still be able to operate at significantly lower bandwidth requirements, however depending on the variance they may be at least a slot behind the chain.
+Note: A full node will still be able to operate at significantly lower bandwidth requirements, however depending on how low they may be at least a slot behind the chain.
 
 ## Backwards Compatibility
 
