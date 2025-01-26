@@ -34,8 +34,8 @@ Without a shared understanding of target hardware specifications:
 | Node type | Storage | RAM | CPU Cores | CPU Single Thread/Multithread rating | Download/Upload speed |
 | -------- | -------- | -------- | --------| -------- |--------|
 | Full node     | 4TB     | 32GB    | 4 cores/8 threads  | 1000 / 3000 | 50 Mbps / 15 Mbps |
-| Attester      | 4TB     | 32GB    | 8 cores/16 threads | 3500 / 25000 | 50 Mbps / 25 Mbps |
-| Block builder | 4TB     | 32GB    | 8 cores/16 threads | 3500 / 25000 |  100 Mbps / 50 Mbps |
+| Attester      | 4TB     | 64GB    | 8 cores/16 threads | 3500 / 25000 | 50 Mbps / 25 Mbps |
+| Block builder | 4TB     | 64GB    | 8 cores/16 threads | 3500 / 25000 |  100 Mbps / 50 Mbps |
 
 ### Recommended Prebuilds (Attester and Block builder)
 
@@ -89,7 +89,9 @@ A 2TB disk can be used, however this is not recommended due to the rate of histo
 
 ### RAM
 
-RAM/memory is dominated by state cache. As of January 2025, it is possible to run a full node with 16GB of RAM, however this has been known to not work with all combinations of EL and CL clients in the past. We therefore recommend 32GB.
+RAM/memory is dominated by state cache. As of January 2025, it is possible to run a full node with 16GB of RAM, however this has been known to not work with all combinations of EL and CL clients in the past.
+
+On 32GB vs 64GB; 32GB works right now, however we recommend 64GB as [preliminary benchmarks](https://hackmd.io/@han/bench-hash-in-snark) have shown that zk-STARKS can consume a significant amount of memory and the difference in cost relative to the entire hardware setup for a validator is insignificant.
 
 ### Bandwidth
 
