@@ -1,7 +1,7 @@
 ---
 title: Hardware and Bandwidth Recommendations for Validators and Full Nodes
 description: System recommendations for Validators and Full nodes
-author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+author: Parithosh Jayanthi (@parithosh), Kevaundray Wedderburn (@kevaundray), Josh Rudolf (@jrudolf), Dankrad Feist (@dankrad), Justin Traglia (@jtraglia), Ignacio Hagopian (@jsign), George Kadianakis (@asn-d6)
 discussions-to: <URL>
 status: Draft
 type: Informational
