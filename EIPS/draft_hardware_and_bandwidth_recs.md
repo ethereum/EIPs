@@ -89,8 +89,7 @@ A 2TB disk can be used, however this is not recommended due to the rate of histo
 
 ### RAM
 
-RAM/memory is dominated by state cache. As of January 2025, it is possible to run a full node with 16GB of RAM, however this has been known to not work with all combinations of EL and CL clients in the past.
-We therefore recommend 32GB.
+RAM/memory is dominated by state cache. As of January 2025, it is possible to run a full node with 16GB of RAM, however this has been known to not work with all combinations of EL and CL clients in the past. We therefore recommend 32GB.
 
 ### Bandwidth
 
