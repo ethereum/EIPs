@@ -37,6 +37,8 @@ Without a shared understanding of target hardware specifications:
 | Attester      | 4TB     | 64GB    | 8 cores/16 threads | 3500 / 25000 | 50 Mbps / 25 Mbps |
 | Block builder | 4TB     | 64GB    | 8 cores/16 threads | 3500 / 25000 |  100 Mbps / 50 Mbps |
 
+- The CPU rating is a measure of how powerful a particular CPU is for single and multithreaded respectively. All numbers references are normalized according to PassMark.
+
 ### Recommended Prebuilds (Attester and Block builder)
 
 #### Minisforum UM790 Pro
