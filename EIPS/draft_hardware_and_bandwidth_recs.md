@@ -11,7 +11,9 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 
 ## Abstract
 
-This proposal specifies hardware and bandwidth requirements for full nodes and validators. Validators are split into attesters and proposers. The resource heavy component of proposing a block is creating it and broadcasting the necessary data needed to ensure that other attesters view the block as valid. We use the "block builder" to further emphasize this.
+This proposal specifies hardware and bandwidth recommendations for full nodes and validators. Validators are split into attesters and proposers. The resource heavy component of proposing a block is creating it and broadcasting the necessary data needed to ensure that other attesters view the block as valid. We use the "block builder" to further emphasize this.
+
+We note that you may be able to run a client with less than the recommended specifications, however benchmarks and decision-making will be made with respects to these recommendations.
 
 ## Motivation
 
@@ -110,7 +112,7 @@ Although most users will be using fixed broadband as opposed to mobile broadband
 
 For validators that want to build blocks locally, we recommend global bandwidth figures inline with the global average for fixed broadband: 100 Mbps download and 50 Mbps upload.
 
-*If a block builder does not have the required bandwidth, we recommend that they build a block that is partially full and or one that includes less blobs.*
+*If a block builder does not have the recommended bandwidth, we recommend that they build a block that is partially full and or one that includes less blobs.*
 
 #### Attesters
 
@@ -131,15 +133,15 @@ The recommendation for validators using mev-boost is the same as the recommendat
 
 For full nodes, whom want to follow the tip of the chain, we recommend 50 Mbps download and 15 Mbps upload.
 
-Full nodes currently participate in sampling, however since they are not latency sensitive like attesters and block builders, we can lower their upload bandwidth requirement.
+Full nodes currently participate in sampling, however since they are not latency sensitive like attesters and block builders, we can lower their recommended upload bandwidth.
 
-The download requirement is kept the same, so that they are able to follow the chain at the same speed as an attester.
+The recommended download speed is kept the same, so that they are able to follow the chain at the same speed as an attester.
 
-Note: A full node will still be able to operate at significantly lower bandwidth requirements, however depending on how low they may be at least a slot behind the chain.
+Note: A full node will still be able to operate at significantly lower bandwidth, however depending on how low they may be at least a slot behind the chain.
 
 ## Backwards Compatibility
 
-This EIP is informational and requires no protocol changes. We recommend that future EIPs include an assessment of their impact on these hardware requirements.
+This EIP is informational and requires no protocol changes. We recommend that future EIPs include an assessment of their impact on these hardware recommendations.
 
 ## Security Considerations
 
