@@ -21,6 +21,7 @@ and subsequently end up not being able to convince the network that the blobs ar
 
 - Create a parameter in block builder's configuration called `USER_CONFIGURED_MAX_BLOBS_PER_BLOCK`
 - Take the minimum out of the `MAX_BLOB_GAS_PER_BLOCK` and the `USER_CONFIGURED_MAX_BLOBS_PER_BLOCK`
+- If the minimum is zero, set the minimum to one.
 - Use the minimum to decide how many blobs to include in the block
 
 Note: By default `USER_CONFIGURED_MAX_BLOBS_PER_BLOCK` may be set to the maximum in the current fork.
