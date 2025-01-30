@@ -2,7 +2,7 @@
 title: Max blob flag for local builders
 description: Adds a flag to set the maximum number of blobs a local builder will put in a block
 author: Kevaundray Wedderburn (@kevaundray), Ben Adams (@benaadams), Gajinder Singh (@g11tech), Dustin (@tersec)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/max-blob-flags-for-local-builders/22734
 status: Draft
 type: Meta
 created: 2025-01-30
