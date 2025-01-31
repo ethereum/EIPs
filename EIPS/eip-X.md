@@ -1,4 +1,5 @@
 ---
+eip: X
 title: DeFi Protocol Solvency Proof Standard
 description: A standardized interface for verifying and reporting DeFi protocol solvency status through smart contracts
 author: Sean Luis Guada Rodríguez (@SeanLuis) <seanluis47@gmail.com>
