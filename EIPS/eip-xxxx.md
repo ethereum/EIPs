@@ -1,36 +1,28 @@
 ---
-title: <The EIP title is a few words, not a complete sentence>
-description: <Description is one full (short) sentence>
-author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+title: Radical Repricing
+description: Gas Cost Repricing to reflect computational complexity and transaction throughput increase
+author: Jacek Glen (@JacekGlen), Lukasz Glen (@lukasz-glen)
 discussions-to: <URL>
 status: Draft
-type: <Standards Track, Meta, or Informational>
-category: <Core, Networking, Interface, or ERC> # Only required for Standards Track. Otherwise, remove this field.
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+type: Standards Track
+category: Core
+created: 2025-02-05
 requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
 ---
 
-<!--
-  READ EIP-1 (https://eips.ethereum.org/EIPS/eip-1) BEFORE USING THIS TEMPLATE!
-
-  This is the suggested template for new EIPs. After you have filled in the requisite fields, please delete these comments.
-
-  Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-  The title should be 44 characters or less. It should not repeat the EIP number in title, irrespective of the category.
-
-  TODO: Remove this comment before submitting
--->
-
 ## Abstract
 
-<!--
-  The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-
-  TODO: Remove this comment before submitting
--->
+This EIP proposes a radical change to the gas cost schedule: opcodes, precompiles, other costs. 
+Radical means that a large number of opcodes and operations are modified at once instead of a particular 
+It focuses on computational complexity agnostic to the implementation and technology to the reasonable extent.
+This EIP does not take into account, and cannot take by its nature, the network costs e.g. the long term cost of state changes persistence.
+As the result, the gas cost schedule is more accurate and the Ethereum Network throughput increases.
 
 ## Motivation
+
+Motivation 1.
+
+Motivation 2.
 
 <!--
   This section is optional.
@@ -56,6 +48,20 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Rationale
 
+Gas Cost Estimator project
+
+Other projects
+
+Conclusions, common conclusions from these projects, security considerations, precompiles
+
+Fractional gas price, pros and cons.
+
+Increase vs. Decrease gas cost, security considerations.
+
+Why only computational complexity? Trying to be independent of EVM implementations, some estimation.
+
+Expected transaction throughput increment. 
+
 <!--
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
 
@@ -64,22 +70,17 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
   TODO: Remove this comment before submitting
 -->
 
-TBD
-
 ## Backwards Compatibility
 
-<!--
+The changes require a hardfork. 
 
-  This section is optional.
+The changes have the following consequences:
 
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+- The gas cost of affected opcodes, precompiles and other operations are changed.
+- It is almost certain that the gas cost of a transaction that calls a contract is changed.
+- Contracts that use hard coded gas limits for subcalls are affected.
 
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-No backward compatibility issues found.
+TODO further research is required to ensure that contracts that use hord ocded limits are broken.
 
 ## Test Cases
 
