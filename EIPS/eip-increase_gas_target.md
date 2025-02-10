@@ -1,7 +1,7 @@
 ---
 title: Increase Gas Utilization Target
 description: Increase the gas utilization target from 50% to 75%
-author: Storm Slivkoff (@sslivkoff)
+author: Storm Slivkoff (@sslivkoff), Toni Wahrstätter (@nerolation)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
