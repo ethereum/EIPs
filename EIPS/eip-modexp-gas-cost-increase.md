@@ -120,13 +120,13 @@ There are no changes to the underlying interface or arithmetic algorithms, so th
 | modexp_marcin_3_balanced     | 1360 | 1360 | 0% |
 
 ## Analyzed Impact
-Based on the analysis up to block 21550926 (January 4, 2025), there were 2447229 calls to the `ModExp` precompile, of which 7622 involved at least one parameter exceeding 32 bytes. This accounts for 0.31% of all calls, meaning that 99.69% of historical calls will remain unaffected. The pricing for the affected 0.31% will now be increased.
+TBD
 
 ## Implementations
 [None]
 
 ## Backwards Compatibility
-This change is backwards incompatible. However, based on analysis up to block 21550926, only 0.31% of past transactions would have been priced differently. While gas costs for a small portion of past transactions will change, similar gas repricings have occurred multiple times in the Ethereum ecosystem, and their effects are well understood.
+This change is backwards incompatible. However, while gas costs for a small portion of past transactions will change, similar gas repricings have occurred multiple times in the Ethereum ecosystem, and their effects are well understood.
 
 ## Security Considerations
 There are no security concerns since no new functionality is introduced or made cheaper. The primary consideration for this EIP is the risk of potentially overpriced `ModExp` scenarios.
