@@ -126,7 +126,7 @@ TBD
 [None]
 
 ## Backwards Compatibility
-This change is backwards incompatible. However, while gas costs for a small portion of past transactions will change, similar gas repricings have occurred multiple times in the Ethereum ecosystem, and their effects are well understood.
+This change is backwards incompatible. However, similar gas repricings have occurred multiple times in the Ethereum ecosystem, and their effects are well understood.
 
 ## Security Considerations
 There are no security concerns since no new functionality is introduced or made cheaper. The primary consideration for this EIP is the risk of potentially overpriced `ModExp` scenarios.
