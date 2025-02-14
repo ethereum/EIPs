@@ -24,6 +24,7 @@ Motivation 1.
 
 Motivation 2.
 
+
 <!--
   This section is optional.
 
@@ -36,6 +37,7 @@ Motivation 2.
 
 ## Specification
 
+WARM_STORAGE_READ_COST 5
 <!--
   The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
 
@@ -95,6 +97,37 @@ TODO further research is required to ensure that contracts that use hord ocded l
 
 ## Reference Implementation
 
+
+```golang
+// Gas costs
+const (
+ RepricedGasBaseStep   uint64 = 1
+ RepricedGasFastStep   uint64 = 2
+ RepricedGasMidStep    uint64 = 3
+ RepricedGasTLoadStep  uint64 = 4
+ RepricedGasTStoreStep uint64 = 10
+ ExpGas                uint64 = 2  // Once per EXP instruction
+ ExpByteGas            uint64 = 4  // One per byte of the EXP exponent
+ Keccak256Gas          uint64 = 30 // Once per KECCAK256 operation.
+ Keccak256WordGas      uint64 = 6  // One per word of the KECCAK256 operation's data.
+)
+
+func newRepricedInstructionSet() JumpTable {
+ instructionSet := newPragueInstructionSet()
+
+ for _, op := range instructionSet {
+  if op.isPush || op.isDup || op.isSwap || op.constantGas == GasFastestStep || op.constantGas == GasFastStep {
+   op.constantGas = RepricedGasBaseStep
+  }
+ }
+ instructionSet[ADDMOD].constantGas = RepricedGasFastStep
+ instructionSet[MULMOD].constantGas = RepricedGasMidStep
+
+ validateAndFillMaxStack(&instructionSet)
+ return instructionSet
+}
+
+```
 <!--
   This section is optional.
 
