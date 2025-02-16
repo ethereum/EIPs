@@ -187,7 +187,7 @@ The changes have the following consequences:
 - It is almost certain that the gas cost of a transaction that calls a contract is changed.
 - Contracts that use hard coded gas limits for subcalls are affected.
 
-TODO further research is required to ensure that contracts that use hord ocded limits are broken.
+TODO further research is required to ensure that contracts that use hard coded limits are not broken.
 
 ## Test Cases
 
