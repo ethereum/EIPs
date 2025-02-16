@@ -13,7 +13,7 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 ## Abstract
 
 This EIP proposes a radical change to the gas cost schedule: opcodes, precompiles, other costs.
-Radical means that a large number of opcodes and operations are modified at once instead of a particular
+Radical means that a large number of opcodes and operations are modified at once instead of a series of fine grained adjustments.
 It focuses on computational complexity agnostic to the implementation and technology to the reasonable extent.
 This EIP does not take into account, and cannot take by its nature, the network costs e.g. the long term cost of state changes persistence.
 As the result, the gas cost schedule is more accurate and the Ethereum Network throughput increases.
