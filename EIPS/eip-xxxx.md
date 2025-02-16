@@ -1,5 +1,5 @@
 ---
-title: Radical Repricing
+title: General Repricing
 description: Gas Cost Repricing to reflect computational complexity and transaction throughput increase
 author: Jacek Glen (@JacekGlen), Lukasz Glen (@lukasz-glen)
 discussions-to: <URL>
