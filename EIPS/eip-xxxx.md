@@ -20,9 +20,51 @@ As the result, the gas cost schedule is more accurate and the Ethereum Network t
 
 ## Motivation
 
-Motivation 1.
+The gas cost refers to opcodes (including arguments and other factors expressed in formulas), precompiles and other operations.
+Other operations are memory expansion, cold addresses etc.
+The gas cost actually consists of two factors: the network cost and compuatation cost.
+The network cost refers to blockchain state maintaining effort. 
+This is storage, logs, calldata, transactions, receipts etc. Data that is to be persisted by the network nodes.
+The computation cost refers to non durable smart contract processing effort.
+While there were a few EIPs changing gas cost related to the network cost,
+there were little to none EIPs changing gas cost related to computational cost.
+(Which EIPs)
+On the other hand it is more convenient to methodologically estimate computational cost by execution measurements.
 
-Motivation 2.
+The gas cost related to computational cost did not change since the beginning in any meaningful manner.
+But now we have several independent EVM implementations (execution layers), optimized and stable,
+and there are the right tools, technical and methodological, to assess how well the conventional gas cost schedule
+fits hardware workload profiles.
+
+Measurements and estimations depend on many factors: hardware, OS, virtualization, EVM, and that is not a close list.
+Not to be mentioned that an execution of a single opcode impacts or depends on caching, block preparation, block finalization,
+garbage collectors, code analysis, parsing etc.
+So the individual computational cost is a sum of many factors, distributed in software stack.
+But still, the examinations showed that in general we observe a common outline.
+The outline of computational cost that is inedpendent to EVM implementation, technology stack and context.
+For instance, the aggregated execution cost of one opcode can last two times longer than a given another opcode in most EVM clients.
+This refers to the computational complexity. 
+The point is that it is determined rather experimentally than theoretically.
+And the gas cost schedule should reflect the computational complexity, the best it can.
+
+1.
+
+The current gas cost schedule is not compliant with experimantally determined computational complexity.
+Many outliers with a strong indication are detected. 
+Many others are reasonable candidates to be rebalanced.
+In particular, precompiles generally are significantly underestimated.
+The unbalanced gas cost schedule can: expose a risk to the network,
+open an attack vector, lead to false optimisation, 
+break the principle that gas is the abstract unit of transaction execution effort.
+
+2.
+
+The gas cost schedule is relative by its nature.
+So in theory it can be modified freely as long as proportions are right.
+In general, it is safer to decrease a gas cost than increase.
+Radical gas price decreament of operations related to computation effort has two important effects:
+it increases the network throughput in terms of transactions per block,
+it increases the weight of network cost.
 
 <!--
   This section is optional.
@@ -168,6 +210,8 @@ Increase vs. Decrease gas cost, security considerations.
 Why only computational complexity? Trying to be independent of EVM implementations, some estimation.
 
 Expected transaction throughput increment.
+
+Imapct on the gas price, expected impact.
 
 <!--
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
