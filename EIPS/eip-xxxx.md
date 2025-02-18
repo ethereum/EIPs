@@ -4,7 +4,7 @@ eip: ""
 title: Delayed execution
 description: Make blocks statically verifiable by charging coinbase for inclusion costs upfront
 author: Francesco D`Amato (@fradamt), Toni Wahrstätter (@nerolation)
-discussions-to: 
+discussions-to: "https://ethereum-magicians.org/t/eip-xxxx-delayed-execution/22890"
 status: Draft
 type: Standards Track
 category: Core
