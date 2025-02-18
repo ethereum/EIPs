@@ -12,59 +12,23 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 
 ## Abstract
 
-This EIP proposes a radical change to the gas cost schedule: opcodes, precompiles, other costs.
-Radical means that a large number of opcodes and operations are modified at once instead of a series of fine grained adjustments.
-It focuses on computational complexity agnostic to the implementation and technology to the reasonable extent.
-This EIP does not take into account, and cannot take by its nature, the network costs e.g. the long term cost of state changes persistence.
-As the result, the gas cost schedule is more accurate and the Ethereum Network throughput increases.
+This EIP proposes a radical change to the gas cost schedule: opcodes, precompiles, and other costs. Radical means that a large number of opcodes and operations are modified at once instead of a series of fine-grained adjustments. It focuses on computational complexity agnostic to the implementation and technology to a reasonable extent. This EIP does not take into account, and cannot take by its nature, the network costs e.g. the long-term cost of state changes persistence. As a result, the gas cost schedule is more accurate and the Ethereum Network throughput increases.
 
 ## Motivation
 
-The gas cost refers to opcodes (including arguments and other factors expressed in formulas), precompiles and other operations.
-Other operations are memory expansion, cold addresses etc.
-The gas cost actually consists of two factors: the network cost and compuatation cost.
-The network cost refers to blockchain state maintaining effort. 
-This is storage, logs, calldata, transactions, receipts etc. Data that is to be persisted by the network nodes.
-The computation cost refers to non durable smart contract processing effort.
-While there were a few EIPs changing gas cost related to the network cost,
-there were little to none EIPs changing gas cost related to computational cost.
-(Which EIPs)
-On the other hand it is more convenient to methodologically estimate computational cost by execution measurements.
+The gas cost refers to opcodes (including arguments and other factors expressed in formulas), precompiles and other operations. Other operations are memory expansion, access to cold or warm addresses etc. The gas cost consists of two factors: the network cost and the computation cost. The network cost refers to the effort required by the blockchain to maintain its state. This is storage, logs, calldata, transactions, receipts etc. Data that is to be persisted by the network nodes. The computation cost refers to the non-durable smart contract processing effort. While there were a few EIPs changing gas cost related to the network cost, there were little to none EIPs changing gas cost related to computational cost (see EIP-160, EIP-1884). On the other hand, it is more convenient to methodologically estimate computational cost by measuring execution time.
 
-The gas cost related to computational cost did not change since the beginning in any meaningful manner.
-But now we have several independent EVM implementations (execution layers), optimized and stable,
-and there are the right tools, technical and methodological, to assess how well the conventional gas cost schedule
-fits hardware workload profiles.
+The gas cost related to computational cost has not changed since the beginning in any meaningful manner. But now we have several independent EVM implementations (execution layers), optimized and stable, and there are the right tools, technical and methodological, to assess how well the conventional gas cost schedule fits hardware workload profiles.
 
-Measurements and estimations depend on many factors: hardware, OS, virtualization, EVM, and that is not a close list.
-Not to be mentioned that an execution of a single opcode impacts or depends on caching, block preparation, block finalization,
-garbage collectors, code analysis, parsing etc.
-So the individual computational cost is a sum of many factors, distributed in software stack.
-But still, the examinations showed that in general we observe a common outline.
-The outline of computational cost that is inedpendent to EVM implementation, technology stack and context.
-For instance, the aggregated execution cost of one opcode can last two times longer than a given another opcode in most EVM clients.
-This refers to the computational complexity. 
-The point is that it is determined rather experimentally than theoretically.
-And the gas cost schedule should reflect the computational complexity, the best it can.
+Measurements and estimations depend on many factors: hardware, OS, virtualization, memory management, EVM, and that is not a close list. Not to mention that the execution of a single opcode impacts or depends on caching, block preparation, block finalization, garbage collectors, code analysis, parsing etc. So the individual computational cost is a sum of many factors, distributed in the software stack. But still, the examinations showed that in general, we observe a common outline. The outline of the computational cost is independent of EVM implementation, technology stack and context. For instance, the aggregated execution cost of one opcode can last two times longer than a given other opcode in most EVM clients. This refers to the computational complexity. The point is that it is determined rather experimentally than theoretically. And the gas cost schedule should reflect the computational complexity, the best it can.
 
-1.
+Observation 1.
 
-The current gas cost schedule is not compliant with experimantally determined computational complexity.
-Many outliers with a strong indication are detected. 
-Many others are reasonable candidates to be rebalanced.
-In particular, precompiles generally are significantly underestimated.
-The unbalanced gas cost schedule can: expose a risk to the network,
-open an attack vector, lead to false optimisation, 
-break the principle that gas is the abstract unit of transaction execution effort.
+The current gas cost schedule differs from the experimentally determined computational complexity. Many outliers with a strong indication are detected. Many others are reasonable candidates to be rebalanced. In particular, precompiles generally are significantly underestimated. The unbalanced gas cost schedule can: expose a risk to the network, open an attack vector, lead to false optimization, and break the principle that gas is the abstract unit of transaction execution effort.
 
-2.
+Observation 2.
 
-The gas cost schedule is relative by its nature.
-So in theory it can be modified freely as long as proportions are right.
-In general, it is safer to decrease a gas cost than increase.
-Radical gas price decreament of operations related to computation effort has two important effects:
-it increases the network throughput in terms of transactions per block,
-it increases the weight of network cost.
+The gas cost schedule is relative by its nature. So in theory it can be modified freely as long as the proportions are right. In general, it is safer to decrease a gas cost than to increase it. Radical gas price decrease of operations related to computation effort has two important effects: it increases the network throughput in terms of transactions per block, and it increases the weight of network cost.
 
 <!--
   This section is optional.
