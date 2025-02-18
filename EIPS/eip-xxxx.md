@@ -70,6 +70,19 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | `LOG_PER_TOPIC_COST`              | `7`                  |
 | `LOG_PER_BYTE_COST`               | `8`                  |
 
+### Cost formulas
+
+| Name | Formula | Notes |
+| ------------- | ------------- | ------------- |
+| data_size | len(data) | The size of the data expressed as number of bytes |
+| data_word_size | (len(data) + 31) / 32 | The size of the data expressed as number of words |
+| exponent_byte_size | len(exp) | The size in bytes of the exponent in the EXP opcode. |
+| topic_count | len(topics) | The number of topics in the LOGx opcode. |
+| sets_count | (len(data) + 63) / 64 | The number of pair sets in the ECPAIRING precompile. |
+| memory_expansion_cost | memory_cost(current_word_size) - memory_cost(previous_word_size)  | The cost of expanding memory to `current_word_size` words from `previous_word_size` words. |
+| memory_cost | (memory_word_size ** 2) / 512  | The cost of memory for `data_word_size` words. |
+| address_access_cost | 5 \| 2100  | The cost of accessing warm and cold address data. |
+
 ### Opcode Costs
 
 | Opcode | Name | Pre-change Gas | Gas Cost |
@@ -153,18 +166,6 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 The cost of 01 (ECRECOVER), 04 (IDENTITY), 05 (MODEXP) and 09 (BLAKE2F) precompiles remains unchanged. The calculated and rescaled cost of 06 (ECADD) is higher than the current cost. This is left unchanged to maintain compatibility with existing contracts. 
 
 Additionally, all precompiles benefit from the lowered cost of *CALL opcodes (see below).
-
-### Cost formulas
-
-| Name | Formula | Notes |
-| ------------- | ------------- | ------------- |
-| data_size | len(data) | The size of the data expressed as number of bytes |
-| data_word_size | (len(data) + 31) / 32 | The size of the data expressed as number of words |
-| exponent_byte_size | len(exp) | The size in bytes of the exponent in the EXP opcode. |
-| topic_count |  | The number of topics in the LOGx opcode. |
-| sets_count | (len(data) + 63) / 64 | The number of pair sets in the ECPAIRING precompile. |
-| memory_expansion_cost |  | The cost of expanding memory by `data_word_size` words. |
-| address_access_cost | 5, 2100  | The cost of accessing an address. |
 
 ### Other changes
 
