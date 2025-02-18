@@ -1,5 +1,5 @@
 ---
-title: Radical Repricing
+title: General Repricing
 description: Gas Cost Repricing to reflect computational complexity and transaction throughput increase
 author: Jacek Glen (@JacekGlen), Lukasz Glen (@lukasz-glen)
 discussions-to: <URL>
@@ -12,17 +12,23 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 
 ## Abstract
 
-This EIP proposes a radical change to the gas cost schedule: opcodes, precompiles, other costs.
-Radical means that a large number of opcodes and operations are modified at once instead of a particular
-It focuses on computational complexity agnostic to the implementation and technology to the reasonable extent.
-This EIP does not take into account, and cannot take by its nature, the network costs e.g. the long term cost of state changes persistence.
-As the result, the gas cost schedule is more accurate and the Ethereum Network throughput increases.
+This EIP proposes a significant overhaul of the gas cost schedule, encompassing opcodes, precompiles, and other costs. The term "radical" indicates that a substantial number of opcodes and operations are modified concurrently, rather than through incremental adjustments. The focus is on computational complexity, agnostic to specific implementations and technologies, to a reasonable extent. This EIP does not account for network costs, such as the long-term cost of state changes persistence. Consequently, the gas cost schedule becomes more accurate, and Ethereum Network throughput is enhanced.
 
 ## Motivation
 
-Motivation 1.
+Gas costs encompass opcodes (including arguments and factors expressed in formulas), precompiles, and other operations such as memory expansion and access to cold or warm addresses. Gas costs are comprised of two components: network cost and computation cost. Network cost pertains to the effort required by the blockchain to maintain its state, including storage, logs, calldata, transactions, and receipts. These are data elements that need to be persisted by network nodes. Computation cost refers to the non-durable processing effort of smart contracts. Although several EIPs have addressed gas costs related to network costs, there has been minimal focus on computational costs (see EIP-160, EIP-1884). However, it is methodologically more feasible to estimate computational costs by measuring execution time.
 
-Motivation 2.
+The computational cost component of gas costs has remained largely unchanged since the inception of Ethereum. With multiple independent EVM implementations now optimized and stable, and the availability of appropriate technical and methodological tools, it is possible to evaluate how well the conventional gas cost schedule aligns with hardware workload profiles.
+
+Measurements and estimations depend on various factors, including hardware, OS, virtualization, memory management, EVM, and more. The execution of a single opcode impacts or depends on caching, block preparation, block finalization, garbage collectors, code analysis, parsing etc. Consequently, the individual computational cost is a sum of multiple factors spread over the software stack. Despite this complexity, examinations have shown a general pattern. The computational cost outline is consistent across EVM implementations, technology stacks, and contexts. For example, the aggregated execution cost of one opcode can be twice as long as another opcode in most EVM clients. This illustrates computational complexity, determined experimentally rather than theoretically. The gas cost schedule should, therefore, accurately reflect computational complexity.
+
+Observation 1.
+
+The current gas cost schedule differs in many places from the experimentally determined computational complexity. Many significant outliers have been identified, indicating a need for rebalancing. Many others are reasonable candidates to be rebalanced. In particular, precompiles generally are significantly underestimated. The unbalanced gas cost schedule can: expose a risk to the network, open an attack vector, lead to false optimization, and break the principle that gas is the abstract unit of transaction execution effort.
+
+Observation 2.
+
+The gas cost schedule is inherently relative, meaning it can be modified as long as the proportions are correct. Generally, it is safer to decrease a gas cost than to increase it. A substantial reduction in gas costs associated with computational effort has two significant effects: it increases network throughput in terms of transactions per block, and it increases the weight of network costs.
 
 <!--
   This section is optional.
@@ -169,6 +175,8 @@ Why only computational complexity? Trying to be independent of EVM implementatio
 
 Expected transaction throughput increment.
 
+Imapct on the gas price, expected impact.
+
 <!--
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
 
@@ -187,7 +195,7 @@ The changes have the following consequences:
 - It is almost certain that the gas cost of a transaction that calls a contract is changed.
 - Contracts that use hard coded gas limits for subcalls are affected.
 
-TODO further research is required to ensure that contracts that use hord ocded limits are broken.
+TODO further research is required to ensure that contracts that use hard coded limits are not broken.
 
 ## Test Cases
 
