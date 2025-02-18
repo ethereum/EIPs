@@ -142,7 +142,29 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### Precompiles Costs
 
+| Precompile | Name | Current Gas | Proposed Gas |
+| ------------- | ------------- | -------------: |  -------------: |
+| 02 | SHA2-256 | 60 + 12 * data_word_size | 10 + 4 * data_word_size |
+| 03 | RIPEMD-160 | 600 + 120 * data_word_size | 60 + 40 * data_word_size |
+| 07 | ECMUL | 6000 |  2700 |
+| 08 | ECPAIRING | 45000 + 34000 * sets_count | 8000 + 7000 * sets_count |
+| 0A | POINTEVAL | 50000 | 21000 |
+
+The cost of 01 (ECRECOVER), 04 (IDENTITY), 05 (MODEXP) and 09 (BLAKE2F) precompiles remains unchanged. The calculated and rescaled cost of 06 (ECADD) is higher than the current cost. This is left unchanged to maintain compatibility with existing contracts. 
+
+Additionally, all precompiles benefit from the lowered cost of *CALL opcodes (see below).
+
 ### Cost formulas
+
+| Name | Formula | Notes |
+| ------------- | ------------- | ------------- |
+| data_size | len(data) | The size of the data expressed as number of bytes |
+| data_word_size | (len(data) + 31) / 32 | The size of the data expressed as number of words |
+| exponent_byte_size | len(exp) | The size in bytes of the exponent in the EXP opcode. |
+| topic_count |  | The number of topics in the LOGx opcode. |
+| sets_count | (len(data) + 63) / 64 | The number of pair sets in the ECPAIRING precompile. |
+| memory_expansion_cost |  | The cost of expanding memory by `data_word_size` words. |
+| address_access_cost | 5, 2100  | The cost of accessing an address. |
 
 ### Other changes
 
@@ -210,22 +232,24 @@ TODO further research is required to ensure that contracts that use hard coded l
 
 ## Reference Implementation
 
+The reference implementation in Go-Ethereum provides new instruction set and new `memoryGasCost` function. Additionally it contains a set of overrides for specific gas elements. The actual implementation requires proper versioning of the overrides.
+
 ```golang
 const (
   RepricedGasBaseStep         uint64 = 1
   RepricedGasFastStep         uint64 = 2
   RepricedGasMidStep          uint64 = 3
-  RepricedWarmStorageReadCost uint64 = 100 // WARM_STORAGE_READ_COST
 
   //overrides
-  ExpGas           uint64 = 2  // Once per EXP instruction
-  ExpByteGas       uint64 = 4  // One per byte of the EXP exponent
-  Keccak256Gas     uint64 = 10 // Once per KECCAK256 operation.
-  Keccak256WordGas uint64 = 6  // One per word of the KECCAK256 operation's data.
-  CopyGas          uint64 = 1  // One per word of the copied code (CALLDATACOPY, CODECOPY, EXTCODECOPY, RETURNDATACOPY, MCOPY)
-  LogGas           uint64 = 7  // Per LOG* operation.
-  LogTopicGas      uint64 = 7  // Multiplied by the * of the LOG*, per LOG transaction. e.g. LOG0 incurs 0, LOG4 incurs 4
-  LogDataGas       uint64 = 8  // Per byte in a LOG* operation's data.
+  WarmStorageReadCost uint64 = 100 // WARM_STORAGE_READ_COST
+  ExpGas              uint64 = 2  // Once per EXP instruction
+  ExpByteGas          uint64 = 4  // One per byte of the EXP exponent
+  Keccak256Gas        uint64 = 10 // Once per KECCAK256 operation.
+  Keccak256WordGas    uint64 = 6  // One per word of the KECCAK256 operation's data.
+  CopyGas             uint64 = 1  // One per word of the copied code (CALLDATACOPY, CODECOPY, EXTCODECOPY, RETURNDATACOPY, MCOPY)
+  LogGas              uint64 = 7  // Per LOG* operation.
+  LogTopicGas         uint64 = 7  // Multiplied by the * of the LOG*, per LOG transaction. e.g. LOG0 incurs 0, LOG4 incurs 4
+  LogDataGas          uint64 = 8  // Per byte in a LOG* operation's data.
 )
 
 func newRepricedInstructionSet() JumpTable {
@@ -238,8 +262,8 @@ func newRepricedInstructionSet() JumpTable {
   }
   instructionSet[ADDMOD].constantGas = RepricedGasFastStep
   instructionSet[MULMOD].constantGas = RepricedGasMidStep
-  instructionSet[TLOAD].constantGas = RepricedWarmStorageReadCost
-  instructionSet[TSTORE].constantGas = RepricedWarmStorageReadCost
+  instructionSet[TLOAD].constantGas = WarmStorageReadCost
+  instructionSet[TSTORE].constantGas = WarmStorageReadCost
 
   validateAndFillMaxStack(&instructionSet)
  return instructionSet
@@ -268,14 +292,6 @@ func memoryGasCost(mem *Memory, newMemSize uint64) (uint64, error) {
 }
 
 ```
-<!--
-  This section is optional.
-
-  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
-  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
-
-  TODO: Remove this comment before submitting
--->
 
 ## Security Considerations
 
