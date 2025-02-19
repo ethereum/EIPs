@@ -42,15 +42,6 @@ The gas cost schedule is inherently relative, meaning it can be modified as long
 
 ## Specification
 
- 5
-<!--
-  The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
-
-  It is recommended to follow RFC 2119 and RFC 8170. Do not remove the key word definitions if RFC 2119 and RFC 8170 are followed.
-
-  TODO: Remove this comment before submitting
--->
-
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 ### Parameters
@@ -72,16 +63,17 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### Cost formulas
 
-| Name | Formula | Notes |
+| Name | Formula | Description |
 | ------------- | ------------- | ------------- |
 | data_size | len(data) | The size of the data expressed as number of bytes |
 | data_word_size | (len(data) + 31) / 32 | The size of the data expressed as number of words |
-| exponent_byte_size | len(exp) | The size in bytes of the exponent in the EXP opcode. |
+| exponent_byte_size | len(exponent) | The size in bytes of the exponent in the EXP opcode. |
 | topic_count | len(topics) | The number of topics in the LOGx opcode. |
-| sets_count | (len(data) + 63) / 64 | The number of pair sets in the ECPAIRING precompile. |
-| memory_expansion_cost | memory_cost(current_word_size) - memory_cost(previous_word_size)  | The cost of expanding memory to `current_word_size` words from `previous_word_size` words. |
+| sets_count | len(data) / 192 | The number of pair sets in the ECPAIRING precompile. |
+| memory_expansion_cost | memory_cost(current_word_size) - memory_cost(previous_word_size)  | The cost of expanding memory to `current_word_size` words from `previous_word_size` words. In a single context memory cannot contract, so the formula is always non-negative |
 | memory_cost | (memory_word_size ** 2) / 512  | The cost of memory for `data_word_size` words. |
-| address_access_cost | 5 \| 2100  | The cost of accessing warm and cold address data. |
+| memory_word_size | (memory_size + 31) / 32 | The size of the allocated memory expressed as number of words |
+| address_access_cost | 5 (warm) \| 2600 (cold)  | The cost of accessing warm and cold address data. |
 
 ### Opcode Costs
 
@@ -151,7 +143,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | 60 - 7F | PUSHx | 3 | BASE_OPCODE_COST |
 | 80 - 8F | DUPx | 3 | BASE_OPCODE_COST |
 | 90 - 9F | SWAPx | 3 | BASE_OPCODE_COST |
-| A0 - A4 | LOGx | 375 + 375 * topic_count + 8 * data_size + memory_expansion_cost | LOG_BASE_COST + LOG_PER_TOPIC_COST * topic_count + LOG_PER_BYTE_COST * data_size + memory_expansion_cost |
+| A0 - A4 | LOGx | 375 + 375 \* topic_count + 8 \* data_size + memory_expansion_cost | LOG_BASE_COST + LOG_PER_TOPIC_COST \* topic_count + LOG_PER_BYTE_COST \* data_size + memory_expansion_cost |
 
 ### Precompiles Costs
 
@@ -163,7 +155,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | 08 | ECPAIRING | 45000 + 34000 * sets_count | 8000 + 7000 * sets_count |
 | 0A | POINTEVAL | 50000 | 21000 |
 
-The cost of 01 (ECRECOVER), 04 (IDENTITY), 05 (MODEXP) and 09 (BLAKE2F) precompiles remains unchanged. The calculated and rescaled cost of 06 (ECADD) is higher than the current cost. This is left unchanged to maintain compatibility with existing contracts. 
+The cost of 01 (ECRECOVER), 04 (IDENTITY), 05 (MODEXP) and 09 (BLAKE2F) precompiles remains unchanged. The calculated and rescaled cost of 06 (ECADD) is higher than the current cost. This is left unchanged to maintain compatibility with existing contracts.
 
 Additionally, all precompiles benefit from the lowered cost of *CALL opcodes (see below).
 
@@ -181,7 +173,6 @@ The formula for these opcodes remains the same, but the total cost is affected b
 | F3 | RETURN | memory_expansion_cost |
 | FD | REVERT | memory_expansion_cost |
 
-
 ## Rationale
 
 Gas Cost Estimator project
@@ -198,7 +189,7 @@ Why only computational complexity? Trying to be independent of EVM implementatio
 
 Expected transaction throughput increment.
 
-Imapct on the gas price, expected impact.
+Impact on the gas price, expected impact.
 
 <!--
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
@@ -230,6 +221,45 @@ TODO further research is required to ensure that contracts that use hard coded l
 
   TODO: Remove this comment before submitting
 -->
+### Test 1
+
+Code:
+
+```mnemonic
+PUSH1 0x60
+```
+
+Gas cost: 1
+
+### Test 2
+
+Code:
+
+```mnemonic
+PUSH2 0x0202
+PUSH2 0x1000
+EXP
+```
+
+Gas cost: 1 + 1 + (2 + 4 * 2) = 12
+
+### Test 3
+
+Code:
+
+```mnemonic
+// Put the required value in memory
+PUSH1 0xFF
+PUSH1 0x00
+MSTORE
+
+// Call the opcode
+PUSH1 0x20
+PUSH1 0x00
+KECCAK256
+```
+
+Gas cost: 1 + 1 + (1 + 0) + 1 + 1 + (10 + 6 * 1) = 21
 
 ## Reference Implementation
 
