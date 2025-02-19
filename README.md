@@ -1,5 +1,7 @@
 # Ethereum Improvement Proposals (EIPs)
 
+> **_ATTENTION_**: The EIPs repository has recently [undergone](https://github.com/ethereum/EIPs/pull/7206) a separation of ERCs and EIPs. ERCs are now accessible at [https://github.com/ethereum/ercs](https://github.com/ethereum/ercs). All new ERCs and updates to existing ones must be directed at this new repository. The editors apologize for this inconvenience.
+
 The goal of the EIP project is to standardize and provide high-quality documentation for Ethereum itself and conventions built upon it. This repository tracks past and ongoing improvements to Ethereum in the form of Ethereum Improvement Proposals (EIPs). [EIP-1](https://eips.ethereum.org/EIPS/eip-1) governs how EIPs are published.
 
 The [status page](https://eips.ethereum.org/) tracks and lists EIPs, which can be divided into the following categories:
@@ -39,9 +41,11 @@ All pull requests in this repository must pass automated checks before they can 
 
 It is possible to run the EIP validator locally:
 
+Make sure to add cargo's `bin` directory to your environment (typically `$HOME/.cargo/bin` in your `PATH` environment variable)
+
 ```sh
-cargo install eipv
-eipv <INPUT FILE / DIRECTORY>
+cargo install eipw
+eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
 ```
 
 ## Build the status page locally
