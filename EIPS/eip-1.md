@@ -91,7 +91,7 @@ A PR moving an EIP from Last Call to Final SHOULD contain no changes other than 
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
-**Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
+**Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued a later date it is considered a new proposal.
 
 **Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
 
