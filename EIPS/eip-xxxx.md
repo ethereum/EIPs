@@ -16,9 +16,9 @@ All calls to the REVERT opcode with non-zero size must emit a log with revert da
 
 ## Motivation
 
-Revert messages are currently are inaccessible to users as they are not available via standard RPC. Instead users have to request a node to trace the transaction and check the stack and memory at the moment when the REVERT opcode was executed. 
+Revert messages are currently inaccessible to users as they are not available via standard RPC. Instead, users have to request a node to trace the transaction and check the stack and memory at the moment when the REVERT opcode was executed. 
 
-This introduces overhead for users and nodes - the user must make an additional request to find out why their transaction failed, and the node has to replay the full transaction (which may be slow and computationally expensive) to get back a relatively small piece of data.
+This introduces overhead for users and nodes - users must make an additional request to find out why their transaction failed, and the node has to replay the full transaction (which may be slow and computationally expensive) to get back a relatively small piece of data.
 
 Currently it is up to smart wallet developers to emit logs before a revert, however this is not a standard feature and thus cannot be relied upon by tools such as client libraries and block explorers. Making this log part of the protocol allows these tools to rely on logs for revert reasons.
 
@@ -35,7 +35,7 @@ Whenever `REVERT` is called with non-zero size, emit a log identical to a LOG1 w
 
 ## Rationale
 
-This is the simples possible implementation that allows revert messages to be accessible via RPC. 
+This is the simplest possible implementation that allows revert messages to be accessible via RPC. 
 
 ## Backwards Compatibility
 
