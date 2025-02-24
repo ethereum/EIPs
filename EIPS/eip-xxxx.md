@@ -12,7 +12,7 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 
 ## Abstract
 
-This EIP proposes a significant overhaul of the gas cost schedule, encompassing opcodes, precompiles, and other costs. The term "radical" indicates that a substantial number of opcodes and operations are modified concurrently, rather than through incremental adjustments. The focus is on computational complexity, agnostic to specific implementations and technologies, to a reasonable extent. This EIP does not account for network costs, such as the long-term cost of state changes persistence. Consequently, the gas cost schedule becomes more accurate, and Ethereum Network throughput is enhanced.
+This Ethereum Improvement Proposal (EIP) introduces a comprehensive revision of the gas cost schedule, encompassing opcodes, precompiles, memory expansion, and address access costs. The term "radical" denotes the concurrent modification of a substantial number of operations, as opposed to incremental changes. This revision prioritizes computational complexity, agnostic to specific implementations and technologies, while excluding network-related costs such as state persistence. The proposed adjustments aim to enhance the accuracy of the gas cost schedule and, as the effect, increase the Ethereum Network's transaction throughput.
 
 ## Motivation
 
@@ -165,34 +165,34 @@ The formula for these opcodes remains the same, but the total cost is affected b
 
 ## Rationale
 
-Gas Cost Estimator project
+### Gas Cost Estimator Project
 
-Other projects
+The Gas Cost Estimator project (available at https://github.com/imapp-pl/gas-cost-estimator) forms the cornerstone of this EIP’s justification. This initiative conducted extensive empirical testing across seven popular  Ethereum Virtual Machine (EVM) implementations, to measure the actual computational effort required by various opcodes and operations. The tests were performed in a controlled environment to eliminate external variables such as hardware differences, operating systems, or virtualization overhead, ensuring accurate and reproducible results. The findings reveal significant misalignments between the current gas cost schedule and the real-world computational complexity of EVM operations. This discrepancy suggests that the existing gas costs do not adequately reflect the workload imposed on Ethereum nodes, potentially compromising both network efficiency and security. By recalibrating gas costs based on these measurements, this EIP aims to align pricing with computational reality, improving the overall performance and resilience of the Ethereum network.
 
-Conclusions, common conclusions from these projects, security considerations, precompiles
+### Other projects
 
-Fractional gas price, pros and cons.
+### Conclusions, common conclusions from these projects, security considerations, precompiles
 
-Increase vs. Decrease gas cost, security considerations.
+### Fractional gas price, pros and cons.
 
-Why only computational complexity? Trying to be independent of EVM implementations, some estimation.
+One alternative considered during the development of this EIP is fractional gas pricing, which would allow for more granular cost assignments based on computational effort. Pros: This approach could theoretically offer a more precise reflection of resource consumption, potentially improving fairness and efficiency in transaction pricing. Cons: However, it introduces significant practical challenges. Fractional gas pricing would complicate transaction fee calculations, increasing computational overhead for users and node operators alike. It could also amplify gas price volatility and make it harder for developers to predict transaction costs accurately. After weighing these trade-offs, this EIP opts for a simpler solution: adjusting integer gas costs to better align with computational complexity while preserving the existing pricing framework’s clarity and predictability.
 
-Expected transaction throughput increment.
+### Increase vs. Decrease gas cost, security considerations.
 
-Impact on the gas price, expected impact.
+Deciding whether to increase or decrease gas costs for specific operations requires balancing efficiency and security. Decreasing Gas Costs: Lowering costs for overpriced operations could boost network throughput by enabling more transactions per block, enhancing Ethereum’s scalability. However, if costs are reduced too aggressively, it risks underpricing computationally heavy tasks, potentially exposing the network to DoS attacks. Increasing Gas Costs: Raising costs for underpriced operations strengthens security by deterring abuse but may increase transaction fees and reduce throughput. This EIP adopts a conservative strategy, prioritizing decreases for operations that empirical data show as overpriced, while ensuring no reductions compromise security. This approach aims to optimize efficiency without introducing new vulnerabilities.
 
-[EIP-7667](./eip-7667.md) introduces another measurement base actually, 
-namely the resource consumption for generating ZK-SNARK proof. 
-Hashing opcodes and precompiles are in the scope as they are heavy for a ZK-SNARK proof generation.
-One reason is that it is planned for Ethereum L1 to be ZK-SNARKed in the long-term.
-The other is that already operating ZK based L2s encounter the problem
-and try to limit the number of hashing operations in a block in various ways.
-To be clear, for this EIP a bare CPU is the reference.
-The idea of ZK-SNARKed Ethereum L1 is distant enough to argue that
-it is reasonable to operate in the current setup.
-For currently operating ZK based L2s, the changes proposed in this EIP
-do not affect significantly the average but affect the worst case.
-This problem requires another systemic solution regardless this EIP.
+### Why only computational complexity? Trying to be independent of EVM implementations, some estimation.
+
+This EIP deliberately focuses on computational complexity—measured as execution time on a bare CPU—while excluding network-related costs like state storage or data access. This choice ensures the proposed gas cost adjustments remain implementation-agnostic, applicable across all EVM clients regardless of their technological stack. By relying on empirical measurements from multiple EVM implementations, the EIP establishes a universal benchmark for computational effort that is both consistent and verifiable. Unlike network costs, which vary with factors like bandwidth or disk I/O, computational complexity can be directly quantified, simplifying the estimation process. This focus enhances the proposal’s clarity and broad applicability within Ethereum’s diverse ecosystem.
+
+### Impact on the gas price, expected impact.
+
+- Expected transaction throughput increment.
+- Impact on the gas price, expected impact.
+
+### Consideration of ZK-SNARK Proof Generation (EIP-7667)
+
+EIP-7667 (./eip-7667.md) proposes an alternative framework for measuring resource consumption, emphasizing the demands of generating ZK-SNARK proofs—an area of growing importance for Ethereum. This includes hashing opcodes and precompiles, which are computationally intensive in ZK-SNARK contexts. Two motivations drive EIP-7667: first, the long-term vision of a ZK-SNARKed Ethereum Layer 1 (L1), where such operations will be critical; second, the immediate challenges faced by ZK-based Layer 2 (L2) solutions, which often limit hashing operations to manage costs. In contrast, this EIP uses a bare CPU as its reference point, focusing on general computational complexity rather than ZK-specific needs. The proposed changes are not expected to significantly alter the average case for ZK-based L2s but may impact worst-case scenarios. While acknowledging the relevance of ZK-SNARKs, this EIP argues that their systemic challenges require distinct solutions beyond the scope of this proposal. The vision of a ZK-SNARKed L1 remains distant, justifying the focus on optimizing the current setup for broader network benefits.
 
 <!--
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
@@ -204,26 +204,25 @@ This problem requires another systemic solution regardless this EIP.
 
 ## Backwards Compatibility
 
-The changes require a hardfork.
+The proposed changes to the gas cost schedule will require a hardfork due to their significant impact on the Ethereum network's operational mechanics. Below, we outline the key consequences of these changes and highlight areas where further research is needed to ensure a smooth transition.
 
 The changes have the following consequences:
 
-- The gas cost of affected opcodes, precompiles and other operations are changed.
-- It is almost certain that the gas cost of a transaction that calls a contract is changed.
-- Contracts that use hard coded gas limits for subcalls are affected.
+- Gas Cost Adjustments:
+  - The gas costs for a wide range of opcodes, precompiles, and other operations (such as memory expansion and access costs) will be modified.
+  - These adjustments aim to better align gas pricing with the computational complexity of operations, but they will directly impact the cost of executing transactions and smart contracts.
+- Transaction Gas Cost Changes:
+  - It is highly likely that the gas cost of any transaction that invokes a contract will change.
+  - This is due to the widespread use of affected opcodes and operations within smart contract code.
+  - Developers and users should prepare for potential variations in transaction fees after the hardfork, which may require updates to gas limit estimations and fee budgeting.
+- Impact on Contracts with Hardcoded Gas Limits:
+  - Contracts that specify hardcoded gas limits for subcalls (e.g., using call(gas, ...)) may face issues if the new gas costs exceed these limits.
+  - Such contracts could fail to execute as intended, potentially resulting in transaction failures or unexpected behavior.
 
 TODO further research is required to ensure that contracts that use hard coded limits are not broken.
 
 ## Test Cases
 
-<!--
-  This section is optional for non-Core EIPs.
-
-  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
-  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
-
-  TODO: Remove this comment before submitting
--->
 ### Test 1
 
 Code:
