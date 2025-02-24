@@ -30,16 +30,6 @@ Observation 2.
 
 The gas cost schedule is inherently relative, meaning it can be modified as long as the proportions are correct. Generally, it is safer to decrease a gas cost than to increase it. A substantial reduction in gas costs associated with computational effort has two significant effects: it increases network throughput in terms of transactions per block, and it increases the weight of network costs.
 
-<!--
-  This section is optional.
-
-  The motivation section should include a description of any nontrivial problems the EIP solves. It should not describe how the EIP solves those problems, unless it is not immediately obvious. It should not describe why the EIP should be made into a standard, unless it is not immediately obvious.
-
-  With a few exceptions, external links are not allowed. If you feel that a particular resource would demonstrate a compelling case for your EIP, then save it as a printer-friendly PDF, put it in the assets folder, and link to that copy.
-
-  TODO: Remove this comment before submitting
--->
-
 ## Specification
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
@@ -190,6 +180,19 @@ Why only computational complexity? Trying to be independent of EVM implementatio
 Expected transaction throughput increment.
 
 Impact on the gas price, expected impact.
+
+[EIP-7667](./eip-7667.md) introduces another measurement base actually, 
+namely the resource consumption for generating ZK-SNARK proof. 
+Hashing opcodes and precompiles are in the scope as they are heavy for a ZK-SNARK proof generation.
+One reason is that it is planned for Ethereum L1 to be ZK-SNARKed in the long-term.
+The other is that already operating ZK based L2s encounter the problem
+and try to limit the number of hashing operations in a block in various ways.
+To be clear, for this EIP a bare CPU is the reference.
+The idea of ZK-SNARKed Ethereum L1 is distant enough to argue that
+it is reasonable to operate in the current setup.
+For currently operating ZK based L2s, the changes proposed in this EIP
+do not affect significantly the average but affect the worst case.
+This problem requires another systemic solution regardless this EIP.
 
 <!--
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
