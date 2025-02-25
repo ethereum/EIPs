@@ -35,7 +35,7 @@ Whenever `REVERT` is called with non-zero size, emit a log identical to a LOG1 w
 
 ## Rationale
 
-This is the simplest possible implementation that allows revert messages to be accessible via RPC. 
+This is the simplest possible implementation that allows revert messages to be accessible via RPC methods. It does not require any changes to client libraries, or other RPC consumers as it is backward compatible. It does not introduce new RPC methods or new opcodes.
 
 ## Backwards Compatibility
 
