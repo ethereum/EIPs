@@ -43,7 +43,7 @@ Reverted transactions may now contain up to one log.
 
 ## Security Considerations
 
-Reverted transactions must cost atleast intrinsic gas which is atleast 21000 gas, which is much more expensive than the LOG1 opcode (750 gas). Hence, this EIP does not introduce any new avenues to inflate Ethereum storage requirements. However, it is expected to increase the average number of logs.
+Reverted transactions must cost at least intrinsic gas (21000 gas), which is much more expensive than the LOG1 opcode (750 gas). Hence, this EIP does not introduce any new avenues to inflate Ethereum storage requirements. However, it is expected to increase the average number of logs.
 
 ## Copyright
 
