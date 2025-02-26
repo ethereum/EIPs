@@ -11,13 +11,13 @@ created: 2025-02-05
 
 ## Abstract
 
-This proposal introduces a comprehensive revision of the gas cost schedule, encompassing opcodes, precompiles, memory expansion, and address access costs. This revision prioritizes computational complexity, agnostic to specific implementations and technologies, while excluding network-related costs such as state persistence. The proposed adjustments aim to enhance the accuracy of the gas cost schedule and, as the effect, increase the Ethereum Network's transaction throughput.
+This proposal revises the gas cost schedule for opcodes, precompiles, memory expansion, and address access, prioritizing computational complexity—agnostic to specific implementations, while excluding network-related costs such as state persistence. The adjustments aim to enhance gas cost accuracy and, as the effect, increase Ethereum’s transaction throughput.
 
 ## Motivation
 
-Gas costs encompass opcodes (including arguments and factors expressed in formulas), precompiles, and related operations such as memory expansion and access to cold or warm addresses. Gas costs are comprised of two components: network (social) cost and computation cost. Network cost pertains to the effort required by the blockchain to maintain its state persisted by network nodes, including storage, logs, calldata, transactions, and receipts. Computation cost refers to the non-durable processing effort of smart contracts.
+Gas costs cover opcodes (including arguments and formulas), precompiles, and operations like memory expansion and cold/warm address access, comprising two components: network (social) cost and computation cost. Network cost reflects the blockchain’s effort to maintain state, including storage, logs, calldata, transactions, and receipts, while computation cost represents the non-durable processing effort of smart contracts.
 
-Several EIPs have addressed gas costs related to the network costs. At the same time, the computational cost has remained largely unchanged since the inception of Ethereum (see [EIP-160](eip-160.md), [EIP-1884](eip-1884.md).With multiple independent EVM implementations now optimized and stable, and the availability of appropriate technical and methodological tools, it is possible to evaluate how well the conventional gas cost schedule aligns with hardware workload profiles.
+While several EIPs (e.g., [EIP-160](eip-160.md), [EIP-1884](eip-1884.md)) have refined network-related gas costs, computational costs have remained largely static since Ethereum’s inception. With multiple EVM implementations now stable and optimized, alongside advanced tools, we can assess how well the current gas schedule aligns with hardware workload profiles.
 
 Measurements and estimations depend on various factors, including hardware, OS, virtualization, compiler, memory management, EVM, and more. The execution of a single opcode impacts or depends on caching, block preparation, block finalization, garbage collectors, code analysis, parsing etc. Consequently, the individual computational cost is a sum of multiple factors spread over the software stack. Despite this complexity, examinations have shown that the computational cost outline is consistent across EVM implementations, technology stacks, and contexts.
 
@@ -27,7 +27,7 @@ The current gas cost schedule differs in many places from the experimentally det
 
 ### Note 2
 
-The gas cost schedule is inherently relative, meaning it can be increased or decreased as long as the proportions are correct. A substantial reduction in the computational costs contained in this proposal has two significant effects: it increases blockchain throughput in terms of transactions per block, and it increases the proportional weight of the network costs.
+The gas cost schedule is inherently relative, adjustable as long as proportions hold. A substantial reduction in the computational costs contained in this proposal has two significant effects: it increases blockchain throughput in terms of transactions per block, and it increases the proportional weight of the network costs.
 
 ## Specification
 
@@ -169,33 +169,40 @@ The formula for these opcodes remains the same, but the total cost is affected b
 
 ### Gas Cost Estimator Project
 
-The [Gas Cost Estimator](https://github.com/imapp-pl/gas-cost-estimator) forms the cornerstone of this EIP’s justification. This initiative conducted extensive empirical testing across seven popular EVM implementations, to measure the actual computational effort required by various opcodes and operations. The tests were performed in a controlled environment to eliminate unwanted factors, ensuring accurate and reproducible results. The [findings](../assets/eip-xxxx/gas-cost-estimator.html) reveal misalignments between the current gas cost schedule and the real-world computational complexity of EVM operations. By recalibrating gas costs based on these measurements, this EIP aims to align pricing with computational reality, improving the overall performance and resilience of the Ethereum network.
+The [Gas Cost Estimator](https://github.com/imapp-pl/gas-cost-estimator) serves as the empirical foundation for this EIP. This project conducted extensive testing across seven widely-used EVM implementations to measure the actual computational effort required by various opcodes and operations. Conducted in a controlled environment to eliminate external variables, the tests produced accurate and reproducible results. The [findings](../assets/eip-xxxx/gas-cost-estimator.html) highlight significant misalignments between the current gas cost schedule and the real-world computational complexity of EVM operations. By recalibrating gas costs based on these measurements, this EIP seeks to align pricing with computational reality, thereby improving Ethereum’s performance and resilience.
 
-This EIP is based on the "radical" proposal from the Gas Cost Estimator project. This means that all estimates have been additionally rescaled so that the most arithmetic operations fall into the price of 1 gas unit. The `rescale factor` used is 0.217391304 as defined in the Gas Cost Estimator project. This factor should be used when comparing this proposals to other EIPs or projects.
+This EIP is based on the "radical" proposal from the Gas Cost Estimator project. This means that all estimates have been additionally rescaled so that basic arithmetic operations cost just 1 gas unit. The `rescale factor` used is 0.217391304 as defined in the Gas Cost Estimator project. This factor should be used when comparing this proposals to other EIPs or projects.
 
-### Other projects
+### Other Projects
 
-There are a few other projects that aim to asses the real gas cost associated with EVM operations. The most notable are:
+Several initiatives have explored the real gas costs of EVM operations, providing valuable context for this EIP. Notable examples include:
 
-- [EIP-7883](./eip-7883.md) - ModExp Gas Cost Increase: This EIP measured ModExp specifically and proposed a new pricing scheme. When applied the `rescale factor` the cost is in line with our proposal and remains unchanged.
-- Nethermind's Gas Benchmarks: This project takes a different approach to measuring gas costs. It uses standalone clients rather than isolated EVM implementations. Still, the results are similar to the Gas Cost Estimator project, and the conclusions are consistent with this EIP.
+- [EIP-7883](./eip-7883.md) - ModExp Gas Cost Increase: This EIP specifically analyzed the ModExp and proposed a revised pricing scheme. When adjusted with our `rescale factor`, its costs align with this proposal, requiring no further changes. This consistency validates our measuring approach.
+- Nethermind's Gas Benchmarks: This project takes a different approach to measuring gas costs. It uses standalone clients rather than isolated EVM implementations. Despite the methodological difference, its results mirror those of the Gas Cost Estimator, reinforcing our conclusions.
 - EVM Memory Analysis by @raxhvl: This project focuses on memory-related costs, providing valuable insights into the memory access and expansion costs. Our proposal incorporates these findings in the `memory_expansion_cost` formula.
 
-### Fractional gas price
+These projects collectively affirm the need to reassess gas costs and demonstrate broad alignment with our approach.
 
-One alternative considered during the development of this EIP is fractional gas pricing, which would allow for more granular cost assignments based on computational effort. Pros: This approach could theoretically offer a more precise reflection of resource consumption, potentially improving fairness and efficiency in transaction pricing. In particular, when gas costs are radically decreased and an expected gas cost of an opcode drops below `1` close to `0`. Cons: However, it introduces significant practical challenges, would require significant changes in gasometering. Potential benefits do not justify it.
+### Fractional Gas Price
 
-### Proposal limited to computational complexity
+An alternative considered during this EIP’s development was fractional gas pricing, which would enable more granular cost assignments based on computational effort.
 
-This EIP deliberately focuses on computational complexity—measured as execution time on a bare CPU—while excluding network-related costs like state persistency. This choice strives to the proposed gas cost adjustments remain implementation-agnostic, applicable across all EVM clients regardless of their technological stack, as much as possible. By relying on empirical measurements from multiple EVM implementations, the EIP establishes a universal benchmark for computational effort that is both consistent and verifiable. Unlike network costs, which vary with more subtle and underspecified factors like long term state persistency cost or blockchain disk size, computational complexity can be directly quantified, simplifying the estimation process. This focus enhances the proposal’s clarity and broad applicability within Ethereum’s diverse ecosystem.
+- Pros: This could offer a more precise reflection of resource use, enhancing fairness and efficiency—especially when gas costs drop below 1 (e.g., approaching 0 for simple operations under the radical rescaling).
+- Cons: However, it poses significant practical challenges, requiring extensive modifications to gasometering infrastructure. The potential benefits do not outweigh these implementation hurdles.
 
-### Impact of increasing or decreasing gas costs
+Given these trade-offs, we opted against fractional pricing in favor of a simpler, more feasible recalibration.
+
+### Proposal Limited to Computational Complexity
+
+This EIP intentionally focuses on computational complexity—measured as execution time on a bare CPU—while excluding network-related costs like state persistency. This ensures the proposed gas cost adjustments remain implementation-agnostic, applicable across diverse EVM clients regardless of their technological stack. By leveraging empirical data from multiple EVM implementations, we establish a universal, verifiable benchmark for computational effort. Unlike network costs, which fluctuate with factors like long-term state persistency or blockchain size, computational complexity is directly quantifiable. This focus simplifies estimation and enhances the proposal’s clarity and applicability within Ethereum’s varied ecosystem.
+
+### Impact of Increasing or Decreasing Gas Costs
 
 Note that, it is safer to decrease because of Backwards Compatibility issues related to gas limits and hard-coded gas limits. See below. Deciding whether to increase or decrease gas costs for specific operations requires balancing efficiency and security. Decreasing Gas Costs: Lowering costs for overpriced operations could improve network throughput by enabling more transactions per block, enhancing Ethereum’s scalability. However, if costs are reduced too aggressively, it risks underpricing computationally heavy tasks, potentially exposing the network to DoS attacks. Increasing Gas Costs: Raising costs for underpriced operations strengthens security by deterring abuse but may increase transaction fees and reduce throughput. This EIP adopts a conservative strategy, prioritizing decreases for operations that empirical data show as overpriced, while ensuring no reductions compromise security. This approach aims to optimize efficiency without introducing new vulnerabilities.
 
 ### Memory expansion cost
 
-The proposal includes a new formula for `memory_expansion_cost`. The current formula is made of two elements: constant cost per word and exponential cost. The second element was added for the security reasons and prevents attacks based excess memory usage. Our findings and [related projects](../assets/eip-xxxx/raxhvl_memory_exp_100M.png) show that the constant cost per word is negligible and is already included in the cost of the opcode that expands memory. Therefore the proposed formula is simplified and only includes the exponential cost. It preserves the security properties of the current formula while reducing the overall gas costs. It also means that the first 22 words of memory can be used for free.
+This proposal introduces a simplified `memory_expansion_cost` formula. The current formula combines a constant cost per word and an exponential cost, the latter added to prevent attacks exploiting excessive memory usage. Our findings, supported by [related projects](../assets/eip-xxxx/raxhvl_memory_exp_100M.png), indicate the constant cost per word is negligible and already accounted for in opcodes that expand memory. Thus, the revised formula retains only the exponential cost, preserving security while reducing overall gas costs. As a result, the first 22 words of memory incur no additional cost, as the exponential penalty begins beyond this threshold.
 
 ### Consideration of ZK-SNARK Proof Generation (EIP-7667)
 
@@ -203,7 +210,7 @@ The proposal includes a new formula for `memory_expansion_cost`. The current for
 
 ### Consideration of Block Gas Limit Increase (EIP-7790)
 
-One of the intended side effects of decreasing the overall computation cost is increased transaction throughput. In other words more transactions can be included in a block. The same effect is intended by [EIP-7783](./eip-7783.md) and [EIP-7790](./eip-7790.md) by increasing the block gas limit. No doubt EIP-7790 is easier to implement and has more controlled impact on the network. However, it does not address the issue of mispriced opcodes and precompiles. The proposed changes are complementary to the block gas limit increase and should be implemented together.
+Reducing computational gas costs aims to increase transaction throughput, allowing more transactions per block. [EIP-7783](./eip-7783.md) and [EIP-7790](./eip-7790.md) pursue a similar outcome by raising the block gas limit—a simpler approach with a controlled impact. However, they do not address mispriced opcodes and precompiles. Our proposal complements these efforts by correcting pricing inaccuracies, and both strategies should be implemented together to maximize throughput while ensuring cost accuracy.
 
 ### Consideration of storage costs
 
