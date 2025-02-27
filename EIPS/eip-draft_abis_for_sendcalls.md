@@ -1,8 +1,8 @@
 ---
-title: ABI attachment in wallet_sendCalls
+title: ABI attachment in `wallet_sendCalls`
 description: A capability to enable calldata decoding in wallets.
 author: Francisco Giordano (@frangio)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-tbd-abi-attachment-in-wallet-sendcalls/23016
 status: Draft
 type: Standards Track
 category: Interface
