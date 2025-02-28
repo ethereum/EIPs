@@ -11,7 +11,7 @@ created: 2025-02-05
 
 ## Abstract
 
-This proposal revises the gas cost schedule for opcodes, precompiles, memory expansion, and address access, prioritizing computational complexity, while excluding network-related costs such as state persistence. The adjustments aim to enhance gas cost accuracy and, as the effect, increase Ethereum’s transaction throughput.
+This proposal revises the gas cost schedule for opcodes, precompiles, memory expansion, and data access, prioritizing computational complexity, while excluding network-related costs such as state persistence. The adjustments aim to enhance gas cost accuracy and rebalance the cost structure.
 
 ## Motivation
 
@@ -169,9 +169,9 @@ The formula for these opcodes remains the same, but the total cost calculated is
 
 ### Gas Cost Estimator Project
 
-The [Gas Cost Estimator](https://github.com/imapp-pl/gas-cost-estimator) serves as the empirical foundation for this EIP. This project conducted extensive testing across seven widely-used EVM implementations to measure the actual computational effort required by various opcodes and operations. Conducted in a controlled environment to eliminate external variables, the tests produced accurate and reproducible results. The [findings](../assets/eip-xxxx/gas-cost-estimator.html) highlight misalignments between the current gas cost schedule and the real-world computational complexity of EVM operations. By recalibrating gas costs based on these measurements, this EIP seeks to align pricing with computational reality, thereby improving Ethereum’s performance and resilience.
+The [Gas Cost Estimator](../assets/eip-xxxx/gas-cost-estimator-report.pdf) project serves as the empirical foundation for this EIP. This project conducted extensive testing across seven widely-used EVM implementations to measure the actual computational effort required by various opcodes and operations. Conducted in a controlled environment to eliminate external variables, the tests produced accurate and reproducible [results](../assets/eip-xxxx/final_gas_schedule_comparison.csv). The [findings](../assets/eip-xxxx/gas-cost-estimator.html) highlight misalignments between the current gas cost schedule and the real-world computational complexity of EVM operations. By recalibrating gas costs based on these measurements, this EIP seeks to align pricing with computational reality, thereby improving Ethereum’s performance and resilience.
 
-This EIP is based on the "radical" proposal from the Gas Cost Estimator project. This means that all estimates have been additionally rescaled so that basic arithmetic operations cost just 1 gas unit. The `rescale factor` used is 0.217391304 as defined in the Gas Cost Estimator project. This factor should be used when comparing this proposals to other EIPs or projects.
+This EIP is based on the [radical](../assets/eip-xxxx/gas-cost-estimator-proposal.pdf) proposal from the Gas Cost Estimator project. This means that all estimates have been additionally rescaled so that basic arithmetic operations cost just 1 gas unit. The `rescale factor` used is 0.217391304 as defined in the Gas Cost Estimator project. This factor should be used when comparing this proposals to other EIPs or projects.
 
 ### Other Projects
 
