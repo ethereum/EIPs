@@ -213,7 +213,7 @@ Library instancing
                 //"exampleEncode()": "a8bc58f4",
                 uint8[] memory tokens = new uint8[](1);
                 tokens[0] = TypeEncoding.TOKEN_BYTES_FIXED_END;
-                ans = tokens.encode();
+                ans = tokens.returnEncode();
             }
         }
 
