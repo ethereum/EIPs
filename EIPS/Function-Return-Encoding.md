@@ -96,7 +96,7 @@ A function’s return type **MUST** be encoded as a `bytes32` word, where each b
 
 ### Why Not Use keccak256(ABI)?
 
-[EIP-721](eip-721.md) encodes types and creates a TYPEHASH from the return string. A simple hash-based approach (e.g., keccak256(abi.encodePacked(returnTypes))) does not allow decoding on-chain without an extensive mapping. Additionally, a hash is not an efficient store of data. This solution fully preserves type structure, allowing contracts to interpret data without off-chain or on-chain lookups.
+[EIP-712](eip-712.md) encodes types and creates a TYPEHASH from the return string. A simple hash-based approach (e.g., keccak256(abi.encodePacked(returnTypes))) does not allow decoding on-chain without an extensive mapping. Additionally, a hash is not an efficient store of data. This solution fully preserves type structure, allowing contracts to interpret data without off-chain or on-chain lookups.
 
 ### Gas Efficiency
 
