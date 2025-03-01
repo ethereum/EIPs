@@ -38,7 +38,7 @@ On-Chain Oracles & Data Feeds: Allow consumers to verify the expected structure 
 
 ### Encoding Scheme
 
-A function’s return type **MUST** be encoded as a `bytes32` word, where each byte represents a type token. The first `N` bytes (starting at index `0`) **MUST** contain type tokens, while unused bytes **MUST** be set to `0x00`, marking the end of the stream. To identify that the contract can broadcast return types, it **MUST** implement the [EIP-165](eip-165.md) standard with the `ITypeReturn` interface exposing the function `funcReturn(bytes4)`.
+A function’s return type **MUST** be encoded as a `bytes32` word, where each byte represents a type token. The first `N` bytes (starting at index `0`) **MUST** contain type tokens, while unused bytes **MUST** be set to `0x00`, marking the end of the stream. To identify that the contract can broadcast return types, it **MUST** implement the [EIP-165](./eip-165.md) standard with the `ITypeReturn` interface exposing the function `funcReturn(bytes4)`.
 
 
 ### Token Definitions
@@ -96,7 +96,7 @@ A function’s return type **MUST** be encoded as a `bytes32` word, where each b
 
 ### Why Not Use keccak256(ABI)?
 
-[EIP-712](eip-712.md) encodes types and creates a TYPEHASH from the return string. A simple hash-based approach (e.g., keccak256(abi.encodePacked(returnTypes))) does not allow decoding on-chain without an extensive mapping. Additionally, a hash is not an efficient store of data. This solution fully preserves type structure, allowing contracts to interpret data without off-chain or on-chain lookups.
+[EIP-712](./eip-712.md) encodes types and creates a TYPEHASH from the return string. A simple hash-based approach (e.g., keccak256(abi.encodePacked(returnTypes))) does not allow decoding on-chain without an extensive mapping. Additionally, a hash is not an efficient store of data. This solution fully preserves type structure, allowing contracts to interpret data without off-chain or on-chain lookups.
 
 ### Gas Efficiency
 
