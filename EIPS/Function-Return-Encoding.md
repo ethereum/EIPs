@@ -1,0 +1,272 @@
+---
+title: On-Chain Function Return Type Encoding for Solidity Functions
+description: This EIP standardizes on-chain return type encoding, removing off-chain ABI dependencies and improving interoperability between smart contracts. It is efficient, flexible, and fully algorithmic, making it ideal for dynamic cross-contract interactions.
+author: Paul Edge (@genkifs) <genkifs@gmail.com>
+discussions-to: https://ethereum-magicians.org/
+status: Draft
+type: <Standards Track>
+category: <ERC> # Only required for Standards Track. Otherwise, remove this field.
+created: <2025-03-01>
+requires: <EIP-165> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+---
+
+## Abstract
+
+This EIP proposes an on-chain encoding format for Solidity function return types, allowing contracts to algorithmically determine the structure of returned data. The encoding scheme fits within a single `bytes32` word and supports elementary types, tuples, fixed arrays, and dynamic arrays, making it efficient for storage and computation.
+
+This enables interoperability between smart contracts, particularly in cases where the source code is not published or where return types need to be introspected dynamically.
+
+
+
+## Motivation
+
+Currently, Solidity does not provide a standardized on-chain method for discovering the return types of a function without source code access. Existing workarounds (such as off-chain ABI parsing or predefined mappings) introduce trust assumptions and inefficiencies. [EIP-165](eip-165.md) is used to confirm if a contract has implemented this EIP to provide encoded return types. This makes the approach an optional parallel implementation that augments existing ABI practices without interference. The contract requesting and decoding return type information is not required to implement any interface or functionality.  
+
+
+**Use Cases**
+
+Cross-Contract Calls: Allow smart contracts to safely interpret function return values without predefined knowledge of their structure.
+
+Middleware and Proxies: Enable middleware contracts (such as meta-transactions and upgradable proxies) to process unknown function outputs dynamically.
+
+Interoperability & Reflection: Facilitate contract self-introspection and interoperability between different smart contract frameworks.
+
+On-Chain Oracles & Data Feeds: Allow consumers to verify the expected structure of returned data without relying on off-chain ABI metadata.
+
+
+## Specification
+
+### Encoding Scheme
+
+A function’s return type **MUST** be encoded as a `bytes32` word, where each byte represents a type token. The first `N` bytes (starting at index `0`) **MUST** contain type tokens, while unused bytes **MUST** be set to `0x00`, marking the end of the stream. To identify that the contract can broadcast return types, it **MUST** implement the [EIP-165](eip-165.md) standard with the `ITypeReturn` interface exposing the function `funcReturn(bytes4)`.
+
+
+### Token Definitions
+ * 0x01: bool
+ * 0x02: address
+ * 0x0C: complex numbers
+ * 0x10–0x2F: uint8 ... uint256 (each increment means +8 bits)
+ * 0x30–0x4F: int8 ... int256
+ * 0x50–0x6F: bytes1 ... bytes32
+ * 0xB0: bytes (dynamic)
+ * 0xB1: string
+ * 0xE0: dynamic array marker; a dynamic array is encoded as [0xE0, elementType]
+ * 0xE1: fixed array marker; a fixed array is encoded as [0xE1, length, elementType]
+ * 0xF0: tuple start, 0xF1: tuple end
+
+---
+
+**Examples**
+
+1. **Encoding `uint256[]` (Dynamic Array)**
+
+   ```solidity
+   uint8[] tokens;
+   tokens.push(0xE0); // Dynamic array marker
+   tokens.push(0x2F); // uint256
+   bytes32 encoded = encode(tokens);
+   // Decodes to: "uint256[]"
+   ```
+
+2. Encoding address[5] (Fixed Array)
+
+    ```solidity
+    uint8;
+    tokens[0] = 0xE1; // Fixed array marker
+    tokens[1] = 5; // Array length
+    tokens[2] = 0x02; // address
+    bytes32 encoded = encode(tokens);
+    // Decodes to: "address[5]"
+    ```
+
+3. Encoding (uint256, bool[]) (Tuple with Dynamic Array)
+
+    ```solidity
+    uint8;
+    tokens[0] = 0xF0; // Tuple start
+    tokens[1] = 0x4F; // int256
+    tokens[2] = 0xE0; // Dynamic array marker
+    tokens[3] = 0x01; // bool
+    tokens[4] = 0xF1; // Tuple end
+    bytes32 encoded = encode(tokens);
+    // Decodes to: "(int256, bool[])"
+    ```
+
+## Rationale
+
+### Why Not Use keccak256(ABI)?
+
+[EIP-721](eip-721.md) encodes types and creates a TYPEHASH from the return string. A simple hash-based approach (e.g., keccak256(abi.encodePacked(returnTypes))) does not allow decoding on-chain without an extensive mapping. Additionally, a hash is not an efficient store of data. This solution fully preserves type structure, allowing contracts to interpret data without off-chain or on-chain lookups.
+
+### Gas Efficiency
+
+This encoding fits in a single bytes32 word, making it cheap to store and transmit while still supporting complex type structures. Dynamic arrays and tuples are algorithmically parsed rather than using a hash lookup table. The same token encoding may also be used in a byte stream return. Not all byte values are used, so future return types can be incorporated. Assuming no changes to prior codes are made, existing contracts implementing the standard will not need to be altered.
+
+### Off chain tools
+
+Off-chain wrappers decoding function output may or may not be implemented. Their existence would be welcome but is not essential. The target user for this functionality is on-chain contracts that need to know the shape of the data they are receiving.
+
+### Limitations
+
+Fixed array lengths must fit in 1 byte (0-255).  An additional code could be assigned for longer fixed arrays.  
+
+At most 32 tokens can be encoded (since each takes 1 byte in bytes32).
+
+Deeply nested structures may hit size limits.  
+
+To address these limitations, a hash lookup table may be more appropriate, but its definition is considered out of scope for this EIP. 
+
+## Backwards Compatibility
+
+No backward compatibility issues found.
+
+## Reference Implementation
+
+```solidity
+    // SPDX-License-Identifier: MIT
+    pragma solidity ^0.8.0;
+
+    library TypeEncoding {
+        uint8 constant TOKEN_END = 0x00; // End-of-stream marker 
+        uint8 constant TOKEN_BOOL = 0x01;
+        uint8 constant TOKEN_ADDRESS = 0x02;
+        uint8 constant TOKEN_COMPLEX = 0x0C;
+        uint8 constant TOKEN_UINT_START = 0x10; // 0x0F == uint8, …, 0x1F == uint256
+        uint8 constant TOKEN_UINT_END = 0x2F;
+        uint8 constant TOKEN_INT_START = 0x30; // 0x30 == int8, …, 0x4F == int256
+        uint8 constant TOKEN_INT_END = 0x4F;
+        uint8 constant TOKEN_BYTES_FIXED_START = 0x50; // 0x50 == bytes1, …, 0x6F == bytes32
+        uint8 constant TOKEN_BYTES_FIXED_END = 0x6f;
+        uint8 constant TOKEN_BYTES_DYNAMIC = 0xB0; // dynamic bytes
+        uint8 constant TOKEN_STRING = 0xB1;
+        uint8 constant TOKEN_TUPLE_START = 0xF0;
+        uint8 constant TOKEN_TUPLE_END = 0xF1;
+        uint8 constant TOKEN_ARRAY_DYNAMIC = 0xE0; // dynamic array marker
+        uint8 constant TOKEN_ARRAY_FIXED = 0xE1; // fixed array marker
+        
+        /**
+         * @notice Encodes an array of uint8[] tokens into a single bytes32.
+         * @param tokens Array of uint8 tokens.
+         * @return result The encoded bytes32.
+         */
+        function returnEncode(uint8[] memory tokens) internal pure returns (bytes32 result) {
+            require(tokens.length <= 32, "Too many tokens to encode in 32 bytes");
+            result = bytes32(0);
+            for (uint256 i = 0; i < tokens.length; i++) {
+                uint8 token = i < tokens.length ? tokens[i] : 0;
+                result |= bytes32(uint256(token) << (8 * (31 - i)));
+            }
+        }
+
+        /**
+         * @notice Decodes an encoded bytes32 into an array of tokens.
+         * @param encoded The bytes32 token stream.
+         * @return tokens An array of tokens.
+         */
+        function returnDecode(bytes32 encoded) internal pure returns (uint8[] memory) {
+            uint count;
+            //find the size
+            for (uint i; i < 32; i++) {
+                if (uint8(encoded[i]) == TOKEN_END) {
+                    break;
+                }
+                count++;
+            }
+            uint8[] memory tokens = new uint8[](count);
+            for (uint i = 0; i < count; i++) {
+                tokens[i] = uint8(encoded[i]);
+            }
+            return tokens;
+        }
+    }
+```
+
+## Test Cases
+
+Library instancing
+```solidity
+
+    interface ITypeReturn {
+        //Return the encoded return type for the given function signature.
+        function funcReturn(bytes4 funcSig) external view returns (bytes32);
+    }
+
+    contract TypeSignatureExample is ITypeReturn{
+        using TypeEncoding for uint8[];
+
+        /**
+         * @notice Encodes a type signature.
+         * @return The bytes32 encoded signature.
+         */
+        function exampleEncode() public pure returns (bytes32) {
+            uint8[] memory tokens = new uint8[](5);
+            tokens[0] = TypeEncoding.TOKEN_TUPLE_START;
+            tokens[1] = TypeEncoding.TOKEN_UINT_END; // 0x1F means uint256.
+            tokens[2] = TypeEncoding.TOKEN_ADDRESS;
+            tokens[3] = TypeEncoding.TOKEN_BOOL;
+            tokens[4] = TypeEncoding.TOKEN_TUPLE_END;
+            return tokens.returnEncode();
+        }
+            
+        function funcReturn(bytes4 funcSig) public pure override returns (bytes32 ans) {
+            if(funcSig == bytes4(keccak256("exampleEncode()"))){
+                //"exampleEncode()": "a8bc58f4",
+                uint8[] memory tokens = new uint8[](1);
+                tokens[0] = TypeEncoding.TOKEN_BYTES_FIXED_END;
+                ans = tokens.encode();
+            }
+        }
+
+    }
+```
+Unit Tests in Hardhat (Chai + Ethers.js)
+
+```javascript
+    const { expect } = require("chai");
+    const { ethers } = require("hardhat");
+
+    describe("TypeEncoding", function () {
+        let contract;
+
+        before(async function () {
+            const TypeEncodingLib = await ethers.deployContract("TypeEncoding");
+            const TypeContract = await ethers.getContractFactory("TypeSignatureExample", {
+                libraries: { TypeEncoding: TypeEncodingLib.target }
+            });
+            contract = await TypeContract.deploy();
+        });
+
+        it("Should encode a function return type signature correctly", async function () {
+            const expectedEncoding = "0xf02f0201f1000000000000000000000000000000000000000000000000000000";
+            const encoded = await contract.exampleEncode();
+            expect(encoded).to.equal(expectedEncoding);
+        });
+
+
+        it("should return 32 bytes when the function signature is a8bc58f4", async function () {
+            // This is the keccak256 hash of "exampleEncode()" which should be a8bc58f4
+            const exampleEncodeSignature = "0xa8bc58f4";
+            const expectedEncoding = "0x6f00000000000000000000000000000000000000000000000000000000000000";
+            // Call the function with the correct signature
+            const encoded = await contract.funcReturn(exampleEncodeSignature);
+            expect(encoded).to.equal(expectedEncoding);
+        });
+
+    });    
+```
+
+## Security Considerations
+
+Encoding errors can cause misinterpretation of return values. Tools to generate encoded returns with validation and error handling should be implemented.
+
+Contract developers must validate the structure before processing encoded types.
+
+It is essential that there is no misalignment in decoding logic across different contracts. This is why a common encoding of return values needs to be adopted as an ecosystem-wide standard.
+
+A contract could promise one type of return data and deliver another. However, it should be noted that calling any unknown contract code is inherently risky, regardless of the return type.
+
+Open Question: Is it worth sacrificing some return data space to implement a checksum or similar validation mechanism?
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
