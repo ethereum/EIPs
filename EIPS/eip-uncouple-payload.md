@@ -2,7 +2,7 @@
 title: Uncouple execution payload from beacon block
 description: Separates the execution payload from beacon block to independently transmit them
 author: Gajinder Singh <@g11tech>
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/uncouple-execution-payload-from-beacon-block/23029
 status: Draft
 type: Standards Track
 category: Core
