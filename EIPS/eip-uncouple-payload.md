@@ -39,11 +39,11 @@ Furthermore CL clients apis and code path will become cleaner and more maintaina
 ## Specification
 
 - `ExecutionPayload` in the `BeaconBlockBody` is replaced by `ExecutionPayloadHeader`
-- `ExecutionPayloadWithInclusionProof` is computed by the proposer/builder and gossiped independently on a new topic. Also builder `submitBlindedBlock` api is modified to respond with `ExecutionPayloadWithInclusionProof` instead.
-- Data availability checks for block import into forkchoice now also wait for availability of the corresponding `ExecutionPayloadWithInclusionProof` but only for gossiped blocks
+- `ExecutionPayloadWithInclusionProof` is computed by the block proposer/builder and gossiped independently on a separate new topic. Also builder `submitBlindedBlock` api is modified to respond with `ExecutionPayloadWithInclusionProof` instead.
+- Data availability checks for block import into forkchoice now must wait for availability of the corresponding `ExecutionPayloadWithInclusionProof` but only for gossiped blocks
 - `newPayloadHeader` engine api is introduced to augument the previous usage of `newPayload` in block processing when `ExecutionPayload` is not available for e.g. in processing range synced blocks signalling EL clients to optimistic sync those payloads from EL p2p network.
 
-ELs can optionally introduce `getExecutionPayload` method (like `getBlobs`) to help faster recovery of execution payload from the EL p2p network peers who can annouce new payload hashes when they see new `VALID` payloads. But as noted above that mechanism could be independently speced and is not part of this EIP.
+ELs can optionally introduce a `getExecutionPayload` method (similar to `getBlobs`) to assist with faster recovery of execution payload from the EL's p2p network peers who could annouce new payload hashes when they see new `VALID` payloads. However, as noted above, that mechanism could be independently specified and is out of scope for this EIP.
 
 <-- TODO: add spec details -->
 
