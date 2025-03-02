@@ -20,7 +20,7 @@ This enables interoperability between smart contracts, particularly in cases whe
 
 ## Motivation
 
-Currently, Solidity does not provide a standardized on-chain method for discovering the return types of a function without source code access. Existing workarounds (such as off-chain ABI parsing or predefined mappings) introduce trust assumptions and inefficiencies. [EIP-165](eip-165.md) is used to confirm if a contract has implemented this EIP to provide encoded return types. This makes the approach an optional parallel implementation that augments existing ABI practices without interference. The contract requesting and decoding return type information is not required to implement any interface or functionality.  
+Currently, Solidity does not provide a standardized on-chain method for discovering the return types of a function without source code access. Existing workarounds (such as off-chain ABI parsing or predefined mappings) introduce trust assumptions and inefficiencies. [EIP-165](./eip-165.md) is used to confirm if a contract has implemented this EIP to provide encoded return types. This makes the approach an optional parallel implementation that augments existing ABI practices without interference. The contract requesting and decoding return type information is not required to implement any interface or functionality.  
 
 
 **Use Cases**
@@ -53,6 +53,40 @@ A function’s return type **MUST** be encoded as a `bytes32` word, where each b
  * 0xE0: dynamic array marker; a dynamic array is encoded as [0xE0, elementType]
  * 0xE1: fixed array marker; a fixed array is encoded as [0xE1, length, elementType]
  * 0xF0: tuple start, 0xF1: tuple end
+
+---
+## ELI5: The Mystery Pump Dispensers 🌮🍦
+
+Imagine you're at a buffet, and there’s a row of pump dispensers filled with different sauces—hot sauce, mustard, and chocolate syrup. 🌮🌭🍫
+
+But here’s the problem… none of them have labels!
+
+Right now, if you want to know what’s inside, you have to:
+
+* Find the manual 📖 (like trusting external documentation).
+* Go to a different room to read a poster 🏃 (like looking up an off-chain ABI repository).
+* Ask the chef and hope they remember 👨‍🍳 (like checking the contract’s source code).
+
+That’s slow, messy, and confusing. You just want hot sauce for your taco, but you have no idea which pump to press! 🌮🔥
+
+What This EIP Does
+This proposal is like adding simple, encoded labels to every pump,like a color-coded dot on each one. Now you can just glance at it and instantly know:
+
+* Red dot = Hot sauce! 🌶️ (for tacos & wings)
+* Brown dot = Chocolate sauce! 🍫 (for ice cream & waffles)
+* Yellow dot = Mustard! 🌭 (for burgers & hot dogs)
+
+This way, no one accidentally puts hot sauce on their ice cream. 🍦🔥🤢
+
+Of course, no one is forcing colored dots to be put on pumps, but if they do then the colors are the same for everyone.
+
+How This Helps Smart Contracts
+
+* No More Guessing! Contracts don’t have to check off-chain sources to understand return data.
+* Faster & Simpler! No need to rely on source code or external ABIs—everything is on-chain.
+* Less Mess! Contracts won’t get unexpected return types, reducing errors.
+
+This EIP brings a clear, built-in labeling system for smart contracts, just like adding color-coded labels to sauce dispensers that match the right foods!
 
 ---
 
@@ -213,7 +247,7 @@ Library instancing
                 //"exampleEncode()": "a8bc58f4",
                 uint8[] memory tokens = new uint8[](1);
                 tokens[0] = TypeEncoding.TOKEN_BYTES_FIXED_END;
-                ans = tokens.encode();
+                ans = tokens.returnEncode();
             }
         }
 
