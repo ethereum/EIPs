@@ -204,6 +204,27 @@ This EIP adopts a conservative strategy, prioritizing decreases for operations t
 
 This proposal introduces a simplified `memory_expansion_cost` formula. The current formula combines a constant cost per word and an exponential cost, the latter added to prevent attacks exploiting excessive memory usage. Our findings, supported by [related projects](../assets/eip-xxxx/raxhvl_memory_exp_100M.png), indicate the constant cost per word is negligible and already accounted for in opcodes that expand memory. Thus, the revised formula retains only the exponential cost, preserving security while reducing overall gas costs. As a result, the first 22 words of memory incur no additional cost, as the exponential penalty begins beyond this threshold.
 
+Here is an estimated possible maximal memory allocation with a single opcode in words (32 bytes).
+
+|  |Block limit 30M|Block limit 36M|Block limit 60M|
+|--------|--------|--------|---------|
+|The current gas schedule|123,169|134,998|174,504|
+|The proposed gas schedule|123,935|135,764|175,271|
+
+Here is an estimated possible maximal total memory allocation with multiple calls in words (32 bytes).
+The working benchmark is a single transaction that makes subcalls in a loop,
+and each subcall simply allocates memory, until the block limit is reached.
+Note that estimations regarding the proposed gas schedule take into account cheaper calls also. 
+This has an impact as a constant call cost. 
+So the most effective balance between a call cost and a memory expansion cost for a single call is attained 
+with 278 words for the current gas schedule
+and 93 words for the proposed gas schedule.
+
+|  |Block limit 30M|Block limit 36M|Block limit 60M|
+|--------|--------|--------|---------|
+|The current gas schedule|7,459,574|8,951,600|14,919,426|
+|The proposed gas schedule|82,058,736|98,470,539|164,117,565|
+
 ### Consideration of ZK-SNARK Proof Generation (EIP-7667)
 
 [EIP-7667](./eip-7667.md) proposes an alternative framework for measuring resource consumption, emphasizing the demands of generating ZK-SNARK proofs — an area of growing importance for Ethereum. This includes hashing opcodes and precompiles, which are computationally intensive in ZK-SNARK contexts. Two motivations drive EIP-7667: first, the long-term vision of a ZK-SNARKed Ethereum Layer 1 (L1), where such operations will be critical; second, the immediate challenges faced by ZK-based Layer 2 (L2) solutions, which often limit hashing operations to manage costs. In contrast, this EIP uses a bare CPU as its reference point, focusing on general computational complexity rather than ZK-specific needs. The proposed changes are not expected to significantly alter the average case for ZK-based L2s but may impact worst-case scenarios. While acknowledging the relevance of ZK-SNARKs, this EIP argues that their systemic challenges require distinct solutions beyond the scope of this proposal. The vision of a ZK-SNARKed L1 remains distant, justifying the focus on optimizing the current setup for broader network benefits.
