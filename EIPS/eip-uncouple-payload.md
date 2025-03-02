@@ -31,7 +31,7 @@ In addition, EL clients can also independently participate in forwarding and rec
 Additional benefits obtained from this EIP:
 
 - Consensus clients don't need to store and serve blocks with transactions, providing greater efficiency and reduced resource requirements for running a beacon node.
-- the PBS pipleline becomes more efficient by proposer transmitting the signed block directly to the p2p network while also submitting to the builder/relay for independent reveal of the `ExecutionPayloadWithInclusionProof`.
+- The proposer-builder separation (PBS) pipeline becomes more efficient by the proposer transmitting the signed block directly to the p2p network, while submitting to the builder/relay for the independent reveal of the `ExecutionPayloadWithInclusionProof`.
 - in future with ZK proof of the EL block execution, one could treat the transactions just like blobs leveraging DAS mechanisms for the availability without worrying about their execution validity.
 
 ## Specification
