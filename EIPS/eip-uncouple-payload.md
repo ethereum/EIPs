@@ -19,7 +19,7 @@ But this availability requirement can infact be restricted to `gossip` import wh
 
 ## Motivation
 
-Ethereum protocol has an ambitious goal to grow the `gasLimit` of the execution payloads (possibly by 10X). This introduces bigger and bigger messages in the networking and  block processing pipeline of the CL clients leading to following issues:
+Ethereum protocol has an ambitious goal to grow the `gasLimit` of the execution payloads (possibly by 10X). This leads to larger messages, negatively affecting the networking and block processing pipelines of the consensus layer (CL) clients leading to following issues:
 
 1. Latency for the arrival of Beacon Block increases and make it more and more dependent on the bandwidth resources available to the running node.
 2. The greater number/size of `transactions` directly increase the merkelization compute time directly affecting the import time of the block.
