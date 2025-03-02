@@ -11,7 +11,7 @@ created: 2025-03-01
 
 ## Abstract
 
-Currently the beacon block in ethereum consensus embeds the transactions in `ExecutionPayload` field of `BeaconBlockBody`. This EIP proposes to replace `ExecutionPayload` with `ExecutionPayloadHeader` in `BeaconBlockBody` and to independently transmit `ExecutionPayloadWithInclusionProof`.
+Currently, the beacon block in Ethereum Consensus embed transactions within `ExecutionPayload` field of `BeaconBlockBody`. This EIP proposes to replace `ExecutionPayload` with `ExecutionPayloadHeader` in `BeaconBlockBody` and to independently transmit `ExecutionPayloadWithInclusionProof`.
 
 However this EIP makes no change to the block import mechanism except that block availability also now includes waiting for the availability of `ExecutionPayloadWithInclusionProof` and this is where its different (and simpler) from proposals like ePBS.
 
