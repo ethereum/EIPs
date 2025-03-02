@@ -189,7 +189,7 @@ Given these trade-offs, we opted against fractional pricing in favor of a simple
 
 ### Computational Complexity Only
 
-This EIP intentionally focuses on computational complexity—measured as execution time on a bare CPU — while excluding network-related costs like state persistency. This ensures the proposed gas cost adjustments remain implementation-agnostic, applicable across diverse EVM clients regardless of their technoical stack. By leveraging empirical data from multiple EVM implementations, we establish a universal, verifiable benchmark for computational effort. Unlike network costs, which fluctuate with factors like long-term state persistency or blockchain size, computational complexity is directly quantifiable. This focus simplifies estimation and enhances the proposal’s clarity and applicability within Ethereum’s varied ecosystem.
+This EIP intentionally focuses on computational complexity—measured as execution time on a bare CPU — while excluding network-related costs like state persistency. This ensures the proposed gas cost adjustments remain implementation-agnostic, applicable across diverse EVM clients regardless of their technological stack. By leveraging empirical data from multiple EVM implementations, we establish a universal, verifiable benchmark for computational effort. Unlike network costs, which fluctuate with factors like long-term state persistency or blockchain size, computational complexity is directly quantifiable. This focus simplifies estimation and enhances the proposal’s clarity and applicability within Ethereum’s varied ecosystem.
 
 ### Impact of Gas Costs Changes
 
