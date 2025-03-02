@@ -26,7 +26,7 @@ Ethereum protocol has an ambitious goal to grow the `gasLimit` of the execution 
 
 We know from timing games that the block import latency greatly affects a client's performance to make correct head attestations. With this EIP, block transmission and block import processes will be decongested, allowing for greater flexibility in receiving a larger `ExecutionPayloadWithInclusionProof`, while the beacon block can simultaneously undergo processing. 
 
-Infact EL clients can also independently participate in the propagation/pull of the execution blocks. That mechanism however can be independently developed and is not the part of this EIP.
+In addition, EL clients can also independently participate in forwarding and receiving larger execution blocks. That mechanism however can be independently developed and is out of scope for this EIP.
 
 Other side benefits of this EIP are that 
 
