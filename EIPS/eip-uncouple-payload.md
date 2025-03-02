@@ -13,7 +13,7 @@ created: 2025-03-01
 
 Currently, the beacon block in Ethereum Consensus embed transactions within `ExecutionPayload` field of `BeaconBlockBody`. This EIP proposes to replace `ExecutionPayload` with `ExecutionPayloadHeader` in `BeaconBlockBody` and to independently transmit `ExecutionPayloadWithInclusionProof`.
 
-However, this EIP makes no change to the block import mechanism, with the exception that block availability now includes waiting for the availability of `ExecutionPayloadWithInclusionProof`, making it different and simpler from proposals like ePBS.
+However, this EIP makes no change to the block import mechanism, with the exception that block availability now includes waiting for the availability of `ExecutionPayloadWithInclusionProof`, making it different and simpler from proposals like ePBS/APS.
 
 But this availability requirement can infact be restricted to `gossip` import while allowing optimistic syncing of the execution layer (EL) on checkpoint/range sync as EL can pull full blocks from their peers in optimistic sync as they do now.
 
@@ -32,16 +32,19 @@ Additional benefits obtained from this EIP:
 
 - Consensus clients don't need to store and serve blocks with transactions, providing greater efficiency and reduced resource requirements for running a beacon node.
 - The proposer-builder separation (PBS) pipeline becomes more efficient by the proposer transmitting the signed block directly to the p2p network, while submitting to the builder/relay for the independent reveal of the `ExecutionPayloadWithInclusionProof`.
-- in future with ZK proof of the EL block execution, one could treat the transactions just like blobs leveraging DAS mechanisms for the availability without worrying about their execution validity.
+- In future with ZK proof of the EL block execution, one could treat the transactions just like blobs leveraging DAS mechanisms for the availability without worrying about their execution validity.
+- Combined with delayed/deffered execution, most benefits of ePBS/APS system would be achieved (apart from proposer builder trustlessness that ePBS/APS provides).
+
+Furthermore CL clients apis and code path will become cleaner and more maintainable because of collapse of blinded and full versions (like `BlindedBeaconBlock`, `BlindedBeaconBlockBody`) into same types.
 
 ## Specification
 
 - `ExecutionPayload` in the `BeaconBlockBody` is replaced by `ExecutionPayloadHeader`
-- `ExecutionPayloadWithInclusionProof` is computed by the proposer/builder and transmitted independently on a gossip channel.
-- data availability checks now also wait for availability of a `VALID` `ExecutionPayloadWithInclusionProof`
-- `newPayload` on engine api is modified to now accept `newPayloadHeader` and a new method for `newExecutionPayload` is introduced to check the vailidity of the `ExecutionPayload` recieved within `ExecutionPayloadWithInclusionProof`
+- `ExecutionPayloadWithInclusionProof` is computed by the proposer/builder and gossiped independently on a new topic
+- data availability checks for block import into forkchoice now also wait for availability of the corresponding `ExecutionPayloadWithInclusionProof` but only for gossiped blocks
+- a `newPayloadHeader` engine api is introduced to augument the previous usage of `newPayload` in block processing when `ExecutionPayload` is not available for e.g. in processing range synced blocks signalling EL clients to optimistic sync those payloads from EL p2p network.
 
-ELs can optionally introduce `getExecutionPayload` method (like `getBlobs`) to help fast recovery of execution payload from the EL p2p network but as noted above that mechanism could be independently speced and is not part of this EIP.
+ELs can optionally introduce `getExecutionPayload` method (like `getBlobs`) to help faster recovery of execution payload from the EL p2p network peers who can annouce new payload hashes when they see new `VALID` payloads. But as noted above that mechanism could be independently speced and is not part of this EIP.
 
 <-- TODO: add spec details -->
 
