@@ -20,6 +20,7 @@ Gas costs compromise of two components: network (social) cost and computation co
 While several EIPs (e.g., [EIP-160](eip-160.md), [EIP-1884](eip-1884.md)) have refined network-related gas costs, computational costs have remained largely static since Ethereum’s inception. With multiple EVM implementations now stable and optimized, alongside advanced tools, we can assess how well the current gas schedule aligns with hardware workload profiles.
 
 Measurements and estimations depend on various factors, including hardware, OS, virtualization, compiler, memory management, EVM, and more. The execution of a single opcode impacts or depends on caching, block preparation, block finalization, garbage collectors, code analysis, parsing etc. Consequently, the individual computational cost is a sum of multiple factors spread over the software stack. Despite this complexity, examinations have shown that the computational cost outline is consistent across EVM implementations, technology stacks, and contexts.
+For example, the overall execution cost of a given opcode can be twice as of another opcode for most EVM clients, so gas cost should be 2:1. This illustrates computational complexity, determined experimentally rather than theoretically. The gas cost schedule should, therefore, accurately reflect computational complexity.
 
 ### Note 1
 
