@@ -32,8 +32,7 @@ Additional benefits obtained from this EIP:
 
 - Consensus clients don't need to store and serve blocks with transactions, providing greater efficiency and reduced resource requirements for running a beacon node.
 - The proposer-builder separation (PBS) pipeline becomes more efficient by the proposer transmitting the signed block directly to the p2p network, while submitting to the builder/relay for the independent reveal of the `ExecutionPayloadWithInclusionProof`.
-- In future with ZK proof of the EL block execution, one could treat the transactions just like blobs leveraging DAS mechanisms for the availability without worrying about their execution validity.
-- Combined with delayed/deffered execution, most benefits of ePBS/APS system would be achieved (apart from proposer builder trustlessness that ePBS/APS provides).
+- In the future with zero-knowledge (ZK) proof of the EL block execution, nodes could treat the transactions similarly to blobs which leverage data availability sampling (DAS) mechanisms for available data since there would be no need to re-execute the transactions to establish validity. Hence the L1 execution would itself become a rollup with no need to import all transaction data by a node.
 
 Furthermore CL clients apis and code path will become cleaner and more maintainable because of collapse of blinded and full versions (like `BlindedBeaconBlock`, `BlindedBeaconBlockBody`) into same types.
 
