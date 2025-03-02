@@ -24,7 +24,7 @@ Ethereum protocol has an ambitious goal to grow the `gasLimit` of the execution 
 1. Higher latencies for the arrival of beacon blocks increase, requiring larger bandwidth resources to be made available for the beacon node.
 2. The greater number and size of transactions directly increase the merkelization compute time, increasing the import time of the block.
 
-We know from timing games that the block import latency greatly affects a client's performance to make correct head attestations. With this EIP, block transmission and import pipeline will be unchocked and allows for greater flexibility in reception of huge `ExecutionPayloadWithInclusionProof` while the beacon block can undergo processing. 
+We know from timing games that the block import latency greatly affects a client's performance to make correct head attestations. With this EIP, block transmission and block import processes will be decongested, allowing for greater flexibility in receiving a larger `ExecutionPayloadWithInclusionProof`, while the beacon block can simultaneously undergo processing. 
 
 Infact EL clients can also independently participate in the propagation/pull of the execution blocks. That mechanism however can be independently developed and is not the part of this EIP.
 
