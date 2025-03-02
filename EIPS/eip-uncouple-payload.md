@@ -30,7 +30,7 @@ In addition, EL clients can also independently participate in forwarding and rec
 
 Other side benefits of this EIP are that 
 
-- consensus clients don't need to store and serve blocks with transactions and provides greater efficiency and reduced resource requirement for running the nodes.
+- Consensus clients don't need to store and serve blocks with transactions, providing greater efficiency and reduced resource requirements for running a beacon node.
 - the PBS pipleline becomes more efficient by proposer transmitting the signed block directly to the p2p network while also submitting to the builder/relay for independent reveal of the `ExecutionPayloadWithInclusionProof`.
 - in future with ZK proof of the EL block execution, one could treat the transactions just like blobs leveraging DAS mechanisms for the availability without worrying about their execution validity.
 
