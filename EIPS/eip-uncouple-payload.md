@@ -28,7 +28,7 @@ We know from timing games that the block import latency greatly affects a client
 
 In addition, EL clients can also independently participate in forwarding and receiving larger execution blocks. That mechanism however can be independently developed and is out of scope for this EIP.
 
-Other side benefits of this EIP are that 
+Additional benefits obtained from this EIP:
 
 - Consensus clients don't need to store and serve blocks with transactions, providing greater efficiency and reduced resource requirements for running a beacon node.
 - the PBS pipleline becomes more efficient by proposer transmitting the signed block directly to the p2p network while also submitting to the builder/relay for independent reveal of the `ExecutionPayloadWithInclusionProof`.
