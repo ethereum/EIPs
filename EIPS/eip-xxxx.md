@@ -46,9 +46,6 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | `KECCAK_BASE_COST`                | `10`                 |
 | `KECCAK_PER_WORD_COST`            | `6`                  |
 | `COPY_PER_WORD_COST`              | `1`                  |
-| `LOG_BASE_COST`                   | `7`                  |
-| `LOG_PER_TOPIC_COST`              | `7`                  |
-| `LOG_PER_BYTE_COST`               | `8`                  |
 
 ### Cost formulas
 
@@ -57,7 +54,6 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | data_size | len(data) | The size of the data expressed as number of bytes |
 | data_word_size | (len(data) + 31) / 32 | The size of the data expressed as number of words |
 | exponent_byte_size | len(exponent) | The size in bytes of the exponent in the EXP opcode. |
-| topic_count | len(topics) | The number of topics in the LOGx opcode. |
 | sets_count | len(data) / 192 | The number of pair sets in the ECPAIRING precompile. |
 | memory_expansion_cost | memory_cost(current_word_size) - memory_cost(previous_word_size)  | The cost of expanding memory to `current_word_size` words from `previous_word_size` words. In a single context memory cannot contract, so the formula is always non-negative |
 | memory_cost | (memory_word_size ** 2) / 512  | The cost of memory for `data_word_size` words. |
@@ -133,7 +129,6 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | 60 - 7F | PUSHx | 3 | BASE_OPCODE_COST |
 | 80 - 8F | DUPx | 3 | BASE_OPCODE_COST |
 | 90 - 9F | SWAPx | 3 | BASE_OPCODE_COST |
-| A0 - A4 | LOGx | 375 + 375 \* topic_count + 8 \* data_size + memory_expansion_cost | LOG_BASE_COST + LOG_PER_TOPIC_COST \* topic_count + LOG_PER_BYTE_COST \* data_size + memory_expansion_cost |
 
 ### Precompiles Costs
 
@@ -194,7 +189,7 @@ Given these trade-offs, we opted against fractional pricing in favor of a simple
 
 ### Computational Complexity Only
 
-This EIP intentionally focuses on computational complexity—measured as execution time on a bare CPU — while excluding network-related costs like state persistency. This ensures the proposed gas cost adjustments remain implementation-agnostic, applicable across diverse EVM clients regardless of their technological stack. By leveraging empirical data from multiple EVM implementations, we establish a universal, verifiable benchmark for computational effort. Unlike network costs, which fluctuate with factors like long-term state persistency or blockchain size, computational complexity is directly quantifiable. This focus simplifies estimation and enhances the proposal’s clarity and applicability within Ethereum’s varied ecosystem.
+This EIP intentionally focuses on computational complexity—measured as execution time on a bare CPU — while excluding network-related costs like state persistency. This ensures the proposed gas cost adjustments remain implementation-agnostic, applicable across diverse EVM clients regardless of their technoical stack. By leveraging empirical data from multiple EVM implementations, we establish a universal, verifiable benchmark for computational effort. Unlike network costs, which fluctuate with factors like long-term state persistency or blockchain size, computational complexity is directly quantifiable. This focus simplifies estimation and enhances the proposal’s clarity and applicability within Ethereum’s varied ecosystem.
 
 ### Impact of Gas Costs Changes
 
@@ -299,9 +294,6 @@ const (
   Keccak256Gas        uint64 = 10 // Once per KECCAK256 operation.
   Keccak256WordGas    uint64 = 6  // One per word of the KECCAK256 operation's data.
   CopyGas             uint64 = 1  // One per word of the copied code (CALLDATACOPY, CODECOPY, EXTCODECOPY, RETURNDATACOPY, MCOPY)
-  LogGas              uint64 = 7  // Per LOG* operation.
-  LogTopicGas         uint64 = 7  // Multiplied by the * of the LOG*, per LOG transaction. e.g. LOG0 incurs 0, LOG4 incurs 4
-  LogDataGas          uint64 = 8  // Per byte in a LOG* operation's data.
 )
 
 func newRepricedInstructionSet() JumpTable {
