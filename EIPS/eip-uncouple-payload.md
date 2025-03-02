@@ -22,7 +22,7 @@ But this availability requirement can infact be restricted to `gossip` import wh
 Ethereum protocol has an ambitious goal to grow the `gasLimit` of the execution payloads (possibly by 10X). This leads to larger messages, negatively affecting the networking and block processing pipelines of the consensus layer (CL) clients leading to following issues:
 
 1. Higher latencies for the arrival of beacon blocks increase, requiring larger bandwidth resources to be made available for the beacon node.
-2. The greater number/size of `transactions` directly increase the merkelization compute time directly affecting the import time of the block.
+2. The greater number and size of transactions directly increase the merkelization compute time, increasing the import time of the block.
 
 We know from timing games that the block import latency greatly affects a client's performance to make correct head attestations. With this EIP, block transmission and import pipeline will be unchocked and allows for greater flexibility in reception of huge `ExecutionPayloadWithInclusionProof` while the beacon block can undergo processing. 
 
