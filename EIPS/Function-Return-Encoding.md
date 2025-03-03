@@ -2,12 +2,12 @@
 title: On-Chain Function Return Type Encoding for Solidity Functions
 description: This EIP standardizes on-chain return type encoding, removing off-chain ABI dependencies and improving interoperability between smart contracts. It is efficient, flexible, and fully algorithmic, making it ideal for dynamic cross-contract interactions.
 author: Paul Edge (@genkifs) <genkifs@gmail.com>
-discussions-to: https://ethereum-magicians.org/
+discussions-to: https://ethereum-magicians.org/t/on-chain-function-return-type-encoding-for-solidity-functions/23040
 status: Draft
 type: <Standards Track>
-category: <ERC> # Only required for Standards Track. Otherwise, remove this field.
+category: <ERC> 
 created: <2025-03-01>
-requires: <EIP-165> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+requires: <EIP-165> 
 ---
 
 ## Abstract
@@ -55,28 +55,28 @@ A function’s return type **MUST** be encoded as a `bytes32` word, where each b
  * 0xF0: tuple start, 0xF1: tuple end
 
 ---
-## ELI5: The Mystery Pump Dispensers 🌮🍦
+## ELI5: The Mystery Pump Dispensers
 
-Imagine you're at a buffet, and there’s a row of pump dispensers filled with different sauces—hot sauce, mustard, and chocolate syrup. 🌮🌭🍫
+Imagine you're at a buffet, and there’s a row of pump dispensers filled with different sauces—hot sauce, mustard, and chocolate syrup.
 
 But here’s the problem… none of them have labels!
 
 Right now, if you want to know what’s inside, you have to:
 
-* Find the manual 📖 (like trusting external documentation).
-* Go to a different room to read a poster 🏃 (like looking up an off-chain ABI repository).
-* Ask the chef and hope they remember 👨‍🍳 (like checking the contract’s source code).
+* Find the manual (like trusting external documentation).
+* Go to a different room to read a poster (like looking up an off-chain ABI repository).
+* Ask the chef and hope they remember (like checking the contract’s source code).
 
-That’s slow, messy, and confusing. You just want hot sauce for your taco, but you have no idea which pump to press! 🌮🔥
+That’s slow, messy, and confusing. You just want hot sauce for your taco, but you have no idea which pump to press! 
 
 What This EIP Does
 This proposal is like adding simple, encoded labels to every pump,like a color-coded dot on each one. Now you can just glance at it and instantly know:
 
-* Red dot = Hot sauce! 🌶️ (for tacos & wings)
-* Brown dot = Chocolate sauce! 🍫 (for ice cream & waffles)
-* Yellow dot = Mustard! 🌭 (for burgers & hot dogs)
+* Red dot = Hot sauce! (for tacos & wings)
+* Brown dot = Chocolate sauce! (for ice cream & waffles)
+* Yellow dot = Mustard! (for burgers & hot dogs)
 
-This way, no one accidentally puts hot sauce on their ice cream. 🍦🔥🤢
+This way, no one accidentally puts hot sauce on their ice cream. 
 
 Of course, no one is forcing colored dots to be put on pumps, but if they do then the colors are the same for everyone.
 
