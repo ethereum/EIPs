@@ -151,6 +151,7 @@ The formula for these opcodes remains the same, but the total cost calculated is
 
 | Opcode | Name | Affected formula component |
 | ------------- | ------------- | ------------- |
+| 0x31 | BALANCE | address_access_cost |
 | 0x54 | SLOAD | storage_access_cost |
 | 0x55 | SSTORE | storage_access_cost |
 | 0xF0 | CREATE | memory_expansion_cost |
