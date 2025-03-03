@@ -94,7 +94,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | 0x1D | SAR | 3 | BASE_OPCODE_COST |
 | 0x20 | KECCAK256 | 30 + 6 * data_word_size + memory_expansion_cost | KECCAK_BASE_COST + KECCAK_PER_WORD_COST * data_word_size + memory_expansion_cost |
 | 0x30 | ADDRESS | 2 | BASE_OPCODE_COST |
-| 0x31 | BALANCE | address_access_cost (current) | address_access_cost (proposed) |
+| 0x31 | BALANCE | address_access_cost | address_access_cost |
 | 0x32 | ORIGIN | 2 | BASE_OPCODE_COST |
 | 0x33 | CALLER | 2 | BASE_OPCODE_COST |
 | 0x34 | CALLVALUE | 2 | BASE_OPCODE_COST |
