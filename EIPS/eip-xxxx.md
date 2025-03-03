@@ -66,82 +66,82 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 | Opcode | Name | Pre-change Gas | Gas Cost |
 | ------------- | ------------- | -------------: | -------------: |
-| 01 | ADD | 3 | BASE_OPCODE_COST |
-| 02 | MUL | 5 | BASE_OPCODE_COST |
-| 03 | SUB | 3 | BASE_OPCODE_COST |
-| 04 | DIV | 5 | BASE_OPCODE_COST |
-| 05 | SDIV | 5 | BASE_OPCODE_COST |
-| 06 | MOD | 5 | BASE_OPCODE_COST |
-| 07 | SMOD | 5 | BASE_OPCODE_COST |
-| 08 | ADDMOD | 8 | FAST_OPCODE_COST |
-| 09 | MULMOD | 8 | MID_OPCODE_COST |
-| 0A | EXP | 10 + 50 * exponent_byte_size | EXP_BASE_COST + EXP_PER_BYTE_COST * exponent_byte_size |
-| 0B | SIGNEXTEND | 5 | BASE_OPCODE_COST |
-| 10 | LT | 3 | BASE_OPCODE_COST |
-| 11 | GT | 3 | BASE_OPCODE_COST |
-| 12 | SLT | 3 | BASE_OPCODE_COST |
-| 13 | SGT | 3 | BASE_OPCODE_COST |
-| 14 | EQ | 3 | BASE_OPCODE_COST |
-| 15 | ISZERO | 3 | BASE_OPCODE_COST |
-| 16 | AND | 3 | BASE_OPCODE_COST |
-| 17 | OR | 3 | BASE_OPCODE_COST |
-| 18 | XOR | 3 | BASE_OPCODE_COST |
-| 19 | NOT | 3 | BASE_OPCODE_COST |
-| 1A | BYTE | 3 | BASE_OPCODE_COST |
-| 1B | SHL | 3 | BASE_OPCODE_COST |
-| 1C | SHR | 3 | BASE_OPCODE_COST |
-| 1D | SAR | 3 | BASE_OPCODE_COST |
-| 20 | KECCAK256 | 30 + 6 * data_word_size + memory_expansion_cost | KECCAK_BASE_COST + KECCAK_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 30 | ADDRESS | 2 | BASE_OPCODE_COST |
-| 32 | ORIGIN | 2 | BASE_OPCODE_COST |
-| 33 | CALLER | 2 | BASE_OPCODE_COST |
-| 34 | CALLVALUE | 2 | BASE_OPCODE_COST |
-| 35 | CALLDATALOAD | 3 | BASE_OPCODE_COST |
-| 36 | CALLDATASIZE | 2 | BASE_OPCODE_COST |
-| 37 | CALLDATACOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 38 | CODESIZE | 2 | BASE_OPCODE_COST |
-| 39 | CODECOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 3A | GASPRICE | 2 | BASE_OPCODE_COST |
-| 3B | EXTCODESIZE | address_access_cost | address_access_cost |
-| 3C | EXTCODECOPY | 0 + 3 * data_word_size + memory_expansion_cost + address_access_cost | COPY_PER_WORD_COST * data_word_size + memory_expansion_cost + address_access_cost |
-| 3D | RETURNDATASIZE | 2 | BASE_OPCODE_COST |
-| 3E | RETURNDATACOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 3F | EXTCODEHASH | address_access_cost | address_access_cost |
-| 41 | COINBASE | 2 | BASE_OPCODE_COST |
-| 42 | TIMESTAMP | 2 | BASE_OPCODE_COST |
-| 43 | NUMBER | 2 | BASE_OPCODE_COST |
-| 45 | GASLIMIT | 2 |  BASE_OPCODE_COST |
-| 46 | CHAINID | 2 | BASE_OPCODE_COST |
-| 47 | SELFBALANCE | 5 | BASE_OPCODE_COST |
-| 50 | POP | 2 | BASE_OPCODE_COST |
-| 51 | MLOAD | 3 | BASE_OPCODE_COST |
-| 52 | MSTORE | 3 + memory_expansion_cost | BASE_OPCODE_COST + memory_expansion_cost |
-| 53 | MSTORE8 | 3 + memory_expansion_cost | BASE_OPCODE_COST + memory_expansion_cost |
-| 56 | JUMP | 8 | BASE_OPCODE_COST |
-| 57 | JUMPI | 10 | BASE_OPCODE_COST |
-| 58 | PC | 2 | BASE_OPCODE_COST |
-| 59 | MSIZE | 2 | BASE_OPCODE_COST |
-| 5A | GAS | 2 | BASE_OPCODE_COST |
-| 5C | TLOAD | 100 | WARM_STORAGE_READ_COST |
-| 5D | TSTORE | 100 | WARM_STORAGE_READ_COST |
-| 5B | JUMPDEST | 1 | BASE_OPCODE_COST |
-| 5E | MCOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 5F | PUSH0 | 2 | BASE_OPCODE_COST |
-| 60 - 7F | PUSHx | 3 | BASE_OPCODE_COST |
-| 80 - 8F | DUPx | 3 | BASE_OPCODE_COST |
-| 90 - 9F | SWAPx | 3 | BASE_OPCODE_COST |
+| 0x01 | ADD | 3 | BASE_OPCODE_COST |
+| 0x02 | MUL | 5 | BASE_OPCODE_COST |
+| 0x03 | SUB | 3 | BASE_OPCODE_COST |
+| 0x04 | DIV | 5 | BASE_OPCODE_COST |
+| 0x05 | SDIV | 5 | BASE_OPCODE_COST |
+| 0x06 | MOD | 5 | BASE_OPCODE_COST |
+| 0x07 | SMOD | 5 | BASE_OPCODE_COST |
+| 0x08 | ADDMOD | 8 | FAST_OPCODE_COST |
+| 0x09 | MULMOD | 8 | MID_OPCODE_COST |
+| 0x0A | EXP | 10 + 50 * exponent_byte_size | EXP_BASE_COST + EXP_PER_BYTE_COST * exponent_byte_size |
+| 0x0B | SIGNEXTEND | 5 | BASE_OPCODE_COST |
+| 0x10 | LT | 3 | BASE_OPCODE_COST |
+| 0x11 | GT | 3 | BASE_OPCODE_COST |
+| 0x12 | SLT | 3 | BASE_OPCODE_COST |
+| 0x13 | SGT | 3 | BASE_OPCODE_COST |
+| 0x14 | EQ | 3 | BASE_OPCODE_COST |
+| 0x15 | ISZERO | 3 | BASE_OPCODE_COST |
+| 0x16 | AND | 3 | BASE_OPCODE_COST |
+| 0x17 | OR | 3 | BASE_OPCODE_COST |
+| 0x18 | XOR | 3 | BASE_OPCODE_COST |
+| 0x19 | NOT | 3 | BASE_OPCODE_COST |
+| 0x1A | BYTE | 3 | BASE_OPCODE_COST |
+| 0x1B | SHL | 3 | BASE_OPCODE_COST |
+| 0x1C | SHR | 3 | BASE_OPCODE_COST |
+| 0x1D | SAR | 3 | BASE_OPCODE_COST |
+| 0x20 | KECCAK256 | 30 + 6 * data_word_size + memory_expansion_cost | KECCAK_BASE_COST + KECCAK_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x30 | ADDRESS | 2 | BASE_OPCODE_COST |
+| 0x32 | ORIGIN | 2 | BASE_OPCODE_COST |
+| 0x33 | CALLER | 2 | BASE_OPCODE_COST |
+| 0x34 | CALLVALUE | 2 | BASE_OPCODE_COST |
+| 0x35 | CALLDATALOAD | 3 | BASE_OPCODE_COST |
+| 0x36 | CALLDATASIZE | 2 | BASE_OPCODE_COST |
+| 0x37 | CALLDATACOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x38 | CODESIZE | 2 | BASE_OPCODE_COST |
+| 0x39 | CODECOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x3A | GASPRICE | 2 | BASE_OPCODE_COST |
+| 0x3B | EXTCODESIZE | address_access_cost | address_access_cost |
+| 0x3C | EXTCODECOPY | 0 + 3 * data_word_size + memory_expansion_cost + address_access_cost | COPY_PER_WORD_COST * data_word_size + memory_expansion_cost + address_access_cost |
+| 0x3D | RETURNDATASIZE | 2 | BASE_OPCODE_COST |
+| 0x3E | RETURNDATACOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x3F | EXTCODEHASH | address_access_cost | address_access_cost |
+| 0x41 | COINBASE | 2 | BASE_OPCODE_COST |
+| 0x42 | TIMESTAMP | 2 | BASE_OPCODE_COST |
+| 0x43 | NUMBER | 2 | BASE_OPCODE_COST |
+| 0x45 | GASLIMIT | 2 |  BASE_OPCODE_COST |
+| 0x46 | CHAINID | 2 | BASE_OPCODE_COST |
+| 0x47 | SELFBALANCE | 5 | BASE_OPCODE_COST |
+| 0x50 | POP | 2 | BASE_OPCODE_COST |
+| 0x51 | MLOAD | 3 | BASE_OPCODE_COST |
+| 0x52 | MSTORE | 3 + memory_expansion_cost | BASE_OPCODE_COST + memory_expansion_cost |
+| 0x53 | MSTORE8 | 3 + memory_expansion_cost | BASE_OPCODE_COST + memory_expansion_cost |
+| 0x56 | JUMP | 8 | BASE_OPCODE_COST |
+| 0x57 | JUMPI | 10 | BASE_OPCODE_COST |
+| 0x58 | PC | 2 | BASE_OPCODE_COST |
+| 0x59 | MSIZE | 2 | BASE_OPCODE_COST |
+| 0x5A | GAS | 2 | BASE_OPCODE_COST |
+| 0x5C | TLOAD | 100 | WARM_STORAGE_READ_COST |
+| 0x5D | TSTORE | 100 | WARM_STORAGE_READ_COST |
+| 0x5B | JUMPDEST | 1 | BASE_OPCODE_COST |
+| 0x5E | MCOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x5F | PUSH0 | 2 | BASE_OPCODE_COST |
+| 0x60 - 0x7F | PUSHx | 3 | BASE_OPCODE_COST |
+| 0x80 - 0x8F | DUPx | 3 | BASE_OPCODE_COST |
+| 0x90 - 0x9F | SWAPx | 3 | BASE_OPCODE_COST |
 
 ### Precompiles Costs
 
 | Precompile | Name | Current Gas | Proposed Gas |
 | ------------- | ------------- | -------------: |  -------------: |
-| 02 | SHA2-256 | 60 + 12 * data_word_size | 10 + 4 * data_word_size |
-| 03 | RIPEMD-160 | 600 + 120 * data_word_size | 60 + 40 * data_word_size |
-| 07 | ECMUL | 6000 |  2700 |
-| 08 | ECPAIRING | 45000 + 34000 * sets_count | 8000 + 7000 * sets_count |
-| 0A | POINTEVAL | 50000 | 21000 |
+| 0x02 | SHA2-256 | 60 + 12 * data_word_size | 10 + 4 * data_word_size |
+| 0x03 | RIPEMD-160 | 600 + 120 * data_word_size | 60 + 40 * data_word_size |
+| 0x07 | ECMUL | 6000 |  2700 |
+| 0x08 | ECPAIRING | 45000 + 34000 * sets_count | 8000 + 7000 * sets_count |
+| 0x0A | POINTEVAL | 50000 | 21000 |
 
-The cost of 01 (ECRECOVER), 04 (IDENTITY), 05 (MODEXP) and 09 (BLAKE2F) precompiles remains unchanged. The calculated and rescaled cost of 06 (ECADD) is higher than the current cost. Still this cost is left unchanged to maintain compatibility with existing contracts.
+The cost of 0x01 (ECRECOVER), 0x04 (IDENTITY), 0x05 (MODEXP) and 0x09 (BLAKE2F) precompiles remains unchanged. The calculated and rescaled cost of 0x06 (ECADD) is higher than the current cost. Still this cost is left unchanged to maintain compatibility with existing contracts.
 
 Additionally, all precompiles benefit from the lowered cost of *CALL opcodes (see below).
 
@@ -151,15 +151,15 @@ The formula for these opcodes remains the same, but the total cost calculated is
 
 | Opcode | Name | Affected formula component |
 | ------------- | ------------- | ------------- |
-| 54 | SLOAD | storage_access_cost |
-| 55 | SSTORE | storage_access_cost |
-| F0 | CREATE | memory_expansion_cost |
-| F5 | CREATE2 | memory_expansion_cost |
-| F1 | CALL | memory_expansion_cost, address_access_cost |
-| FA | STATICCALL | memory_expansion_cost, address_access_cost |
-| F4 | DELEGATECALL | memory_expansion_cost, address_access_cost |
-| F3 | RETURN | memory_expansion_cost |
-| FD | REVERT | memory_expansion_cost |
+| 0x54 | SLOAD | storage_access_cost |
+| 0x55 | SSTORE | storage_access_cost |
+| 0xF0 | CREATE | memory_expansion_cost |
+| 0xF5 | CREATE2 | memory_expansion_cost |
+| 0xF1 | CALL | memory_expansion_cost, address_access_cost |
+| 0xFA | STATICCALL | memory_expansion_cost, address_access_cost |
+| 0xF4 | DELEGATECALL | memory_expansion_cost, address_access_cost |
+| 0xF3 | RETURN | memory_expansion_cost |
+| 0xFD | REVERT | memory_expansion_cost |
 
 ## Rationale
 
