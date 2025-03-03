@@ -6,6 +6,8 @@ Note: `BLS12_G1MUL` is executed by the `BLS12_G1MULTIEXP` precompile and `BLS12_
 
 - [`BLS12_G1ADD` Machine-readable data](add_G1_bls.json)
 - [`BLS12_G2ADD` Machine-readable data](add_G2_bls.json)
+- [`BLS12_G1MUL` Machine-readable data](mul_G1_bls.json)
+- [`BLS12_G2MUL` Machine-readable data](mul_G2_bls.json)
 - [`BLS12_G1MSM` Machine-readable data](msm_G1_bls.json)
 - [`BLS12_G2MSM` Machine-readable data](msm_G2_bls.json)
 - [`BLS12_PAIRING_CHECK` Machine-readable data](pairing_check_bls.json)
@@ -13,6 +15,8 @@ Note: `BLS12_G1MUL` is executed by the `BLS12_G1MULTIEXP` precompile and `BLS12_
 - [`BLS12_MAP_FP2_TO_G2` Machine-readable data](map_fp2_to_G2_bls.json)
 - [Fail `BLS12_G1ADD` Machine-readable data](fail-add_G1_bls.json)
 - [Fail `BLS12_G2ADD` Machine-readable data](fail-add_G2_bls.json)
+- [Fail `BLS12_G1MUL` Machine-readable data](fail-mul_G1_bls.json)
+- [Fail `BLS12_G2MUL` Machine-readable data](fail-mul_G2_bls.json)
 - [Fail `BLS12_G1MSM` Machine-readable data](fail-msm_G1_bls.json)
 - [Fail `BLS12_G2MSM` Machine-readable data](fail-msm_G2_bls.json)
 - [Fail `BLS12_MAP_FP_TO_G1` Machine-readable data](fail-map_fp_to_G1_bls.json)
