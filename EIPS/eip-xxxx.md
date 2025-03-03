@@ -240,7 +240,6 @@ Reducing computational gas costs aims to increase transaction throughput, allowi
 
 By implementing the proposal, the overall computational cost will decrease, while the storage costs remains the same. This reflects the improvements in EVM software efficiency and the cost of ever growing state. By increasing the relative gap between computational and storage costs, the proposal indirectly incentivizes developers to optimize their contracts and reduce the state size. This is a positive side effect of the proposal.
 
-
 ### SLOAD and SSTORE
 
 The proposal modifies SLOAD. This is because SLOAD does not update the blockchain state. It is considered as a computational opcode executed locally by EVM client.
@@ -253,6 +252,29 @@ It is consistent with SLOAD.
 The proposal modifies two formulas `address_access_cost` and `storage_access_cost`. But only for the warm data. The cost for the cold data remains. 
 Considering the methodology employed when constructing this proposal, it is straightforward to estimate computation complexity for accessing the warm data.
 The gas cost of accessing the cold data is out of the scope. 
+
+### Precompiles and hashing
+
+Summary. 
+For MODEXP, the [EIP-7883](eip-7883.md) is assumed and the gas cost is not changed.
+For ECPAIRING, the gas cost is decreased by the factor around 5.
+This is similar as for other opcodes in this proposal.
+For ECRECOVER, IDENTITY, MODEXP, ECADD, ECMUL, BLAKE2F, POINTEVAL, the gas cost is not changed or moderately decreased.
+Other projects, for instance Nethermind's Gas Benchmarks, 
+showed that ECRECOVER gas cost cannot decrease for the security reason -- the worst case of block computation will take too long.
+The same for MODEXP.
+So the `rescale factor` set to `0.217391304` cannot be lowered, despite the fact that the gas cost figures are relative values.
+The point is that the block limit is set.
+The Gas Cost Estimator project implies that ECRECOVER gas cost should be moderately increased. 
+But it is not followed because: the change is negligible, a backwards compatibility risk is avoided.
+
+There are the hasing precompiles SHA2-256, RIPEMD-160, BLAKE2F and the hashing opcode KECCAK256.
+[EIP-7667](./eip-7667.md) considers the worst cases of ZK proofs generations for blocks filled solely with hashing operations.
+Note that this proposal does not change the gas cost for BLAKE2F, 
+and does not change the per word gas cost for KECCAK256.
+It does change the per word gas cost for SHA2-256 and RIPEMD-160 - it is 3 times lower.
+But for SHA2-256 and RIPEMD-160 EIP-7667 is less radical.
+Thus this proposal does not make these edge cases of EIP-7667 worse.
 
 ## Backwards Compatibility
 
