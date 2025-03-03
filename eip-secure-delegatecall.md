@@ -38,7 +38,7 @@ A new EVM opcode `SDELEGATECALL` is introduced with the following properties:
 
 3. The opcode SHALL execute the target contract code with the same context rules as `DELEGATECALL`.
 
-4. The opcode SHALL return the deployer's address as determined the contract create transcation.
+4. The opcode SHALL return the deployer's address as determined by the contract creation transaction
 
 5. When the call completes, the stack items are arranged as follows (from top to bottom):
    - `success` (1 for success, 0 for failure)
