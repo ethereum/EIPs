@@ -2,7 +2,7 @@
 title: Secure Delegatecall Opcode
 description: A secure version of delegatecall that returns the target contract's deployer address
 author: nolan wang (https://x.com/ma1fan)
-discussions-to:https://ethereum-magicians.org/t/introduce-sdelegatecall-opcode-for-enhanced-delegatecall-security/23045/1 
+discussions-to: https://ethereum-magicians.org/t/introduce-sdelegatecall-opcode-for-enhanced-delegatecall-security/23045/
 status: Draft
 type: Standards Track
 category: Core
