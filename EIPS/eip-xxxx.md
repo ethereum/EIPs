@@ -60,7 +60,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | memory_cost | (memory_word_size ** 2) / 512  | The cost of memory for `data_word_size` words. |
 | memory_word_size | (memory_size + 31) / 32 | The size of the allocated memory expressed as number of words |
 | address_access_cost | 5 (warm) \| 2600 (cold)  | The cost of accessing warm and cold address data. |
-| storage_access_cost | 5 (warm) \| 2100 (cold)  | The cost of accessing warm and cold address data. |
+| storage_access_cost | 5 (warm) \| 2100 (cold)  | The cost of accessing warm and cold storage data. |
 
 ### Opcode Costs
 
