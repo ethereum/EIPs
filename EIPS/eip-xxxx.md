@@ -28,7 +28,7 @@ The current gas cost schedule differs in many places from the experimentally det
 
 ### Note 2
 
-The gas cost schedule is inherently relative, adjustable as long as proportions hold. A substantial reduction in the computational costs contained in this proposal has two significant effects: it increases blockchain throughput in terms of transactions per block, and it increases the proportional weight of the network costs.
+The gas cost schedule is inherently relative, adjustable as long as proportions hold. A substantial reduction in the gas costs contained in this proposal has two significant effects: it increases blockchain throughput in terms of transactions per block, and it increases the proportional weight of the network costs.
 
 ## Specification
 
