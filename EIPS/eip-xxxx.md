@@ -239,6 +239,20 @@ Reducing computational gas costs aims to increase transaction throughput, allowi
 
 By implementing the proposal, the overall computational cost will decrease, while the storage costs remains the same. This reflects the improvements in EVM software efficiency and the cost of ever growing state. By increasing the relative gap between computational and storage costs, the proposal indirectly incentivizes developers to optimize their contracts and reduce the state size. This is a positive side effect of the proposal.
 
+
+### SLOAD and SSTORE
+
+The proposal modifies SLOAD. This is because SLOAD does not update the blockchain state. It is considered as a computational opcode executed locally by EVM client.
+Although, its computational cost may depend on the blockchain state, on the size, if a cold starage is accessed. See the note below.
+The proposal modifies SSTORE the same way. But note that the formula for SSTORE is complex and only warm/cold access cost factor is modified.
+It is consistent with SLOAD.
+
+### COLD addresses and storage
+
+The proposal modifies two formulas `address_access_cost` and `storage_access_cost`. But only for the warm data. The cost for the cold data remains. 
+Considering the methodology employed when constructing this proposal, it is straightforward to estimate computation complexity for accessing the warm data.
+The gas cost of accessing the cold data is out of the scope. 
+
 ## Backwards Compatibility
 
 The proposed changes to the gas cost schedule will require a hardfork due to their significant impact on the Ethereum network's operational mechanics. Below, we outline the key consequences of these changes and highlight areas where further research is needed to ensure a smooth transition.
