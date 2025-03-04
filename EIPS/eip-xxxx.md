@@ -244,7 +244,7 @@ By implementing the proposal, the overall computational cost will decrease, whil
 
 ### Address and Storage Access Cost
 
-The proposal modifies two formulas for `address_access_cost` and `storage_access_cost`, but for the warm data only. This is because it can be estimated using the same methodology used here.
+The proposal modifies two formulas for `address_access_cost` and `storage_access_cost`, but for the warm data only. This is because it can be estimated using the same methodology used here. The cold access cost is multi-layered, and depends on the blockchain state, its size and data structure. Accurate measurements would require to devise more suitable methodology.
 
 The two storage opcodes, SLOAD and STORE, are indirectly updated. Their cost formulas are complex and only the warm/cold data access cost ratio is modified. Similarly for CREATE and CREATE2. Only the memory expansion cost factor is modified, which is computational and is consistent with other opcodes that may expand memory.
 
