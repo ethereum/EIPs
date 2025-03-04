@@ -21,7 +21,8 @@ Gas costs compromise of two components: network (social) cost and computation co
 While several EIPs (e.g., [EIP-160](eip-160.md), [EIP-1884](eip-1884.md)) have refined network-related gas costs, computational costs have remained largely static since Ethereum’s inception. With multiple EVM implementations now stable and optimized, alongside advanced tools, we can assess how well the current gas schedule aligns with hardware workload profiles.
 
 Measurements and estimations depend on various factors, including hardware, OS, virtualization, compiler, memory management, EVM, and more. The execution of a single opcode impacts or depends on caching, block preparation, block finalization, garbage collectors, code analysis, parsing etc. Consequently, the individual computational cost is a sum of multiple factors spread over the software stack. Despite this complexity, examinations have shown that the computational cost outline is consistent across EVM implementations, technology stacks, and contexts.
-For example, the overall execution cost of a given opcode can be twice as of another opcode for most EVM clients, so gas cost should be 2:1. This illustrates computational complexity, determined experimentally rather than theoretically. The gas cost schedule should, therefore, accurately reflect computational complexity.
+
+For instance, experimental data might reveal that the computational effort required to execute one opcode is consistently twice that of another opcode across most EVM implementations. In such cases, the gas cost ratio between these opcodes should be set at 2:1 to reflect their relative computational complexity. This approach relies on empirical measurements rather than theoretical assumptions. The gas cost schedule should, therefore, accurately reflect computational complexity.
 
 ### Note 1
 
@@ -196,9 +197,9 @@ This EIP intentionally focuses on computational complexity—measured as executi
 
 ### Impact of Gas Costs Changes
 
-Note that, it is safer to decrease because of Backwards Compatibility issues related to gas limits and hard-coded gas limits (see below). Deciding whether to increase or decrease gas costs for specific operations requires balancing efficiency and security. 
+Note that, it is safer to decrease because of Backwards Compatibility issues related to gas limits and hard-coded gas limits (see below). Deciding whether to increase or decrease gas costs for specific operations requires balancing efficiency and security.
 
-- Decreasing Gas Costs: Lowering costs for overpriced operations could improve network throughput by enabling more transactions per block, enhancing Ethereum’s scalability. However, if costs are reduced too aggressively, it risks underpricing computationally heavy tasks, potentially exposing the network to DoS attacks. 
+- Decreasing Gas Costs: Lowering costs for overpriced operations could improve network throughput by enabling more transactions per block, enhancing Ethereum’s scalability. However, if costs are reduced too aggressively, it risks underpricing computationally heavy tasks, potentially exposing the network to DoS attacks.
 - Increasing Gas Costs: Raising costs for underpriced operations strengthens security by deterring abuse but may increase transaction fees and reduce throughput.
 
 This EIP adopts a conservative strategy, prioritizing decreases for operations that empirical data show as overpriced, while ensuring no reductions compromise security. This approach aims to optimize efficiency without introducing new vulnerabilities.
@@ -207,26 +208,27 @@ This EIP adopts a conservative strategy, prioritizing decreases for operations t
 
 This proposal introduces a simplified `memory_expansion_cost` formula. The current formula combines a constant cost per word and an exponential cost, the latter added to prevent attacks exploiting excessive memory usage. Our findings, supported by [related projects](../assets/eip-xxxx/raxhvl_memory_exp_100M.png), indicate the constant cost per word is negligible and already accounted for in opcodes that expand memory. Thus, the revised formula retains only the exponential cost, preserving security while reducing overall gas costs. As a result, the first 22 words of memory incur no additional cost, as the exponential penalty begins beyond this threshold.
 
-Here is an estimated possible maximal memory allocation with a single opcode in words (32 bytes).
+#### Estimated Maximum Memory Allocation
 
-|  |Block limit 30M|Block limit 36M|Block limit 60M|
-|--------|--------|--------|---------|
-|The current gas schedule|123,169|134,998|174,504|
-|The proposed gas schedule|123,935|135,764|175,271|
+The tables below compare the maximum memory allocations under the current and proposed gas schedules, showed for different block gas limits.
 
-Here is an estimated possible maximal total memory allocation with multiple calls in words (32 bytes).
-The working benchmark is a single transaction that makes subcalls in a loop,
-and each subcall simply allocates memory, until the block limit is reached.
-Note that estimations regarding the proposed gas schedule take into account cheaper calls also. 
-This has an impact as a constant call cost. 
-So the most effective balance between a call cost and a memory expansion cost for a single call is attained 
-with 278 words for the current gas schedule
-and 93 words for the proposed gas schedule.
+**Single Opcode Memory Allocation:**
+This table shows the estimated maximum memory allocation achievable with a single opcode:
 
-|  |Block limit 30M|Block limit 36M|Block limit 60M|
-|--------|--------|--------|---------|
-|The current gas schedule|7,459,574|8,951,600|14,919,426|
-|The proposed gas schedule|82,058,736|98,470,539|164,117,565|
+| Block Gas Limit | Current Gas Schedule | Proposed Gas Schedule |
+|-----------------|----------------------|-----------------------|
+| 30M             | 123,169 words        | 123,935 words         |
+| 36M             | 134,998 words        | 135,764 words         |
+| 60M             | 174,504 words        | 175,271 words         |
+
+**Multiple Calls Memory Allocation:**
+This table estimates the maximum memory allocation achievable with a transaction that repeatedly makes subcalls in a loop, until block gas limit is reached. Each subcall allocates memory in the most effective way balancing call costs and memory expansion costs. For the current gas schedule, it is 278 words per call, and for the proposed gas schedule, it is 93 words per call.
+
+| Block Gas Limit | Current Gas Schedule | Proposed Gas Schedule |
+|-----------------|----------------------|-----------------------|
+| 30M             | 7,459,574 words      | 82,058,736 words      |
+| 36M             | 8,951,600 words      | 98,470,539 words      |
+| 60M             | 14,919,426 words     | 164,117,565 words     |
 
 ### Consideration of ZK-SNARK Proof Generation (EIP-7667)
 
@@ -240,43 +242,27 @@ Reducing computational gas costs aims to increase transaction throughput, allowi
 
 By implementing the proposal, the overall computational cost will decrease, while the storage costs remains the same. This reflects the improvements in EVM software efficiency and the cost of ever growing state. By increasing the relative gap between computational and storage costs, the proposal indirectly incentivizes developers to optimize their contracts and reduce the state size. This is a positive side effect of the proposal.
 
-### SLOAD
+### Address and Storage Access Cost
 
-The proposal modifies SLOAD. This is because SLOAD does not update the blockchain state. It is considered as a computational opcode executed locally by EVM client.
-Although, its computational cost may depend on the blockchain state, on the size, if a cold starage is accessed. See the note below.
-The proposal modifies SSTORE the same way. But note that the formula for SSTORE is complex and only warm/cold access cost factor is modified.
-It is consistent with SLOAD.
+The proposal modifies two formulas for `address_access_cost` and `storage_access_cost`, but for the warm data only. This is because the warm data access is considered as a computational cost that is executed locally by EVM client. Also it can be estimated using the same methodology as any other cost of this type. The cold data access is considered to be a network cost and is out of the scope of this proposal.
 
-Similary for CRATE and CREATE2. Only the memory expansion cost factor is modified, which is computational and is consistent with other opcodes that may expand memory.
+The two storage opcodes, SLOAD and STORE, are indirectly updated. Their cost formulas are complex and only the warm/cold access cost factor is modified. Similarly for CREATE and CREATE2. Only the memory expansion cost factor is modified, which is computational and is consistent with other opcodes that may expand memory.
 
-### COLD addresses and storage
+### Precompiles and Hashing
 
-The proposal modifies two formulas `address_access_cost` and `storage_access_cost`. But only for the warm data. The cost for the cold data remains. 
-Considering the methodology employed when constructing this proposal, it is straightforward to estimate computation complexity for accessing the warm data.
-The gas cost of accessing the cold data is out of the scope. 
+For the MODEXP precompile, this proposal assumes [EIP-7883](eip-7883.md) is adopted, and its gas cost remains unchanged. For ECPAIRING, the gas cost is reduced by approximately a factor of 5, consistent with similar adjustments in this proposal. Precompiles such as ECRECOVER, IDENTITY, ECADD, ECMUL, BLAKE2F, and POINTEVAL either retain their current gas costs or see moderate reductions.
 
-### Precompiles and hashing
+Projects like Nethermind's Gas Benchmarks highlight a security concern: lowering the gas cost for ECRECOVER could lead to the worst-case scenario where the block computation time exceeds safety threshold. A similar issue applies to MODEXP. As the result, the `rescale factor` cannot be lower that the proposed `0.217391304` even though there is a room for further reduction.
 
-Summary. 
-For MODEXP, the [EIP-7883](eip-7883.md) is assumed and the gas cost is not changed.
-For ECPAIRING, the gas cost is decreased by the factor around 5.
-This is similar as for other opcodes in this proposal.
-For ECRECOVER, IDENTITY, MODEXP, ECADD, ECMUL, BLAKE2F, POINTEVAL, the gas cost is not changed or moderately decreased.
-Other projects, for instance Nethermind's Gas Benchmarks, 
-showed that ECRECOVER gas cost cannot decrease for the security reason -- the worst case of block computation will take too long.
-The same for MODEXP.
-So the `rescale factor` set to `0.217391304` cannot be lowered, despite the fact that the gas cost figures are relative values.
-The point is that the block limit is set.
-The Gas Cost Estimator project implies that ECRECOVER gas cost should be moderately increased. 
-But it is not followed because: the change is negligible, a backwards compatibility risk is avoided.
+The Gas Cost Estimator project suggests a slight increase in ECRECOVER’s gas cost, but this proposal avoids that change to maintain backward compatibility and because the impact would be minor.
 
-There are the hasing precompiles SHA2-256, RIPEMD-160, BLAKE2F and the hashing opcode KECCAK256.
-[EIP-7667](./eip-7667.md) considers the worst cases of ZK proofs generations for blocks filled solely with hashing operations.
-Note that this proposal does not change the gas cost for BLAKE2F, 
-and does not change the per word gas cost for KECCAK256.
-It does change the per word gas cost for SHA2-256 and RIPEMD-160 - it is 3 times lower.
-But for SHA2-256 and RIPEMD-160 EIP-7667 is less radical.
-Thus this proposal does not make these edge cases of EIP-7667 worse.
+For hashing operations, this proposal covers the precompiles SHA2-256, RIPEMD-160, BLAKE2F, and the KECCAK256 opcode. Key updates include:
+
+- The gas cost for BLAKE2F remains unchanged.
+- The per-word gas cost for KECCAK256 stays the same.
+- For SHA2-256 and RIPEMD-160, the per-word gas cost is reduced by a factor of 3.
+
+[EIP-7667](./eip-7667.md) examines worst-case scenarios for generating ZK proofs in blocks filled entirely with hashing operations. Although this reduction for SHA2-256 and RIPEMD-160 might seem substantial, EIP-7667 takes a more conservative approach. Therefore, the changes proposed here do not worsen the edge cases outlined in that EIP.
 
 ## Backwards Compatibility
 
