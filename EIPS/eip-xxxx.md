@@ -244,9 +244,9 @@ By implementing the proposal, the overall computational cost will decrease, whil
 
 ### Address and Storage Access Cost
 
-The proposal modifies two formulas for `address_access_cost` and `storage_access_cost`, but for the warm data only. This is because the warm data access is considered as a computational cost that is executed locally by EVM client. Also it can be estimated using the same methodology as any other cost of this type. The cold data access is considered to be a network cost and is out of the scope of this proposal.
+The proposal modifies two formulas for `address_access_cost` and `storage_access_cost`, but for the warm data only. This is because it can be estimated using the same methodology used here.
 
-The two storage opcodes, SLOAD and STORE, are indirectly updated. Their cost formulas are complex and only the warm/cold access cost factor is modified. Similarly for CREATE and CREATE2. Only the memory expansion cost factor is modified, which is computational and is consistent with other opcodes that may expand memory.
+The two storage opcodes, SLOAD and STORE, are indirectly updated. Their cost formulas are complex and only the warm/cold data access cost ratio is modified. Similarly for CREATE and CREATE2. Only the memory expansion cost factor is modified, which is computational and is consistent with other opcodes that may expand memory.
 
 ### Precompiles and Hashing
 
