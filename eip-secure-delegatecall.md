@@ -50,9 +50,24 @@ A new EVM opcode `SDELEGATECALL` is introduced with the following properties:
 
 ## Rationale
 
-By returning the deployer's address, `SDELEGATECALL` allows contracts to make informed decisions about execution based on the origin of the target contract. This provides a crucial security check when executing external code, as contracts can verify if the deployer is an expected/trusted address before continuing execution.
+The SDELEGATECALL opcode represents a significant security enhancement over DELEGATECALL by exposing the deployer's address of the target contract. This design enables smart contracts to implement origin-based trust verification, allowing developers to make security decisions based on the provenance of external code rather than just its current address. With this information, contracts can maintain whitelists of trusted deployers and reject execution from unauthorized sources, effectively preventing many contract replacement attacks.
 
-The opcode enhances security while preserving the essential functionality of `DELEGATECALL`, making it straightforward for developers to adopt.
+This security improvement is achieved without sacrificing the core functionality that makes DELEGATECALL valuable for proxy patterns and other use cases. The opcode maintains backward compatibility with existing patterns while providing additional security guarantees.
+
+Below is a simple demonstrating the practical application:
+
+```solidity
+contract SecureProxy {
+   mapping(address => bool) public whiteListed;
+   ...
+   fallback()external payable  {
+   (success,deployer,byte memory data)=sdelegatecall(gas,addr,argsOffset, argsSize,retOffset, retSize);
+   if whiteListed[deployer]! =true{
+        revert();
+    }
+   ...
+}
+```
 
 ## Backwards Compatibility
 
