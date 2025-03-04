@@ -240,12 +240,14 @@ Reducing computational gas costs aims to increase transaction throughput, allowi
 
 By implementing the proposal, the overall computational cost will decrease, while the storage costs remains the same. This reflects the improvements in EVM software efficiency and the cost of ever growing state. By increasing the relative gap between computational and storage costs, the proposal indirectly incentivizes developers to optimize their contracts and reduce the state size. This is a positive side effect of the proposal.
 
-### SLOAD and SSTORE
+### SLOAD
 
 The proposal modifies SLOAD. This is because SLOAD does not update the blockchain state. It is considered as a computational opcode executed locally by EVM client.
 Although, its computational cost may depend on the blockchain state, on the size, if a cold starage is accessed. See the note below.
 The proposal modifies SSTORE the same way. But note that the formula for SSTORE is complex and only warm/cold access cost factor is modified.
 It is consistent with SLOAD.
+
+Similary for CRATE and CREATE2. Only the memory expansion cost factor is modified, which is computational and is consistent with other opcodes that may expand memory.
 
 ### COLD addresses and storage
 
