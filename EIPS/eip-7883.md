@@ -1,0 +1,160 @@
+---
+eip: 7883
+title: ModExp Gas Cost Increase
+description: Increases cost of ModExp precompile
+author: Marcin Sobczak (@marcindsobczak), Marek Moraczyński (@MarekM25), Marcos Maceo (@stdevMac)
+discussions-to: https://ethereum-magicians.org/t/eip-7883-modexp-gas-cost-increase/22841
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-02-11
+requires: 2565
+---
+
+## Abstract
+
+This EIP is modifying the `ModExp` precompile pricing algorithm introduced in [EIP-2565](./eip-2565.md).
+
+## Motivation
+
+There are cases where the `ModExp` precompile is underpriced for it's resource consumption. By modifying the `ModExp` pricing formula these scenarios would be covered with minimal impact on real world applications. The target is to make `ModExp` at least as fast as EcRecover precompile in all cases.
+
+## Specification
+
+Upon activation of this EIP, the gas cost of calling the precompile at address `0x0000000000000000000000000000000000000005` will be calculated as follows:
+
+```
+def calculate_multiplication_complexity(base_length, modulus_length):
+    max_length = max(base_length, modulus_length)
+    words = math.ceil(max_length / 8)
+    multiplication_complexity = 0
+    if max_length <= 32: multiplication_complexity = words**2
+    elif max_length > 32: multiplication_complexity = 2 * words**2
+    return multiplication_complexity
+
+def calculate_iteration_count(exponent_length, exponent):
+    iteration_count = 0
+    if exponent_length <= 32 and exponent == 0: iteration_count = 0
+    elif exponent_length <= 32: iteration_count = exponent.bit_length() - 1
+    elif exponent_length > 32: iteration_count = (16 * (exponent_length - 32)) + ((exponent & (2**256 - 1)).bit_length() - 1)
+    return max(iteration_count, 1)
+
+def calculate_gas_cost(base_length, modulus_length, exponent_length, exponent):
+    multiplication_complexity = calculate_multiplication_complexity(base_length, modulus_length)
+    iteration_count = calculate_iteration_count(exponent_length, exponent)
+    return max(500, math.floor(multiplication_complexity * iteration_count / 3))
+```
+
+Changes (with algorithm from [EIP-2565](./eip-2565.md)):
+
+### 1. Increase minimal price from 200 to 500
+
+This part of equation:
+
+```
+    return max(200, math.floor(multiplication_complexity * iteration_count / 3))
+```
+
+Is replaced by this:
+
+```
+    return max(500, math.floor(multiplication_complexity * iteration_count / 3))
+```
+
+### 2. Increase cost when exponent is larger than 32 bytes
+
+This part of equation:
+
+```
+    elif exponent_length > 32: iteration_count = (8 * (exponent_length - 32)) + ((exponent & (2**256 - 1)).bit_length() - 1)
+```
+
+Is replaced by this:
+
+```
+    elif exponent_length > 32: iteration_count = (16 * (exponent_length - 32)) + ((exponent & (2**256 - 1)).bit_length() - 1)
+```
+
+Multiplier 8 is replaced by 16.
+
+### 3. Increase cost when base or modulus is larger than 32 bytes
+
+This part of equation:
+
+```
+def calculate_multiplication_complexity(base_length, modulus_length):
+    max_length = max(base_length, modulus_length)
+    words = math.ceil(max_length / 8)
+    return words**2
+```
+
+Is replaced by this:
+
+```
+def calculate_multiplication_complexity(base_length, modulus_length):
+    max_length = max(base_length, modulus_length)
+    words = math.ceil(max_length / 8)
+    multiplication_complexity = 0
+    if max_length <= 32: multiplication_complexity = words**2
+    elif max_length > 32: multiplication_complexity = 2 * words**2
+    return multiplication_complexity
+```
+
+Multiplication complexity is doubled if base or modulus is bigger than 32 bytes.
+
+## Rationale
+
+After benchmarking the `ModExp` precompile, we identified certain scenarios that are underpriced and require repricing to ensure appropriate costs. Further research revealed that all underpriced edge cases can be addressed by adjusting the parameters in the current `ModExp` pricing formula. With these changes, the minimum cost for using the `ModExp` precompile will increase from 200 to 500 (a 150% increase), and the cost will scale higher when the `base`, `modulus`, or `exponent` exceed 32 bytes. These adjustments will ensure that the worst-performing edge cases of the `ModExp` precompile perform no worse than the `EcRecover` precompile.
+
+## Backwards Compatibility
+
+This change is backwards incompatible. However, similar gas repricings have occurred multiple times in the Ethereum ecosystem, and their effects are well understood.
+
+## Test Cases
+
+There are no changes to the underlying interface or arithmetic algorithms, so the existing test vectors can be reused. Below is a table with the updated test vectors:
+
+| Test Case                    | [EIP-2565](./eip-2565.md) Pricing | EIP-7883 Pricing | Increase |
+|------------------------------|-----|-----|----|
+| modexp_nagydani_1_square     | 200 | 500 | 150% |
+| modexp_nagydani_1_qube       | 200 | 500 | 150% |
+| modexp_nagydani_1_pow0x10001 | 341 | 682 | 100% |
+| modexp_nagydani_2_square     | 200 | 500 | 150% |
+| modexp_nagydani_2_qube       | 200 | 500 | 150% |
+| modexp_nagydani_2_pow0x10001 | 1365 | 2730 | 100% |
+| modexp_nagydani_3_square     | 341 | 682 | 100% |
+| modexp_nagydani_3_qube       | 341 | 682 | 100% |
+| modexp_nagydani_3_pow0x10001 | 5461 | 10922 | 100% |
+| modexp_nagydani_4_square     | 1365 | 2730 | 100% |
+| modexp_nagydani_4_qube       | 1365 | 2730 | 100% |
+| modexp_nagydani_4_pow0x10001 | 21845 | 43690 | 100% |
+| modexp_nagydani_5_square     | 5461 | 10922 | 100% |
+| modexp_nagydani_5_qube       | 5461 | 10922 | 100% |
+| modexp_nagydani_5_pow0x10001 | 87381 | 174762 | 100% |
+| modexp_marius_1_even         | 2057 | 3774 | 83% |
+| modexp_guido_1_even          | 2298 | 4261 | 85% |
+| modexp_guido_2_even          | 2300 | 4262 | 85% |
+| modexp_guido_3_even          | 5400 | 10800 | 100% |
+| modexp_guido_4_even          | 1026 | 1967 | 92% |
+| modexp_marcin_1_base_heavy   | 200 | 500 | 150% |
+| modexp_marcin_1_exp_heavy    | 215 | 500 | 133% |
+| modexp_marcin_1_balanced     | 200 | 500 | 150% |
+| modexp_marcin_2_base_heavy   | 867 | 1734 | 100% |
+| modexp_marcin_2_exp_heavy    | 852 | 1364 | 60% |
+| modexp_marcin_2_balanced     | 996 | 1992 | 100% |
+| modexp_marcin_3_base_heavy   | 677 | 677 | 0% |
+| modexp_marcin_3_exp_heavy    | 765 | 765 | 0% |
+| modexp_marcin_3_balanced     | 1360 | 1360 | 0% |
+
+
+## Reference Implementation
+
+[None]
+
+## Security Considerations
+
+There are no security concerns since no new functionality is introduced or made cheaper. The primary consideration for this EIP is the risk of potentially overpriced `ModExp` scenarios.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
