@@ -5,7 +5,11 @@ This EIP proposes the removal of the initcode size limit of 49152 bytes introduc
 
 ## Motivation
 
-[EIP-3860](https://eips.ethereum.org/EIPS/eip-3860) limits initcode size to 49152 bytes to cap JUMPDEST analysis costs during contract deployment. However, this restriction hinders deploying multiple contracts in one transaction, a pattern for working around [EIP-170](https://eips.ethereum.org/EIPS/eip-170)'s 24576-byte deployed code limit. The initcode gas metering already accounts for JUMPDEST analysis, making the size cap redundant and overly restrictive.
+The [EIP-3860](https://eips.ethereum.org/EIPS/eip-3860) initcode size limit imposes an unnecessary constraint on deployment patterns, particularly for create transactions creating large _logical_ contracts composed of multiple _physical sub-contracts_ in a single transaction.
+A key argument for retaining [EIP-170](https://eips.ethereum.org/EIPS/eip-170)'s 24KB runtime code limit is that high-level languages (HLLs) should abstract it away.
+However, the [EIP-3860](https://eips.ethereum.org/EIPS/eip-3860) limit prevents HLLs from cleanly abstracting this, as deploying large logical contracts exceeding 49152 bytes of initcode requires splitting into multiple transactions, undermining the abstraction.
+
+Removing the cap simplifies smart contract deployment and enables HLLs to cleanly abstract large contracts, without compromising network security or cost attribution.
 
 ## Specification
 Revert the initcode size limit introduced in [EIP-3860](https://eips.ethereum.org/EIPS/eip-3860). Specifically:
@@ -15,17 +19,22 @@ Revert the initcode size limit introduced in [EIP-3860](https://eips.ethereum.or
 No changes to deployed contract size limits ([EIP-170](https://eips.ethereum.org/EIPS/eip-170)) or gas schedules beyond removing the size restriction are proposed.
 
 ## Rationale
-The initcode size limit imposes an unnecessary constraint on deployment patterns, particularly for factory contracts creating multiple sub-contracts in a single transaction. Gas metering sufficiently covers the computational cost of JUMPDEST analysis, scaling linearly with initcode size. Removing the cap simplifies development without compromising network security or cost fairness.
+
+This proposal is driven by the need to restore flexibility in contract deployment patterns, such as factory contracts creating multiple sub-contracts in one transaction. The design decision to remove the 49152-byte cap leverages the pre-existing gas metering system, which scales linearly with initcode size (i.e., 2 gas per byte), ensuring fair cost attribution without artificial limits.
+
+A key justification for [EIP-170](https://eips.ethereum.org/EIPS/eip-170)'s 24576-byte limit is that high-level languages (HLLs) should abstract it away. However, [EIP-3860](https://eips.ethereum.org/EIPS/eip-3860)'s initcode cap undermines this by forcing multi-transaction deployments for large contracts, breaking the abstraction HLLs aim to provide. Removing the cap aligns with this philosophy by enabling single-transaction deployments.
+
+Alternative designs, such as increasing the cap (e.g., to 98304 bytes), were considered but rejected as arbitrary; gas metering already mitigates resource concerns. The per-block gas limit already naturally restricts initcode (at the current gas limit of 35 million, initcode is restricted to ~16mb).
+
 
 ## Backwards Compatibility
 This change is fully backwards compatible. Existing contracts and transactions remain unaffected, as the proposal only lifts a restriction without altering execution semantics or gas costs.
 
 ## Test Cases
 1. Deploy a transaction with initcode exceeding 49152 bytes, verifying successful execution.
-2. Confirm gas consumption matches existing metering (e.g., 2 gas per byte for JUMPDEST analysis) without additional penalties.
 
 ## Security Considerations
-No new security risks are introduced. The gas schedule already mitigates denial-of-service concerns by charging for initcode processing.
+No new security risks are introduced. The gas schedule already mitigates denial-of-service concerns by charging per-byte for initcode.
 
 ## Copyright
 Copyright and related rights waived via CC0.
