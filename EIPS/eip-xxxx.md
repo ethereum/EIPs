@@ -8,6 +8,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2025-02-05
+requires: 7883
 ---
 
 ## Abstract
@@ -22,13 +23,15 @@ While several EIPs (e.g., [EIP-160](eip-160.md), [EIP-1884](eip-1884.md)) have r
 
 Measurements and estimations depend on various factors, including hardware, OS, virtualization, compiler, memory management, EVM, and more. The execution of a single opcode impacts or depends on caching, block preparation, block finalization, garbage collectors, code analysis, parsing etc. Consequently, the individual computational cost is a sum of multiple factors spread over the software stack. Despite this complexity, examinations have shown that the computational cost outline is consistent across EVM implementations, technology stacks, and contexts.
 
+For instance, experimental data might reveal that the computational effort required to execute one opcode is consistently twice that of another opcode across most EVM implementations. In such cases, the gas cost ratio between these opcodes should be set at 2:1 to reflect their relative computational complexity. This approach relies on empirical measurements rather than theoretical assumptions. The gas cost schedule should, therefore, accurately reflect computational complexity.
+
 ### Note 1
 
 The current gas cost schedule differs in many places from the experimentally determined computational complexity. Many significant outliers have been identified, indicating a need for rebalancing. Many others are reasonable candidates to be rebalanced. The unbalanced gas cost schedule can: expose a risk to the network, open an attack vector, lead to false optimization, and break the principle that gas is the abstract unit of transaction execution effort.
 
 ### Note 2
 
-The gas cost schedule is inherently relative, adjustable as long as proportions hold. A substantial reduction in the computational costs contained in this proposal has two significant effects: it increases blockchain throughput in terms of transactions per block, and it increases the proportional weight of the network costs.
+The gas cost schedule is inherently relative, adjustable as long as proportions hold. A substantial reduction in the gas costs contained in this proposal has two significant effects: it increases blockchain throughput in terms of transactions per block, and it increases the proportional weight of the network costs.
 
 ## Specification
 
@@ -47,9 +50,6 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | `KECCAK_BASE_COST`                | `10`                 |
 | `KECCAK_PER_WORD_COST`            | `6`                  |
 | `COPY_PER_WORD_COST`              | `1`                  |
-| `LOG_BASE_COST`                   | `7`                  |
-| `LOG_PER_TOPIC_COST`              | `7`                  |
-| `LOG_PER_BYTE_COST`               | `8`                  |
 
 ### Cost formulas
 
@@ -58,95 +58,94 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | data_size | len(data) | The size of the data expressed as number of bytes |
 | data_word_size | (len(data) + 31) / 32 | The size of the data expressed as number of words |
 | exponent_byte_size | len(exponent) | The size in bytes of the exponent in the EXP opcode. |
-| topic_count | len(topics) | The number of topics in the LOGx opcode. |
 | sets_count | len(data) / 192 | The number of pair sets in the ECPAIRING precompile. |
 | memory_expansion_cost | memory_cost(current_word_size) - memory_cost(previous_word_size)  | The cost of expanding memory to `current_word_size` words from `previous_word_size` words. In a single context memory cannot contract, so the formula is always non-negative |
 | memory_cost | (memory_word_size ** 2) / 512  | The cost of memory for `data_word_size` words. |
 | memory_word_size | (memory_size + 31) / 32 | The size of the allocated memory expressed as number of words |
 | address_access_cost | 5 (warm) \| 2600 (cold)  | The cost of accessing warm and cold address data. |
-| storage_access_cost | 5 (warm) \| 2100 (cold)  | The cost of accessing warm and cold address data. |
+| storage_access_cost | 5 (warm) \| 2100 (cold)  | The cost of accessing warm and cold storage data. |
 
 ### Opcode Costs
 
 | Opcode | Name | Pre-change Gas | Gas Cost |
 | ------------- | ------------- | -------------: | -------------: |
-| 01 | ADD | 3 | BASE_OPCODE_COST |
-| 02 | MUL | 5 | BASE_OPCODE_COST |
-| 03 | SUB | 3 | BASE_OPCODE_COST |
-| 04 | DIV | 5 | BASE_OPCODE_COST |
-| 05 | SDIV | 5 | BASE_OPCODE_COST |
-| 06 | MOD | 5 | BASE_OPCODE_COST |
-| 07 | SMOD | 5 | BASE_OPCODE_COST |
-| 08 | ADDMOD | 8 | FAST_OPCODE_COST |
-| 09 | MULMOD | 8 | MID_OPCODE_COST |
-| 0A | EXP | 10 + 50 * exponent_byte_size | EXP_BASE_COST + EXP_PER_BYTE_COST * exponent_byte_size |
-| 0B | SIGNEXTEND | 5 | BASE_OPCODE_COST |
-| 10 | LT | 3 | BASE_OPCODE_COST |
-| 11 | GT | 3 | BASE_OPCODE_COST |
-| 12 | SLT | 3 | BASE_OPCODE_COST |
-| 13 | SGT | 3 | BASE_OPCODE_COST |
-| 14 | EQ | 3 | BASE_OPCODE_COST |
-| 15 | ISZERO | 3 | BASE_OPCODE_COST |
-| 16 | AND | 3 | BASE_OPCODE_COST |
-| 17 | OR | 3 | BASE_OPCODE_COST |
-| 18 | XOR | 3 | BASE_OPCODE_COST |
-| 19 | NOT | 3 | BASE_OPCODE_COST |
-| 1A | BYTE | 3 | BASE_OPCODE_COST |
-| 1B | SHL | 3 | BASE_OPCODE_COST |
-| 1C | SHR | 3 | BASE_OPCODE_COST |
-| 1D | SAR | 3 | BASE_OPCODE_COST |
-| 20 | KECCAK256 | 30 + 6 * data_word_size + memory_expansion_cost | KECCAK_BASE_COST + KECCAK_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 30 | ADDRESS | 2 | BASE_OPCODE_COST |
-| 32 | ORIGIN | 2 | BASE_OPCODE_COST |
-| 33 | CALLER | 2 | BASE_OPCODE_COST |
-| 34 | CALLVALUE | 2 | BASE_OPCODE_COST |
-| 35 | CALLDATALOAD | 3 | BASE_OPCODE_COST |
-| 36 | CALLDATASIZE | 2 | BASE_OPCODE_COST |
-| 37 | CALLDATACOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 38 | CODESIZE | 2 | BASE_OPCODE_COST |
-| 39 | CODECOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 3A | GASPRICE | 2 | BASE_OPCODE_COST |
-| 3B | EXTCODESIZE | address_access_cost | address_access_cost |
-| 3C | EXTCODECOPY | 0 + 3 * data_word_size + memory_expansion_cost + address_access_cost | COPY_PER_WORD_COST * data_word_size + memory_expansion_cost + address_access_cost |
-| 3D | RETURNDATASIZE | 2 | BASE_OPCODE_COST |
-| 3E | RETURNDATACOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 3F | EXTCODEHASH | address_access_cost | address_access_cost |
-| 41 | COINBASE | 2 | BASE_OPCODE_COST |
-| 42 | TIMESTAMP | 2 | BASE_OPCODE_COST |
-| 43 | NUMBER | 2 | BASE_OPCODE_COST |
-| 45 | GASLIMIT | 2 |  BASE_OPCODE_COST |
-| 46 | CHAINID | 2 | BASE_OPCODE_COST |
-| 47 | SELFBALANCE | 5 | BASE_OPCODE_COST |
-| 50 | POP | 2 | BASE_OPCODE_COST |
-| 51 | MLOAD | 3 | BASE_OPCODE_COST |
-| 52 | MSTORE | 3 + memory_expansion_cost | BASE_OPCODE_COST + memory_expansion_cost |
-| 53 | MSTORE8 | 3 + memory_expansion_cost | BASE_OPCODE_COST + memory_expansion_cost |
-| 56 | JUMP | 8 | BASE_OPCODE_COST |
-| 57 | JUMPI | 10 | BASE_OPCODE_COST |
-| 58 | PC | 2 | BASE_OPCODE_COST |
-| 59 | MSIZE | 2 | BASE_OPCODE_COST |
-| 5A | GAS | 2 | BASE_OPCODE_COST |
-| 5C | TLOAD | 100 | WARM_STORAGE_READ_COST |
-| 5D | TSTORE | 100 | WARM_STORAGE_READ_COST |
-| 5B | JUMPDEST | 1 | BASE_OPCODE_COST |
-| 5E | MCOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
-| 5F | PUSH0 | 2 | BASE_OPCODE_COST |
-| 60 - 7F | PUSHx | 3 | BASE_OPCODE_COST |
-| 80 - 8F | DUPx | 3 | BASE_OPCODE_COST |
-| 90 - 9F | SWAPx | 3 | BASE_OPCODE_COST |
-| A0 - A4 | LOGx | 375 + 375 \* topic_count + 8 \* data_size + memory_expansion_cost | LOG_BASE_COST + LOG_PER_TOPIC_COST \* topic_count + LOG_PER_BYTE_COST \* data_size + memory_expansion_cost |
+| 0x01 | ADD | 3 | BASE_OPCODE_COST |
+| 0x02 | MUL | 5 | BASE_OPCODE_COST |
+| 0x03 | SUB | 3 | BASE_OPCODE_COST |
+| 0x04 | DIV | 5 | BASE_OPCODE_COST |
+| 0x05 | SDIV | 5 | BASE_OPCODE_COST |
+| 0x06 | MOD | 5 | BASE_OPCODE_COST |
+| 0x07 | SMOD | 5 | BASE_OPCODE_COST |
+| 0x08 | ADDMOD | 8 | FAST_OPCODE_COST |
+| 0x09 | MULMOD | 8 | MID_OPCODE_COST |
+| 0x0A | EXP | 10 + 50 * exponent_byte_size | EXP_BASE_COST + EXP_PER_BYTE_COST * exponent_byte_size |
+| 0x0B | SIGNEXTEND | 5 | BASE_OPCODE_COST |
+| 0x10 | LT | 3 | BASE_OPCODE_COST |
+| 0x11 | GT | 3 | BASE_OPCODE_COST |
+| 0x12 | SLT | 3 | BASE_OPCODE_COST |
+| 0x13 | SGT | 3 | BASE_OPCODE_COST |
+| 0x14 | EQ | 3 | BASE_OPCODE_COST |
+| 0x15 | ISZERO | 3 | BASE_OPCODE_COST |
+| 0x16 | AND | 3 | BASE_OPCODE_COST |
+| 0x17 | OR | 3 | BASE_OPCODE_COST |
+| 0x18 | XOR | 3 | BASE_OPCODE_COST |
+| 0x19 | NOT | 3 | BASE_OPCODE_COST |
+| 0x1A | BYTE | 3 | BASE_OPCODE_COST |
+| 0x1B | SHL | 3 | BASE_OPCODE_COST |
+| 0x1C | SHR | 3 | BASE_OPCODE_COST |
+| 0x1D | SAR | 3 | BASE_OPCODE_COST |
+| 0x20 | KECCAK256 | 30 + 6 * data_word_size + memory_expansion_cost | KECCAK_BASE_COST + KECCAK_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x30 | ADDRESS | 2 | BASE_OPCODE_COST |
+| 0x31 | BALANCE | address_access_cost | address_access_cost |
+| 0x32 | ORIGIN | 2 | BASE_OPCODE_COST |
+| 0x33 | CALLER | 2 | BASE_OPCODE_COST |
+| 0x34 | CALLVALUE | 2 | BASE_OPCODE_COST |
+| 0x35 | CALLDATALOAD | 3 | BASE_OPCODE_COST |
+| 0x36 | CALLDATASIZE | 2 | BASE_OPCODE_COST |
+| 0x37 | CALLDATACOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x38 | CODESIZE | 2 | BASE_OPCODE_COST |
+| 0x39 | CODECOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x3A | GASPRICE | 2 | BASE_OPCODE_COST |
+| 0x3B | EXTCODESIZE | address_access_cost | address_access_cost |
+| 0x3C | EXTCODECOPY | 0 + 3 * data_word_size + memory_expansion_cost + address_access_cost | COPY_PER_WORD_COST * data_word_size + memory_expansion_cost + address_access_cost |
+| 0x3D | RETURNDATASIZE | 2 | BASE_OPCODE_COST |
+| 0x3E | RETURNDATACOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x3F | EXTCODEHASH | address_access_cost | address_access_cost |
+| 0x41 | COINBASE | 2 | BASE_OPCODE_COST |
+| 0x42 | TIMESTAMP | 2 | BASE_OPCODE_COST |
+| 0x43 | NUMBER | 2 | BASE_OPCODE_COST |
+| 0x45 | GASLIMIT | 2 |  BASE_OPCODE_COST |
+| 0x46 | CHAINID | 2 | BASE_OPCODE_COST |
+| 0x47 | SELFBALANCE | 5 | BASE_OPCODE_COST |
+| 0x50 | POP | 2 | BASE_OPCODE_COST |
+| 0x51 | MLOAD | 3 | BASE_OPCODE_COST |
+| 0x52 | MSTORE | 3 + memory_expansion_cost | BASE_OPCODE_COST + memory_expansion_cost |
+| 0x53 | MSTORE8 | 3 + memory_expansion_cost | BASE_OPCODE_COST + memory_expansion_cost |
+| 0x56 | JUMP | 8 | BASE_OPCODE_COST |
+| 0x57 | JUMPI | 10 | BASE_OPCODE_COST |
+| 0x58 | PC | 2 | BASE_OPCODE_COST |
+| 0x59 | MSIZE | 2 | BASE_OPCODE_COST |
+| 0x5A | GAS | 2 | BASE_OPCODE_COST |
+| 0x5C | TLOAD | 100 | WARM_STORAGE_READ_COST |
+| 0x5D | TSTORE | 100 | WARM_STORAGE_READ_COST |
+| 0x5B | JUMPDEST | 1 | BASE_OPCODE_COST |
+| 0x5E | MCOPY | 3 + 3 * data_word_size + memory_expansion_cost | BASE_OPCODE_COST + COPY_PER_WORD_COST * data_word_size + memory_expansion_cost |
+| 0x5F | PUSH0 | 2 | BASE_OPCODE_COST |
+| 0x60 - 0x7F | PUSHx | 3 | BASE_OPCODE_COST |
+| 0x80 - 0x8F | DUPx | 3 | BASE_OPCODE_COST |
+| 0x90 - 0x9F | SWAPx | 3 | BASE_OPCODE_COST |
 
 ### Precompiles Costs
 
 | Precompile | Name | Current Gas | Proposed Gas |
 | ------------- | ------------- | -------------: |  -------------: |
-| 02 | SHA2-256 | 60 + 12 * data_word_size | 10 + 4 * data_word_size |
-| 03 | RIPEMD-160 | 600 + 120 * data_word_size | 60 + 40 * data_word_size |
-| 07 | ECMUL | 6000 |  2700 |
-| 08 | ECPAIRING | 45000 + 34000 * sets_count | 8000 + 7000 * sets_count |
-| 0A | POINTEVAL | 50000 | 21000 |
+| 0x02 | SHA2-256 | 60 + 12 * data_word_size | 10 + 4 * data_word_size |
+| 0x03 | RIPEMD-160 | 600 + 120 * data_word_size | 60 + 40 * data_word_size |
+| 0x07 | ECMUL | 6000 |  2700 |
+| 0x08 | ECPAIRING | 45000 + 34000 * sets_count | 8000 + 7000 * sets_count |
+| 0x0A | POINTEVAL | 50000 | 21000 |
 
-The cost of 01 (ECRECOVER), 04 (IDENTITY), 05 (MODEXP) and 09 (BLAKE2F) precompiles remains unchanged. The calculated and rescaled cost of 06 (ECADD) is higher than the current cost. Still this cost is left unchanged to maintain compatibility with existing contracts.
+The cost of 0x01 (ECRECOVER), 0x04 (IDENTITY), 0x05 (MODEXP) and 0x09 (BLAKE2F) precompiles remains unchanged. The calculated and rescaled cost of 0x06 (ECADD) is higher than the current cost. Still this cost is left unchanged to maintain compatibility with existing contracts.
 
 Additionally, all precompiles benefit from the lowered cost of *CALL opcodes (see below).
 
@@ -156,15 +155,15 @@ The formula for these opcodes remains the same, but the total cost calculated is
 
 | Opcode | Name | Affected formula component |
 | ------------- | ------------- | ------------- |
-| 54 | SLOAD | storage_access_cost |
-| 55 | SSTORE | storage_access_cost |
-| F0 | CREATE | memory_expansion_cost |
-| F5 | CREATE2 | memory_expansion_cost |
-| F1 | CALL | memory_expansion_cost, address_access_cost |
-| FA | STATICCALL | memory_expansion_cost, address_access_cost |
-| F4 | DELEGATECALL | memory_expansion_cost, address_access_cost |
-| F3 | RETURN | memory_expansion_cost |
-| FD | REVERT | memory_expansion_cost |
+| 0x54 | SLOAD | storage_access_cost |
+| 0x55 | SSTORE | storage_access_cost |
+| 0xF0 | CREATE | memory_expansion_cost |
+| 0xF5 | CREATE2 | memory_expansion_cost |
+| 0xF1 | CALL | memory_expansion_cost, address_access_cost |
+| 0xFA | STATICCALL | memory_expansion_cost, address_access_cost |
+| 0xF4 | DELEGATECALL | memory_expansion_cost, address_access_cost |
+| 0xF3 | RETURN | memory_expansion_cost |
+| 0xFD | REVERT | memory_expansion_cost |
 
 ## Rationale
 
@@ -199,9 +198,9 @@ This EIP intentionally focuses on computational complexity—measured as executi
 
 ### Impact of Gas Costs Changes
 
-Note that, it is safer to decrease because of Backwards Compatibility issues related to gas limits and hard-coded gas limits (see below). Deciding whether to increase or decrease gas costs for specific operations requires balancing efficiency and security. 
+Note that, it is safer to decrease because of Backwards Compatibility issues related to gas limits and hard-coded gas limits (see below). Deciding whether to increase or decrease gas costs for specific operations requires balancing efficiency and security.
 
-- Decreasing Gas Costs: Lowering costs for overpriced operations could improve network throughput by enabling more transactions per block, enhancing Ethereum’s scalability. However, if costs are reduced too aggressively, it risks underpricing computationally heavy tasks, potentially exposing the network to DoS attacks. 
+- Decreasing Gas Costs: Lowering costs for overpriced operations could improve network throughput by enabling more transactions per block, enhancing Ethereum’s scalability. However, if costs are reduced too aggressively, it risks underpricing computationally heavy tasks, potentially exposing the network to DoS attacks.
 - Increasing Gas Costs: Raising costs for underpriced operations strengthens security by deterring abuse but may increase transaction fees and reduce throughput.
 
 This EIP adopts a conservative strategy, prioritizing decreases for operations that empirical data show as overpriced, while ensuring no reductions compromise security. This approach aims to optimize efficiency without introducing new vulnerabilities.
@@ -209,6 +208,28 @@ This EIP adopts a conservative strategy, prioritizing decreases for operations t
 ### Memory expansion cost
 
 This proposal introduces a simplified `memory_expansion_cost` formula. The current formula combines a constant cost per word and an exponential cost, the latter added to prevent attacks exploiting excessive memory usage. Our findings, supported by [related projects](../assets/eip-xxxx/raxhvl_memory_exp_100M.png), indicate the constant cost per word is negligible and already accounted for in opcodes that expand memory. Thus, the revised formula retains only the exponential cost, preserving security while reducing overall gas costs. As a result, the first 22 words of memory incur no additional cost, as the exponential penalty begins beyond this threshold.
+
+#### Estimated Maximum Memory Allocation
+
+The tables below compare the maximum memory allocations under the current and proposed gas schedules, showed for different block gas limits.
+
+**Single Opcode Memory Allocation:**
+This table shows the estimated maximum memory allocation achievable with a single opcode:
+
+| Block Gas Limit | Current Gas Schedule | Proposed Gas Schedule |
+|-----------------|----------------------|-----------------------|
+| 30M             | 123,169 words        | 123,935 words         |
+| 36M             | 134,998 words        | 135,764 words         |
+| 60M             | 174,504 words        | 175,271 words         |
+
+**Multiple Calls Memory Allocation:**
+This table estimates the maximum memory allocation achievable with a transaction that repeatedly makes subcalls in a loop, until block gas limit is reached. Each subcall allocates memory in the most effective way balancing call costs and memory expansion costs. For the current gas schedule, it is 278 words per call, and for the proposed gas schedule, it is 93 words per call.
+
+| Block Gas Limit | Current Gas Schedule | Proposed Gas Schedule |
+|-----------------|----------------------|-----------------------|
+| 30M             | 7,459,574 words      | 82,058,736 words      |
+| 36M             | 8,951,600 words      | 98,470,539 words      |
+| 60M             | 14,919,426 words     | 164,117,565 words     |
 
 ### Consideration of ZK-SNARK Proof Generation (EIP-7667)
 
@@ -221,6 +242,28 @@ Reducing computational gas costs aims to increase transaction throughput, allowi
 ### Consideration of Storage Costs
 
 By implementing the proposal, the overall computational cost will decrease, while the storage costs remains the same. This reflects the improvements in EVM software efficiency and the cost of ever growing state. By increasing the relative gap between computational and storage costs, the proposal indirectly incentivizes developers to optimize their contracts and reduce the state size. This is a positive side effect of the proposal.
+
+### Address and Storage Access Cost
+
+The proposal modifies two formulas for `address_access_cost` and `storage_access_cost`, but for the warm data only. This is because it can be estimated using the same methodology used here. The cold access cost is multi-layered, and depends on the blockchain state, its size and data structure. Accurate measurements would require to devise more suitable methodology.
+
+The two storage opcodes, SLOAD and STORE, are indirectly updated. Their cost formulas are complex and only the warm/cold data access cost ratio is modified. Similarly for CREATE and CREATE2. Only the memory expansion cost factor is modified, which is computational and is consistent with other opcodes that may expand memory.
+
+### Precompiles and Hashing
+
+For the MODEXP precompile, this proposal assumes [EIP-7883](eip-7883.md) is adopted, and its gas cost remains unchanged. For ECPAIRING, the gas cost is reduced by approximately a factor of 5, consistent with similar adjustments in this proposal. Precompiles such as ECRECOVER, IDENTITY, ECADD, ECMUL, BLAKE2F, and POINTEVAL either retain their current gas costs or see moderate reductions.
+
+Projects like Nethermind's Gas Benchmarks highlight a security concern: lowering the gas cost for ECRECOVER could lead to the worst-case scenario where the block computation time exceeds safety threshold. A similar issue applies to MODEXP. As the result, the `rescale factor` cannot be lower that the proposed `0.217391304` even though there is a room for further reduction. Note that the maximum number of operations in a block depends on the gas cost schedule and the block gas limit.
+
+The Gas Cost Estimator project suggests a slight increase in ECRECOVER’s gas cost, but this proposal avoids that change to maintain backward compatibility and because the impact would be minor.
+
+For hashing operations, this proposal covers the precompiles SHA2-256, RIPEMD-160, BLAKE2F, and the KECCAK256 opcode. Key updates include:
+
+- The gas cost for BLAKE2F remains unchanged.
+- The per-word gas cost for KECCAK256 stays the same.
+- For SHA2-256 and RIPEMD-160, the per-word gas cost is reduced by a factor of 3.
+
+[EIP-7667](./eip-7667.md) examines worst-case scenarios for generating ZK proofs in blocks filled entirely with hashing operations. Although this reduction for SHA2-256 and RIPEMD-160 might seem substantial, EIP-7667 takes a more conservative approach. Therefore, the changes proposed here do not worsen the edge cases outlined in that EIP.
 
 ## Backwards Compatibility
 
@@ -300,9 +343,6 @@ const (
   Keccak256Gas        uint64 = 10 // Once per KECCAK256 operation.
   Keccak256WordGas    uint64 = 6  // One per word of the KECCAK256 operation's data.
   CopyGas             uint64 = 1  // One per word of the copied code (CALLDATACOPY, CODECOPY, EXTCODECOPY, RETURNDATACOPY, MCOPY)
-  LogGas              uint64 = 7  // Per LOG* operation.
-  LogTopicGas         uint64 = 7  // Multiplied by the * of the LOG*, per LOG transaction. e.g. LOG0 incurs 0, LOG4 incurs 4
-  LogDataGas          uint64 = 8  // Per byte in a LOG* operation's data.
 )
 
 func newRepricedInstructionSet() JumpTable {
