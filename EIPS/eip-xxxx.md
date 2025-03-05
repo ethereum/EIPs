@@ -1,4 +1,15 @@
-# EIP: [Number TBD] - Remove Initcode Size Limit
+---
+eip: <TBD>
+title: Remove Initcode Size Limit
+description: Removes the initcode size limit introduced in EIP-3860
+author: Charles Cooper (@charles-cooper)
+discussions-to: tbd
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-05-5
+requires: 170, 3860
+---
 
 ## Abstract
 This EIP proposes the removal of the initcode size limit of 49152 bytes introduced in [EIP-3860](https://eips.ethereum.org/EIPS/eip-3860). The restriction complicates deploying multiple contracts addressing the [EIP-170](https://eips.ethereum.org/EIPS/eip-170) limit (24576 bytes) within a single transaction, while the existing gas metering for initcode, including JUMPDEST analysis, already ensures fair cost attribution.
