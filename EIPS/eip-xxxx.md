@@ -12,7 +12,7 @@ requires: 170, 3860
 ---
 
 ## Abstract
-This EIP proposes the removal of the initcode size limit of 49152 bytes introduced in [EIP-3860](https://eips.ethereum.org/EIPS/eip-3860). The restriction complicates deploying multiple contracts addressing the [EIP-170](https://eips.ethereum.org/EIPS/eip-170) limit (24576 bytes) within a single transaction, while the existing gas metering for initcode, including JUMPDEST analysis, already ensures fair cost attribution.
+This EIP proposes the removal of the initcode size limit of 49152 bytes introduced in [EIP-3860](https://eips.ethereum.org/EIPS/eip-3860). The restriction complicates deploying multiple contracts addressing the [EIP-170](https://eips.ethereum.org/EIPS/eip-170) limit (24576 bytes) within a single transaction, while the existing gas metering for initcode, already ensures fair initcode costing, including for JUMPDEST analysis.
 
 ## Motivation
 
@@ -45,7 +45,7 @@ This change is fully backwards compatible. Existing contracts and transactions r
 1. Deploy a transaction with initcode exceeding 49152 bytes, verifying successful execution.
 
 ## Security Considerations
-No new security risks are introduced. The gas schedule already mitigates denial-of-service concerns by charging per-byte for initcode.
+No new security risks are introduced. The current gas schedule already mitigates denial-of-service concerns by charging per-byte for initcode.
 
 ## Copyright
 Copyright and related rights waived via CC0.
