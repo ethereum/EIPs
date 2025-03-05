@@ -1,8 +1,9 @@
 ---
+eip: <TBD>
 title: General Repricing
 description: Gas Cost Repricing to reflect computational complexity and transaction throughput increase
 author: Jacek Glen (@JacekGlen), Lukasz Glen (@lukasz-glen)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/gas-cost-repricing-to-reflect-computational-complexity/23067
 status: Draft
 type: Standards Track
 category: Core
