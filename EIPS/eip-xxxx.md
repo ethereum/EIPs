@@ -3,7 +3,7 @@ eip: <TBD>
 title: Remove Initcode Size Limit
 description: Removes the initcode size limit introduced in EIP-3860
 author: Charles Cooper (@charles-cooper)
-discussions-to: tbd
+discussions-to: https://ethereum-magicians.org/t/remove-initcode-size-limit/23066
 status: Draft
 type: Standards Track
 category: Core
