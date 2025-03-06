@@ -1,5 +1,5 @@
 ---
-eip: <TBD>
+eip: 7901
 title: General Repricing
 description: Gas Cost Repricing to reflect computational complexity and transaction throughput increase
 author: Jacek Glen (@JacekGlen), Lukasz Glen (@lukasz-glen)
@@ -222,15 +222,15 @@ but the total cost calculated is affected by changes to some components.
 
 ### Gas Cost Estimator Project
 
-The [Gas Cost Estimator](../assets/eip-xxxx/gas-cost-estimator-report.pdf)
+The [Gas Cost Estimator](../assets/eip-7901/gas-cost-estimator-report.pdf)
 project serves as the empirical foundation for this EIP.
 This project conducted extensive testing
 across seven widely-used EVM implementations to measure
 the actual computational effort required by various opcodes and operations.
 Conducted in a controlled environment to eliminate external variables,
 the tests produced accurate and reproducible
-[results](../assets/eip-xxxx/final_gas_schedule_comparison.csv).
-The [findings](../assets/eip-xxxx/gas-cost-estimator.html)
+[results](../assets/eip-7901/final_gas_schedule_comparison.csv).
+The [findings](../assets/eip-7901/gas-cost-estimator.html)
 highlight misalignments between the current gas cost schedule
 and the real-world computational complexity of EVM operations.
 By recalibrating gas costs based on these measurements,
@@ -238,7 +238,7 @@ this EIP seeks to align pricing with computational reality,
 thereby improving Ethereum’s performance and resilience.
 
 This EIP is based on the
-[radical](../assets/eip-xxxx/gas-cost-estimator-proposal.pdf) proposal
+[radical](../assets/eip-7901/gas-cost-estimator-proposal.pdf) proposal
 from the Gas Cost Estimator project.
 This means that all estimates have been additionally rescaled
 so that basic arithmetic operations cost just 1 gas unit.
@@ -328,7 +328,7 @@ This proposal introduces a simplified `memory_expansion_cost` formula.
 The current formula combines a constant cost per word and an exponential cost,
 the latter added to prevent attacks exploiting excessive memory usage.
 Our findings, supported by
-[related projects](../assets/eip-xxxx/raxhvl_memory_exp_100M.png),
+[related projects](../assets/eip-7901/raxhvl_memory_exp_100M.png),
 indicate the constant cost per word is negligible
 and already accounted for in opcodes that expand memory.
 Thus, the revised formula retains only the exponential cost,
