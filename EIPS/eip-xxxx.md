@@ -43,7 +43,6 @@ Alternative designs, such as increasing the cap (e.g., to 98304 bytes), were con
 This change is fully backwards compatible. Existing contracts and transactions remain unaffected, as the proposal only lifts a restriction without altering execution semantics or gas costs.
 
 ## Test Cases
-1. Deploy a transaction with initcode exceeding 49152 bytes, verifying successful execution.
 
 ## Security Considerations
 No new security risks are introduced. The current gas schedule already mitigates denial-of-service concerns by charging per-byte for initcode.
