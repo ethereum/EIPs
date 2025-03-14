@@ -2,7 +2,7 @@
 title: Remove Contract Code Size Limit
 description: Removes the contract code size limit introduced in EIP-170 and adds a gas metering to code loading
 author: Charles Cooper (@charles-cooper)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-remove-contract-size-limit/23156
 status: Draft
 type: Standards Track
 category: Core
