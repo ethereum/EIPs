@@ -1,37 +1,30 @@
 governance:
   - lightclient
-  - axic
-  - gcolvin
   - SamWilsn
   - xinbenlv
   - g11tech
 core:
   - lightclient
-  - axic
-  - gcolvin
   - SamWilsn
   - g11tech
 erc:
-  - axic
   - SamWilsn
   - xinbenlv
 networking:
   - lightclient
-  - axic
   - SamWilsn
+  - g11tech
 interface:
   - lightclient
-  - axic
   - SamWilsn
+  - g11tech
 meta:
   - lightclient
-  - axic
-  - gcolvin
   - SamWilsn
   - xinbenlv
+  - g11tech
 informational:
   - lightclient
-  - axic
-  - gcolvin
   - SamWilsn
   - xinbenlv
+  - g11tech

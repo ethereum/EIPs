@@ -87,7 +87,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 A PR moving an EIP from Last Call to Final SHOULD contain no changes other than the status update. Any content or editorial proposed change SHOULD be separate from this status-updating PR and committed prior to it.
 
-**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status.
+**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or its earlier status. If not resurrected, a proposal may stay forever in this status.
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
@@ -216,6 +216,28 @@ Permitted Execution Client Specifications URLs must anchor to a specific commit,
 ^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
+### Execution Specification Tests
+
+Links to the Ethereum Execution Specification Tests (EEST) may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+
+Permitted Execution Specification Tests URLs must anchor to a specific commit, and so must match one of these regular expressions:
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/(blob|tree)/[a-f0-9]{40}/.+$
+```
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/commit/[a-f0-9]{40}$
+```
+
 ### Consensus Layer Specifications
 
 Links to specific commits of files within the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
@@ -250,6 +272,24 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 
 ```regex
 ^https://github.com/ethereum/devp2p/(blob|commit)/[0-9a-f]{40}/.*$
+```
+
+### Portal Specifications
+
+Links to specific commits of files within the Ethereum Portal Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+```
+
+Which renders as:
+
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+
+Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/portal-network-specs/(blob|commit)/[0-9a-f]{40}/.*$
 ```
 
 ### World Wide Web Consortium (W3C)
@@ -337,6 +377,24 @@ Links to the Common Vulnerabilities and Exposures (CVE) system as published by t
 Which renders to:
 
 [CVE-2023-29638 (2023-10-17T10:14:15)](https://nvd.nist.gov/vuln/detail/CVE-2023-29638)
+
+### Chain Agnostic Improvement Proposals (CAIPs)
+
+Links to a Chain Agnostic Improvement Proposals (CAIPs) specification may be included using normal markdown syntax, such as:
+
+```markdown
+[CAIP 10](https://github.com/ChainAgnostic/CAIPs/blob/5dd3a2f541d399a82bb32590b52ca4340b09f08b/CAIPs/caip-10.md)
+```
+
+Which renders to:
+
+[CAIP 10](https://github.com/ChainAgnostic/CAIPs/blob/5dd3a2f541d399a82bb32590b52ca4340b09f08b/CAIPs/caip-10.md)
+
+Permitted Chain Agnostic URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ChainAgnostic/CAIPs/blob/[0-9a-f]{40}/CAIPs/caip-[0-9]+\.md)$
+```
 
 ### Ethereum Yellow Paper
 
@@ -467,8 +525,6 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 
 The current EIP editors are
 
-- Alex Beregszaszi (@axic)
-- Greg Colvin (@gcolvin)
 - Matt Garnett (@lightclient)
 - Sam Wilson (@SamWilsn)
 - Zainan Victor Zhou (@xinbenlv)
@@ -476,8 +532,10 @@ The current EIP editors are
 
 Emeritus EIP editors are
 
+- Alex Beregszaszi (@axic)
 - Casey Detrio (@cdetrio)
 - Gavin John (@Pandapip1)
+- Greg Colvin (@gcolvin)
 - Hudson Jameson (@Souptacular)
 - Martin Becze (@wanderer)
 - Micah Zoltu (@MicahZoltu)

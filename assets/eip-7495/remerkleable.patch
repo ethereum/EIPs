@@ -1,0 +1,61 @@
+diff --git a/remerkleable/complex.py b/remerkleable/complex.py
+index 5971925..0483095 100644
+--- a/remerkleable/complex.py
++++ b/remerkleable/complex.py
+@@ -5,7 +5,8 @@ from textwrap import indent
+ from collections.abc import Sequence as ColSequence
+ from itertools import chain
+ import io
+-from remerkleable.core import View, BasicView, OFFSET_BYTE_LENGTH, ViewHook, ObjType, ObjParseException
++from remerkleable.core import View, BackedView, BasicView, OFFSET_BYTE_LENGTH,\
++    ViewHook, ObjType, ObjParseException
+ from remerkleable.basic import uint256, uint8, uint32
+ from remerkleable.tree import Node, subtree_fill_to_length, subtree_fill_to_contents,\
+     zero_node, Gindex, PairNode, to_gindex, NavigationError, get_depth, RIGHT_GINDEX
+@@ -107,6 +108,11 @@ class MonoSubtreeView(ColSequence, ComplexView):
+             else:
+                 return ComplexElemIter(backing, tree_depth, length, elem_type)
+
++    def check_backing(self):
++        for el in self:
++            if isinstance(el, BackedView):
++                el.check_backing()
++
+     @classmethod
+     def deserialize(cls: Type[M], stream: BinaryIO, scope: int) -> M:
+         elem_cls = cls.element_cls()
+@@ -714,6 +720,11 @@ class _ContainerBase(ComplexView):
+     def fields(cls) -> Fields:  # base condition for the subclasses deriving the fields
+         return {}
+
++    def check_backing(self):
++        for el in self:
++            if isinstance(el, BackedView):
++                el.check_backing()
++
+
+ class Container(_ContainerBase):
+     _field_indices: Dict[str, int]
+diff --git a/remerkleable/core.py b/remerkleable/core.py
+index cac08d9..91e89ed 100644
+--- a/remerkleable/core.py
++++ b/remerkleable/core.py
+@@ -247,6 +247,18 @@ class BackedView(View):
+         if self._hook is not None:
+             self._hook(self)
+
++    def check_backing(self):
++        pass
++
++    @classmethod
++    def from_base(cls: Type[BackedV], value) -> BackedV:
++        res = cls(backing=value.get_backing())
++        res.check_backing()
++        return res
++
++    def to_base(self, cls: Type[BackedV]) -> BackedV:
++        return cls(backing=self.get_backing())
++
+
+ BV = TypeVar('BV', bound="BasicView")
+
