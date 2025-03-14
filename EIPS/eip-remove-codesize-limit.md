@@ -1,0 +1,53 @@
+---
+title: Remove Contract Code Size Limit
+description: Removes the contract code size limit introduced in EIP-170 and adds a gas metering to code loading
+author: Charles Cooper (@charles-cooper)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-03-14
+requires: 170
+---
+
+## Abstract
+
+This EIP removes the hard contract code size limit of 24KB (24576 bytes) introduced in [EIP-170](./eip-170.md) and replaces it with a gas-based mechanism. It introduces a gas cost of 2 gas per (32 byte) word for contract code exceeding 24KB, allowing deployment of contracts of any size while preventing DoS attacks through appropriate gas metering.
+
+## Motivation
+
+EIP-170 introduced a 24KB contract code size limit to prevent potential DoS attacks, as large contract code requires O(n) resource cost in terms of disk reads, VM preprocessing, and Merkle proof sizes, all of which are not directly compensated by gas fees. However, this hard limit restricts legitimate use cases for large contracts.
+
+Rather than imposing an arbitrary size limit, this EIP proposes a gas-based solution that allows contracts of any size while ensuring that users loading very large contracts pay gas proportional to the additional resources they consume. This approach aligns with Ethereum's gas model philosophy of paying for the resources consumed.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+1. Remove the contract code size limit of 24KB (`0x6000` bytes) introduced in EIP-170.
+2. Change the gas schedule for opcodes which load code. Specifically, the `CALL`, `STATICCALL`, `DELEGATECALL`, `CALLCODE`, and `EXTCODESIZE` opcodes are modified so that `ceil32(excess_contract_size) * 2 // 32` gas is deducted, where `excess_contract_size = max(0, contract_size - 0x6000)`. (Cf. initcode metering: [EELS](https://github.com/ethereum/execution-specs/blob/1a587803e3e698407d204888b02342393f8b4fe5/src/ethereum/cancun/vm/gas.py#L269))
+
+## Rationale
+
+The gas cost of 2 per word was chosen in-line with EIP-3860. This accounts for:
+1. The additional disk I/O for retrieving larger contract code
+2. The increased computational resources for preprocessing larger code for execution (a.k.a. "JUMPDEST analysis").
+3. The growth in Merkle proof sizes for blocks containing very large contracts
+
+This EIP introduces the gas cost as an additional cost for contracts exceeding 24KB. It could have been specified as a simpler `ceil32(contract_size) * 2 // 32`, without hardcoding the existing contract size limit. However, for the sake of being conservative and avoiding lowering the cost of loading existing contracts (which could be small, under the 24KB limit), the 24KB floor was added to the formula.
+
+## Backwards Compatibility
+
+This EIP is backward compatible with existing contracts. All contracts that were valid before this EIP will remain valid after it, and their gas costs will not change.
+
+The only change is that new contracts larger than 24KB will be allowed, whereas they were previously rejected regardless of available gas.
+
+## Test Cases
+
+## Reference Implementation
+
+## Security Considerations
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
