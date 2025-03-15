@@ -25,7 +25,7 @@ Rather than imposing an arbitrary size limit, this EIP proposes a gas-based solu
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 1. Remove the contract code size limit of 24KB (`0x6000` bytes) introduced in EIP-170.
-2. Change the gas schedule for opcodes which load code. Specifically, the `CALL`, `STATICCALL`, `DELEGATECALL`, `CALLCODE`, and `EXTCODESIZE` opcodes are modified so that `ceil32(excess_contract_size) * 2 // 32` gas is deducted, where `excess_contract_size = max(0, contract_size - 0x6000)`. (Cf. initcode metering: [EELS](https://github.com/ethereum/execution-specs/blob/1a587803e3e698407d204888b02342393f8b4fe5/src/ethereum/cancun/vm/gas.py#L269))
+2. Change the gas schedule for opcodes which load code. Specifically, the `CALL`, `STATICCALL`, `DELEGATECALL`, `CALLCODE`, `EXTCODESIZE` and `EXTCODECOPY` opcodes are modified so that `ceil32(excess_contract_size) * 2 // 32` gas is deducted, where `excess_contract_size = max(0, contract_size - 0x6000)`. (Cf. initcode metering: [EELS](https://github.com/ethereum/execution-specs/blob/1a587803e3e698407d204888b02342393f8b4fe5/src/ethereum/cancun/vm/gas.py#L269))
 
 ## Rationale
 
@@ -35,6 +35,8 @@ The gas cost of 2 per word was chosen in-line with EIP-3860. This accounts for:
 3. The growth in Merkle proof sizes for blocks containing very large contracts
 
 This EIP introduces the gas cost as an additional cost for contracts exceeding 24KB. It could have been specified as a simpler `ceil32(contract_size) * 2 // 32`, without hardcoding the existing contract size limit. However, for the sake of being conservative and avoiding lowering the cost of loading existing contracts (which could be small, under the 24KB limit), the 24KB floor was added to the formula.
+
+`EXTCODESIZE` and `EXTCODECOPY` opcodes could theoretically be exempt from this, since clients could just load the parts of the bytecode which are actually requested. However, this might require a change at the p2p level. It also is trickier for clients to implement in general. For this reason, `EXTCODESIZE` and `EXTCODECOPY` are included in the pricing scheme, and a carveout for them could be considered at a later date.
 
 ## Backwards Compatibility
 
