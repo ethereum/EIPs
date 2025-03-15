@@ -25,7 +25,7 @@ Rather than imposing an arbitrary size limit, this EIP proposes a gas-based solu
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 1. Remove the contract code size limit of 24KB (`0x6000` bytes) introduced in EIP-170.
-2. Change the gas schedule for opcodes which load code. Specifically, the `CALL`, `STATICCALL`, `DELEGATECALL`, `CALLCODE`, `EXTCODESIZE` and `EXTCODECOPY` opcodes are modified so that `ceil32(excess_contract_size) * 2 // 32` gas is deducted, where `excess_contract_size = max(0, contract_size - 0x6000)`. (Cf. initcode metering: [EELS](https://github.com/ethereum/execution-specs/blob/1a587803e3e698407d204888b02342393f8b4fe5/src/ethereum/cancun/vm/gas.py#L269))
+2. Change the gas schedule for opcodes which load code. Specifically, the `CALL`, `STATICCALL`, `DELEGATECALL`, `CALLCODE`, `EXTCODESIZE` and `EXTCODECOPY` opcodes are modified so that `ceil32(excess_contract_size) * 2 // 32` gas is added to the [cold access cost](https://github.com/ethereum/execution-specs/blob/1a587803e3e698407d204888b02342393f8b4fe5/src/ethereum/cancun/vm/instructions/system.py#L367), where `excess_contract_size = max(0, contract_size - 0x6000)`. (Cf. initcode metering: [EELS](https://github.com/ethereum/execution-specs/blob/1a587803e3e698407d204888b02342393f8b4fe5/src/ethereum/cancun/vm/gas.py#L269)). If the account is warm, no change to the gas schedule occurs.
 
 ## Rationale
 
