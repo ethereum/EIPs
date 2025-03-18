@@ -1,4 +1,5 @@
 ---
+eip: XXXX
 title: eth_config JSON-RPC Method
 description: A JSON-RPC method that describes the configuration of the current and next fork
 author: Danno Ferrin (@shemnon)
@@ -104,7 +105,7 @@ Future forks MUST define the list of system contracts in their meta-EIPs.
 
 The purpose of this specification is to enable nodes to advertise, prior to a fork, that they have the correct configurations loaded and ready. Past testnet and mainnet forks have revealed clients with incorrect precompile sets, chain IDs, deposit contract addresses, and other configuration errors.
 
-For precompiles in particular there has been discussion about removing or replaceing precomiles in future forks, so a full enumeration of precompiles will reflect removal.
+For precompiles in particular there has been discussion about removing or replacing precomiles in future forks, so a full enumeration of precompiles will reflect removal.
 
 Generally, if a configurable variable or constant causes a client to diverge at a fork—whether on mainnet, a testnet, a devnet, or a public rollup—that variable or constant is a candidate for inclusion in the reportable configuration.
 
