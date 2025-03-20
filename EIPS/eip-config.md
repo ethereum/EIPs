@@ -18,7 +18,7 @@ This document describes an RPC method that provides node-relevant configuration 
 
 Throughout Ethereum's history, there have been multiple instances where a client was not correctly configured for an upcoming hard fork, causing it to fall out of consensus when the fork boundary was crossed. Most incidents have been minor, such as a single client forking the chain in proof-of-work or having its blocks orphaned in proof-of-stake.
 
-The most significant occurrence was during the Pectra activation on the Holesky testnet. Four out of six clients on the network had an incorrect configuration for the deposits contract. Instead of being orphaned, the incorrect chain was justified, and the side effects persist on Holesky even after reaching finality.
+The most significant occurrence was during the Pectra activation on the Holešky testnet. Four out of six clients on the network had an incorrect configuration for the deposits contract. Instead of being orphaned, the incorrect chain was justified, and the side effects persist on Holešky even after reaching finality.
 
 By providing an RPC method that allows clients to report key configuration variables before the next hard fork, operations teams can gain greater confidence that clients are correctly configured and prepared for upcoming forks.
 
@@ -73,7 +73,7 @@ The fork activation timestamp, represented as a JSON number in Unix epoch second
 
 #### `blobsSchedule`
 
-The blob configuration parameters for the specific fork, as defined in the genesis file. This is a JSON object with three members —  `basefeeUpdateFraction`, `max`, and `target` — all represented as JSON numbers.
+The blob configuration parameters for the specific fork, as defined in the genesis file. This is a JSON object with three members —  `baseFeeUpdateFraction`, `max`, and `target` — all represented as JSON numbers.
 
 #### `chainId`
 
@@ -87,7 +87,7 @@ This is a JSON object where the members are the 20-byte `0x`-prefixed hexadecima
 
 For Cancun, the contract names are (in order): `ECREC`, `SHA256`, `RIPEMD160`, `ID`, `MODEXP`, `BN256_ADD`, `BN256_MUL`, `BN256_PAIRING`, `BLAKE2F`, `KZG_POINT_EVALUATION`.
 
-For Prague, the added contracts are (in order): `BLS12_G1ADD`, `BLS12_G1MULTIEXP`, `BLS12_G2ADD`, `BLS12_G2MULTIEXP`, `BLS12_PAIRING`, `BLS12_MAP_FIELD_TO_CURVE`, `BLS12_MAP_FIELD_TO_CURVE`.
+For Prague, the added contracts are (in order): `BLS12_G1ADD`, `BLS12_G1MSM`,`BLS12_G2ADD`, `BLS12_G2MSM`, `BLS12_PAIRING_CHECK`, `BLS12_MAP_FP_TO_G1`, `BLS12_MAP_FP2_TO_G2`.
 
 #### `systemContracts`
 
@@ -141,16 +141,16 @@ Clients supporting pre-Cancun forks MAY return partial or non-standard configura
 
 ### Sample Configs
 
-Holesky Prague Config
+Hoodi Prague Config
 ```JSON
 {
-  "activationTime": 1740434112,
+  "activationTime": 1742999832,
   "blobSchedule": {
     "baseFeeUpdateFraction": 5007716,
     "max": 9,
     "target": 6
   },
-  "chainId": "0x4268",
+  "chainId": "0x88bb0",
   "precompiles": {
     "0x0000000000000000000000000000000000000001": "ECREC",
     "0x0000000000000000000000000000000000000002": "SHA256",
@@ -163,33 +163,33 @@ Holesky Prague Config
     "0x0000000000000000000000000000000000000009": "BLAKE2F",
     "0x000000000000000000000000000000000000000a": "KZG_POINT_EVALUATION",
     "0x000000000000000000000000000000000000000b": "BLS12_G1ADD",
-    "0x000000000000000000000000000000000000000c": "BLS12_G1MULTIEXP",
+    "0x000000000000000000000000000000000000000c": "BLS12_G1MSM",
     "0x000000000000000000000000000000000000000d": "BLS12_G2ADD",
-    "0x000000000000000000000000000000000000000e": "BLS12_G2MULTIEXP",
-    "0x000000000000000000000000000000000000000f": "BLS12_PAIRING",
-    "0x0000000000000000000000000000000000000010": "BLS12_MAP_FIELD_TO_CURVE",
-    "0x0000000000000000000000000000000000000011": "BLS12_MAP_FIELD_TO_CURVE"
+    "0x000000000000000000000000000000000000000e": "BLS12_G2MSM",
+    "0x000000000000000000000000000000000000000f": "BLS12_PAIRING_CHECK",
+    "0x0000000000000000000000000000000000000010": "BLS12_MAP_FP_TO_G1",
+    "0x0000000000000000000000000000000000000011": "BLS12_MAP_FP2_TO_G2"
   },
   "systemContracts": {
     "BEACON_ROOTS_ADDRESS": "0x000f3df6d732807ef1319fb7b8bb8522d0beac02",
     "CONSOLIDATION_REQUEST_PREDEPLOY_ADDRESS": "0x0000bbddc7ce488642fb579f8b00f3a590007251",
-    "DEPOSIT_CONTRACT_ADDRESS": "0x4242424242424242424242424242424242424242",
+    "DEPOSIT_CONTRACT_ADDRESS": "0x00000000219ab540356cbb839cbe05303d7705fa",
     "HISTORY_STORAGE_ADDRESS": "0x0000f90827f1c53a10cb7a02335b175320002935",
     "WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS": "0x00000961ef480eb55e80d19ad83579a64c007002"
   }
 }
 ```
 
-Holesky Cancun Config
+Hoodi Cancun Config
 ```JSON
 {
-  "activationTime": 1707305664,
+  "activationTime": 0,
   "blobSchedule": {
     "baseFeeUpdateFraction": 3338477,
     "max": 6,
     "target": 3
   },
-  "chainId": "0x4268",
+  "chainId": "0x88bb0",
   "precompiles": {
     "0x0000000000000000000000000000000000000001": "ECREC",
     "0x0000000000000000000000000000000000000002": "SHA256",
@@ -210,7 +210,7 @@ Holesky Cancun Config
 
 #### Sample JSON-RPC
 
-The following RPC command, issued on Holesky when Prague was scheduled but not activated:
+The following RPC command, issued on Hoodi when Prague was scheduled but not activated:
 
 ```bash
 curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_config","id":1}' http://localhost:8545
@@ -224,13 +224,13 @@ would return (after formatting):
   "id": 1,
   "result": {
     "current": {
-      "activationTime": 1707305664,
+      "activationTime": 0,
       "blobSchedule": {
         "baseFeeUpdateFraction": 3338477,
         "max": 6,
         "target": 3
       },
-      "chainId": "0x4268",
+      "chainId": "0x88bb0",
       "precompiles": {
         "0x0000000000000000000000000000000000000001": "ECREC",
         "0x0000000000000000000000000000000000000002": "SHA256",
@@ -247,15 +247,15 @@ would return (after formatting):
         "BEACON_ROOTS_ADDRESS": "0x000f3df6d732807ef1319fb7b8bb8522d0beac02"
       }
     },
-    "currentHash": "9c186ad4",
+    "currentHash": "243c27d1",
     "next": {
-      "activationTime": 1740434112,
+      "activationTime": 1742999832,
       "blobSchedule": {
         "baseFeeUpdateFraction": 5007716,
         "max": 9,
         "target": 6
       },
-      "chainId": "0x4268",
+      "chainId": "0x88bb0",
       "precompiles": {
         "0x0000000000000000000000000000000000000001": "ECREC",
         "0x0000000000000000000000000000000000000002": "SHA256",
@@ -268,22 +268,22 @@ would return (after formatting):
         "0x0000000000000000000000000000000000000009": "BLAKE2F",
         "0x000000000000000000000000000000000000000a": "KZG_POINT_EVALUATION",
         "0x000000000000000000000000000000000000000b": "BLS12_G1ADD",
-        "0x000000000000000000000000000000000000000c": "BLS12_G1MULTIEXP",
+        "0x000000000000000000000000000000000000000c": "BLS12_G1MSM",
         "0x000000000000000000000000000000000000000d": "BLS12_G2ADD",
-        "0x000000000000000000000000000000000000000e": "BLS12_G2MULTIEXP",
-        "0x000000000000000000000000000000000000000f": "BLS12_PAIRING",
-        "0x0000000000000000000000000000000000000010": "BLS12_MAP_FIELD_TO_CURVE",
-        "0x0000000000000000000000000000000000000011": "BLS12_MAP_FIELD_TO_CURVE"
+        "0x000000000000000000000000000000000000000e": "BLS12_G2MSM",
+        "0x000000000000000000000000000000000000000f": "BLS12_PAIRING_CHECK",
+        "0x0000000000000000000000000000000000000010": "BLS12_MAP_FP_TO_G1",
+        "0x0000000000000000000000000000000000000011": "BLS12_MAP_FP2_TO_G2"
       },
       "systemContracts": {
         "BEACON_ROOTS_ADDRESS": "0x000f3df6d732807ef1319fb7b8bb8522d0beac02",
         "CONSOLIDATION_REQUEST_PREDEPLOY_ADDRESS": "0x0000bbddc7ce488642fb579f8b00f3a590007251",
-        "DEPOSIT_CONTRACT_ADDRESS": "0x4242424242424242424242424242424242424242",
+        "DEPOSIT_CONTRACT_ADDRESS": "0x00000000219ab540356cbb839cbe05303d7705fa",
         "HISTORY_STORAGE_ADDRESS": "0x0000f90827f1c53a10cb7a02335b175320002935",
         "WITHDRAWAL_REQUEST_PREDEPLOY_ADDRESS": "0x00000961ef480eb55e80d19ad83579a64c007002"
       }
     },
-    "nextHash": "1c6a3b9f"
+    "nextHash": "10368496"
   }
 }
 ```
