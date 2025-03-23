@@ -22,7 +22,7 @@ This EIP also gives applications the flexibility to verify messages in isolation
 
 As the ecosystem moves towards ETH-less transactions, users are often required to sign multiple off-chain messages in quick succession. Typically, a first signature is needed for a precise EIP-20 allowance (via [Permit2](https://blog.uniswap.org/permit2-and-universal-router), [EIP-2612](./eip-2612.md), etc.), followed by subsequent messages to direct the use of funds. This creates a frictional user experience as each signature requires a separate wallet interaction and creates confusion about what, in aggregate, is being approved.
 
-![before and after](../assets/eip-tbd/eip-tbd.png=577x)
+![before and after](../assets/eip-tbd/eip-tbd.png =577x)
 
 Current solutions have significant drawbacks:
 
