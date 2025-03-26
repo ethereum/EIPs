@@ -2,7 +2,7 @@
 title: Pureth Meta
 description: List of EIPs belonging to the Pureth proposal
 author: Etan Kissling (@etan-status), Gajinder Singh (@g11tech)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-pureth-meta/23273
 status: Draft
 type: Meta
 created: 2025-03-26
