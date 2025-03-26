@@ -5,6 +5,7 @@ status: Draft
 type: Standards Track
 category: Core
 author: William Morriss <wjmelements@gmail.com>
+discussions-to: TBD
 created: 2025-03-26
 ---
 
@@ -36,7 +37,7 @@ Removing the check solves several problems while reducing EVM complexity.
 
 ## Backwards Compatibility
 
-Contracts utilizing
+This change will not break any existing functionality.
 
 ## Security Considerations
 
