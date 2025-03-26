@@ -43,8 +43,10 @@ This change will not break any existing functionality.
 
 Current contracts performing dynamic jumps may gain new unintended functionality if it is possible to jump to an immediate argument containing `JUMPDEST`.
 It is expected that very few contracts will become vulnerable in this way.
-Most smart contract programming languages do not even allow dynamic jumps, so few contracts will become vulnerable, and for many of them the newly possible codepaths will be invalid.
+Most smart contract programming languages do not even allow dynamic jumps, and of those that do, few will have `JUMPDEST` in an accessible immediate argument.
+Therefore it is expected that few contracts will become vulnerable, and for many of them the newly possible codepaths will contain invalid opcodes.
 A static analysis tool should be developed and made publicly available to test if a contract might become vulnerable, and the program should be run for all current contracts in order to notify projects about potential security issues.
+Affected programs will have ample time to migrate.
 
 ## Copyright
 
