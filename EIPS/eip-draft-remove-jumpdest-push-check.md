@@ -21,6 +21,7 @@ This presents several problems:
 
 1. Codesize is a linear DoS vector because code must be preprocessed to determine `JUMPDEST` validity.
 2. New opcodes with immediate arguments cannot be safely adopted.
+3. `CODECOPY` data spans can invalidate subsequent `JUMPDEST`.
 
 The rationale for this `JUMPDEST` validity check is to prevent unintended code execution.
 However, almost all `JUMP` and `JUMPI` target constant destinations.
