@@ -41,9 +41,11 @@ All pull requests in this repository must pass automated checks before they can 
 
 It is possible to run the EIP validator locally:
 
+Make sure to add cargo's `bin` directory to your environment (typically `$HOME/.cargo/bin` in your `PATH` environment variable)
+
 ```sh
-cargo install eipv
-eipv <INPUT FILE / DIRECTORY>
+cargo install eipw
+eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
 ```
 
 ## Build the status page locally
@@ -79,6 +81,8 @@ eipv <INPUT FILE / DIRECTORY>
    ```sh
    bundle exec jekyll serve
    ```
+
+   **Note:** The site uses WEBrick for local development only. WEBrick is not intended for production use and has limitations. It is sufficient for previewing your changes locally, but should not be used to serve the site in a production environment.
 
 2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
 
