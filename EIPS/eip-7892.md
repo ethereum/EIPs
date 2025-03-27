@@ -1,0 +1,119 @@
+---
+eip: 7892
+title: Blob Parameter Only Hardforks
+description: Defines a mechanism for scaling Ethereum’s blob capacity via specialized hard forks that modify only blob-related parameters.
+author: Mark Mackey (@ethDreamer)
+discussions-to: https://ethereum-magicians.org/t/eip-7892-blob-parameter-only-hardforks/23018
+status: Draft
+type: Informational
+created: 2025-02-28
+requires: 7840
+---
+
+## Abstract
+
+This EIP introduces **Blob Parameter Only (BPO) Hardforks**, a lightweight mechanism for incrementally scaling Ethereum’s blob capacity through targeted hard forks that modify only blob-related parameters: `blob target`, `blob limit`, and `baseFeeUpdateFraction`. Unlike traditional hard forks, which require extensive coordination and introduce broader protocol changes, BPO forks enable rapid, low-overhead scaling of blob capacity in response to **real-world demand and network conditions**.
+
+## Motivation
+
+Ethereum's scaling strategy relies on Layer 2 (L2) solutions for transaction execution while using Ethereum as a **data availability (DA) layer**. However, the demand for DA has increased rapidly, and the current approach of only modifying blob parameters in large, infrequent hard forks is **not agile enough** to keep up with L2 growth. 
+
+The key motivations for BPO forks are:
+
+1. **Continuous Scaling**  
+   - L2 DA demand is growing rapidly, leading to saturation of blob capacity.
+   - Large, infrequent blob parameter changes create high costs and inefficiencies.
+   - BPO forks allow for more frequent, safer capacity increases.
+
+2. **Reduced Operational Overhead**  
+   - Full Ethereum hard forks require significant coordination, testing, and upgrade efforts across clients.
+   - By isolating blob parameter changes, BPO forks reduce the complexity of upgrades.
+
+3. **Enhanced Stability with New Scaling Technologies**
+   - Major scaling upgrades (e.g. [EIP-7594](./eip-7594.md)), introduce uncertainty in optimal blob limits.
+   - Rather than forcing core developers to accept a suboptimal tradeoff between stability and capacity, BPO forks allow developers to safely increase parameters after observing mainnet performance and stability.
+
+4. **Predictable Upgrades for Builders**  
+   - Builders and L2s require confidence that Ethereum will continuously scale to support their needs.
+   - A structured BPO framework provides predictability, allowing rollups to commit to Ethereum over alternative DA solutions.
+
+## Specification
+
+BPO forks are a special class of hard fork which **only modifies any of the following** blob-related parameters:
+
+- **Blob Target (`blob_target`)**: The expected number of blobs per block.
+- **Blob Limit (`blob_limit`)**: The maximum number of blobs per block.
+- **Blob Base Fee Update Fraction (`baseFeeUpdateFraction`)**: Determines how blob gas pricing adjusts per block.
+
+To facilitate these changes on the execution layer, the `blobSchedule` object specified in [EIP-7840](./eip-7840.md) is extended to allow for an arbitrary number of block timestamps at which these parameters **MAY** change.
+
+```json
+"blobSchedule": {
+  "cancun": {
+    "target": 3,
+    "max": 6,
+    "baseFeeUpdateFraction": 3338477
+  },
+  "prague": {
+    "target": 6,
+    "max": 9,
+    "baseFeeUpdateFraction": 5007716
+  },
+  "1740693335": {
+    "target": 24,
+    "max": 48,
+    "baseFeeUpdateFraction": 5007716
+  },
+  "1743285335": {
+    "target": 36,
+    "max": 56,
+    "baseFeeUpdateFraction": 5007716
+  }
+}
+```
+
+On the consensus layer, a new parameter is added to the configuration:
+
+```
+#         epoch   max_blobs
+BPO_FORK: 348618  24
+BPO_FORK: 355368  56
+```
+
+The parameters and schedules above are purely illustrative. Actual values and schedules are beyond the scope of this specification.
+
+### Requirements
+
+- Execution and consensus clients **MUST** share consistent BPO fork schedules
+- BPO forks **MUST NOT** conflict with other fork schedules
+- The timestamp in `blobSchedule` **MUST** align with the start of the epoch specified in the consensus layer configuration
+- The max field in `blobSchedule` **MUST** equal the `max_blobs` value in the consensus layer configuration
+
+## Rationale
+
+### Why not just use regular hardforks?
+
+Full hard forks require extensive coordination, testing, and implementation changes beyond parameter adjustments. For example, in Lighthouse, a typical hard fork implementation requires thousands of lines of boilerplate before any protocol changes occur. BPO forks streamline this process by avoiding the need for this boilerplate code.
+
+### Why specify parameters in the node configuration instead of code?
+
+Allowing blob parameters to be configured externally enables rapid experimentation, testing, and adjustments without requiring code changes across client implementations. Testing teams can investigate different parameters with minimal involvement from client implementers.
+
+### Why not create an on-chain voting mechanism for blob parameters?
+
+- Ethereum's recent gas limit increase to 36M took nearly a year to coordinate
+- Blob capacity is a rapidly evolving, moving target that the wider staking community is not currently well equipped to track
+- An on-chain mechanism would require much more extensive code changes, testing cycles, and debates about governance structures.
+- BPO forks provide a simpler, more predictable approach while leaving room for future on-chain voting mechanisms when blob capacity stabilizes
+
+## Backwards Compatibility
+
+BPO forks introduce no backwards compatibility concerns.
+
+## Security Considerations
+
+No security risks have been identified.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
