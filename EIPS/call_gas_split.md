@@ -31,7 +31,7 @@ A new instruction `CALL_GAS_SPLIT` is introduced. This instruction:
 1. Pops one item from the stack representing a gas split ratio.
 2. Floors this value to `65535` (u16::MAX).
 3. Calculates the gas limit by using the **current** gas by spliting it by floored value as `split_gas=(gas*value)/65535`.And preserves this value until the end of the call. 
-4. The preserved value should be used in all EXT*CALL operations to set gas limit as `max(split_gas, gas_left)`.
+4. The preserved value should be used in all `EXT*CALL` operations to set gas limit as `max(split_gas, gas_left)`.
 
 If this value is not set, the EVM interpreter MUST maintain the `63/64` rule that was previously used as default.
 
@@ -39,7 +39,7 @@ If this value is not set, the EVM interpreter MUST maintain the `63/64` rule tha
 
 Several alternatives were considered for implementing gas split functionality:
 
-Adding gas split parameters directly to `EXT*` call instructions: While possible, this would require setting the split for each call individually. Having a standalone instruction allows setting the split once for multiple calls.
+Adding gas split parameters directly to `EXT*CALL` call instructions: While possible, this would require setting the split for each call individually. Having a standalone instruction allows setting the split once for multiple calls.
 
 Hardcoding the gas split value as immediate: This would be restrictive for dynamic scenarios where the number of calls is only known at runtime.
 
@@ -47,7 +47,7 @@ Using a stack item for `CALL_GAS_SPLIT`: This approach was chosen as it provides
 
 Flooring popped value allows `push 0xffff, CALL_GAS_SPLIT` to be used to set full gas forwarding and 65535 parts seems big enought.
 
-An alternative to using current gas for a split when `CALL_GAS_SPLIT` is called would be to split current gas when EXT*CALL is used. This alternative would make gas inconsistent and dependent on the amount of gas that was used. The chosen approach gives the benefit of using the same gas limit.
+An alternative to using current gas for a split when `CALL_GAS_SPLIT` is called would be to split current gas when `EXT*CALL` is used. This alternative would make gas inconsistent and dependent on the amount of gas that was used. The chosen approach gives the benefit of using the same gas limit.
 
 ## Backwards Compatibility
 
