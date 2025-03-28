@@ -1,6 +1,6 @@
 ---
 title: Linear, Page-Based Memory Costing
-description: Linearize Memory Costing and replace the current quadratic formula iwth a page-based cost model.
+description: Linearize Memory Costing and replace the current quadratic formula with a page-based cost model.
 author: Charles Cooper (@charles-cooper)
 discussions-to: https://ethereum-magicians.org/t/eip-linearize-memory-costing/23290
 status: Draft
