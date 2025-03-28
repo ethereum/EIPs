@@ -118,8 +118,8 @@ index bf34fbee..477f969e 100644
 +        if size == 0:
 +            return
 +
-+        ALLOCATE_PAGE_COST = 50
-+        THRASH_PAGE_COST = 3
++        ALLOCATE_PAGE_COST = 100
++        THRASH_PAGE_COST = 6
 +
 +        end = start_position + size
 +
