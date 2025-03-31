@@ -83,6 +83,14 @@ This new method instead punishes the core developers by committing them to ten-t
 They will not be allowed to change jobs or die.
 They will be chained to their desk and kept on life support, writing security patches and providing technical support for increasingly rare issues until EOL.
 
+## Security Considerations
+
+### Real-world Assets
+
+Whenever a new BE chain forks off of an LTS chain, all real-world-assets will have to choose which network is canonical.
+They and their users can use the `CHAINID` opcode to disable dangerous functionality.
+If they always want to stay on the latest version, they can assert that the `CHAINID` is `1`.
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](../LICENSE.md).
