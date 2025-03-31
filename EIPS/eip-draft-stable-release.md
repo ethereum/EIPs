@@ -3,7 +3,7 @@ eip: tbd
 title: Long-Term Support Release
 description: Procedure for designating and maintaining Ethereum LTS releases
 author: William Morriss (@wjmelements)
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/eip-ethereum-lts/23328
 type: Meta
 status: Draft
 created: 2025-04-01
