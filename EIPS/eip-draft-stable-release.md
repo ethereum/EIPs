@@ -1,6 +1,7 @@
 ---
 eip: tbd
 title: Long-Term Support Release
+description: Procedure for designating and maintaining Ethereum LTS releases
 author: William Morriss (@wjmelements)
 discussions-to: TBD
 type: Meta
