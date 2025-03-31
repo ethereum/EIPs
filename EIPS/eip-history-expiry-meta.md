@@ -40,6 +40,8 @@ This EIP exists to document the process through which history expiry will be act
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
+Execution layer client MUST implement [EIP-7642](https://eips.ethereum.org/EIPS/eip-7642) to support the `eth/69` over DevP2P.
+
 
 ### Mainnet Activation
 
@@ -79,6 +81,10 @@ Pre-merge data is available in the [e2store archival format](https://github.com/
 
 
 ## Backwards Compatibility
+
+### DevP2P `eth` protocol
+
+Clients of the DevP2P `eth` protocol will need to upgrade to the new `eth/69` version specified in [EIP-7642](https://eips.ethereum.org/EIPS/eip-7642)
 
 ### Pre-Merge Deposit Logs
 
