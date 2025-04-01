@@ -31,7 +31,7 @@
     },
     {
         "Input": "000000000000000000000000000000000123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef00000000000000000000000000000000193fb7cedb32b2c3adc06ec11a96bc0d661869316f5e4a577a9f7c179593987beb4fb2ee424dbb2f5dd891e228b46c4a0000000000000000000000000000000000000000000000000000000000000002",
-        "ExpectedError": "g1 point is not on correct subgroup",
+        "ExpectedError": "g1 point is not in the correct subgroup",
         "Name": "bls_g1mul_g1_not_in_correct_subgroup"
     }
 ]
