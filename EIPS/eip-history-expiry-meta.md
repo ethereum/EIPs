@@ -47,7 +47,7 @@ Execution clients may test dropping of history on devnets for all history prior 
 
 ## Rationale
 
-### Why wait for Pecra
+### Why wait for Pectra
 
 Consensus Layer clients have a dependency on pre-merge deposit logs. [EIP-6110](https://eips.ethereum.org/EIPS/eip-6110) will remove this dependency when the Pectra fork is activated.
 
@@ -69,6 +69,8 @@ History Expiry doesn't require clients to remove this data. It only allows them 
 Pre-merge data is available in the [e2store archival format](https://github.com/eth-clients/e2store-format-specs). A public list of these archives can be found in the [eth-clients historical data endpoints](https://eth-clients.github.io/history-endpoints/)
 
 The Portal network also implements a decentralized peer-to-peer solution for storage and retrieval of all of Ethereum's pre-merge block data.
+
+The [EIP-7801](https://eips.ethereum.org/EIPS/eip-7801) DevP2P protocol also provides a peer-to-peer solution for retrieval of this data.
 
 
 ## Backwards Compatibility
@@ -103,7 +105,7 @@ Execution clients that choose to drop history will no longer be capable of servi
 
 ### Full History Sync
 
-Execution layer clients will no longer be able to implement a full historical sync of history from the DevP2P network.  Clients that wish to retain this functionality will need to source the pre-merge blocks from an alternate source.  Clients SHOULD ensure that they continue to correctly validate block data sourced from alternate locations.
+Execution layer clients will no longer be able to implement a full historical sync of history from the DevP2P `eth` protocol.  Clients that wish to retain this functionality will need to source the pre-merge blocks from an alternate source.  Clients SHOULD ensure that they continue to correctly validate block data sourced from alternate locations.
 
 ### Partial History Sync
 
