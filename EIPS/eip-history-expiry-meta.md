@@ -2,7 +2,7 @@
 title: History Expiry Meta
 description: Meta EIP for History Expiry changes happening in conjunction with Pectra
 author: Piper Merriam (@pipermerriam)
-discussions-to: <URL>
+discussions-to: <URL> TODO: waiting for eth-magicians to return to the living.
 status: Draft
 type: Meta
 created: 2025-03-28
@@ -12,35 +12,24 @@ requires: 4444
 ## Abstract
 
 
-
-<!--
-  The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-
-  TODO: Remove this comment before submitting
--->
-This Meta-EIP is meant to document the activation process and plan for history expiry. TODO: what else should be here
+This Meta-EIP documents the activation process and plan for history expiry as well as providing links to other EIPs that are related.
 
 ## Motivation
 
-<!--
-  This section is optional.
-
-  The motivation section should include a description of any nontrivial problems the EIP solves. It should not describe how the EIP solves those problems, unless it is not immediately obvious. It should not describe why the EIP should be made into a standard, unless it is not immediately obvious.
-
-  With a few exceptions, external links are not allowed. If you feel that a particular resource would demonstrate a compelling case for your EIP, then save it as a printer-friendly PDF, put it in the assets folder, and link to that copy.
-
-  TODO: Remove this comment before submitting
--->
 
 [EIP-4444](https://eips.ethereum.org/EIPS/eip-4444) documents the motivation for history expiry itself.
 
-This EIP exists to document the process through which history expiry will be activated on mainnet, including the testnet activation on Sepolia.
+This EIP exists to document the process through which history expiry will be activated on mainnet, the testnet activation on Sepolia, devnet testing and other information surrounding history expiry that doesn't fit cleanly in any of the supporting EIPs.
 
 ## Specification
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 Execution layer client MUST implement [EIP-7642](https://eips.ethereum.org/EIPS/eip-7642) to support the `eth/69` over DevP2P.
+
+Execution layer clients MAY drop pre-merge history according to [EIP-7639](https://eips.ethereum.org/EIPS/eip-7639).
+
+Consensus layer clients SHOULD NOT depend on Execution Layer clients having the deposit logs from pre-merge blocks and SHOULD implement [EIP-6110](https://eips.ethereum.org/EIPS/eip-6110).
 
 
 ### Mainnet Activation
@@ -79,6 +68,8 @@ History Expiry doesn't require clients to remove this data. It only allows them 
 
 Pre-merge data is available in the [e2store archival format](https://github.com/eth-clients/e2store-format-specs). A public list of these archives can be found in the [eth-clients historical data endpoints](https://eth-clients.github.io/history-endpoints/)
 
+The Portal network also implements a decentralized peer-to-peer solution for storage and retrieval of all of Ethereum's pre-merge block data.
+
 
 ## Backwards Compatibility
 
@@ -110,15 +101,14 @@ Execution clients that choose to drop history will no longer be capable of servi
 
 ## Security Considerations
 
-<!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+### Full History Sync
 
-  The current placeholder is acceptable for a draft.
+Execution layer clients will no longer be able to implement a full historical sync of history from the DevP2P network.  Clients that wish to retain this functionality will need to source the pre-merge blocks from an alternate source.  Clients SHOULD ensure that they continue to correctly validate block data sourced from alternate locations.
 
-  TODO: Remove this comment before submitting
--->
+### Partial History Sync
 
-Needs discussion.
+Execution layer clients that do a partial sync will need to adjust their syncing algorithms to only go back to the merge block as opposed to the previous behavior of tracing all the way back to genesis.  Clients SHOULD ensure that their sync algorithms and other functionality are able to handle this data no longer being locally available.
+
 
 ## Copyright
 
