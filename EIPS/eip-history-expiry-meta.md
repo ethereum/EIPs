@@ -2,7 +2,7 @@
 title: History Expiry Meta
 description: Meta EIP for History Expiry changes happening in conjunction with Pectra
 author: Piper Merriam (@pipermerriam)
-discussions-to: <URL> TODO: waiting for eth-magicians to return to the living.
+discussions-to: https://ethereum-magicians.org/t/history-expiry-meta-eip/23359
 status: Draft
 type: Meta
 created: 2025-03-28
