@@ -21,7 +21,7 @@ return valid: true
 end
 |||
 
-group Executoin Phase
+group Execution Phase
 "AA_ENTRY_POINT"->SCECS: Execute AA Transaction\n""senderExecutionData""
 |||
 SCECS->TCECS: AA Transaction\nExecution Body
