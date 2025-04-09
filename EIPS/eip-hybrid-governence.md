@@ -3,7 +3,7 @@ eip: TBD
 title: Hybrid Governance Documents  Management
 description: Hybrid governance document management for on-chain organizations built upon off-chain legal frameworks
 author: Akira Umeno (@cardene777), Takashi Oka <oktks@proton.me>
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/new-erc-hybrid-governance-document-management-hgdm/23444?u=thxdao
 status: Draft
 type: Standards Track
 category: ERC
