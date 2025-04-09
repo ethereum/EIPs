@@ -1,13 +1,13 @@
 ---
+eip: TBD
 title: Hybrid Governance Documents  Management
-description: <Description is one full (short) sentence>
+description: Hybrid governence document management for on-chain organizations built upon off-chain legal frameworks
 author: Akira Umeno (@cardene777), Takashi Oka <oktks@proton.me>
-discussions-to: <URL>
+discussions-to: TBD
 status: Draft
-type: <Standards Track, Meta, or Informational>
-category: <Core, Networking, Interface, or ERC> # Only required for Standards Track. Otherwise, remove this field.
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+type: Standards Track
+category: ERC
+created: 2025-04-10
 ---
 
 ## Abstract
