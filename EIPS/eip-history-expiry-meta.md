@@ -1,4 +1,5 @@
 ---
+eip: 7927
 title: History Expiry Meta
 description: Meta EIP for History Expiry changes happening in conjunction with Pectra
 author: Piper Merriam (@pipermerriam)
