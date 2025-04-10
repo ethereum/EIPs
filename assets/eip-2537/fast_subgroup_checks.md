@@ -8,7 +8,8 @@ Field Fp2 is defined as `Fp[X]/(X^2-nr2)` with elements  `el = c0 + c1 * v`, whe
  
 Group G1 is defined as a set of Fp pairs (points) `(x,y)` such that either `(x,y)` is  `(0,0)` or `x,y` satisfy the curve Fp equation.
 
-Group G2 is defined as a set of Fp2 pairs (points) `(x',y')` such that either `(x,y)` is `(0,0)` or `(x',y')` satisfy the curve Fp2 equation.
+Group G2 is defined as a set of Fp2 pairs (points) `(x', y')` such that either `(x', y')` is `(0,0)` or `(x', y')` satisfy the curve Fp2 equation.
+
 
 ## Curve parameters
 
