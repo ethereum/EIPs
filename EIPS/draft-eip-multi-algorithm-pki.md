@@ -28,7 +28,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 | Constant | Value |
 | - | - |
-| `ALG_TX_TYPE` | `Bytes1(0x04)` |
+| `ALG_TX_TYPE` | `Bytes1(0x07)` |
 | `GAS_PER_ADDITIONAL_VERIFICATION_BYTE`| `16` |
 
 ### Algorithmic Transaction
@@ -80,12 +80,12 @@ def verify(signature_info: bytes, parent_hash: bytes32) -> boolean, bytes20:
   # This assumes `ecrecover` is identical to the `ecrecover` function in solidity.
   signer = ecrecover(parent_hash, v, r, s)
 
-  return (signer != 0x0, signer[:20])
+  return (signer != 0x0, signer)
 ```
 
 ### Verification
 
-Implementations MUST NOT gossip transactions and MUST reject transactions that have a `len(tx.signature_info)` of more than `alg.MAX_SIZE`.
+Implementations MUST consider transactions invalid where `len(tx.signature_info) > alg.MAX_SIZE`.
 
 The validity/processing of the transaction is completed by the function defined below:
 ```python
@@ -159,7 +159,7 @@ Non-EIP-<TODO-PUT-EIP-NUMBER-HERE> transactions will still be included within bl
 
 ## Test Cases
 
-These test cases do not involve processing other types of transactions. Only the wrapping, unwrapping and verification of these transactions.
+These test cases do not involve processing other types of transactions. Only the wrapping, unwrapping and verification of these transactions without interfacing with the `parent` tx held inside the main tx.
 
 TODO, must be done before EIP enter review stage.
 
