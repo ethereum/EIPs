@@ -37,7 +37,7 @@ This EIP introduces a new [eip-2718](./eip-2718.md) transaction with a `Transact
 
 `[alg_type, signature_info, parent]`
 
-The field `alg_type` is a unsigned 8-bit integer (uint8) that represents the algorithm used to sign the transaction in the `parent` field. This EIP defines only a single value that could be in this value which is `0` for the default secp256k1 curve.
+The field `alg_type` is a unsigned 8-bit integer (uint8) that represents the algorithm used to sign the transaction in the `parent` field. This EIP does not define algorithms for use with this transaction type but a structure so they remain interoperable.
 
 The `signature_info` info field contains information required to verify the signature of the transaction in the `parent` field. This is a byte-array of arbitrary length, which would be passed to the verification function.
 
@@ -64,7 +64,31 @@ New algorithms MUST also specify how to recover & verify a valid address (`bytes
 
 The verify function MUST return `(false, 0x0)` if there was an error recovering a valid address from the signature, otherwise the function MUST return `true` and the address of the signer.
 
-### The default secp256k1 `0x0` algorithmic type
+### Example EIP for adding the secp256k1 curve
+
+~~~md
+
+---
+title: Example EIP to add secp256k1 curve as an algorithmic type
+description: Example EIP to add secp256k1 curve as an algorithmic type
+Author: ExampleAuthor
+discussions-to: fakeurl
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-04-12
+requires: <TODO-PUT-EIP-NUMBER-HERE>
+---
+
+## Abstract
+This example EIP adds secp256k1 curve as an algorithmic type.
+
+## Motivation
+secp256k1 is the commonly used curve, therefore it should be added.
+
+## Specification
+
+This EIP defines a new [EIP-<TODO-PUT-EIP-NUMBER-HERE>](./eip-<TODO-PUT-EIP-NUMBER-HERE>.md) algorithmic type with the following parameters.
 
 | Constant | Value |
 | - | - |
@@ -82,6 +106,20 @@ def verify(signature_info: bytes, parent_hash: bytes32) -> boolean, bytes20:
 
   return (signer != 0x0, signer)
 ```
+
+## Rationale
+secp256k1 is the commonly used curve, therefore it should be added.
+
+## Backwards Compatibility
+No backward compatibility issues found.
+
+## Security Considerations
+Needs discussion.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
+~~~
 
 ### Verification
 
@@ -141,9 +179,9 @@ Since having multiple different algorithms results in multiple different signatu
 
 The `GAS_PER_ADDITIONAL_VERIFICATION_BYTE` value being `16` was taken from the calldata cost of a transaction, as it is a similar datatype and must persist indefinitely to ensure later verification.
 
-### Redundant `0` type
+### Not adding the `secp256k1` curve
 
-The default type is not designed for general use, but is mostly for prototyping and testing with client teams, as the resultant reciept, logs and state change would be the same as a non-wrapped transaction. It also allows implementations to always wrap transactions while still allowing use of the secp256k1 curve.
+Having a type for `secp256k1` allows for several iterations of the same object to be present across the network. Additionally the only purpose for this curve would be for prototyping and testing with client teams, as the resultant reciept, logs and state change would be the same as a non-wrapped transaction.
 
 ### Not specifing account key-sharing / migration
 
