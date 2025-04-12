@@ -12,7 +12,7 @@ requires: 2718, 2930, 1559, 4844
 
 ## Abstract
 
-This EIP introduces a new wrapper type transaction to allow for an alternative signature algorithm to sign off on an ethereum transaction.
+This EIP introduces a new wrapper type transaction to allow for alternative signature algorithms to sign off on an ethereum transactions.
 
 ## Motivation
 
