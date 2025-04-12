@@ -1,6 +1,6 @@
 ---
 title: Support for transactions signed with non-secp256k1 algorithms
-description: This EIP adds a standardized way to support additional algorithms to signed transactions with
+description: This EIP adds a standardized way to support additional algorithms to signed transactions
 author: James Kempton (@SirSpudlington)
 discussions-to: <URL>
 status: Draft
