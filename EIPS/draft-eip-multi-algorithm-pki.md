@@ -199,6 +199,8 @@ Non-EIP-<TODO-PUT-EIP-NUMBER-HERE> transactions will still be included within bl
 
 These test cases do not involve processing other types of transactions. Only the wrapping, unwrapping and verification of these transactions without interfacing with the `parent` tx held inside the main tx.
 
+All the following test cases use the parameters from the [example eip](#example-eip-for-adding-the-secp256k1-curve) listed above.
+
 TODO, must be done before EIP enter review stage.
 
 ## Security Considerations
