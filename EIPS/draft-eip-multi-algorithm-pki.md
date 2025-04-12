@@ -1,6 +1,6 @@
 ---
-title: Transactions backed with non-secp256k1 PKI algorithms
-description: This EIP adds a standardized way to support additional algorithms to back security of accounts and transactions.
+title: Support for transactions signed with non-secp256k1 algorithms
+description: This EIP adds a standardized way to support additional algorithms to signed transactions with
 author: James Kempton (@SirSpudlington)
 discussions-to: <URL>
 status: Draft
