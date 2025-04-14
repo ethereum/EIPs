@@ -163,7 +163,7 @@ def calculate_penalty(signing_data: bytes, algorithm: int) -> int:
   return total_gas_pentalty
 ```
 
-The penalty MUST be added onto the `21000` base gas of each transaction BEFORE the transaction is processed. If the wrapped tx's `gas_limit` is less than to `21000 + calculate_penalty(signing_data, algorithm)` than the transaction MUST be considered invalid and MUST NOT be included within blocks.
+The penalty MUST be added onto the `21000` base gas of each transaction BEFORE the transaction is processed. If the wrapped tx's `gas_limit` is less than to `21000 + calculate_penalty(signing_data, algorithm)` than the transaction MUST be considered invalid and MUST NOT be included within blocks. This transaction also MUST inherit the intrinsics of the wrapped tx's fee structure (e.g. a wrapped EIP-1559 tx would behave as a EIP-1559 tx).
 
 ## Rationale
 
