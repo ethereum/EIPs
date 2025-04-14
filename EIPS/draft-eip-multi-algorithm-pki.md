@@ -41,7 +41,9 @@ The field `alg_type` is a unsigned 8-bit integer (uint8) that represents the alg
 
 The `signature_info` info field contains information required to verify the signature of the transaction in the `parent` field. This is a byte-array of arbitrary length, which would be passed to the verification function.
 
-The `parent` field contains another [eip-2718](./eip-2718.md) Typed Transaction Envelope, which MUST support all existing `TransactionType`s. In addition, all legacy transactions with a `TransactionType` of `> 0x7f` MUST also be supported, the only exception to this rule is the `Algorithmic Transaction` itself, which MUST NOT be placed within itself. These transactions all contain `y_parity`, `r`, `s` values, which MUST be set to `Bytes0()` if wrapped in a `AlgTransactionPayloadBody`, all other values MUST be unchanged from their original values.
+The `parent` field contains another [eip-2718](./eip-2718.md) Typed Transaction Envelope, while MUST be able to contain every possible `TransactionType`s, including legacy transactions with a `TransactionType` of `> 0x7f`, the only exception to this rule is the `Algorithmic Transaction` itself, which MUST NOT be placed within itself. These transactions all contain `y_parity`, `r`, `s` values, which MUST be set to `Bytes0()` if wrapped in a `AlgTransactionPayloadBody`, all other values MUST be unchanged from their original values.
+
+If new transaction types are specified they MUST NOT attempt to build off of this EIP but instead MUST include the `y_parity`, `r`, `s` values, this will prevent backwards compatibility issues and ensure that any transaction other than EIP-<TODO-PUT-EIP-NUMBER-HERE> can be safely assumed to be secp256k1.
 
 The Algorithmic Transaction MUST NOT generate a transaction reciept with a `TransactionType` of `ALG_TX_TYPE`, it MUST generate a transaction receipt of the transaction it is wrapping (the tx in the `parent` field). Implementations MUST not be able differentiate between these receipts.
 
@@ -99,7 +101,7 @@ This EIP defines a new [EIP-<TODO-PUT-EIP-NUMBER-HERE>](./eip-<TODO-PUT-EIP-NUMB
 ```python
 def verify(signature_info: bytes, parent_hash: bytes32) -> boolean, bytes20:
   assert(len(signature_info) == 65)
-  v, r, s = int.from_bytes(signature_info[0:32], 16), int.from_bytes(signature_info[32:64], 16), signature_info[64]
+  r, s, v = signature_info[0:32], signature_info[32:64], signature_info[64]
 
   # This assumes `ecrecover` is identical to the `ecrecover` function in solidity.
   signer = ecrecover(parent_hash, v, r, s)
