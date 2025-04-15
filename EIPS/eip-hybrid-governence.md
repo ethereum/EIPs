@@ -12,31 +12,31 @@ created: 2025-04-10
 
 ## Abstract
 
-This EIP standardizes a framework for encrypting and storing organizational governance documents—such as articles of incorporation and internal regulations—on-chain in hierarchical structures, while limiting access to designated NFT holders.
+This EIP defines a standard for on-chain storage and access control of organizational governance documents using NFT-based permissions and hierarchical document structures. 
+The standard supports encrypted storage with cryptographic integrity verification, version tracking, and signature preservation to enable legally compliant governance for on-chain organizations operating within off-chain legal frameworks, such as decentralized autonomous organization limited liability companies (DAO LLCs). 
 
-Client-side derivation of decryption keys ensures they never appear on-chain. Merkle trees efficiently verify document integrity, with each version tracked by its unique root hash. The system also preserves evidence of consensus by recording the final signature after multiple signatories have reached agreement.
-
-This standard enables hybrid document management for on-chain organizations built upon off-chain legal frameworks (like articles of incorporation or operating agreements), a common structure in DAO LLCs.
 
 ## Motivation
 
-While operating our DAO LLC, we sought to address information asymmetry by maintaining codified governance documents like articles of incorporation and internal regulations on-chain. However, these documents frequently contain confidential information meant only for internal circulation, making plaintext storage on public blockchains unsuitable.
+Current blockchain infrastructure lacks standardized methods for managing hierarchical governance documents that require selective access controls. 
+Many DAOLLCs and similar entities need to store critical documents, such as articles of incorporation and bylaws, on-chain to ensure transparency and immutability. 
+However, these documents often contain sensitive information meant only for authorized members, making plaintext storage on public blockchains impractical.
 
-We faced several significant challenges:
+Key challenges include:
 
-- We needed to store our DAO LLC's articles of incorporation and bylaws on-chain while restricting access exclusively to member NFT holders
-- Our documents follow a hierarchical structure of articles, sections, and clauses, and undergo regular partial amendments
-- We struggled to ensure overall document integrity when only specific portions were updated
-- To minimize gas costs, we wanted to efficiently re-encrypt only the modified sections
-- Distributing and managing individual keys for each member proved impractical
-- While we required secure off-chain decryption, we needed to clearly establish on-chain who had decryption rights
-- We needed an efficient and verifiable system to document consensus and approval from multiple board members
+- Selective access control: There is no standardized mechanism to store sensitive governance documents on-chain while restricting access to authorized participants, such as NFT-holding members.
+- Hierarchical document structure: Governance documents often follow a hierarchical structure (e.g., articles, sections, clauses) and require regular partial amendments. Efficiently managing these updates while preserving document integrity remains a challenge.
+- Gas efficiency: Minimizing gas costs when updating specific portions of documents, such as re-encrypting only the modified sections, is critical for scalability.
+- Key management: Distributing and managing individual decryption keys for each member is complex and impractical in large organizations.
+- Off-chain decryption with on-chain verification: Ensuring that decryption occurs securely off-chain while maintaining clear, on-chain records of decryption rights is a critical gap.
+- Consensus and approval tracking: Verifiable systems for documenting consensus and approvals from multiple board members or stakeholders are needed to establish trust in governance processes.
 
-Through this EIP, we aim to address these challenges by creating a document management system that preserves privacy while leveraging blockchain's transparency and permanence. This solution dramatically improves how critical documents are managed in DAOs and decentralized organizations, expanding the possibilities for on-chain governance.
+This EIP proposes a document management system that addresses these challenges by combining privacy-preserving encryption techniques with blockchain's transparency and permanence. 
+By providing a standardized framework for managing governance documents on-chain, this proposal aims to enhance document integrity, improve operational efficiency, and expand the possibilities for decentralized governance.
 
 ## Specification
 
-Smart contracts complying with this standard must implement the following interface:
+Smart contracts complying with this standard MUST implement the following interface:
 
 ### Interface
 
@@ -355,12 +355,12 @@ This structure allows flexible specification as follows:
 
 - `articleId`
     - ID representing a "chapter" (top-level hierarchy).
-    - Must be 1 or greater.
+    - MUST be 1 or greater.
     - "1" indicates "Article 1", "2" indicates "Article 2".
 - `paragraphId`
     - ID representing a section.
     - "0" means no section specified.
-    - If `itemId` is "1" or greater, this value must also be "1" or greater.
+    - If `itemId` is "1" or greater, this value MUST also be "1" or greater.
 - `itemId`
     - ID representing an item.
     - "0" means no item specified.
@@ -980,7 +980,7 @@ Here are examples of other encryption methods that could be adopted:
 
 ### Why Register Articles Divided Into Chapters, Sections, and Items?
 
-Registering an entire articles of incorporation document at once may not be possible if it's too long for a smart contract.
+Registering an entire articles of incorporation document at once MAY NOT be possible if it's too long for a smart contract.
 
 Additionally, longer documents increase gas costs.
 
