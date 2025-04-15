@@ -12,7 +12,7 @@ requires: 2718, 2930, 1559, 4844
 
 ## Abstract
 
-This EIP introduces a new wrapper type transaction to allow for alternative signature algorithms to sign off on ethereum transactions.
+This EIP introduces a new [eip-2718](./eip-2718.md) type transaction that wraps (contains) another transaction, this EIP nullifies the default signature parameters and appends signature data to the front of the transaction with a selector, this effectively wraps a transactions and swaps out signature data for alternative algorithms and data. It also modifies the ecrecover precompile to be able to decode these additional signature algorithms.
 
 ## Motivation
 
@@ -35,9 +35,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 This EIP introduces a new [eip-2718](./eip-2718.md) transaction with a `TransactionType` of `ALG_TX_TYPE` and a `TransactionPayload` of the RLP serialization of the `AlgTransactionPayloadBody` defined below:
 
-`[alg_type, signature_info, parent]`
+`[alg_type, signature_info, parent, (additional_info)]`
 
-The field `alg_type` is a unsigned 8-bit integer (uint8) that represents the algorithm used to sign the transaction in the `parent` field. This EIP does not define algorithms for use with this transaction type but a structure so they remain interoperable.
+The field `alg_type` is a unsigned 8-bit integer (uint8) that represents the algorithm used to sign the transaction in the `parent` field. This EIP does not define algorithms for use with this transaction type.
 
 The `signature_info` info field contains information required to verify the signature of the transaction in the `parent` field. This is a byte-array of arbitrary length, which would be passed to the verification function.
 
@@ -66,62 +66,7 @@ New algorithms MUST also specify how to recover & verify a valid address (`bytes
 
 The verify function MUST return `(false, 0x0)` if there was an error recovering a valid address from the signature, otherwise the function MUST return `true` and the address of the signer.
 
-### Example EIP for adding the secp256k1 curve
-
-~~~md
-
----
-title: Example EIP to add secp256k1 curve as an algorithmic type
-description: Example EIP to add secp256k1 curve as an algorithmic type
-Author: ExampleAuthor
-discussions-to: fakeurl
-status: Draft
-type: Standards Track
-category: Core
-created: 2025-04-12
-requires: <TODO-PUT-EIP-NUMBER-HERE>
----
-
-## Abstract
-This example EIP adds secp256k1 curve as an algorithmic type.
-
-## Motivation
-secp256k1 is the commonly used curve, therefore it should be added.
-
-## Specification
-
-This EIP defines a new [EIP-<TODO-PUT-EIP-NUMBER-HERE>](./eip-<TODO-PUT-EIP-NUMBER-HERE>.md) algorithmic type with the following parameters.
-
-| Constant | Value |
-| - | - |
-| `ALG_TYPE` | `Bytes1(0x0)` |
-| `GAS_PENALTY`| `0` |
-| `MAX_SIZE` | `65` |
-
-```python
-def verify(signature_info: bytes, parent_hash: bytes32) -> boolean, bytes20:
-  assert(len(signature_info) == 65)
-  r, s, v = signature_info[0:32], signature_info[32:64], signature_info[64]
-
-  # This assumes `ecrecover` is identical to the `ecrecover` function in solidity.
-  signer = ecrecover(parent_hash, v, r, s)
-
-  return (signer != 0x0, signer)
-```
-
-## Rationale
-secp256k1 is the commonly used curve, therefore it should be added.
-
-## Backwards Compatibility
-No backward compatibility issues found.
-
-## Security Considerations
-Needs discussion.
-
-## Copyright
-Copyright and related rights waived via [CC0](../LICENSE.md).
-
-~~~
+An example of this specification can be found [here](../assets/draft-eip-multi-algorithm-pki/template-eip.md).
 
 ### Verification
 
@@ -165,6 +110,10 @@ def calculate_penalty(signing_data: bytes, algorithm: int) -> int:
 
 The penalty MUST be added onto the `21000` base gas of each transaction BEFORE the transaction is processed. If the wrapped tx's `gas_limit` is less than to `21000 + calculate_penalty(signing_data, algorithm)` than the transaction MUST be considered invalid and MUST NOT be included within blocks. This transaction also MUST inherit the intrinsics of the wrapped tx's fee structure (e.g. a wrapped EIP-1559 tx would behave as a EIP-1559 tx).
 
+### Modification to `ecrecover` precompile
+
+
+
 ## Rationale
 
 ### Setting `y_parity`, `r`, `s` values to zero rather than removing them
@@ -201,7 +150,7 @@ Non-EIP-<TODO-PUT-EIP-NUMBER-HERE> transactions will still be included within bl
 
 These test cases do not involve processing other types of transactions. Only the wrapping, unwrapping and verification of these transactions without interfacing with the `parent` tx held inside the main tx.
 
-All the following test cases use the parameters from the [example eip](#example-eip-for-adding-the-secp256k1-curve) listed above.
+All the following test cases use the parameters from the example eip specified in the [Algorithm Specification Section](../assets/draft-eip-multi-algorithm-pki/template-eip.md) listed above.
 
 TODO, must be done before EIP enter review stage.
 
