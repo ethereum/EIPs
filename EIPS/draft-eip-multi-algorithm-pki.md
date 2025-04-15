@@ -1,6 +1,6 @@
 ---
 title: Support for transactions signed with non-secp256k1 algorithms
-description: This EIP adds a standardized way to support additional algorithms to signed transactions
+description: Introduces a new transaction type allowing alternative transaction signature algorithms
 author: James Kempton (@SirSpudlington)
 discussions-to: https://ethereum-magicians.org/t/draft-eip-multi-algorithm-signing-support/23514
 status: Draft
@@ -41,7 +41,7 @@ The field `alg_type` is a unsigned 8-bit integer (uint8) that represents the alg
 
 The `signature_info` info field contains information required to verify the signature of the transaction in the `parent` field. This is a byte-array of arbitrary length, which would be passed to the verification function.
 
-The `parent` field contains another [eip-2718](./eip-2718.md) Typed Transaction Envelope, while MUST be able to contain every possible `TransactionType`s, including legacy transactions with a `TransactionType` of `> 0x7f`, the only exception to this rule is the `Algorithmic Transaction` itself, which MUST NOT be placed within itself. These transactions all contain `y_parity`, `r`, `s` values, which MUST be set to `Bytes0()` if wrapped in a `AlgTransactionPayloadBody`, all other values MUST be unchanged from their original values.
+The `parent` field contains another [eip-2718](./eip-2718.md) Typed Transaction Envelope, which MUST be able to contain every possible `TransactionType`, including legacy transactions with a `TransactionType` of `> 0x7f`, but the only exception to this rule is the `Algorithmic Transaction` itself, which MUST NOT be placed within itself. These transactions all contain `y_parity`, `r`, `s` values, which MUST be set to `Bytes0()` if wrapped in a `AlgTransactionPayloadBody`, all other values MUST be unchanged from their original values.
 
 If new transaction types are specified they MUST NOT attempt to build off of this EIP but instead MUST include the `y_parity`, `r`, `s` values, this will prevent backwards compatibility issues and ensure that any transaction other than EIP-<TODO-PUT-EIP-NUMBER-HERE> can be safely assumed to be secp256k1.
 
@@ -128,8 +128,8 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 Implementations MUST consider transactions invalid where `len(tx.signature_info) > alg.MAX_SIZE`.
 
 The validity/processing of the transaction is completed by the function defined below:
-```python
 
+```python
 def process_transaction(tx: Transaction, from_address: bytes20 = None, start_gas = 21000):
   match tx:
     # Verification for other transactions, if `from_address != None`
@@ -203,7 +203,7 @@ These test cases do not involve processing other types of transactions. Only the
 
 All the following test cases use the parameters from the [example eip](#example-eip-for-adding-the-secp256k1-curve) listed above.
 
-TODO, must be done before EIP enter review stage.
+<!-- TODO, must be done before EIP enter review stage. -->
 
 ## Security Considerations
 
@@ -211,7 +211,7 @@ Allowing more ways to potentially create transactions for a single account may d
 
 Having `signature_info` be of no concrete type creates a chance that an algorithms logic could be specified or implemented incorrectly, which could lead to, in the best case, invalid blocks, or at worst, the ability for anyone to sign a fraudulent transaction for any account. This security consideration is delegated to the algorithms specification, therefore care must be taken when writing these algorithm specifications to avoid critical security flaws.
 
-Further security considerations need discussion.
+<!-- TODO: Further security considerations need discussion. -->
 
 ## Copyright
 
