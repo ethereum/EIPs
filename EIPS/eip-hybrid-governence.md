@@ -358,12 +358,18 @@ function updateChapter(
 ```
 
 Function executed based on votes in the Governance contract to batch update chapters (articles, sections, items) of the articles of incorporation.
-
 Receives addresses that participated in the vote in the Governance contract and the Executor's address.
-
 Registers the specified version.
-
 After signature verification, it updates the articles data and emits the `ChapterUpdated` event.
+
+An error SHOULD be returned in the following cases:
+
+- When versionRoot is 0 bytes.
+- When the signers array is empty.
+- When the signatures array is empty.
+- When finalSignature is 0 bytes.
+- When the length of version is 0.
+- When the items array is empty.
 
 Parameters
 
@@ -385,8 +391,11 @@ function setEphemeralSalt(bytes32 ephemeralSalt) external;
 ```
 
 Function to mark a specific temporary `ephemeralSalt` (unique value for each decryption session) as "used".
-
 Used to prevent reuse of decryption keys. Returns an `EphemeralSaltAlreadyUsed` error if already used.
+
+An error SHOULD be returned in the following case:
+
+- When ephemeralSalt is 0 bytes.
 
 Parameters
 
@@ -400,8 +409,11 @@ function setGovernance(address governance) external;
 ```
 
 Function to update the Governance contract address.
-
 Emits a `GovernanceUpdated` event.
+
+An error SHOULD be returned in the following case:
+
+- When governance is the zero address.
 
 - `governance`
     - Updated Governance contract address.
@@ -413,8 +425,11 @@ function setToken(address token) external;
 ```
 
 Function to update the NFT contract address.
-
 Emits a `TokenUpdated` event.
+
+An error SHOULD be returned in the following case:
+
+- When token is the zero address.
 
 - `token`
     - Updated NFT contract address.
@@ -513,11 +528,8 @@ function verifyDecryptionKeyHashWithSaltHash(
 ```
 
 Function to verify the `ephemeralSalt`, `masterSaltHash`, and NFT ownership used to derive the decryption key.
-
 Returns `false` if the `ephemeralSalt` has been used.
-
 Returns `false` if the `masterSaltHash` differs from the value registered in the contract.
-
 Returns `false` if the address is not an NFT holder.
 
 **Parameters**
@@ -545,7 +557,6 @@ event ChapterUpdated(
 ```
 
 Event emitted when new chapter (article, paragraph, item) data is registered or updated.
-
 This is emitted when the AOI contract is deployed or when executed by the Executor following a vote in the Governance contract.
 
 #### Parameters:
@@ -568,7 +579,6 @@ event EphemeralSaltMarkedUsed(bytes32 ephemeralSalt);
 ```
 
 Event emitted when a user marks a specific `ephemeralSalt` (temporary session identifier) as used to prevent reuse of decryption keys.
-
 Emitted when `setEphemeralSalt()` is executed.
 
 - `ephemeralSalt`
