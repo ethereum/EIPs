@@ -1,4 +1,3 @@
-
 ---
 title: Example EIP to add secp256k1 curve as an algorithmic type
 description: Example EIP to add secp256k1 curve as an algorithmic type
@@ -8,7 +7,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2025-04-12
-requires: <TODO-PUT-EIP-NUMBER-HERE>
+requires: 7932
 ---
 
 ## Abstract
@@ -19,7 +18,7 @@ secp256k1 is the commonly used curve, therefore it should be added.
 
 ## Specification
 
-This EIP defines a new [EIP-<TODO-PUT-EIP-NUMBER-HERE>](./eip-<TODO-PUT-EIP-NUMBER-HERE>.md) algorithmic type with the following parameters.
+This EIP defines a new [EIP-7932](./eip-7932.md) algorithmic type with the following parameters.
 
 | Constant | Value |
 | - | - |
