@@ -911,81 +911,11 @@ contract AOI is IAOI, AccessControl {
 
 ```
 
-### Options
-
-#### EIP712
-
-EIP712 can also be used for Executor verification.
-
-You can use any signature verification method you prefer.
-
-## Rationale
-
-### Flow
-
-The following explains the flow from encryption of articles of incorporation to decryption by NFT holders.
-
-#### [1] Encryption of Articles by Administrators (Off-chain)
-
-- Administrators prepare each chapter (article, section, item) of the articles of incorporation.
-- For each chapter, the following process is executed:
-    - Determine the `plaintext`.
-    - Randomly generate a `masterSalt` (different for each chapter).
-    - Generate a decryption key:
-
-```jsx
-key = keccak256(encode([location, masterSalt, userAddress, ephemeralSalt]))
-```
-
-- At this stage, the decryptor's address is set to the administrator's address.
-- Encrypt using `AES-256-GCM` to obtain `encryptedData`.
-- `plaintextHash = keccak256(plaintext)`.
-- `masterSaltHash = keccak256(masterSalt)`.
-- Deploy the AOI contract and pass the information prepared earlier.
-
-#### [2] Derivation of Decryption Key by User (NFT Holder) (Off-chain)
-
-- User specifies the chapter (location) of the articles they want to view and generates an `ephemeralSalt` (disposable random value).
-- Derive the decryption key by combining their own `userAddress` with `location`, `masterSalt`, and `ephemeralSalt`.
-
-```jsx
-key = keccak256(encode([location, masterSalt, userAddress, ephemeralSalt]))
-```
-
-#### [3] Verify Decryption Key Integrity On-chain
-
-- Verify using one of the following functions with the `masterSalt` and `ephemeralSalt` derived off-chain:
-    - `verifyDecryptionKeyForHolder(location, ephemeralSalt, masterSalt)`
-        
-        → Check if the hash calculated from masterSalt matches the registered `masterSaltHash`.
-        
-        → Check if the `ephemeralSalt` is not already used.
-        
-        → Check if the address is an NFT holder.
-        
-- After successful verification, execute `setEphemeralSalt(ephemeralSalt)` to the contract to invalidate that `ephemeralSalt` (preventing reuse).
-
-#### [4] Decryption (Off-chain)
-
-- Retrieve `encryptedData` using `getEncryptedItem(location)`.
-- Decrypt using `AES-256-GCM` with the derived `key` and `ephemeralSalt`.
-- Compare the decryption result with `plaintextHash` (stored on-chain).
-    - If they match, it confirms that the data is **legitimate and unaltered**.
-
-#### [5] Updating Articles of Incorporation (On-chain)
-
-- Conduct a vote in the Governance contract to execute the following process:
-    - Update the articles information by passing an array of structures containing the following information through the `updateChapter()` function:
-        - `location` (structured identifier of article, section, item)
-        - `encryptedData`
-        - `plaintextHash`
-        - `masterSaltHash`
-- Generate a Merkle Root from all `plaintextHash` values and save it as `versionRoot`.
-- The `ChapterUpdated` event is emitted, transparently recording the change history.
-
 ## Test Cases
 
 Sample test code is available and running on Github.
+
+## Rationale
 
 ### Why Use AES-256-GCM?
 
@@ -1073,6 +1003,73 @@ When changes are made, `updateChapter()` is executed and a new `versionRoot` is 
 This is not mandatory.
 
 However, recording this information on the smart contract makes it possible to know who served as Executor and who participated in voting, which can be useful in situations where this information is needed.
+
+### Flow
+
+The following explains the flow from encryption of articles of incorporation to decryption by NFT holders.
+
+#### [1] Encryption of Articles by Administrators (Off-chain)
+
+- Administrators prepare each chapter (article, section, item) of the articles of incorporation.
+- For each chapter, the following process is executed:
+    - Determine the `plaintext`.
+    - Randomly generate a `masterSalt` (different for each chapter).
+    - Generate a decryption key:
+
+```jsx
+key = keccak256(encode([location, masterSalt, userAddress, ephemeralSalt]))
+```
+
+- At this stage, the decryptor's address is set to the administrator's address.
+- Encrypt using `AES-256-GCM` to obtain `encryptedData`.
+- `plaintextHash = keccak256(plaintext)`.
+- `masterSaltHash = keccak256(masterSalt)`.
+- Deploy the AOI contract and pass the information prepared earlier.
+
+#### [2] Derivation of Decryption Key by User (NFT Holder) (Off-chain)
+
+- User specifies the chapter (location) of the articles they want to view and generates an `ephemeralSalt` (disposable random value).
+- Derive the decryption key by combining their own `userAddress` with `location`, `masterSalt`, and `ephemeralSalt`.
+
+```jsx
+key = keccak256(encode([location, masterSalt, userAddress, ephemeralSalt]))
+```
+
+#### [3] Verify Decryption Key Integrity On-chain
+
+- Verify using one of the following functions with the `masterSalt` and `ephemeralSalt` derived off-chain:
+    - `verifyDecryptionKeyForHolder(location, ephemeralSalt, masterSalt)`
+        
+        → Check if the hash calculated from masterSalt matches the registered `masterSaltHash`.
+        
+        → Check if the `ephemeralSalt` is not already used.
+        
+        → Check if the address is an NFT holder.
+        
+- After successful verification, execute `setEphemeralSalt(ephemeralSalt)` to the contract to invalidate that `ephemeralSalt` (preventing reuse).
+
+#### [4] Decryption (Off-chain)
+
+- Retrieve `encryptedData` using `getEncryptedItem(location)`.
+- Decrypt using `AES-256-GCM` with the derived `key` and `ephemeralSalt`.
+- Compare the decryption result with `plaintextHash` (stored on-chain).
+    - If they match, it confirms that the data is **legitimate and unaltered**.
+
+#### [5] Updating Articles of Incorporation (On-chain)
+
+- Conduct a vote in the Governance contract to execute the following process:
+    - Update the articles information by passing an array of structures containing the following information through the `updateChapter()` function:
+        - `location` (structured identifier of article, section, item)
+        - `encryptedData`
+        - `plaintextHash`
+        - `masterSaltHash`
+- Generate a Merkle Root from all `plaintextHash` values and save it as `versionRoot`.
+- The `ChapterUpdated` event is emitted, transparently recording the change history.
+
+### EIP712
+
+EIP712 can also be used for Executor verification.
+You can use any signature verification method you prefer.
 
 ## Security Considerations
 
