@@ -267,70 +267,6 @@ interface IAOI {
 
 ```
 
-### Events
-
-#### `ChapterUpdated`
-
-```solidity
-event ChapterUpdated(
-    bytes32 versionRoot,
-    ItemLocation[] updatedLocations
-);
-```
-
-Event emitted when new chapter (article, paragraph, item) data is registered or updated.
-
-This is emitted when the AOI contract is deployed or when executed by the Executor following a vote in the Governance contract.
-
-#### Parameters:
-
-- `versionId`
-    - ID converted from `versionRoot` to `uint256`.
-    - Used as an identifier for version management.
-- `versionRoot`
-    - Root hash of the articles being signed.
-- `finalSigner`
-    - Address of the Executor.
-- `signers`
-    - Array of addresses that participated in the vote in the Governance contract.
-- `updatedLocations`: Array of positions (`ItemLocation`) of updated chapters.
-
-#### `EphemeralSaltMarkedUsed`
-
-```solidity
-event EphemeralSaltMarkedUsed(bytes32 ephemeralSalt);
-```
-
-Event emitted when a user marks a specific `ephemeralSalt` (temporary session identifier) as used to prevent reuse of decryption keys.
-
-Emitted when `setEphemeralSalt()` is executed.
-
-- `ephemeralSalt`
-    - Temporary salt value marked as used.
-    - Cannot be reused.
-
-#### `GovernanceUpdated`
-
-```solidity
-event GovernanceUpdated(address governance);
-```
-
-Event emitted when the Governance contract address is updated.
-
-- `governance`
-    - Updated Governance contract address.
-
-#### `TokenUpdated`
-
-```solidity
-event TokenUpdated(address token);
-```
-
-Event emitted when the NFT contract address is updated.
-
-- `token`
-    - Updated NFT contract address.
-
 ### Struct
 
 #### `ItemLocation`
@@ -596,6 +532,70 @@ Returns `false` if the address is not an NFT holder.
 **Returns**
 
 - `true` if all match.
+
+### Events
+
+#### `ChapterUpdated`
+
+```solidity
+event ChapterUpdated(
+    bytes32 versionRoot,
+    ItemLocation[] updatedLocations
+);
+```
+
+Event emitted when new chapter (article, paragraph, item) data is registered or updated.
+
+This is emitted when the AOI contract is deployed or when executed by the Executor following a vote in the Governance contract.
+
+#### Parameters:
+
+- `versionId`
+    - ID converted from `versionRoot` to `uint256`.
+    - Used as an identifier for version management.
+- `versionRoot`
+    - Root hash of the articles being signed.
+- `finalSigner`
+    - Address of the Executor.
+- `signers`
+    - Array of addresses that participated in the vote in the Governance contract.
+- `updatedLocations`: Array of positions (`ItemLocation`) of updated chapters.
+
+#### `EphemeralSaltMarkedUsed`
+
+```solidity
+event EphemeralSaltMarkedUsed(bytes32 ephemeralSalt);
+```
+
+Event emitted when a user marks a specific `ephemeralSalt` (temporary session identifier) as used to prevent reuse of decryption keys.
+
+Emitted when `setEphemeralSalt()` is executed.
+
+- `ephemeralSalt`
+    - Temporary salt value marked as used.
+    - Cannot be reused.
+
+#### `GovernanceUpdated`
+
+```solidity
+event GovernanceUpdated(address governance);
+```
+
+Event emitted when the Governance contract address is updated.
+
+- `governance`
+    - Updated Governance contract address.
+
+#### `TokenUpdated`
+
+```solidity
+event TokenUpdated(address token);
+```
+
+Event emitted when the NFT contract address is updated.
+
+- `token`
+    - Updated NFT contract address.
 
 ## Backwards Compatibility
 
