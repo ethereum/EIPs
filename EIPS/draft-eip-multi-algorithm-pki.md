@@ -1,4 +1,5 @@
 ---
+eip: 7932
 title: Support for transactions signed with non-secp256k1 algorithms
 description: Introduces a new transaction type allowing alternative transaction signature algorithms
 author: James Kempton (@SirSpudlington)
