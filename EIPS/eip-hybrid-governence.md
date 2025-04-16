@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: 7931
 title: Hybrid Governance Documents  Management
 description: Hybrid governance document management for on-chain organizations built upon off-chain legal frameworks
 author: Akira Umeno (@cardene777), Takashi Oka <oktks@proton.me>
