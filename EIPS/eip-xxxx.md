@@ -1,7 +1,7 @@
 ---
 eip: xxxx
 title: RLP Block Size Limit
-description: Introduce a protocol-level cap on the maximum RLP-encoded block size to 10.5 MB, including a 512 KB margin for beacon block size.
+description: Introduce a protocol-level cap on the maximum RLP-encoded block size to 10 MB, including a 512 KB margin for beacon block size.
 author: Giulio Rebuffo (@Giulio2002), Ben Adams (@benaadams)
 discussions-to: ---
 status: Draft
