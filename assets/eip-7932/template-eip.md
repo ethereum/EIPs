@@ -18,7 +18,7 @@ secp256k1 is the commonly used curve, therefore it should be added.
 
 ## Specification
 
-This EIP defines a new [EIP-7932](./eip-7932.md) algorithmic type with the following parameters.
+This EIP defines a new [EIP-7932](../../EIPS/eip-7932.md) algorithmic type with the following parameters.
 
 | Constant | Value |
 | - | - |
@@ -47,4 +47,4 @@ No backward compatibility issues found.
 Needs discussion.
 
 ## Copyright
-Copyright and related rights waived via [CC0](../LICENSE.md).
+Copyright and related rights waived via [CC0](../../LICENSE.md).
