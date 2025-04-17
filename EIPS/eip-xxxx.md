@@ -1,7 +1,7 @@
 ---
 eip: xxxx
 title: RLP Block Size Limit
-description: Introduce a protocol-level cap on the maximum RLP-encoded block size to 10 MB.
+description: Introduce a protocol-level cap on the maximum RLP-encoded block size to 10.5 MB, including a 512 KB margin for beacon block size.
 author: Giulio Rebuffo (@Giulio2002)
 discussions-to: https://ethereum-magicians.org/t/eip-7826-rlp-block-size-limit/21849
 status: Draft
@@ -12,30 +12,34 @@ created: 2025-04-16
 
 ## Abstract
 
-This proposal introduces a protocol-level cap on the maximum RLP-encoded block size to 10 megabytes (MB) to facilitate predictable validation and propagation of Ethereum blocks.
-
+This proposal introduces a protocol-level cap on the maximum RLP-encoded block size to 10 megabytes (MB), which includes a margin of 512 KB to account for beacon block sizes.
 ## Motivation
 
 Currently, Ethereum does not enforce a strict upper limit on the encoded size of blocks. This lack of constraint can result in:
 
 1. **Network Instability**: Extremely large blocks slow down propagation and increase the risk of temporary forks and reorgs.
-3. **DoS Risks**: Malicious actors could generate exceptionally large blocks to disrupt network performance.
+2. **DoS Risks**: Malicious actors could generate exceptionally large blocks to disrupt network performance.
 
 Additionally, blocks exceeding 10 MB are not propagated by the consensus layer's (CL) gossip protocol, potentially causing network fragmentation or denial-of-service (DoS) conditions.
 
-By imposing a protocol-level limit on the RLP-encoded block size, Ethereum can ensure Enhanced resilience against targeted attacks on block validation times.
-
-Therefore, this EIP proposes a maximum RLP-encoded block size of 10 MB, which is consistent with the current block size dynamics and the limitations of the Ethereum consensus layer, this way increase block size limits is safer.
+By imposing a protocol-level limit on the RLP-encoded block size, Ethereum can ensure enhanced resilience against targeted attacks on block validation times. Adding an additional margin of 512 KB explicitly accommodates beacon block sizes, ensuring compatibility across network components.
 
 ## Specification
 
 ### Block Size Cap
 
-- Introduce a constant `MAX_RLP_BLOCK_SIZE` set to **10 MB (10,485,760 bytes)**.
+- Introduce constants:
+  - `MAX_BLOCK_SIZE` set to **10.5 MB (11,010,048 bytes)**
+  - `MARGIN` set to **512 KB (524,288 bytes)**
+  - `MAX_RLP_BLOCK_SIZE` calculated as `MAX_BLOCK_SIZE - MARGIN`
 - Any RLP-encoded block exceeding `MAX_RLP_BLOCK_SIZE` must be considered invalid.
 
 Thus add the following check to the Ethereum protocol:
 ```python
+MAX_BLOCK_SIZE = 11_010_048  # 10.5 MB
+MARGIN = 524_288  # 512 KB
+MAX_RLP_BLOCK_SIZE = MAX_BLOCK_SIZE - MARGIN
+
 # if true, the block is invalid and should be rejected/not get built
 def exceed_max_rlp_block_size(block: Block) -> bool:
     return len(rlp.encode(block)) > MAX_RLP_BLOCK_SIZE
@@ -53,9 +57,9 @@ def exceed_max_rlp_block_size(block: Block) -> bool:
 
 ## Rationale
 
-### Why 10 MB?
+### Why 10.5 MB?
 
-A cap of 10 MB aligns with the gossip protocol constraint in Ethereum's consensus layer (CL), ensuring compatibility and consistent block propagation across the network. Blocks larger than 10 MB will not be broadcast by the CL, which could lead to network fragmentation or denial-of-service scenarios.
+A cap of 10 MB aligns with the gossip protocol constraint in Ethereum's consensus layer (CL). An additional 512 KB margin explicitly accounts for beacon block sizes, ensuring compatibility and consistent block propagation across the network. Blocks significantly larger than 10 MB will not be broadcast by the CL, potentially leading to network fragmentation or denial-of-service scenarios.
 
 ## Backwards Compatibility
 
