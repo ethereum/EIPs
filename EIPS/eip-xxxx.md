@@ -57,7 +57,7 @@ def exceed_max_rlp_block_size(block: Block) -> bool:
 
 ## Rationale
 
-### Why 10.5 MB?
+### Why 10 MB?
 
 A cap of 10 MB aligns with the gossip protocol constraint in Ethereum's consensus layer (CL). An additional 512 KB margin explicitly accounts for beacon block sizes, ensuring compatibility and consistent block propagation across the network. Blocks significantly larger than 10 MB will not be broadcast by the CL, potentially leading to network fragmentation or denial-of-service scenarios.
 
