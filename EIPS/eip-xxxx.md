@@ -3,7 +3,7 @@ eip: xxxx
 title: RLP Block Size Limit
 description: Introduce a protocol-level cap on the maximum RLP-encoded block size to 10.5 MB, including a 512 KB margin for beacon block size.
 author: Giulio Rebuffo (@Giulio2002)
-discussions-to: https://ethereum-magicians.org/t/eip-7826-rlp-block-size-limit/21849
+discussions-to: ---
 status: Draft
 type: Standards Track
 category: Core
@@ -67,8 +67,7 @@ This change is **not backward-compatible** with any blocks larger than the newly
 
 ## Security Considerations
 
-1. **Enhanced DoS Mitigation**: Restricting maximum block size provides inherent protection against deliberate oversized-block attacks.
-2. **Predictable Validation**: More consistent block sizes streamline validation and synchronization, strengthening the network's resilience and decentralization.
+Restricting maximum block size provides inherent protection against deliberate oversized-block attacks.
 
 ## Copyright
 
