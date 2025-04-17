@@ -3,7 +3,7 @@ eip: xxxx
 title: RLP Execution Block Size Limit
 description: Introduce a protocol-level cap on the maximum RLP-encoded block size to 10 MB, including a 512 KB margin for beacon block size.
 author: Giulio Rebuffo (@Giulio2002), Ben Adams (@benaadams), Storm Slivkoff (@sslivkoff)
-discussions-to: ---
+discussions-to: https://ethereum-magicians.org/t/eip-xxx-add-bytesize-limit-to-blocks/23589
 status: Draft
 type: Standards Track
 category: Core
