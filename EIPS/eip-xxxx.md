@@ -29,14 +29,14 @@ By imposing a protocol-level limit on the RLP-encoded block size, Ethereum can e
 ### Block Size Cap
 
 - Introduce constants:
-  - `MAX_BLOCK_SIZE` set to **10.5 MB (11,010,048 bytes)**
+  - `MAX_BLOCK_SIZE` set to **10 MB (10,485,760 bytes)**
   - `MARGIN` set to **512 KB (524,288 bytes)**
   - `MAX_RLP_BLOCK_SIZE` calculated as `MAX_BLOCK_SIZE - MARGIN`
 - Any RLP-encoded block exceeding `MAX_RLP_BLOCK_SIZE` must be considered invalid.
 
 Thus add the following check to the Ethereum protocol:
 ```python
-MAX_BLOCK_SIZE = 11_010_048  # 10.5 MB
+MAX_BLOCK_SIZE = 10_485_760  # 10 MB
 MARGIN = 524_288  # 512 KB
 MAX_RLP_BLOCK_SIZE = MAX_BLOCK_SIZE - MARGIN
 
