@@ -1,0 +1,162 @@
+---
+title: 64-bit mode EVM operations
+description: Multibyte opcodes for 64-bit arithmetic, comparison, bitwise, stack and flow operations in EVM.
+author: Wei Tang (@sorpaas)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-04-23
+---
+
+## Abstract
+
+This EIP introduces multibyte opcodes prefixed by `C0` for 64-bit arithmetic (`C001`-`C00B`), comparison (`C010`-`C015`), bitwise (`C016`-`C019`), stack (`DUP*` and `SWAP*`) and flow (`C056` and `C057` in "legacy", or `C0E1` and `C0E2` in EOFv1) operations.
+
+## Motivation
+
+Not all computations in EVM can utilize the full 256-bit integer width. It can therefore be beneficial to have a "64-bit mode" to avoid unnecessary cycles. This EIP uses a "prefix" opcode `C0`, essentially forming multibyte opcodes to avoid polluting the EVM opcode space too much.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+### Prefix opcode behavior
+
+This EIP uses the prefix opcode `C0`, and it only occupies this single EVM opcode space. Upon the interpreter encountering opcode `C0`, it MUST continue to seek the next byte in code. It then executes things in "64-bit mode", based on the second byte, described below. If the execution is successful, then the interpreter MUST increase `PC` by 2 (instead of 1).
+
+If the second byte is not a valid 64-bit mode operation, then the interpreter MUST OOG.
+
+### General 64-bit mode behavior
+
+In 64-bit mode, all operations only work on the lowest 64-bit of each stack value. The first 192-bit is discarded. When a result value is pushed back onto the stack, then it MUST ensures that observable effects will see that the first 192-bit is zero. Note that here it's not necessary for an interpreter to reset the first 192-bit to zero every time -- if the next opcode is still in 64-bit mode, then the first 192-bit is still unobservable. We discuss the full details in the "rationale" section, but the short summary is that both endianess and integer size can be optimized away. The interpreter only needs to reproduce the full 256-bit value upon entering non-64-bit mode. If the full computational heavy part can be written in pure 64-bit mode, then this can result in noticable performance gain.
+
+### Gas cost constants
+
+We define the following gas cost constants:
+
+* `G_BASE64`: 1
+* `G_VERYLOW64`: 2
+* `G_LOW64`: 3
+* `G_MID64`: 4
+
+### Arithmetic opcodes
+
+The 64-bit mode arithmetic opcodes are defined the same as non-64-bit mode, except that it only operates on the last 64-bits. In the below definition, `a`, `b`, `N` is `a mod 2^64`, `b mod 2^64` and `N mod 2^64`.
+
+* ADD (`C001`) and `SUB` (`C003`): `a op b mod 2^64`, gas cost `G_VERYLOW64`.
+* MUL (`C002`), DIV (`C004`), SDIV (`C005`), MOD (`C006`), SMOD (`C007`), SIGNEXTEND (`C00B`): `a op b mod 2^64`, gas cost `G_LOW64`.
+* ADDMOD (`C008`), MULMOD (`C009`): `a op b % N mod 2^64`, gas cost `G_MID64`.
+* EXP (`C00A`): `a EXP b mod 2^64`, gas cost is the same as non-64-bit mode.
+
+### Comparison and bitwise opcodes
+
+The 64-bit mode comparison and bitwise opcodes are defined the same as non-64-bit mode, except that they only operates on the last 64-bits.
+
+* LT (`C010`), GT (`C011`), SLT (`C012`), SGT (`C013`), EQ (`C014`), AND (`C016`), OR (`C017`), XOR (`C018`): `a op b mod 2^64`, gas cost `G_VERYLOW64`
+* ISZERO (`C015`), NOT (`C019`): `op a mod 2^64`, gas cost `G_VERYLOW64`
+
+Note that:
+
+* 64-bit EQ (`C014`) may return true for two different integers because it'll only compare the last 64-bits.
+* 64-bit ISZERO (`C015`) may return true for non-zero 256-bit integers as long as the last 64 bits are zero.
+* BYTE (`1A`) does not have 64-bit mode because it affects endianness.
+
+### Stack opcodes
+
+For stack opcodes `DUP*` and `SWAP*`, the behavior is as follows:
+
+* For `DUP*`, the value duplicated on the stack will only have the last 64-bit copied. The rest 192 bits, when observable, are zero. For example, DUP1 with stack `[ value ]` will be `[ value mod 2^64, value ]`.
+* For `SWAP*`, the two values swapped will only have the last 64 bits. The rest 192 bits, when observable, are zero. For example, SWAP1 with stack `[ a, b ]` will be `[ b mod 2^64, a mod 2^64 ]`.
+
+Note that:
+
+* `PUSH0`-`PUSH8` and `POP` are automatically in 64-bit mode without prefix. This only affects optimizations.
+* The gas costs of `DUP*` and `SWAP*` in 64-bit mode is the same as in non-64-bit mode.
+
+### Non-EOFv1 "legacy" mode and JUMP, JUMPI
+
+For flow operations JUMP and JUMPI, the behavior is as follows:
+
+* `JUMP` will only read the last 64 bits from the stack value. The rest 192 bits are discarded without reading.
+* `JUMPI` will only read the last 64 bits from the stack as destination, and the condition check will only read the last 64 bits.
+* The gas costs for `JUMP` and `JUMPI` remains the same.
+
+### EOFv1 mode and RJUMPI, RJUMPV
+
+If EOFv1 mode is entered, then an additional validation step is added. If the opcode `C0` is encountered and it is not part of PUSH opcode's data, then the interpreter MUST validate that:
+
+* The next opcode exists.
+* The next opcode is one of the valid 64-bit mode opcode described above.
+
+For flow operations RJUMPI and RJUMPV, the 64-bit mode has following changes:
+
+* For `RJUMPI`, the condition popped from stack is only read for the last 64 bits.
+* For `RJUMPV`, the case popped from stack is only read for the last 64 bits.
+
+Note that:
+
+* `RJUMP` is automatically in 64-bit mode because it does not read or write the stack.
+* The gas costs for `RJUMPI` and `RJUMPV` remains the same.
+
+## Rationale
+
+When a smart contract uses the 64-bit mode, it's expected that once entered, it will want to stay in 64-bit mode, and only exit to non-64-bit mode when the computationally intensive function is finished. This EIP is designed particularly with this fact in mind.
+
+All 64-bit opcodes only operates on the 64-bit value. It totally discards the rest 192 bits. The interpreter only needs to ensure that when it exits into non-64-bit mode and next time when a value result is read, that value has the first 192 bits reset to zero. The EVM interpreter can therefore use a typed stack for optmization:
+
+```haskell
+type StackItem = Value U256 | Value64 U64
+```
+
+The typed stack can also be implemented as a bitmap for memory alignment.
+
+For all inputs of 64-bit opcodes, it will either read in a `Value`, when it'll only take the last 64 bits, or a `Value64`, which is what is needed. It then always outputs a `Value64`. After exiting into non-64-bit mode and upon a `Value64` is read, the interpreter then translate the value back to 256-bit `Value` by extending the first 192 bits with zero.
+
+The 64-bit mode does not contain any opcodes which depends on the value's endianness, therefore `Value64` can also be stored in the optimal endianness of the architecture.
+
+## Backwards Compatibility
+
+This EIP introduces a new (prefix) opcode `C0`. `C0` was previously an invalid opcode that has little usage, and thus the backward compatibility issues are minimal.
+
+## Recommendations
+
+This EIP also recommends that we reserve `C0`-`CF` for prefix (modes) opcodes. For example, an additional modes OVERFLOW can be envisioned that changes the behavior of arithmetic opcodes from wrapping to overflow OOG, which can help to reduce, for example, the extra cycles needed for `SafeMath`.
+
+## Test Cases
+
+<!--
+  This section is optional for non-Core EIPs.
+
+  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
+  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
+
+  TODO: Remove this comment before submitting
+-->
+
+## Reference Implementation
+
+<!--
+  This section is optional.
+
+  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
+  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
+
+  TODO: Remove this comment before submitting
+-->
+
+## Security Considerations
+
+<!--
+  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+
+  The current placeholder is acceptable for a draft.
+
+  TODO: Remove this comment before submitting
+-->
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
