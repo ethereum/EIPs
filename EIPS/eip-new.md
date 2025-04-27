@@ -1,0 +1,68 @@
+---
+eip: <TBD>
+title: Exponential Gas Limit Increase via Default Client Voting Behavior
+description: Exponentially increase gas limit 100x over 4 years
+author: [Dankrad Feist] <dankrad@ethereum.org>
+discussions-to: <URL>
+status: Draft
+type: Informational
+category: Core
+created: 2025-04-23
+requires: <None>
+---
+
+## Abstract
+
+This proposal introduces a deterministic gas limit growth schedule via client-side defaults. Ethereum clients will vote to increase the gas limit according to an exponential schedule unless explicitly configured otherwise by the user. The gas limit increase occurs every beacon chain epoch, aligned to a factor-of-10 increase every approximately 164,250 epochs (2 years). It will stop after 4 years when an updated gas increase schedule should be decided and committed to.
+
+## Motivation
+
+The current gas limit mechanism relies on miner/operator voting, which lacks coordination and predictability. While flexible, this approach can lead to stagnation or overly cautious increases. By introducing a predictable exponential growth pattern as a client default, this EIP encourages a sustainable and transparent gas limit trajectory, aligned with expected advancements in hardware and protocol efficiency.
+
+## Specification
+
+### Schedule
+
+Let `G0 = 50,000,000` be the gas limit at the activation epoch. Let the activation epoch be Ethereum beacon chain **epoch 369017**, which corresponds to approximately June 1, 2025.
+
+Let `t` be the number of beacon chain epochs since the activation epoch (Epoch 0).
+
+To reach a 10x increase over 164,250 epochs (2 years), the gas limit at epoch `t` is:
+
+```text
+G(t) = round(G0 * m^t)
+where m = 10^(1/164250) ≈ 1.0000140438
+```
+
+The increase  stops when it reaches `100 * G0`, which will be after approximately 4 years.
+
+`round` should round to the next integer. 
+
+### Client Behavior
+
+- At the start of each new beacon chain epoch, the default gas limit vote is recalculated using the formula above.
+- Clients automatically vote for the calculated gas limit using the existing gas voting mechanism.
+- Users can override this default by setting a manual gas limit policy in client configuration.
+
+### Activation
+
+- Activation is at Ethereum beacon chain epoch 369017.
+
+## Rationale
+
+This EIP maintains Ethereum's current gas voting mechanism but enhances it with a predictable and community-coordinated trajectory. By distributing responsibility across clients rather than enforcing protocol changes via consensus rules, this proposal offers flexibility while encouraging scalability.
+
+The exponential growth model ensures gradual but significant increases, allowing the network to adapt while targeting ambitious throughput goals.
+
+## Backwards Compatibility
+
+The change is non-consensus and backward compatible. Clients not implementing the EIP will continue to behave as before. Only the default behavior changes; manual configuration remains supported.
+
+## Security Considerations
+
+A rapid increase in the gas limit may stress less-optimized nodes and increase block propagation times. However, the exponential schedule with very gradual increments per epoch gives node operators and developers ample time to adapt and optimize.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
