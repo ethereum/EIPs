@@ -1,10 +1,10 @@
-EIP: <to be assigned>
-Title: Available Attestation: A Reorg-Resilient Fork Choice Rule for Ethereum
-Author: Mingfei Zhang <mingfei.zh@outlook.com>, Rujia Li <rujia@tsinghua.edu.cn>, Xueqian Lu <xueqian.lu@bitheart.org>, Sisi Duan <duansisi@tsinghua.edu.cn>
-Status: Draft
-Type: Core
-Category: Consensus
-Created: 2025-03-25
+EIP: <to be assigned>\
+Title: Available Attestation: A Reorg-Resilient Fork Choice Rule for Ethereum\
+Author: Mingfei Zhang <mingfei.zh@outlook.com>, Rujia Li <rujia@tsinghua.edu.cn>, Xueqian Lu <xueqian.lu@bitheart.org>, Sisi Duan <duansisi@tsinghua.edu.cn>\
+Status: Draft\
+Type: Core\
+Category: Consensus\
+Created: 2025-03-25\
 
 ---
 
