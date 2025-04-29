@@ -1,6 +1,6 @@
 ---
 EIP: xxx <to be assigned>
-Title: Available Attestation: A Reorg-resilient solution for Ethereum
+Title: Available Attestation: A Reorg-resilient Solution for Ethereum
 Author: Mingfei Zhang @Mart1i1n, Rujia Li @rick635, Xueqian Lu @xueqianLu, Sisi Duan @fififish
 Status: Draft
 Type: Core
