@@ -1,6 +1,6 @@
 ---
 EIP: xxx <to be assigned>
-Title: Available Attestation: A Reorg-Resilient Fork Choice Rule for Ethereum
+Title: Available Attestation: A Reorg-resilient solution for Ethereum
 Author: Mingfei Zhang @Mart1i1n, Rujia Li @rick635, Xueqian Lu @xueqianLu, Sisi Duan @fififish
 Status: Draft
 Type: Core
@@ -23,7 +23,7 @@ Created: 2025-03-25
 
 ## Abstract
 
-Ethereum transitioned from Proof-of-Work consensus to Proof-of-Stake (PoS) consensus in September 2022. While this upgrade brings significant improvements (e.g., lower energy costs and higher throughput), it also introduces new vulnerabilities. One notable example is the so-called malicious *reorganization attack*. Malicious reorganization denotes an attack in which Byzantine faulty validators intentionally manipulate the canonical chain so that blocks created by honest validators are discarded. By doing so, the faulty validators can gain benefits such as higher rewards, lower chain quality, or even pose a liveness threat to the system. We show that all known attacks on Ethereum PoS are some form of reorganization attacks. In practice, most of these attacks can be launched even if the network is synchronous (where there exists a known upper bound for message transmission and processing). Different from existing studies that mitigate the attacks in an ad-hoc way, we take a systematic approach and provide an elegant yet efficient solution to reorganization attacks. Our solution is provably secure such that no reorganization attacks can be launched in a synchronous network. In a partially synchronous network, our approach achieves the conventional safety and liveness properties of the consensus protocol, which are even stronger than those of the vanilla Ethereum PoS protocol. Our proposal has been accepted in USENIX Security 2025 ([eprint](https://eprint.iacr.org/2025/097.pdf)).
+We propose a solution to address all known attacks in Ethereum PoS called Available Attestation. We show that all known attacks on Ethereum PoS are some form of reorganization attacks. Different from existing studies that mitigate the attacks in an ad-hoc way, we take a systematic approach and provide an elegant yet efficient solution to reorganization attacks. Our solution is provably secure such that no reorganization attacks can be launched in a synchronous network. In a partially synchronous network, our approach achieves the conventional safety and liveness properties of the consensus protocol, which are even stronger than those of the vanilla Ethereum PoS protocol. Our proposal has been accepted in USENIX Security 2025 ([eprint](https://eprint.iacr.org/2025/097.pdf)).
 
 ---
 
