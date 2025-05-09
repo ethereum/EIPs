@@ -125,7 +125,7 @@ Calling `confidentialApprove` splits the confidential balance of caller's accoun
 
 The values behind two parts above after calling `confidentialApprove` , and the value behind the original confidential balance of caller's account before calling `confidentialApprove` satisfy the equation:
 
- <img src="../assets/eip-draft-N/value_equation.png" width=690 height=27>
+ <img src="../assets/eip-draft-9733/value_equation.png" width=690 height=27>
 
 
 
