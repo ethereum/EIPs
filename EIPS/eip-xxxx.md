@@ -3,7 +3,7 @@ eip: xxxx
 title: Sorted Key-Value Store with Iteration for the EVM
 description: Enable smart contracts to efficiently store, retrieve, and iterate over ordered key-value pairs by exposing the underlying key-value database functionality of Ethereum clients through a precompiled contract.
 author: Keyvan Kambakhsh (@keyvank), Nobitex Labs (@nobitex) <labs@nobitex.ir>
-discussions-to: .
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-sorted-key-value-store-with-iteration-for-the-evm/24267
 status: Draft
 type: Standards Track
 category: Core
