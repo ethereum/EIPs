@@ -12,7 +12,7 @@ requires:
 
 ## Abstract
 
-This EIP defines a canonical structure for Ethereum genesis files (`genesis.json`) used to bootstrap Ethereum networks. The standard aligns with the de facto structure implemented by Geth (Go-Ethereum), and alredy adopted by other clients. It introduces a JSON Schema to ensure consistency and tool compatibility across clients.
+This EIP defines a canonical structure for Ethereum genesis files (`genesis.json`) used to bootstrap Ethereum networks. The standard aligns with the de facto structure implemented by Geth (Go-Ethereum), and already adopted by other clients. It introduces a JSON Schema to ensure consistency and tool compatibility across clients.
 
 ## Motivation
 
@@ -46,7 +46,7 @@ The `config` object contains hardfork activation block numbers and fork configur
 | `<hardfork(Block\|Time)>` | block height or timestamp to activate the named hardfork.                        |
 | `terminalTotalDifficulty` | difficulty after which to switch from PoW to PoS.                                |
 | `depositContractAddress`  | Ethereum address for the deposit contract                                        |
-| `blobSchedule`            | Map of hardforks and their [EIP-4844](eip-7840.md) DAS configuration parameters. |
+| `blobSchedule`            | Map of hardforks and their EIP-4844 DAS [configuration parameters](eip-7840.md). |
 
 ### `blobSchedule` Object
 
