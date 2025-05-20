@@ -28,51 +28,48 @@ The canonical genesis file MUST be a JSON object with the following top-level fi
 
 ### Top-Level Fields
 
-| Field           | Type              | Required | Description                                                     |
-|-----------------|-------------------|----------|-----------------------------------------------------------------|
-| `config`        | `object`          | Yes      | Chain configuration parameters.                                 |
-| `alloc`         | `object`          | No       | Map of addresses to pre-allocated balances and/or code/storage. |
-| `blobSchedule`    | `object`          | No       | EIP-4844 DAS configuration parameters.                          |
-| `nonce`         | `string`          | No       | Hex-encoded nonce (8 bytes).                                    |
-| `timestamp`     | `string`          | No       | Hex-encoded UNIX timestamp.                                     |
-| `extraData`     | `string`          | No       | Arbitrary extra data (max 32 bytes for Ethereum Mainnet).       |
-| `gasLimit`      | `string`          | Yes      | Hex-encoded block gas limit.                                    |
-| `difficulty`    | `string`          | Yes      | Hex-encoded block difficulty.                                   |
-| `mixhash`       | `string`          | No       | Hex-encoded mix hash.                                           |
-| `coinbase`      | `string`          | No       | Hex-encoded address.                                            |
-| `gasUsed`       | `string`          | No       | Initial gas used, defaults to `"0x0"`.                          |
-| `baseFeePerGas` | `string`          | No       | Initial base fee per gas.                                       |
+| Field           | Description                                                     |
+|-----------------|-----------------------------------------------------------------|
+| `config`        | Chain configuration object.                                     |
+| `alloc`         | Map of addresses to pre-allocated balances and/or code/storage. |
+| `nonce`         | Hex-encoded nonce (8 bytes).                                    |
+| `timestamp`     | Hex-encoded UNIX timestamp.                                     |
+| `extraData`     | Arbitrary extra data.                                           |
+| `gasLimit`      | Hex-encoded block gas limit.                                    |
+| `difficulty`    | Hex-encoded block difficulty.                                   |
+| `mixhash`       | Hex-encoded mix hash.                                           |
+| `coinbase`      | Hex-encoded address.                                            |
 
 ### `config` Object
 
 The `config` object contains hardfork activation block numbers and fork configurations. Known keys include:
 
-| Field     | Type     | Description                                      |
-|-----------|----------|--------------------------------------------------|
-| `chainId` | `number` | unique identifier for the blockchain.            |
-| `<hardforkName>`| `number` | block height or timestamp to activate the named hardfork.|
-|`terminalTotalDifficulty`| `number` | difficulty after which to switch from PoW to PoS.|
-|`terminalTotalDifficultyPassed`| `boolean` | PoS at genesis or not |
-|`depositContractAddress` | `string` | Ethereum address for the deposit contract |
+| Field                     | Description                                                       |
+|---------------------------|-------------------------------------------------------------------|
+| `chainId`                 | unique identifier for the blockchain.                             |
+| `<hardfork(Block\|Time)>` | block height or timestamp to activate the named hardfork.         |
+| `terminalTotalDifficulty` | difficulty after which to switch from PoW to PoS.                 |
+| `depositContractAddress`  | Ethereum address for the deposit contract                         |
+| `blobSchedule`            | Map of hardforks and their EIP-4844 DAS configuration parameters. |
 
 ### `blobSchedule` Object
 
-| Field    | Type     | Description                                  |
-|----------|----------|----------------------------------------------|
-| `target` | `number` | desired number of blobs to include per block |
-| `max` | `number` | maximum number of blobs to include per block |
-| `updateFraction` | `number` | input to pricing formula per EIP-4844 |
+| Field            | Description                                  |
+|------------------|----------------------------------------------|
+| `target`         | desired number of blobs to include per block |
+| `max`            | maximum number of blobs to include per block |
+| `updateFraction` | input to pricing formula per EIP-4844        |
 
 ### `alloc` Object
 
 The `alloc` field is optional and maps addresses (as lowercase hex strings) to the following object:
 
-| Field         | Type     | Description                                     |
-|---------------|----------|-------------------------------------------------|
-| `balance`     | `string` | decimal balance in wei.                         |
-| `code`        | `string` | Hex-encoded EVM bytecode.                       |
-| `nonce`      | `string` | decimal value.
-| `storage`     | `object` | Key-value hex map representing initial storage. |
+| Field          | Description                                     |
+|----------------|-------------------------------------------------|
+| `balance`      | decimal balance in wei.                         |
+| `code`         | Hex-encoded EVM bytecode.                       |
+| `nonce`        | decimal value.                                  |
+| `storage`      | Key-value hex map representing initial storage. |
 
 ## JSON Schema
 
@@ -97,11 +94,10 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
   },
   "title": "Ethereum Genesis File",
   "type": "object",
-  "required": ["config"],
+  "required": ["alloc", "gasLimit", "difficulty"],
   "properties": {
     "config": {
       "type": "object",
-      "required": ["chainId"],
       "properties": {
         "chainId": { "type": "integer" },
         "homesteadBlock": { "type": "integer" },
@@ -113,6 +109,7 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
         "constantinopleBlock": { "type": "integer" },
         "petersburgBlock": { "type": "integer" },
         "istanbulBlock": { "type": "integer" },
+        "muirGlacierBlock": {"type": "integer"},
         "berlinBlock": { "type": "integer" },
         "londonBlock": { "type": "integer" },
         "arrowGlacierBlock": { "type": "integer" },
@@ -122,6 +119,9 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
         "mergeNetsplitBlock": { "type": "integer"},
         "shanghaiTime": { "type": "integer"},
         "cancunTime": { "type": "integer"},
+        "pragueTime": { "type": "integer"},
+        "osakaTime": { "type": "integer"},
+        "depositContractAddress": { "$ref": "#/$defs/address"},
         "blobSchedule": {
           "type": "object",
           "additionalProperties": {
@@ -132,21 +132,9 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
                 "baseFeeUpdateFraction": { "type" : "integer" }
               }
           }
-        },
-        "depositContractAddress": { "$ref": "#/$defs/address"},
-        "pragueTime": { "type": "integer"},
-        "osakaTime": { "type": "integer"},
-        "ethash": { "type": "object" },
-        "clique": {
-          "type": "object",
-          "properties": {
-            "period": { "type": "integer" },
-            "epoch": { "type": "integer" }
-          }
-        },
-        "proofOfStake": { "type": "object" }
+        }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "nonce": { "$ref": "#/$defs/hexOrDecimal48" },
     "timestamp": { "$ref": "#/$defs/hexOrDecimal48" },
@@ -160,11 +148,6 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
     "difficulty": { "$ref": "#/$defs/hexOrDecimal48" },
     "mixhash": { "$ref": "#/$defs/hash" },
     "coinbase": { "$ref": "#/$defs/address" },
-    "number": { "$ref": "#/$defs/hexOrDecimal48" },
-    "gasUsed": { "$ref": "#/$defs/hexOrDecimal48" },
-    "parentHash": { "$ref": "#/$defs/hash" },
-    "excessBlobGas": { "$ref": "#/$defs/hexOrDecimal48" },
-    "blobGasUsed": { "$ref": "#/$defs/hexOrDecimal48" },
     "alloc": {
       "type": "object",
       "additionalProperties": {
@@ -183,11 +166,12 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
         },
         "additionalProperties": false
       }
-    },
-	"additionalProperties": false
+    }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }
+
+
 
 
 

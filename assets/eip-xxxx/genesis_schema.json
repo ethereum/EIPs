@@ -16,11 +16,10 @@
   },
   "title": "Ethereum Genesis File",
   "type": "object",
-  "required": ["config"],
+  "required": ["alloc", "gasLimit", "difficulty"],
   "properties": {
     "config": {
       "type": "object",
-      "required": ["chainId"],
       "properties": {
         "chainId": { "type": "integer" },
         "homesteadBlock": { "type": "integer" },
@@ -32,6 +31,7 @@
         "constantinopleBlock": { "type": "integer" },
         "petersburgBlock": { "type": "integer" },
         "istanbulBlock": { "type": "integer" },
+        "muirGlacierBlock": {"type": "integer"},
         "berlinBlock": { "type": "integer" },
         "londonBlock": { "type": "integer" },
         "arrowGlacierBlock": { "type": "integer" },
@@ -41,6 +41,9 @@
         "mergeNetsplitBlock": { "type": "integer"},
         "shanghaiTime": { "type": "integer"},
         "cancunTime": { "type": "integer"},
+        "pragueTime": { "type": "integer"},
+        "osakaTime": { "type": "integer"},
+        "depositContractAddress": { "$ref": "#/$defs/address"},
         "blobSchedule": {
           "type": "object",
           "additionalProperties": {
@@ -51,21 +54,9 @@
                 "baseFeeUpdateFraction": { "type" : "integer" }
               }
           }
-        },
-        "depositContractAddress": { "$ref": "#/$defs/address"},
-        "pragueTime": { "type": "integer"},
-        "osakaTime": { "type": "integer"},
-        "ethash": { "type": "object" },
-        "clique": {
-          "type": "object",
-          "properties": {
-            "period": { "type": "integer" },
-            "epoch": { "type": "integer" }
-          }
-        },
-        "proofOfStake": { "type": "object" }
+        }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "nonce": { "$ref": "#/$defs/hexOrDecimal48" },
     "timestamp": { "$ref": "#/$defs/hexOrDecimal48" },
@@ -79,11 +70,6 @@
     "difficulty": { "$ref": "#/$defs/hexOrDecimal48" },
     "mixhash": { "$ref": "#/$defs/hash" },
     "coinbase": { "$ref": "#/$defs/address" },
-    "number": { "$ref": "#/$defs/hexOrDecimal48" },
-    "gasUsed": { "$ref": "#/$defs/hexOrDecimal48" },
-    "parentHash": { "$ref": "#/$defs/hash" },
-    "excessBlobGas": { "$ref": "#/$defs/hexOrDecimal48" },
-    "blobGasUsed": { "$ref": "#/$defs/hexOrDecimal48" },
     "alloc": {
       "type": "object",
       "additionalProperties": {
@@ -102,8 +88,7 @@
         },
         "additionalProperties": false
       }
-    },
-	"additionalProperties": false
+    }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }
