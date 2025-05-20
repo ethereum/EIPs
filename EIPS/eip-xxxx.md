@@ -7,7 +7,7 @@ status: Draft
 type: Informational
 category: Core
 created: 2025-05-19
-requires: 0
+requires: 
 ---
 
 ## Simple Summary
@@ -76,13 +76,28 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
 
 ## JSON Schema
 
+
 ```json
 
 {
-  "$schema": "http://json-schema.org/ethereum/genesis/schema#",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+  	"hexOrDecimal48": {
+    		"type": "string",
+    		"pattern": "^(0x[0-9a-fA-F]{1,12}|[0-9]{1,12})$"
+  	},
+    "address": {
+      "type": "string",
+      "pattern":  "^0x[0-9a-fA-F]{40}$"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{64}$"
+    }
+  },
   "title": "Ethereum Genesis File",
   "type": "object",
-  "required": ["config", "gasLimit", "difficulty"],
+  "required": ["config"],
   "properties": {
     "config": {
       "type": "object",
@@ -103,6 +118,24 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
         "arrowGlacierBlock": { "type": "integer" },
         "grayGlacierBlock": { "type": "integer" },
         "terminalTotalDifficulty": { "type": "integer" },
+        "terminalTotalDifficultyPassed": { "type": "boolean" },
+        "mergeNetsplitBlock": { "type": "integer"},
+        "shanghaiTime": { "type": "integer"},
+        "cancunTime": { "type": "integer"},
+        "blobSchedule": {
+          "type": "object",
+          "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "target": { "type": "integer" },
+                "max": { "type" : "integer" },
+                "baseFeeUpdateFraction": { "type" : "integer" }
+              }
+          }
+        },
+        "depositContractAddress": { "$ref": "#/$defs/address"},
+        "pragueTime": { "type": "integer"},
+        "osakaTime": { "type": "integer"},
         "ethash": { "type": "object" },
         "clique": {
           "type": "object",
@@ -115,18 +148,23 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
       },
       "additionalProperties": false
     },
-    "nonce": { "type": "string", "pattern": "^0x[0-9a-fA-F]+$" },
-    "timestamp": { "type": "string", "pattern": "^[0-9]+$" },
+    "nonce": { "$ref": "#/$defs/hexOrDecimal48" },
+    "timestamp": { "$ref": "#/$defs/hexOrDecimal48" },
     "extraData": { 
 	    "anyOf": [ 
 		    {"type": "string", "const": "" },
 		    {"type": "string", "pattern": "^0x([0-9a-fA-F]{2})*$" }
 	    ]
     },
-    "difficulty": { "type": "string", "pattern": "^0x[0-9a-fA-F]+$" },
-    "mixhash": { "type": "string", "pattern": "^0x[0-9a-fA-F]{64}$" },
-    "parentHash": { "type": "string", "pattern": "^0x[0-9a-fA-F]{64}$" },
-    "coinbase": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$" },
+    "gasLimit": { "$ref": "#/$defs/hexOrDecimal48" },
+    "difficulty": { "$ref": "#/$defs/hexOrDecimal48" },
+    "mixhash": { "$ref": "#/$defs/hash" },
+    "coinbase": { "$ref": "#/$defs/address" },
+    "number": { "$ref": "#/$defs/hexOrDecimal48" },
+    "gasUsed": { "$ref": "#/$defs/hexOrDecimal48" },
+    "parentHash": { "$ref": "#/$defs/hash" },
+    "excessBlobGas": { "$ref": "#/$defs/hexOrDecimal48" },
+    "blobGasUsed": { "$ref": "#/$defs/hexOrDecimal48" },
     "alloc": {
       "type": "object",
       "additionalProperties": {
@@ -134,7 +172,7 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
         "properties": {
           "balance": { "type": "string", "pattern": "^[0-9]+$" },
     	  "nonce": { "type": "string", "pattern": "^[0-9]+$" },
-          "code": { "type": "string", "pattern": "^0x([0-9a-fA-F]{2})*$" },
+          "code": { "type": "string", "pattern": "^0x([0-9a-fA-F])*$" },
           "storage": {
             "type": "object",
             "additionalProperties": {
@@ -146,8 +184,10 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
         "additionalProperties": false
       }
     },
+	"additionalProperties": false
   },
   "additionalProperties": false
 }
+
 
 
