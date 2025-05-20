@@ -37,7 +37,6 @@
         "arrowGlacierBlock": { "type": "integer" },
         "grayGlacierBlock": { "type": "integer" },
         "terminalTotalDifficulty": { "type": "integer" },
-        "terminalTotalDifficultyPassed": { "type": "boolean" },
         "mergeNetsplitBlock": { "type": "integer"},
         "shanghaiTime": { "type": "integer"},
         "cancunTime": { "type": "integer"},
@@ -74,6 +73,7 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
+        "required": ["balance"],
         "properties": {
           "balance": { "type": "string", "pattern": "^[0-9]+$" },
     	  "nonce": { "type": "string", "pattern": "^[0-9]+$" },

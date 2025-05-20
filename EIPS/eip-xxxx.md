@@ -1,7 +1,7 @@
 ---
 eip: <TBD>
 title: Genesis File Format Standardization
-author: Justin Florentine (@jflo) <justin@florentine.us>
+author: Justin Florentine (@jflo) <justin@florentine.us>, Jochem Brouwer (@jochem-brouwer) <jochem@ethereum.org>
 discussions-to: https://ethereum-magicians.org/t/eip-xxxx-genesis-json-standardization/24271
 status: Draft
 type: Informational
@@ -10,13 +10,9 @@ created: 2025-05-19
 requires: 
 ---
 
-## Simple Summary
-
-Standardize the format of the `genesis.json` file used to initialize modern (post-merge) Ethereum chains, aligning it with Geth’s current implementation and providing a JSON Schema for validation.
-
 ## Abstract
 
-This EIP defines a canonical structure for Ethereum genesis files (`genesis.json`) used to bootstrap Ethereum networks. The standard aligns with the de facto structure implemented by Geth (Go-Ethereum) and introduces a JSON Schema to ensure consistency and tool compatibility across clients.
+This EIP defines a canonical structure for Ethereum genesis files (`genesis.json`) used to bootstrap Ethereum networks. The standard aligns with the de facto structure implemented by Geth (Go-Ethereum), and alredy adopted by other clients. It introduces a JSON Schema to ensure consistency and tool compatibility across clients.
 
 ## Motivation
 
@@ -44,25 +40,25 @@ The canonical genesis file MUST be a JSON object with the following top-level fi
 
 The `config` object contains hardfork activation block numbers and fork configurations. Known keys include:
 
-| Field                     | Description                                                       |
-|---------------------------|-------------------------------------------------------------------|
-| `chainId`                 | unique identifier for the blockchain.                             |
-| `<hardfork(Block\|Time)>` | block height or timestamp to activate the named hardfork.         |
-| `terminalTotalDifficulty` | difficulty after which to switch from PoW to PoS.                 |
-| `depositContractAddress`  | Ethereum address for the deposit contract                         |
-| `blobSchedule`            | Map of hardforks and their EIP-4844 DAS configuration parameters. |
+| Field                     | Description                                                                      |
+|---------------------------|----------------------------------------------------------------------------------|
+| `chainId`                 | unique identifier for the blockchain.                                            |
+| `<hardfork(Block\|Time)>` | block height or timestamp to activate the named hardfork.                        |
+| `terminalTotalDifficulty` | difficulty after which to switch from PoW to PoS.                                |
+| `depositContractAddress`  | Ethereum address for the deposit contract                                        |
+| `blobSchedule`            | Map of hardforks and their [EIP-4844](eip-7840.md) DAS configuration parameters. |
 
 ### `blobSchedule` Object
 
-| Field            | Description                                  |
-|------------------|----------------------------------------------|
-| `target`         | desired number of blobs to include per block |
-| `max`            | maximum number of blobs to include per block |
-| `updateFraction` | input to pricing formula per EIP-4844        |
+| Field                   | Description                                  |
+|-------------------------|----------------------------------------------|
+| `target`                | desired number of blobs to include per block |
+| `max`                   | maximum number of blobs to include per block |
+| `baseFeeUpdateFraction` | input to pricing formula per EIP-4844        |
 
 ### `alloc` Object
 
-The `alloc` field is optional and maps addresses (as lowercase hex strings) to the following object:
+The `alloc` field defines the initial state at genesis. It maps addresses (as lowercase hex strings) to the following object:
 
 | Field          | Description                                     |
 |----------------|-------------------------------------------------|
@@ -115,7 +111,6 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
         "arrowGlacierBlock": { "type": "integer" },
         "grayGlacierBlock": { "type": "integer" },
         "terminalTotalDifficulty": { "type": "integer" },
-        "terminalTotalDifficultyPassed": { "type": "boolean" },
         "mergeNetsplitBlock": { "type": "integer"},
         "shanghaiTime": { "type": "integer"},
         "cancunTime": { "type": "integer"},
@@ -152,6 +147,7 @@ The `alloc` field is optional and maps addresses (as lowercase hex strings) to t
       "type": "object",
       "additionalProperties": {
         "type": "object",
+        "required": ["balance"],
         "properties": {
           "balance": { "type": "string", "pattern": "^[0-9]+$" },
     	  "nonce": { "type": "string", "pattern": "^[0-9]+$" },
