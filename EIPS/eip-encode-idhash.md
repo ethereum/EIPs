@@ -1,12 +1,12 @@
 ---
 title: Encode chain id with transaction hash
-description: A standard for encoding a chain ID and transaction hash into a unique string format
+description: Way to encode a chain ID and transaction hash into a unique string format
 author: Lauri Peltonen (@microbecode)
 discussions-to: https://ethereum-magicians.org/t/a-new-standard-for-encoding-chain-id-transaction-hash/23782
 status: Draft
 type: Standards Track
-category: ERC
-created: 2025-05-10
+category: Interface
+created: 2025-05-22
 requires: 155
 ---
 
@@ -23,7 +23,8 @@ Such strings can then be used, for example, in a forwarder service that forwards
 ## Specification
 
 The encoded string has three components:
-- A chain ID, denoted as `chainId`. The used chain id MUST be based on [EIP-155](./eip-155.md) and the chain ID repository stated in that EIP.
+
+- A chain ID, denoted as `chainId`. The used chain id MUST be based on [EIP-155](./eip-155) and the chain ID repository stated in that EIP.
 - A transaction hash, denoted as `txHash`. The hash MUST include the `0x` prefix.
 - A static string `tx`, acting as a type identifier.
 
@@ -41,7 +42,7 @@ The suffix `tx` is used to differentiate from, for example, addresses. Without t
 
 ## Security Considerations
 
-Needs discussion.
+This EIP does not introduce direct security risks. It is up to the external service providers (such as wallet developers and blockchain explorers) to decide how and if they want to incorporate this EIP.
 
 ## Copyright
 
