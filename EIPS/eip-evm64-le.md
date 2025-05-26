@@ -36,7 +36,7 @@ The gas cost is `G_VERYLOW64`.
 
 `MLOAD64` (0xc051) will load a 64-bit integer in little endian onto the stack. `MSTORE64` (0xc052) will read an 64-bit integer from the stack, and store it to memory in little endian.
 
-The gas cost for both opcodes is `G_VERYLOW64`.
+The gas cost for both opcodes is `G_VERYLOW64`. The memory resizing costs count as 8 bytes.
 
 As an example, `[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]` is an array of 8 bytes (64 bits). Calling `MLOAD64` to load this 8-byte value to stack will read it in little endian, resulting in 64-bit integer `0x0807060504030201`. 64-bit mode always operate on only the least significant 64 bits. When another 256-bit opcodes encounter this value on stack, it will be `0x00..00 0807060504030201`. Calling `MSTORE64` to store this value to memory will result in the array `[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]`.
 
