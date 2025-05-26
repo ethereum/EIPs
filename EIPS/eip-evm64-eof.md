@@ -29,7 +29,7 @@ We define the following gas cost constant:
 At EOF contract creation time as defined in [EIP-3670](./eip-3670.md), if the opcode `C0` is encountered and it is not part of PUSH opcode's data, then the interpreter MUST validate that:
 
 * The next opcode exists.
-* The next opcode is one of the valid 64-bit mode opcode described above.
+* The next opcode is `RJUMPI64`, `RJUMPV64`, or one of the core 64-bit opcode defined in [EIP-7937](./eip-7937.md) minus `JUMP64` and `JUMPI64`.
 
 For flow operations RJUMPI and RJUMPV, the 64-bit mode has following changes:
 
