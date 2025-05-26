@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2025-05-26
-requires: 3500, 3670, 4200, 7937
+requires: 3540, 3670, 4200, 7937
 ---
 
 ## Abstract
@@ -26,7 +26,7 @@ We define the following gas cost constant:
 
 * `G_RJUMPIV64`: 3
 
-If EOFv1 mode is entered, then an additional validation step is added. If the opcode `C0` is encountered and it is not part of PUSH opcode's data, then the interpreter MUST validate that:
+At EOF contract creation time as defined in [EIP-3670](./eip-3670.md), if the opcode `C0` is encountered and it is not part of PUSH opcode's data, then the interpreter MUST validate that:
 
 * The next opcode exists.
 * The next opcode is one of the valid 64-bit mode opcode described above.
