@@ -1,3 +1,4 @@
+---
 EIP: \[to be assigned\]
 Title: RPC Provider Capacity and Service Advertisement
 Author: @Peersky
@@ -7,6 +8,7 @@ Type: Standards Track
 Category: Interface
 Created: 2025-05-28
 Requires: None
+---
 
 ## **Abstract**
 
