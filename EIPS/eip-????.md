@@ -1,6 +1,7 @@
 ---
 EIP: [to be assigned]
 Title: RPC Provider Capacity and Service Advertisement
+Description: A standard mechanism for Ethereum RPC providers to advertise their service endpoints and operational capacity through DNS-based Service Discovery and direct IP querying. Defines a machine-readable API for providers to share real-time capacity metrics, enabling clients to discover and select from a diverse set of RPC endpoints to improve decentralization and performance.
 Author: @Peersky
 Discussions-To: https://ethereum-magicians.org/t/eip-rpc-provider-capacity-and-service-advertisement/24357
 Status: Draft
