@@ -1,0 +1,192 @@
+EIP: \[to be assigned\]
+Title: RPC Provider Capacity and Service Advertisement
+Author: @Peersky
+Discussions-To: https://ethereum-magicians.org/t/eip-rpc-provider-capacity-and-service-advertisement/24357
+Status: Draft
+Type: Standards Track
+Category: Interface
+Created: 2025-05-28
+Requires: None
+
+## **Abstract**
+
+This EIP proposes a standard mechanism for Ethereum RPC (Remote Procedure Call) providers, including Internet Service Providers (ISPs) or individual network hops, to advertise their RPC service endpoints and their current operational capacity. It defines discovery methods using DNS-based Service Discovery (DNS-SD) for domain-based lookups, and direct IP address querying for IP-specific lookups. It also specifies a schema for a machine-readable Capacity Information API endpoint that provides details about available RPC services, their capabilities, and real-time capacity metrics.
+
+## **Motivation**
+
+As the Ethereum ecosystem grows, reliance on a few centralized RPC providers presents challenges for decentralization, censorship resistance, and performance. Enabling users and applications to discover and utilize a wider array of RPC providers, including those potentially offered by their local ISP, specific network infrastructure nodes, or other community-run nodes, can improve network resilience and user experience.
+
+Currently, discovering available RPC endpoints and their operational status or capacity is an ad-hoc process, often requiring manual configuration or reliance on curated lists. This EIP aims to:
+
+1. **Enhance Decentralization:** Facilitate the discovery and use of a more diverse set of RPC providers.
+2. **Improve User Choice & Performance:** Allow clients to dynamically select RPC endpoints based on advertised capacity, features, and potentially proximity or latency, whether discovered via domain names or direct IP addresses.
+3. **Enable New Provider Types:** Provide a standard for ISPs, network operators, or even individual nodes (identifiable by IP) to offer and advertise Ethereum RPC services.
+4. **Reduce** Reliance on **Centralized Endpoints:** Offer alternatives for dApps and wallets.
+5. **Standardize Information Exchange:** Create a common format for providers to share vital operational details.
+
+## **Specification**
+
+The standard consists of two main parts:
+
+1. **Discovery Mechanisms:** Methods to locate a provider's Capacity Information API, either via DNS-SD or direct IP query.
+2. **Capacity Information API:** An HTTP(S) endpoint providing a structured JSON response detailing RPC services and their capacity.
+
+### **1\. Discovery Mechanisms**
+
+Clients can locate the Capacity Information API endpoint using one of the following methods:
+
+#### **Method 1: DNS-based Service Discovery (DNS-SD)**
+
+This method is suitable for discovering services associated with a domain name.
+
+* **Service Name:** Providers MUST advertise their service using the following DNS SRV service label:
+  * \_ethrpc-info.\_tcp
+* **DNS Query:** Clients SHOULD construct a DNS query for SRV records. For example, if a client's local DNS search path or ISP domain is example.com, the query would be for \_ethrpc-info.\_tcp.example.com. Clients MAY also allow users to configure specific discovery domains.
+* **SRV Record:** The SRV record (RFC 2782\) MUST point to the hostname and port where the provider's Capacity Information API is hosted. Standard SRV priority and weight mechanisms apply.
+* **TXT Record:** An associated TXT record (RFC 1035\) for the same SRV name SHOULD be provided. It MAY contain the following key-value pairs:
+  * api\_path: (Optional) The specific path for the API endpoint on the host discovered via SRV. Defaults to /.well-known/ethrpc-info if not specified.
+  * api\_ver: (Optional) The version of the Capacity Information API schema supported (e.g., "1.0"). Clients can use this for compatibility.
+  * provider\_name: (Optional) A human-readable name of the RPC provider.
+
+**Example DNS Records for example.com:**
+
+\_ethrpc-info.\_tcp.example.com.  SRV   10 0 443 rpcinfo.example.com.
+\_ethrpc-info.\_tcp.example.com.  TXT   "api\_path=/.well-known/ethrpc-info" "api\_ver=1.0" "provider\_name=Example ISP RPC"
+
+#### **Method 2: Direct IP Address Query**
+
+This method is suitable when a client wishes to query a specific IP address (e.g., a known network hop or a local node) for its RPC capacity information.
+
+* **Target:** The client has a specific IP address (IPv4 or IPv6) of a potential provider.
+* **Query Construction:** Clients SHOULD attempt to query the Capacity Information API by constructing a URL using the IP address and the well-known path.
+  * The primary attempt SHOULD be made over HTTPS on port 443: https://\<IP\_ADDRESS\>/.well-known/ethrpc-info
+  * If HTTPS fails or is not expected, a fallback to HTTP on port 80 MAY be attempted: http://\<IP\_ADDRESS\>/.well-known/ethrpc-info
+  * Providers implementing this direct IP query method MUST serve the Capacity Information API on the /.well-known/ethrpc-info path on their standard HTTP/S ports.
+* **Note:** This method bypasses DNS for service discovery and directly queries the IP. The authenticity of the service at the IP address relies on the TLS certificate (for HTTPS) or other out-of-band trust mechanisms.
+
+### **2\. Capacity Information API**
+
+The endpoint discovered via either DNS-SD or Direct IP Address Query MUST be an HTTP(S) server. HTTPS is STRONGLY RECOMMENDED for all interactions. The API MUST return a JSON object (application/json) structured according to the schema below.
+
+**Default Path for API:**
+
+* If discovered via DNS-SD and api\_path is not specified in the TXT record, clients SHOULD query /.well-known/ethrpc-info on the host and port from the SRV record.
+* If discovered via Direct IP Address Query, clients MUST query /.well-known/ethrpc-info on the target IP address (default HTTPS port 443, then optionally HTTP port 80).
+
+**JSON Response Schema:**
+```json
+{
+  "specVersion": "1.0",
+  "providerName": "Example ISP RPC",
+  "providerHomepage": "\[https://example.com/rpc-service-info\](https://example.com/rpc-service-info)",
+  "lastUpdated": "2025-05-28T10:00:00Z",
+  "documentationUrl": "\[https://example.com/rpc-api-docs\](https://example.com/rpc-api-docs)",
+  "endpoints": \[
+    {
+      "networkId": 1,
+      "description": "Mainnet Full Node \- General Use",
+      "httpUrl": "\[https://mainnet-rpc.example.com/http\](https://mainnet-rpc.example.com/http)",
+      "wsUrl": "wss://\[mainnet-rpc.example.com/ws\](https://mainnet-rpc.example.com/ws)",
+      "capabilities": {
+        "isArchiveNode": false,
+        "supportedMethods": \["eth\_call", "eth\_getBalance", "eth\_sendRawTransaction", "eth\_blockNumber", "..."\],
+        "maxBlockHistory": 128,
+        "supportedTraceTypes": \["callTracer", "stateDiff"\]
+      },
+      "capacity": {
+        "requestsPerMinuteLimit": 10000,
+        "concurrentRequestsLimit": 100,
+        "loadIndicator": 0.35,
+        "status": "operational"
+      },
+      "authentication": {
+        "type": "apiKey",
+        "paramName": "X-API-Key",
+        "signupUrl": "\[https://example.com/rpc-signup\](https://example.com/rpc-signup)"
+      },
+      "geographicRegion": "eu-west-1"
+    },
+    {
+      "networkId": 11155111,
+      "description": "Sepolia Testnet Archive Node",
+      "httpUrl": "\[https://sepolia-rpc.example.com/http\](https://sepolia-rpc.example.com/http)",
+      "capabilities": {
+        "isArchiveNode": true,
+        "supportedMethods": "all"
+      },
+      "capacity": {
+        "requestsPerMinuteLimit": 5000,
+        "concurrentRequestsLimit": 50,
+        "loadIndicator": 0.1,
+        "status": "operational"
+      },
+      "authentication": {
+        "type": "none"
+      }
+    }
+  \]
+}
+```
+
+**Field Explanations:**
+
+* specVersion: The version of this EIP's API specification that the response conforms to.
+* providerName: Human-readable name of the RPC provider.
+* providerHomepage: A URL to a webpage with more information about the provider or their RPC service.
+* lastUpdated: An ISO 8601 timestamp indicating when the capacity and status information was last generated or refreshed. Clients can use this to understand data freshness.
+* documentationUrl: A URL to the provider's detailed documentation for their Ethereum RPC methods, quirks, etc.
+* endpoints: An array of objects, where each object describes a specific RPC service endpoint.
+  * networkId: The EIP-155 Chain ID.
+  * description: A human-readable description of this specific endpoint (e.g., "Mainnet Archive \- High Capacity").
+  * httpUrl: The full URL for the HTTP/HTTPS RPC endpoint. Optional.
+  * wsUrl: The full URL for the WebSocket RPC endpoint. Optional. (At least one of httpUrl or wsUrl MUST be present).
+  * capabilities:
+    * isArchiveNode: Boolean, true if the node has full historical state.
+    * supportedMethods: An array of strings listing supported RPC methods, or the string "all" if all standard methods for the node type are supported. Providers MAY include custom methods.
+    * maxBlockHistory: If not an archive node, the number of recent blocks for which state is typically available.
+    * supportedTraceTypes: Optional. If tracing methods (like trace\_call, debug\_traceTransaction) are supported, this array lists the types of tracers available (e.g., "callTracer", "stateDiff", "fourByteTracer").
+  * capacity:
+    * requestsPerMinuteLimit: An integer representing the approximate number of requests a client can make per minute before expecting rate-limiting.
+    * concurrentRequestsLimit: An integer for the maximum number of simultaneous connections/requests.
+    * loadIndicator: A float between 0.0 (idle/low load) and 1.0 (at or near maximum capacity). The exact meaning/scale is provider-defined, but allows relative comparison.
+    * status: A string indicating the current operational status of the endpoint (e.g., "operational", "degraded\_performance", "under\_maintenance", "offline").
+  * authentication:
+    * type: A string indicating the authentication method (e.g., "none", "apiKey", "oauth2", "jwt").
+    * paramName: If type is "apiKey", this specifies the name of the HTTP header or query parameter for the API key.
+    * signupUrl: A URL where users can obtain credentials if authentication is required.
+  * geographicRegion: Optional. A string indicating the general geographic location or cloud region of the endpoint, which can help clients select for latency.
+
+Clients SHOULD gracefully handle missing optional fields.
+
+## **Rationale**
+
+* **DNS-SD:** Leverages a well-established, standardized, and decentralized service discovery protocol for domain-based discovery. It is widely supported and understood.
+* **Direct IP Address Query:** Provides a straightforward method for clients to query known IP addresses, such as specific network hops or local nodes, without requiring DNS. This is useful for direct probing or in environments where DNS-SD is not available or applicable for the target.
+* **SRV Records:** Standard for specifying the location (host/port) of services in DNS-SD.
+* **TXT Records:** Standard for associating arbitrary metadata with DNS records, suitable for API path and version in DNS-SD.
+* **HTTPS for API:** Ensures integrity and confidentiality of the advertised information for both discovery methods.
+* **JSON for API Response:** Widely used, human-readable, and easy to parse by clients.
+* **Well-Known URI:** Provides a consistent, predictable path (/.well-known/ethrpc-info) for the API, following RFC 8615, simplifying client implementation for both discovery methods.
+* **Capacity Fields:** Chosen to provide actionable information for clients to make informed decisions (load, limits, status) without being overly prescriptive on how providers measure these.
+* **lastUpdated Timestamp:** Crucial for clients to understand the freshness of the dynamic capacity information. Clients should be aware that capacity can change rapidly.
+* **supportedMethods and capabilities:** Allows clients to filter for nodes that meet their specific functional requirements (e.g., needing archive state or specific trace methods).
+* **authentication:** Essential for providers who wish to gate access to their RPC services.
+
+## **Backwards Compatibility**
+
+This EIP introduces new discovery mechanisms and an API. It does not affect existing RPC methods or client configurations and is therefore fully backwards compatible. Clients will need to be updated to take advantage of this EIP.
+
+## **Security Considerations**
+
+* **Authenticity** of DNS Records (for **DNS-SD):** DNSSEC SHOULD be used by providers to ensure the authenticity and integrity of the SRV and TXT records, preventing DNS spoofing.
+* **Authenticity of API Endpoint (for both methods):** The Capacity Information API endpoint MUST be served over HTTPS to prevent man-in-the-middle attacks and ensure data integrity. Providers should use valid, trusted TLS certificates. When using Direct IP Address Query with HTTPS, clients MUST validate the certificate according to standard practices (though matching hostname to IP is not applicable, certificate validity is still key).
+* **Trusting the Queried IP (for Direct IP Query):** When using Direct IP Address Query, the client is implicitly trusting the IP address it is querying. The source of this IP address (e.g., from a traceroute, manual configuration) should be considered.
+* **Data Freshness and Accuracy:** Providers are responsible for keeping the lastUpdated timestamp and capacity information reasonably current. Clients should be aware that capacity is dynamic and the advertised information is a snapshot. Malicious or negligent providers might advertise inaccurate information.
+* **Denial of Service:** The DNS infrastructure (for DNS-SD), individual IP addresses (for Direct IP Query), and the Capacity Information API endpoints could be targets for DoS attacks. Providers should implement standard DoS mitigation techniques.
+* **API Query Privacy:** Client queries to the API endpoint will reveal their IP address and interest in using RPC services from that provider. Standard HTTPS practices apply.
+* **Scanning IP Ranges:** The Direct IP Address Query method could potentially be used by clients to scan IP ranges for services. Clients implementing this SHOULD do so responsibly and avoid aggressive scanning. Providers MAY implement rate limiting or other measures to mitigate scanning.
+* **Rate Limiting for API:** The Capacity Information API itself SHOULD be rate-limited to prevent abuse from any single client.
+
+## **Copyright**
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
