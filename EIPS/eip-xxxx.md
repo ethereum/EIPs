@@ -227,7 +227,9 @@ Unlike secp256k1 ECDSA signatures, secp256r1 ECDSA signatures are not required t
 
 We explicitly state that this precompile **IS NOT REQUIRED** to perform all the operations using constant time algorithms.
 
-## References
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
 
 [^1]:
     ```csl-json
@@ -254,7 +256,7 @@ We explicitly state that this precompile **IS NOT REQUIRED** to perform all the 
     }
     ```
 
-[^2]
+[^2]:
     ```csl-json
     {
         "id": "https://doi.org/10.6028/NIST.FIPS.186-5",
@@ -274,7 +276,3 @@ We explicitly state that this precompile **IS NOT REQUIRED** to perform all the 
         "DOI": "10.6028/NIST.FIPS.186-5"
     }
     ```
-
-## Copyright
-
-Copyright and related rights waived via [CC0](../LICENSE.md).
