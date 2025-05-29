@@ -98,7 +98,7 @@ For flow operations RJUMPI and RJUMPV, the 64-bit mode has following changes:
 
 This alternative definition (compared with EIP-7937) has the advantage that the code size is now shorter (because no multibyte opcodes are needed). It however will only work with EOF contract but not "legacy" EVM. The interaction between EVM64 and "system calls" (those calls that reads Ethereum block values, addresses, balances and storages) will be more difficult. It's not "seamless" like EIP-7937 where one can enter/exit 64-bit mode at ease. Depending on how the 64-bit optimization works out, this may be an advantage or an disadvantage.
 
-The memory is, as usuall, still shared during the entire execution. So in EVM64, the contract can always use the memory to push/fetch data.
+The memory is, as usual, still shared during the entire execution. So in EVM64, the contract can always use the memory to push/fetch data.
 
 ## Backwards Compatibility
 
