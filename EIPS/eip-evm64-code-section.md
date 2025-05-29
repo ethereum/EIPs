@@ -88,7 +88,7 @@ For flow operations RJUMPI and RJUMPV, the 64-bit mode has following changes:
 
 ### Stack behavior
 
-In this specification, we don't specifically define 64-bit stack. As far as this EIP is concerned, stack is still 256-bit with no change. However, EVM64 only operates on the least significant 64 bits. The most significant 192 bits are unobservable. Thus an EVM interpreter can optimize EVM64 execution as follows:
+"Pure" in "pure EVM64" refers to the fact that all opcodes in EVM64 mode only operates on the least significant 64 bits. In this specification, we don't specifically define 64-bit stack. As far as this EIP is concerned, stack is still 256-bit. However, because it only operates on the least significant 64 bits. The most significant 192 bits becomes unobservable as long as the interpreter is in an EVM64 code section. Thus an EVM interpreter can optimize EVM64 execution as follows:
 
 * When entering EVM64 code section, truncate `inputs` to 64 bits.
 * Use 64-bit stack during EVM64 execution.
