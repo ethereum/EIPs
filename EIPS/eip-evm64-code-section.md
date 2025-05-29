@@ -61,7 +61,7 @@ The 64-bit mode comparison and bitwise opcodes are defined the same as non-64-bi
 
 ### Memory opcodes
 
-`MLOAD64` (0x51) will load a 64-bit integer in little endian onto the stack. `MSTORE64` (0x52) will read an 64-bit integer from the stack, and store it to memory in little endian.
+`MLOAD64` (0x51) will load a 64-bits integer in little endian onto the stack. `MSTORE64` (0x52) will read an 64-bits integer from the stack, and store it to memory in little endian.
 
 The gas cost for both opcodes is `G_VERYLOW64`. The memory resizing costs count as 8 bytes.
 
