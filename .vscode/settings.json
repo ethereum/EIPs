@@ -1,0 +1,8 @@
+{
+    "rainbow_csv.virtual_alignment_mode": "manual",
+    "rainbow_csv.enable_debug_logging": true,
+    "rainbow_csv.enable_context_menu_tail": true,
+    "rainbow_csv.enable_context_menu_head": true,
+    "rainbow_csv.csv_lint_detect_trailing_spaces": true,
+    "rainbow_csv.align_in_scratch_file": true
+}
