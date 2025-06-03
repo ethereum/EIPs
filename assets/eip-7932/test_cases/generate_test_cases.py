@@ -1,5 +1,5 @@
 # Template secp256k1 variables
-from typing import Tuple
+from typing import List, Tuple
 
 ALG_TX_TYPE = b"\x07"
 MAX_SIZE = 65
@@ -68,10 +68,89 @@ def generate_tx_wrapping() -> Tuple[bytes, bytes, bytes, bytes, bytes]:
 
     return (tx, tx_sig_data, legacy_tx, legacy_tx_sig_data, acc.address) # type: ignore
 
+def generate_fee_txs_gas() -> Tuple[bytes, bytes, bytes]:
+    from hexbytes import HexBytes
+    from web3 import Web3
+    import rlp
+
+    w3 = Web3()
+    acc = w3.eth.account.create()
+
+    tx = {
+        'to': '0x0000000000000000000000000000000000000000',
+        'value': 1000000000,
+        'gas': 21000,
+        'maxFeePerGas': 2000000000,
+        'maxPriorityFeePerGas': 1000000000,
+        'nonce': 0,
+        'chainId': 1,
+    }
+
+    tx_signed = acc.sign_transaction(tx).raw_transaction
+    tx_signed_rlp = rlp.decode(tx_signed[1:])
+
+    tx_sig_data = tx_signed_rlp[-2] + tx_signed_rlp[-1] + (int.from_bytes(tx_signed_rlp[-3], "big") + 27).to_bytes(1, "big")
+
+    tx_signed_rlp[-1] = HexBytes("0x")
+    tx_signed_rlp[-2] = HexBytes("0x")
+    tx_signed_rlp[-3] = HexBytes("0x")
+
+    tx = tx_signed[0].to_bytes(1, "big") + rlp.encode(tx_signed_rlp)
+
+    return (tx, tx_sig_data, acc.address) # type: ignore
+
+def generate_7702_tx(gas: int) -> Tuple[bytes, bytes, List[Tuple[int, bytes]], bytes]:
+    from hexbytes import HexBytes
+    from web3 import Web3
+    import rlp
+
+    w3 = Web3()
+    acc = w3.eth.account.create()
+
+    signed_auth = acc.sign_authorization({
+        "address": "0x0000000000000000000000000000000000000000",
+        "nonce": 1,
+        "chainId": 1,
+    })
+
+    signed_auth_2 = acc.sign_authorization({
+        "address": "0x0000000000000000000000000000000000000001",
+        "nonce": 2,
+        "chainId": 1,
+    })
+
+    tx = {
+        'to': '0x0000000000000000000000000000000000000000',
+        'value': 1000000000,
+        'gas': gas,
+        'maxFeePerGas': 2000000000,
+        'maxPriorityFeePerGas': 1000000000,
+        'nonce': 0,
+        "authorizationList": [signed_auth, signed_auth_2],
+        'chainId': 1,
+    }
+
+    tx_signed = acc.sign_transaction(tx).raw_transaction
+    tx_signed_rlp = rlp.decode(tx_signed[1:])
+
+    sig_data = tx_signed_rlp[-4][1][-2] + tx_signed_rlp[-4][1][-1] + (int.from_bytes(tx_signed_rlp[-4][1][-3], "big") + 27).to_bytes(1, "big")
+
+    tx_signed_rlp[-4][1][-1] = HexBytes("0x")
+    tx_signed_rlp[-4][1][-2] = HexBytes("0x")
+    tx_signed_rlp[-4][1][-3] = HexBytes("0x")
+
+    tx_signed = tx_signed[:1] + rlp.encode(tx_signed_rlp)
+
+    auth_list = [(0x00, sig_data)]
+
+    return (tx_signed, b"", auth_list, acc.address) # type: ignore
+
 tx, tx_sig_data, legacy_tx, legacy_tx_sig_data, address = generate_tx_wrapping()
 
 # Generate test cases for TX handling
 import rlp, json, os
+
+# Wrapping / Unwrapping normal and legacy tx
 
 cases = []
 
@@ -135,13 +214,52 @@ cases.append({
     "output": None,
 })
 
+# Generate test cases with little gas
 
-# TODO
-# Calculate Penalty
-# Additional Info 
-# Gas calculations
+tx, tx_sig_data, addr = generate_fee_txs_gas()
+
+cases.append({
+    "name": "Inalid tx not enough gas",
+    "tx": "0x" + (ALG_TX_TYPE + rlp.encode([0xfe, b"\x00" * 256, mangled_legacy_tx])).hex(),
+    "output": None,
+})
 
 with open(os.path.join(os.path.dirname(__file__), "transactions.json"), "w") as f:
+    json.dump(cases, f, indent=4)
+
+# Generate test cases with `additional_info`
+
+cases = []
+
+tx, _sig_data, auth_info, addr = generate_7702_tx(200000)
+
+cases.append({
+    "name": "Valid 7702 tx, 2 authorizations",
+    "tx": "0x" + (ALG_TX_TYPE + rlp.encode([0xff, b"", tx, auth_info])).hex(),
+    "output": [addr, addr, addr],
+})
+
+mangled_auth_info = auth_info
+mangled_auth_info[0] = (mangled_auth_info[0][0], b"\x00")
+
+cases.append({
+    "name": "Invalid 7702 tx, bad signature",
+    "tx": "0x" + (ALG_TX_TYPE + rlp.encode([0xff, b"", tx, mangled_auth_info])).hex(),
+    "output": None,
+})
+
+
+tx, _sig_data, auth_info, addr = generate_7702_tx(21000 + (2 * 25000))
+
+auth_info.append((0xfe, b"\x00" * 200))
+
+cases.append({
+    "name": "Invalid 7702 tx, not enough gas",
+    "tx": "0x" + (ALG_TX_TYPE + rlp.encode([0xff, b"", tx, auth_info])).hex(),
+    "output": None,
+})
+
+with open(os.path.join(os.path.dirname(__file__), "additional_info.json"), "w") as f:
     json.dump(cases, f, indent=4)
 
 # Generate test cases for Sigrecover Precompile
