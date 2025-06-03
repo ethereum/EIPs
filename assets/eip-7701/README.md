@@ -43,15 +43,15 @@ while keeping the [Specification](../../EIPS/eip-7701.md#specification) section 
   interpretation of the user input.
   These frames do not define the **Validity** of the transaction.
 
-## Global `current_frame_role` variable
+## A frame context `current_frame_role` variable
 
 During the execution of the `Sender`, `Paymaster` or a `Deployer` code as defined by the `AA_TX_TYPE` transaction,
-the global `current_frame_role` variable is set to the corresponding role.
+the frame context `current_frame_role` variable is set to the corresponding role.
 
 The `current_frame_role` remains set only for the top-level frame, as well as for inner frames made in the context of the entity, through an uninterrupted chain of `DELEGATECALL` calls.
 
-By default, the value for `current_frame_role` is not set. Call frames initiated with any opcodes other than
-`DELEGATECALL` run without a role.
+By default, the value for `current_frame_role` is set to `ROLE_SENDER_EXECUTION`.
+Call frames initiated with any opcodes other than `DELEGATECALL` run with the `ROLE_SENDER_EXECUTION` role.
 
 If by the end of the execution of the `Sender`, `Paymaster` or a `Deployer` code
 `current_frame_role` is not explicitly accepted by using the `ACCEPTROLE` opcode,
@@ -61,10 +61,9 @@ An EIP-7701 transaction is valid if and only if the following conditions are met
 `role_sender_deployment`, `role_sender_validation`, `role_paymaster_validation`:
 
 * The top-level call frame did not revert.
-* `ACCEPTROLE` was called exactly once and with the correct role input parameter equal to `current_frame_role`,
-  either in the top level call frame, or in an uninterrupted chain of `DELEGATECALL` calls.
+* `ACCEPTROLE` was called at least once with the role input parameter equal to `current_frame_role`
 
-The `role_sender_execution` and `role_paymaster_post_op` EIP-7701 Call Frame is reverted if
+The `role_paymaster_post_op` EIP-7701 Call Frame is reverted if
 a corresponding `ACCEPTROLE` opcode was not executed, executed for a wrong role, or executed more than once.
 
 ### New `TXPARAMLOAD`, `TXPARAMSIZE`, and `TXPARAMCOPY` opcodes
@@ -77,16 +76,12 @@ families.
 
 ### Limitations on `TXPARAM*` opcodes
 
-The `TXPARAM*` opcodes are only enabled in the top level frames with a correct `current_frame_role`.
-Calling these opcodes in another context, or with invalid `txparam_id`, returns zero values and zero lengths.
+The `TXPARAM*` opcodes are only functional in the top level frames for all roles.
+Calling these opcodes in another context returns zero values and zero lengths.
+
+Requesting `execution_status` and `execution_gas_used` parameters outside the `role_paymaster_post_op` role's frame returns zero values.
 
 Contact should first call `CURRENT_ROLE` (`current_frame_role`) to determine the current frame role.
-In case `current_frame_role` is not set for the current frame it has a default value of `0`.
-
-## Time range validity parameters (optional)
-
-If the `valid_until` field is non-zero, the transaction is only valid for inclusion in a block with a timestamp at most `valid_until` value.
-Similarly, the transaction is only valid for inclusion in blocks with a timestamp at most the `valid_after` value.
 
 ## Paymaster post-operation frame (optional)
 
@@ -142,13 +137,6 @@ Note that some behaviours in the EVM depend on the transaction context. These be
 
 These features are not affected by the separation of the transaction into multiple frames.
 Meaning, for example, that a value set with `TSTORE (0x5D)` in one frame will remain available in the next one.
-
-### Costs of accessing cold addresses for Sender, Paymaster, and Deployer
-
-The Sender address is pre-warmed as part of the `AA_BASE_GAS_COST`.
-
-When a non-zero address that is not equal to the `Sender` address, is provided for a `Paymaster` or a `Deployer` contract,
-an additional EIP-2929 `COLD_ACCOUNT_READ_COST` cost of 2600 gas is charged and the address is added to `accessed_addresses`.
 
 ### Flow diagrams
 
