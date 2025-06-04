@@ -19,7 +19,7 @@ while keeping the [Specification](../../EIPS/eip-7701.md#specification) section 
   This property depends on both the inputs of the transaction and the current state of the Ethereum blockchain and can
   change over time.
 * **EIP-7701 Transaction**: the entire transaction initiated by the `Sender` Smart Contract Account and represented with
-  an [EIP-2718](./eip-2718) compatible Transaction Envelope object.
+  an [EIP-2718](../../EIPS/eip-2718) compatible Transaction Envelope object.
 * **Call Frame**: The context and state for a specific function call during contract execution, including input
   parameters, local variables, and the execution environment.
 * **Top-Level Call Frame**: The initial execution context of a transaction accessing the contract, the "entry point" to
@@ -119,10 +119,10 @@ in order for the transaction to be considered valid for a given position in a bl
 
 Note that some behaviours in the EVM depend on the transaction context. These behaviours include:
 
-1. Costs of the `SSTORE (0x55)` opcode per [EIP-2200](./eip-2200)
-2. Costs of accessing cold addresses and slots per [EIP-2929](./eip-2929)
-3. Values available within the transient storage per [EIP-1153](./eip-1153)
-4. Maximum amount of gas refund assigned after the execution per [EIP-3529](./eip-3529)
+1. Costs of the `SSTORE (0x55)` opcode per [EIP-2200](../../EIPS/eip-2200)
+2. Costs of accessing cold addresses and slots per [EIP-2929](../../EIPS/eip-2929)
+3. Values available within the transient storage per [EIP-1153](../../EIPS/eip-1153)
+4. Maximum amount of gas refund assigned after the execution per [EIP-3529](../../EIPS/eip-3529)
 
 These features are not affected by the separation of the transaction into multiple frames.
 Meaning, for example, that a value set with `TSTORE (0x5D)` in one frame will remain available in the next one.
