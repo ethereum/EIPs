@@ -155,5 +155,5 @@ which could create backwards compatibility issues in the future.
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](../LICENSE.md).
+Copyright and related rights waived via [CC0](../../LICENSE.md).
 
