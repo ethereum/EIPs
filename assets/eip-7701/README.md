@@ -153,6 +153,25 @@ These values are not made accessible to the transactions' execution or to legacy
 This limitation prevents the `TXPARAM*` opcode family from becoming a new source of a globally observable state,
 which could create backwards compatibility issues in the future.
 
+### Reverting execution on `postOp` frame revert
+
+The `postOp` frame is part of the execution phase and is a way for Paymasters to manage their bookkeeping,
+refund the user, and enforce post-execution conditions to make sure the Sender did what the Paymaster expected it to.
+It is not a part of transaction validation, meaning that if it reverts, the Paymaster still pays for the transaction.
+
+If the `postOp` frame reverts it indicates that these post-execution conditions, defined by the paymaster, were not met.
+This could occur if, for example:
+
+* A user failed to perform the specific action the Paymaster intended to pay for
+* A user provided false information during validation that was found to be false when checked in the `postOp` frame.
+* An "intent" was not correctly fulfilled by a solver as verified in the `postOp` frame.
+
+By reverting the main execution frame when the `postOp` frame reverts:
+
+* The user receives no value from the transaction, as their intended operation is undone. This removes an important potential incentive for users to exploit the Paymaster.
+* The paymaster is protected from sponsoring unintended or abusive operations. While the paymaster still incurs the gas costs for the transaction, they prevent non-compliant operation from successfully completing.
+* The paymaster is able to identify the offending Sender account and take action, such as refusing future transactions.
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](../../LICENSE.md).
