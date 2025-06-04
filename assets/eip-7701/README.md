@@ -43,25 +43,25 @@ while keeping the [Specification](../../EIPS/eip-7701.md#specification) section 
   interpretation of the user input.
   These frames do not define the **Validity** of the transaction.
 
-## A frame context `current_frame_role` variable
+## A frame context `current_context_role` variable
 
 During the execution of the `Sender`, `Paymaster` or a `Deployer` code as defined by the `AA_TX_TYPE` transaction,
-the frame context `current_frame_role` variable is set to the corresponding role.
+the frame context `current_context_role` variable is set to the corresponding role.
 
-The `current_frame_role` remains set only for the top-level frame, as well as for inner frames made in the context of the entity, through an uninterrupted chain of `DELEGATECALL` calls.
+The `current_context_role` remains set only for the top-level frame, as well as for inner frames made in the context of the entity, through an uninterrupted chain of `DELEGATECALL` calls.
 
-By default, the value for `current_frame_role` is set to `ROLE_SENDER_EXECUTION`.
+By default, the value for `current_context_role` is set to `ROLE_SENDER_EXECUTION`.
 Call frames initiated with any opcodes other than `DELEGATECALL` run with the `ROLE_SENDER_EXECUTION` role.
 
 If by the end of the execution of the `Sender`, `Paymaster` or a `Deployer` code
-`current_frame_role` is not explicitly accepted by using the `ACCEPTROLE` opcode,
+`current_context_role` is not explicitly accepted by using the `ACCEPT_ROLE` opcode,
 the EIP-7701 Call Frame reverts.
 
 An EIP-7701 transaction is valid if and only if the following conditions are met for each of
 `role_sender_deployment`, `role_sender_validation`, `role_paymaster_validation`:
 
 * The top-level call frame did not revert.
-* `ACCEPTROLE` was called at least once with the role input parameter equal to `current_frame_role` in a frame that did not revert.
+* `ACCEPT_ROLE` was called at least once with the role input parameter equal to `current_context_role` in a frame that did not revert.
 
 ### New `TXPARAMLOAD`, `TXPARAMSIZE`, and `TXPARAMCOPY` opcodes
 
@@ -78,7 +78,7 @@ Calling these opcodes in another context returns zero values and zero lengths.
 
 Requesting `execution_status` and `execution_gas_used` parameters outside the `role_paymaster_post_op` role's frame returns zero values.
 
-Contact may use `CURRENT_ROLE` (`current_frame_role`) to determine the current frame role.
+Contact may use `CURRENT_ROLE` (`current_context_role`) to determine the current frame role.
 
 ## Paymaster post-operation frame (optional)
 
@@ -136,6 +136,22 @@ Meaning, for example, that a value set with `TSTORE (0x5D)` in one frame will re
 #### Complete AA transaction flow
 
 ![Simple AA transaction flow diagram](./complete_flow.svg)
+
+## Rationale
+
+### Introduction of the `TXPARAM*` opcode family
+
+The validation calls of a Smart Contract Account code need to have full access to the majority of transaction
+details in order to be able to make an informed decision about either accepting or rejecting the transaction.
+
+A small subset of this data is available with the existing opcodes, like `CALLER (0x33)` or `GASPRICE  (0x3A)`.
+However, creating an opcode for every transaction parameter is not feasible or desirable.
+
+The `TXPARAM*` opcode family provides the Account Abstraction contracts with access to this data.
+
+These values are not made accessible to the transactions' execution or to legacy transaction types.
+This limitation prevents the `TXPARAM*` opcode family from becoming a new source of a globally observable state,
+which could create backwards compatibility issues in the future.
 
 ## Copyright
 
