@@ -168,7 +168,7 @@ This could occur if, for example:
 
 By reverting the main execution frame when the `postOp` frame reverts:
 
-* The user receives no value from the transaction, as their intended operation is undone. This removes an important potential incentive for users to exploit the Paymaster.
+* The user receives no value from the transaction, as their intended operation is undone. This removes an important potential incentive for users to exploit the paymaster.
 * The paymaster is protected from sponsoring unintended or abusive operations. While the paymaster still incurs the gas costs for the transaction, they prevent non-compliant operation from successfully completing.
 * The paymaster is able to identify the offending Sender account and take action, such as refusing future transactions.
 
