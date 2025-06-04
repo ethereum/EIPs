@@ -61,7 +61,7 @@ An EIP-7701 transaction is valid if and only if the following conditions are met
 `role_sender_deployment`, `role_sender_validation`, `role_paymaster_validation`:
 
 * The top-level call frame did not revert.
-* `ACCEPTROLE` was called at least once with the role input parameter equal to `current_frame_role`
+* `ACCEPTROLE` was called at least once with the role input parameter equal to `current_frame_role` in a frame that did not revert.
 
 ### New `TXPARAMLOAD`, `TXPARAMSIZE`, and `TXPARAMCOPY` opcodes
 
@@ -78,7 +78,7 @@ Calling these opcodes in another context returns zero values and zero lengths.
 
 Requesting `execution_status` and `execution_gas_used` parameters outside the `role_paymaster_post_op` role's frame returns zero values.
 
-Contact should first call `CURRENT_ROLE` (`current_frame_role`) to determine the current frame role.
+Contact may use `CURRENT_ROLE` (`current_frame_role`) to determine the current frame role.
 
 ## Paymaster post-operation frame (optional)
 
@@ -114,14 +114,6 @@ The full list of possible frames and their corresponding role definitions is as 
 
 All execution frames in the **Validation Phase** must be completed successfully without reverting
 in order for the transaction to be considered valid for a given position in a block.
-
-In all top-level frames, the global variables have the following meaning:
-
-| Opcode Name | Solidity Equivalent | Value                                                                                                           |
-|-------------|---------------------|-----------------------------------------------------------------------------------------------------------------|
-| `CALLER`    | `msg.sender`        | The `AA_ENTRY_POINT` address                                                                                    |
-| `ORIGIN`    | `tx.origin`         | The transaction `sender` address                                                                                |
-| `CALLDATA*` | `msg.data`          | Empty for all call frames except for the sender execution frame, for which it is set to `sender_execution_data` |
 
 ## Transaction execution context
 
