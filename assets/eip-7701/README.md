@@ -63,9 +63,6 @@ An EIP-7701 transaction is valid if and only if the following conditions are met
 * The top-level call frame did not revert.
 * `ACCEPTROLE` was called at least once with the role input parameter equal to `current_frame_role`
 
-The `role_paymaster_post_op` EIP-7701 Call Frame is reverted if
-a corresponding `ACCEPTROLE` opcode was not executed, executed for a wrong role, or executed more than once.
-
 ### New `TXPARAMLOAD`, `TXPARAMSIZE`, and `TXPARAMCOPY` opcodes
 
 Accessing transaction details within call frames is performed using the new `TXPARAM*` opcode family.
