@@ -78,7 +78,7 @@ Calling these opcodes in another context returns zero values and zero lengths.
 
 Requesting `execution_status` and `execution_gas_used` parameters outside the `role_paymaster_post_op` role's frame returns zero values.
 
-Contact may use `CURRENT_ROLE` (`current_context_role`) to determine the current frame role.
+Contracts may use `CURRENT_ROLE` (`current_context_role`) to determine the current frame role.
 
 ## Paymaster post-operation frame (optional)
 
