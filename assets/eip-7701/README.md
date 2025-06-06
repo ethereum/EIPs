@@ -146,12 +146,39 @@ details in order to be able to make an informed decision about either accepting 
 
 A small subset of this data is available with the existing opcodes, like `CALLER (0x33)` or `GASPRICE  (0x3A)`.
 However, creating an opcode for every transaction parameter is not feasible or desirable.
+We do not seem able to satisfy all possible use-cases with a manipulation of existing "calldata" and "returndata" buffers either.
 
 The `TXPARAM*` opcode family provides the Account Abstraction contracts with access to this data.
 
 These values are not made accessible to the transactions' execution or to legacy transaction types.
 This limitation prevents the `TXPARAM*` opcode family from becoming a new source of a globally observable state,
 which could create backwards compatibility issues in the future.
+There is no motivation additionally restrict the `TXPARAM*` opcodes to certain fields based on the current frame.
+There are no immediate benefits in doing so while certain use-cases may be prevented.
+
+#### Examples of use-cases for `TXPARAM*` opcodes
+
+The number of such use-cases can be exponential, and the point of the following examples is to provide some intuition about it.
+
+##### Paymaster that only sponsors the transactions with a certain payload
+
+Such a Paymaster will have to check the `sender_execution_data` field of a transaction to see that it contains the expected payload.
+It must also check the `sender_execution_gas` to make sure the transaction is given enough gas to succeed.
+The Paymaster may still require some additional information from the `paymaster_data` field.
+
+##### Paymaster that only sponsors the creation of certain accounts
+
+Such a Paymaster will have to check the `deployer` and `deployer_data` fields of a transaction to see that it contains the expected values.
+
+##### Smart Account keeping track of gas used through Paymasters
+
+Most Paymasters in practice charge the user for the gas fees they cover.
+This can be done with [ERC-20](../../EIPS/eip-20) tokens or through pre-configured fiat charges using a backend service.
+
+We want to enable the Smart Accounts to keep a mapping of gas used for transactions with each Paymaster.
+This way such Smart Accounts can implement on-chain gas spending limits.
+
+In order to do so, the Smart Account must have access to the `paymaster` and `paymaster_validation_gas` fields.
 
 ### Reverting execution on `postOp` frame revert
 
