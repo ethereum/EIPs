@@ -16,11 +16,12 @@
 title: Ethereum Improvement Proposals
 description: >-
   Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum
-  platform, including core protocol specifications, client APIs, and contract
-  standards.
+  platform, such as core protocol specifications.
 url: "https://eips.ethereum.org"
 github_username:  ethereum
 repository: ethereum/EIPs
+lang: en
+timezone: UTC
 
 header_pages:
  - all.html
@@ -39,7 +40,7 @@ kramdown:
   parse_block_html: false
   # This is the default, but be explicit as some EIPs depend on it
   auto_ids: true
-  # This is to ensure more determistic behaviour
+  # This is to ensure more deterministic behaviour
   auto_id_stripping: true
   syntax_highlighter: rouge
 

@@ -87,7 +87,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 A PR moving an EIP from Last Call to Final SHOULD contain no changes other than the status update. Any content or editorial proposed change SHOULD be separate from this status-updating PR and committed prior to it.
 
-**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status.
+**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or its earlier status. If not resurrected, a proposal may stay forever in this status.
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
@@ -105,7 +105,7 @@ Each EIP should have the following parts:
 - Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
 - Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
 - Backwards Compatibility *(optional)* - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.
-- Test Cases *(optional)* - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
+- Test Cases *(optional)* - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs) or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
 - Reference Implementation *(optional)* - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all EIPs.
 - Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 - Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](../LICENSE.md).`
@@ -216,6 +216,28 @@ Permitted Execution Client Specifications URLs must anchor to a specific commit,
 ^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
+### Execution Specification Tests
+
+Links to the Ethereum Execution Specification Tests (EEST) may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+
+Permitted Execution Specification Tests URLs must anchor to a specific commit, and so must match one of these regular expressions:
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/(blob|tree)/[a-f0-9]{40}/.+$
+```
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/commit/[a-f0-9]{40}$
+```
+
 ### Consensus Layer Specifications
 
 Links to specific commits of files within the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
@@ -250,6 +272,24 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 
 ```regex
 ^https://github.com/ethereum/devp2p/(blob|commit)/[0-9a-f]{40}/.*$
+```
+
+### Portal Specifications
+
+Links to specific commits of files within the Ethereum Portal Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+```
+
+Which renders as:
+
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+
+Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/portal-network-specs/(blob|commit)/[0-9a-f]{40}/.*$
 ```
 
 ### World Wide Web Consortium (W3C)
@@ -338,6 +378,24 @@ Which renders to:
 
 [CVE-2023-29638 (2023-10-17T10:14:15)](https://nvd.nist.gov/vuln/detail/CVE-2023-29638)
 
+### Chain Agnostic Improvement Proposals (CAIPs)
+
+Links to a Chain Agnostic Improvement Proposals (CAIPs) specification may be included using normal markdown syntax, such as:
+
+```markdown
+[CAIP 10](https://github.com/ChainAgnostic/CAIPs/blob/5dd3a2f541d399a82bb32590b52ca4340b09f08b/CAIPs/caip-10.md)
+```
+
+Which renders to:
+
+[CAIP 10](https://github.com/ChainAgnostic/CAIPs/blob/5dd3a2f541d399a82bb32590b52ca4340b09f08b/CAIPs/caip-10.md)
+
+Permitted Chain Agnostic URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ChainAgnostic/CAIPs/blob/[0-9a-f]{40}/CAIPs/caip-[0-9]+\.md)$
+```
+
 ### Ethereum Yellow Paper
 
 Links to the Ethereum Yellow Paper may be included using normal markdown syntax, such as:
@@ -356,6 +414,23 @@ Permitted Yellow Paper URLs must anchor to a specific commit, and so must match 
 ^(https://github\.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/paper\.pdf)$
 ```
 
+### Execution Client Specification Tests
+
+Links to the Ethereum Execution Client Specification Tests may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
+
+Permitted Execution Client Specification Tests URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ethereum/execution-spec-tests/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-spec-tests/tree/[0-9a-f]{40}/.*)$
+```
 
 ### Digital Object Identifier System
 
@@ -450,9 +525,6 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 
 The current EIP editors are
 
-- Alex Beregszaszi (@axic)
-- Gavin John (@Pandapip1)
-- Greg Colvin (@gcolvin)
 - Matt Garnett (@lightclient)
 - Sam Wilson (@SamWilsn)
 - Zainan Victor Zhou (@xinbenlv)
@@ -460,7 +532,10 @@ The current EIP editors are
 
 Emeritus EIP editors are
 
+- Alex Beregszaszi (@axic)
 - Casey Detrio (@cdetrio)
+- Gavin John (@Pandapip1)
+- Greg Colvin (@gcolvin)
 - Hudson Jameson (@Souptacular)
 - Martin Becze (@wanderer)
 - Micah Zoltu (@MicahZoltu)

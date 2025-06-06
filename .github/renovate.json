@@ -13,5 +13,6 @@
     "ethereum/eipw-action",
     "ethereum/eip-review-bot",
     "ethereum/EIP-Bot"
-  ]
+  ],
+  "enabled": false
 }
