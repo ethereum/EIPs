@@ -172,6 +172,19 @@ By reverting the main execution frame when the `postOp` frame reverts:
 * The paymaster is protected from sponsoring unintended or abusive operations. While the paymaster still incurs the gas costs for the transaction, they prevent non-compliant operation from successfully completing.
 * The paymaster is able to identify the offending Sender account and take action, such as refusing future transactions.
 
+### Supporting [EIP-7702](../../EIPS/eip-7702) `authorization_list` parameters
+
+Currently, the "authorization tuples" provide a way for users with EOA accounts to have all the benefits of Smart Contract Accounts.
+If support for such EOAs was not part of EIP-7701. these accounts would be forced to continue using other solutions,
+such as [ERC-4337](../../EIPS/eip-4337) which would lead to degraded user experience and fragmentation.
+
+The addition of EIP-7702 accounts to Native Account Abstraction transactions may appear to further enshrine EOAs in the Ethereum protocol,
+but in practice this allows us to eventually deprecate EOA-based ERC-4337 and provide a native upgrade path to the EOAs.
+
+For now, EOAs represent a vast majority of accounts on Ethereum, and almost all remaining accounts are ECDSA-based Smart Contract Accounts.
+In case there is a need to deprecate EOAs throughout Ethereum, proposing an EIP that forces an empty `authorization_list`
+in EIP-7701 should be the easy part.
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](../../LICENSE.md).
