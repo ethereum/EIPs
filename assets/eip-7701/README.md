@@ -115,6 +115,24 @@ The full list of possible frames and their corresponding role definitions is as 
 All execution frames in the **Validation Phase** must be completed successfully without reverting
 in order for the transaction to be considered valid for a given position in a block.
 
+## Transaction Gas Estimation Flow
+
+For all legacy transaction types, gas estimation is performed strictly before the transaction is signed,
+as the EOA signature is not available on-chain and cannot affect the estimation or execution.
+The signature is created later and contains the results of the gas estimation.
+
+With EIP-7701 transactions, all the necessary signatures are validated on-chain by executing some EVM code,
+and performing a gas estimation for this code without a valid signature may pose a challenge.
+
+There are a number of instruments developers of AA contracts should use to make their code "estimateable":
+
+1. Use the pre-determined "stub" in place of the signature data during the gas estimation.
+2. Return without reverting **and without using** the `ACCEPT_ROLE` opcode when signature matches this stub.
+3. Use the `stateOverride` feature of gas estimation API to modify the contracts' observed state during gas estimation.
+
+Used together correctly, these tools allow the gas estimation flow without any risk of the transaction being
+included on-chain without valid signature data.
+
 ## Transaction execution context
 
 Note that some behaviours in the EVM depend on the transaction context. These behaviours include:
