@@ -115,6 +115,24 @@ The full list of possible frames and their corresponding role definitions is as 
 All execution frames in the **Validation Phase** must be completed successfully without reverting
 in order for the transaction to be considered valid for a given position in a block.
 
+## Transaction Gas Estimation Flow
+
+For all legacy transaction types, gas estimation is performed strictly before the transaction is signed,
+as the EOA signature is not available on-chain and cannot affect the estimation or execution.
+The signature is created later and contains the results of the gas estimation.
+
+With EIP-7701 transactions, all the necessary signatures are validated on-chain by executing some EVM code,
+and performing a gas estimation for this code without a valid signature may pose a challenge.
+
+There are a number of instruments developers of AA contracts should use to make their code "estimateable":
+
+1. Use the pre-determined "stub" in place of the signature data during the gas estimation.
+2. Return without reverting **and without using** the `ACCEPT_ROLE` opcode when signature matches this stub.
+3. Use the `stateOverride` feature of gas estimation API to modify the contracts' observed state during gas estimation.
+
+Used together correctly, these tools allow the gas estimation flow without any risk of the transaction being
+included on-chain without valid signature data.
+
 ## Transaction execution context
 
 Note that some behaviours in the EVM depend on the transaction context. These behaviours include:
@@ -146,12 +164,39 @@ details in order to be able to make an informed decision about either accepting 
 
 A small subset of this data is available with the existing opcodes, like `CALLER (0x33)` or `GASPRICE  (0x3A)`.
 However, creating an opcode for every transaction parameter is not feasible or desirable.
+We do not seem able to satisfy all possible use-cases with a manipulation of existing "calldata" and "returndata" buffers either.
 
 The `TXPARAM*` opcode family provides the Account Abstraction contracts with access to this data.
 
 These values are not made accessible to the transactions' execution or to legacy transaction types.
 This limitation prevents the `TXPARAM*` opcode family from becoming a new source of a globally observable state,
 which could create backwards compatibility issues in the future.
+There is no motivation additionally restrict the `TXPARAM*` opcodes to certain fields based on the current frame.
+There are no immediate benefits in doing so while certain use-cases may be prevented.
+
+#### Examples of use-cases for `TXPARAM*` opcodes
+
+The number of such use-cases can be exponential, and the point of the following examples is to provide some intuition about it.
+
+##### Paymaster that only sponsors the transactions with a certain payload
+
+Such a Paymaster will have to check the `sender_execution_data` field of a transaction to see that it contains the expected payload.
+It must also check the `sender_execution_gas` to make sure the transaction is given enough gas to succeed.
+The Paymaster may still require some additional information from the `paymaster_data` field.
+
+##### Paymaster that only sponsors the creation of certain accounts
+
+Such a Paymaster will have to check the `deployer` and `deployer_data` fields of a transaction to see that it contains the expected values.
+
+##### Smart Account keeping track of gas used through Paymasters
+
+Most Paymasters in practice charge the user for the gas fees they cover.
+This can be done with [ERC-20](../../EIPS/eip-20) tokens or through pre-configured fiat charges using a backend service.
+
+We want to enable the Smart Accounts to keep a mapping of gas used for transactions with each Paymaster.
+This way such Smart Accounts can implement on-chain gas spending limits.
+
+In order to do so, the Smart Account must have access to the `paymaster` and `paymaster_validation_gas` fields.
 
 ### Reverting execution on `postOp` frame revert
 
@@ -171,6 +216,19 @@ By reverting the main execution frame when the `postOp` frame reverts:
 * The user receives no value from the transaction, as their intended operation is undone. This removes an important potential incentive for users to exploit the paymaster.
 * The paymaster is protected from sponsoring unintended or abusive operations. While the paymaster still incurs the gas costs for the transaction, they prevent non-compliant operation from successfully completing.
 * The paymaster is able to identify the offending Sender account and take action, such as refusing future transactions.
+
+### Supporting [EIP-7702](../../EIPS/eip-7702) `authorization_list` parameters
+
+Currently, the "authorization tuples" provide a way for users with EOA accounts to have all the benefits of Smart Contract Accounts.
+If support for such EOAs was not part of EIP-7701. these accounts would be forced to continue using other solutions,
+such as [ERC-4337](../../EIPS/eip-4337) which would lead to degraded user experience and fragmentation.
+
+The addition of EIP-7702 accounts to Native Account Abstraction transactions may appear to further enshrine EOAs in the Ethereum protocol,
+but in practice this allows us to eventually deprecate EOA-based ERC-4337 and provide a native upgrade path to the EOAs.
+
+For now, EOAs represent a vast majority of accounts on Ethereum, and almost all remaining accounts are ECDSA-based Smart Contract Accounts.
+In case there is a need to deprecate EOAs throughout Ethereum, proposing an EIP that forces an empty `authorization_list`
+in EIP-7701 should be the easy part.
 
 ## Copyright
 
