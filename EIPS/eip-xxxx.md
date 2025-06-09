@@ -10,10 +10,6 @@ created: 2025-06-09
 requires: 1
 ---
 
-## Simple Summary
-
-Increase the maximum size of contract code from 24KB to 32KB.
-
 ## Abstract
 
 This EIP proposes to raise the maximum allowed size for contract code deployed on Ethereum from 24,576 bytes (24KB) to 32,768 bytes (32KB).
