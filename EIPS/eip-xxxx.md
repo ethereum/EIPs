@@ -20,7 +20,7 @@ This EIP proposes to change the gas cost calculation for the `data` field of the
 
 ## Motivation
 
-Currently, the LOG opcodes charge gas for the `data` field in increments of 8 bytes. With increasing block gas limits, this allows for a large amount of event data to be included in a single block, risking blocks that exceed the 10 MiB devp2p protocol limit. By increasing the granularity to 32 bytes, the network can safely support higher gas limits (up to 300 million gas per block) without risking oversized blocks.
+Currently, the LOG opcodes charge gas for the `data` field in increments of 8 bytes. With increasing block gas limits, this allows for a large amount of event data to be included in a single block, risking blocks that exceed the 10 MiB devp2p protocol limit when calling `GetReceipts`. By increasing the granularity to 32 bytes, the network can safely support higher gas limits (up to 300 million gas per block) without risking oversized blocks.
 
 ## Specification
 
