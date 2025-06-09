@@ -37,10 +37,11 @@ Currently, the LOG opcodes charge gas for the `data` field in increments of 8 by
 ## Backwards Compatibility
 
 This change is not backwards compatible and must be activated via a network upgrade (hard fork). Contracts that emit large amounts of event data will see increased gas costs.
-
 ## Security Considerations
 
 This change reduces the risk of denial-of-service attacks via oversized blocks filled with event data.
+
+
 
 ## Copyright
 
