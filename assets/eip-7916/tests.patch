@@ -1,5 +1,5 @@
 diff --git a/remerkleable/test_impl.py b/remerkleable/test_impl.py
-index 966bfb2..b368559 100644
+index 966bfb2..319cffc 100644
 --- a/remerkleable/test_impl.py
 +++ b/remerkleable/test_impl.py
 @@ -9,6 +9,7 @@ from remerkleable.basic import boolean, bit, byte, uint8, uint16, uint32, uint64
@@ -10,34 +10,21 @@ index 966bfb2..b368559 100644
  from remerkleable.stable_container import Profile, StableContainer
  from remerkleable.union import Union
  from hashlib import sha256
-@@ -47,7 +48,7 @@ class ComplexTestStruct(Container):
-     A: uint16
-     B: List[uint16, 128]
-     C: uint8
--    D: List[byte, 256]
-+    D: ProgressiveList[byte]
-     E: VarTestStruct
-     F: Vector[FixedTestStruct, 4]
+@@ -53,6 +54,13 @@ class ComplexTestStruct(Container):
      G: Vector[VarTestStruct, 2]
-@@ -284,7 +285,7 @@ test_data = [
-          A=0xaabb,
-          B=List[uint16, 128](0x1122, 0x3344),
-          C=0xff,
--         D=List[byte, 256](b"foobar"),
-+         D=ProgressiveList[byte](b"foobar"),
-          E=VarTestStruct(A=0xabcd, B=List[uint16, 1024](1, 2, 3), C=0xff),
-          F=Vector[FixedTestStruct, 4](
-              FixedTestStruct(A=0xcc, B=0x4242424242424242, C=0x13371337),
-@@ -319,7 +320,7 @@ test_data = [
-              ),
-              h(  # C and D
-                  chunk("ff"),
--                 h(merge(chunk("666f6f626172"), zero_hashes[0:3]), chunk("06000000"))  # 256/32 = 8 chunks
-+                 h(h(chunk("666f6f626172"), zero_hashes[0]), chunk("06000000"))  # 256/32 = 8 chunks
-              )
-          ),
-          h(
-@@ -363,7 +364,211 @@ test_data = [
+
+
++class ProgressiveTestStruct(Container):
++    A: ProgressiveList[byte]
++    B: ProgressiveList[uint64]
++    C: ProgressiveList[SmallTestStruct]
++    D: ProgressiveList[ProgressiveList[VarTestStruct]]
++
++
+ sig_test_data = [0 for i in range(96)]
+ for k, v in {0: 1, 32: 2, 64: 3, 95: 0xff}.items():
+     sig_test_data[k] = v
+@@ -363,7 +371,416 @@ test_data = [
              {'A': 0xdead, 'B': [1, 2, 3], 'C': 0x11},
              {'A': 0xbeef, 'B': [4, 5, 6], 'C': 0x22},
          ),
@@ -219,7 +206,7 @@ index 966bfb2..b368559 100644
 +         ),
 +         chunk("02")  # length mix in
 +     ), [{'A': 0x01}, {'A': 0x02}]),
-+    ("progressiveList 7", ProgressiveList[SingleFieldTestStruct],
++    ("progressiveList 8", ProgressiveList[SingleFieldTestStruct],
 +     ProgressiveList[SingleFieldTestStruct](
 +         SingleFieldTestStruct(A=1),
 +         SingleFieldTestStruct(A=2),
@@ -247,10 +234,215 @@ index 966bfb2..b368559 100644
 +         ),
 +         chunk("05")  # length mix in
 +     ), [{'A': 0x01}, {'A': 0x02}, {'A': 0x03}, {'A': 0x04}, {'A': 0x05}]),
++    ("progressiveTestStruct", ProgressiveTestStruct,
++     ProgressiveTestStruct(
++         A=ProgressiveList[byte](b"foobar"),
++         B=ProgressiveList[uint64](1, 2, 3, 4, 5),
++         C=ProgressiveList[SmallTestStruct](
++             SmallTestStruct(A=0x13, B=0x37),
++             SmallTestStruct(A=0x420, B=0x69),
++         ),
++         D=ProgressiveList[ProgressiveList[VarTestStruct]](
++             ProgressiveList[VarTestStruct](
++                 VarTestStruct(A=0x123, B=List[uint16, 1024](1, 2, 3), C=0x12),
++                 VarTestStruct(A=0x456, B=List[uint16, 1024](4, 5, 6), C=0x45),
++                 VarTestStruct(A=0x789, B=List[uint16, 1024](7, 8, 9), C=0x78),
++             ),
++             ProgressiveList[VarTestStruct](
++                 VarTestStruct(A=0x123, B=List[uint16, 1024](1, 2, 3), C=0x12),
++                 VarTestStruct(A=0x456, B=List[uint16, 1024](4, 5, 6), C=0x45),
++             ),
++             ProgressiveList[VarTestStruct](
++                 VarTestStruct(A=0x123, B=List[uint16, 1024](1, 2, 3), C=0x12),
++             ),
++             ProgressiveList[VarTestStruct](),
++         ),
++     ),
++     "10000000"  # offset of A
++     "16000000"  # offset of B
++     "3e000000"  # offset of C
++     "46000000"  # offset of D
++     "666f6f626172"  # foobar
++     "01000000000000000200000000000000030000000000000004000000000000000500000000000000"  # B
++     "1300370020046900"  # C
++     "10000000"  # offset of D[0]
++     "43000000"  # offset of D[1]
++     "65000000"  # offset of D[2]
++     "76000000"  # offset of D[3]
++     "0c000000"  # offset of D[0][0]
++     "19000000"  # offset of D[0][1]
++     "26000000"  # offset of D[0][2]
++     "23010700000012010002000300"  # D[0][0]
++     "56040700000045040005000600"  # D[0][1]
++     "89070700000078070008000900"  # D[0][2]
++     "08000000"  # offset of D[1][0]
++     "15000000"  # offset of D[1][1]
++     "23010700000012010002000300"  # D[1][0]
++     "56040700000045040005000600"  # D[1][1]
++     "04000000"  # offset of D[2][0]
++     "23010700000012010002000300",  # D[2][0]
++     h(
++         h(
++             h(h(chunk("666f6f626172"), zero_hashes[0]), chunk("06")),
++             h(
++                 h(
++                     chunk("0100000000000000020000000000000003000000000000000400000000000000"),
++                     h(
++                         merge(chunk("0500000000000000"), zero_hashes[0:2]),
++                         zero_hashes[0]  # terminator
++                     )
++                 ),
++                 chunk("05")  # length mix in
++             )
++         ),
++         h(
++             h(
++                 h(
++                     h(chunk("1300"), chunk("3700")),
++                     h(
++                         merge(h(chunk("2004"), chunk("6900")), zero_hashes[0:2]),
++                         zero_hashes[0]  # terminator
++                     )
++                 ),
++                 chunk("02")  # length mix in
++             ),
++             h(
++                 h(
++                     h(
++                         h(
++                             h(
++                                 h(
++                                     chunk("2301"),
++                                     h(merge(chunk("010002000300"), zero_hashes[0:6]), chunk("03"))
++                                 ),
++                                 h(
++                                     chunk("12"),
++                                     zero_hashes[0]
++                                 )
++                             ),
++                             h(
++                                 h(
++                                     h(
++                                         h(
++                                             h(
++                                                 chunk("5604"),
++                                                 h(merge(chunk("040005000600"), zero_hashes[0:6]), chunk("03"))
++                                             ),
++                                             h(
++                                                 chunk("45"),
++                                                 zero_hashes[0]
++                                             )
++                                         ),
++                                         h(
++                                             h(
++                                                 chunk("8907"),
++                                                 h(merge(chunk("070008000900"), zero_hashes[0:6]), chunk("03"))
++                                             ),
++                                             h(
++                                                 chunk("78"),
++                                                 zero_hashes[0]
++                                             )
++                                         )
++                                     ),
++                                     zero_hashes[1]
++                                 ),
++                                 zero_hashes[0]  # terminator
++                             )
++                         ),
++                         chunk("03")  # length mix in
++                     ),
++                     h(
++                         h(
++                             h(
++                                 h(
++                                     h(
++                                         h(
++                                             h(
++                                                 chunk("2301"),
++                                                 h(merge(chunk("010002000300"), zero_hashes[0:6]), chunk("03")),
++                                             ),
++                                             h(
++                                                 chunk("12"),
++                                                 zero_hashes[0]
++                                             )
++                                         ),
++                                         h(
++                                             h(
++                                                 h(
++                                                     h(
++                                                         h(
++                                                             chunk("5604"),
++                                                             h(merge(chunk("040005000600"), zero_hashes[0:6]), chunk("03"))
++                                                         ),
++                                                         h(
++                                                             chunk("45"),
++                                                             zero_hashes[0]
++                                                         )
++                                                     ),
++                                                     zero_hashes[0]
++                                                 ),
++                                                 zero_hashes[1]
++                                             ),
++                                             zero_hashes[0]  # terminator
++                                         )
++                                     ),
++                                     chunk("02")  # length mix in
++                                 ),
++                                 h(
++                                     h(
++                                         h(
++                                             h(
++                                                 chunk("2301"),
++                                                 h(merge(chunk("010002000300"), zero_hashes[0:6]), chunk("03")),
++                                             ),
++                                             h(
++                                                 chunk("12"),
++                                                 zero_hashes[0]
++                                             )
++                                         ),
++                                         zero_hashes[0]  # terminator
++                                     ),
++                                     chunk("01")  # length mix in
++                                 ),
++                             ),
++                             h(
++                                 h(
++                                     zero_hashes[0],  # terminator
++                                     chunk("00")  # length mix in
++                                 ),
++                                 zero_hashes[0]
++                             )
++                         ),
++                         zero_hashes[0]  # terminator
++                     )
++                 ),
++                 chunk("04")  # length mix in
++             )
++         )
++     ), {
++         'A': list(b"foobar"),
++         'B': [1, 2, 3, 4, 5],
++         'C': [{'A': 0x13, 'B': 0x37}, {'A': 0x420, 'B': 0x69}],
++         'D': [
++             [
++                 {'A': 0x123, 'B': [1, 2, 3], 'C': 0x12},
++                 {'A': 0x456, 'B': [4, 5, 6], 'C': 0x45},
++                 {'A': 0x789, 'B': [7, 8, 9], 'C': 0x78},
++             ],
++             [
++                 {'A': 0x123, 'B': [1, 2, 3], 'C': 0x12},
++                 {'A': 0x456, 'B': [4, 5, 6], 'C': 0x45},
++             ],
++             [
++                 {'A': 0x123, 'B': [1, 2, 3], 'C': 0x12},
++             ],
++             [],
++         ],
++     }),
  ]
 
 
-@@ -478,6 +683,22 @@ def test_container_equality():
+@@ -478,6 +895,22 @@ def test_container_equality():
      assert A(1, 2, 3) not in {B(1, 2, 3, 0)}
 
 
