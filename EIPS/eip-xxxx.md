@@ -2,7 +2,7 @@
 eip: XXXX
 title: Increase Maximum Contract Size to 32KB
 status: Draft
-author: Giulio Rebuffo (@Giulio2002)
+author: Giulio Rebuffo (@Giulio2002), Ben Adams (@badams)
 discussions-to: <URL or platform for discussion>
 type: Core
 category: Core
