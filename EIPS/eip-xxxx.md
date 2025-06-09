@@ -1,6 +1,6 @@
 ---
 eip: XXXX
-title: Increase LOG Opcode Data Cost to 32 Bytes
+title: Increase LOG Opcode Data Field Cost
 status: Draft
 author: Giulio Rebuffo (@Giulio2002), Ben Adams (@benadams)
 discussions-to: <URL or platform for discussion>
