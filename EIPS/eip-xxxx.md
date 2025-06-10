@@ -3,7 +3,7 @@ eip: XXXX
 title: Increase LOG Opcode Cost
 status: Draft
 author: Giulio Rebuffo (@Giulio2002), Ben Adams (@benadams)
-discussions-to: <URL or platform for discussion>
+discussions-to: https://ethereum-magicians.org/t/increase-log-opcode-cost/24510
 type: Core
 category: Core
 created: 2025-06-09
