@@ -1,6 +1,6 @@
 ---
 eip: XXXX
-title: Increase LOG Opcode Data Field Cost
+title: Increase LOG Opcode Cost
 status: Draft
 author: Giulio Rebuffo (@Giulio2002), Ben Adams (@benadams)
 discussions-to: <URL or platform for discussion>
@@ -10,39 +10,37 @@ created: 2025-06-09
 requires: 1
 ---
 
-## Simple Summary
-
-Increase the cost granularity of the `data` field for the LOG opcodes (LOG0-LOG4) from 8 bytes to 32 bytes per gas accounting, to better accommodate higher block gas limits and ensure that the maximum event data per block does not exceed the 10 MiB devp2p block size limit until at least 300 million gas per block.
-
 ## Abstract
 
-This EIP proposes to change the gas cost calculation for the `data` field of the LOG opcodes from being charged per 8 bytes to per 32 bytes. This adjustment is intended to maintain network stability and prevent blocks from exceeding the devp2p 10 MiB size limit as block gas limits increase.
+This EIP proposes to change the gas cost calculation for the `data` field of the LOG opcodes from being charged 8 gas per byte to 32 gas per byte. This adjustment is intended to maintain network stability and prevent blocks from exceeding the devp2p 10 MiB size limit as block gas limits increase. Additionally, it increases both the base cost for LOGN opcodes and the additional cost per topic to 1095 gas from 375 gas.
 
 ## Motivation
 
-Currently, the LOG opcodes charge gas for the `data` field in increments of 8 bytes. With increasing block gas limits, this allows for a large amount of event data to be included in a single block, risking blocks that exceed the 10 MiB devp2p protocol limit when calling `GetReceipts`. By increasing the granularity to 32 bytes, the network can safely support higher gas limits (up to 300 million gas per block) without risking oversized blocks.
+The current cost of LOG operations no longer reflects the real impact that log data has on block size and network stability, especially as the block gas limit increases. Excessively large blocks risk exceeding the 10 MiB devp2p protocol limit, causing propagation and synchronization issues.
 
 ## Specification
 
-- The gas cost for the `data` field of LOG opcodes (LOG0, LOG1, LOG2, LOG3, LOG4) is changed from being charged per 8 bytes to per 32 bytes.
-- The per-byte cost remains unchanged; only the granularity of charging is updated.
-- For example, if the current cost is `Glogdata * ceil(data_length / 8)`, it becomes `Glogdata * ceil(data_length / 32)`.
+Change the gas cost calculation for LOG opcodes as follows:
+
+- The per-byte cost for the `data` field in LOG opcodes is increased from 8 gas to 32 gas. (4x increase)
+- The base cost for each LOGN opcode and the additional cost per topic are increased from 375 gas to 1095 gas.
+
+These changes apply to all LOG variants (LOG0, LOG1, LOG2, LOG3, LOG4).
 
 ## Rationale
 
-- **Network Stability:** Prevents blocks from exceeding the devp2p 10 MiB limit as block gas limits increase.
-- **Future-Proofing:** Allows for safe increases in block gas limit up to 300 million gas per block.
-- **Minimal Disruption:** The change is simple and only affects the granularity of gas accounting for LOG data.
+Increasing the per-byte cost of logs discourages excessive use of LOG as a cheap storage mechanism, aligning the cost with the actual network impact. Raising the base and per-topic costs reflects the computational and propagation complexity associated with LOG operations. We are targeting a 32 gas per byte of the raw rpl receipt. this is accomplished by 3x the Glog and 4x the GlogData costs. with this parameter, each byte is worth 32 gas, which allows us for a Gas Limit increase up to `300mn`.
+
+`300_000_000/32=9_375_000` bytes, which is 9.3 MiB, well within the devp2p protocol limit of 10 MiB.
 
 ## Backwards Compatibility
 
-This change is not backwards compatible and must be activated via a network upgrade (hard fork). Contracts that emit large amounts of event data will see increased gas costs.
+This change is not backwards compatible.
+
 ## Security Considerations
 
-This change reduces the risk of denial-of-service attacks via oversized blocks filled with event data.
-
-
+Increasing the costs reduces the risk of DoS attacks based on excessive logs and helps keep block sizes within manageable limits.
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via [CC0](../LICENSE.md).
