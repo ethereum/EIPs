@@ -21,7 +21,7 @@ The current 24KB contract size limit can be restrictive for complex contracts an
 ## Specification
 
 1. Update the [EIP-170](./eip-170.md) contract code size limit of 24KB (`0x6000` bytes) to 48KB (`0xC000` bytes).
-2. Update the [EIP-3860](./eip-3860.md) initcode size limit of 24KB (`0x6000` bytes) to 72KB (`0x12000` bytes).
+2. Update the [EIP-3860](./eip-3860.md) initcode size limit of 48KB (`0xC000` bytes) to 72KB (`0x12000` bytes).
 
 ## Rationale
 
