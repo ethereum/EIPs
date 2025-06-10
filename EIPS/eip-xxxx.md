@@ -31,7 +31,7 @@ The current 24KB contract size limit can be restrictive for complex contracts an
 
 ## Backwards Compatibility
 
-This change is not backwards compatible and must be activated via a network upgrade (hard fork). Contracts larger than 24KB but up to 48KB will be deployable after activation.
+This change is not backwards compatible and must be activated via a network upgrade (hard fork). Contracts larger than 24KiB, up to 48KiB, will be deployable after activation.
 
 ## Security Considerations
 
