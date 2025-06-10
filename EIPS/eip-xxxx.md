@@ -43,21 +43,21 @@ Increasing the costs reduces the risk of DoS attacks based on excessive logs and
 
 ## Test Cases
 
+```
 - A transaction using LOG1 with 32 bytes of data and 1 topic should cost:
-  - Before: 375 (base) + 375 (topic) + 32*8 = 375 + 375 + 256 = 1006 gas
-  - After: 1095 (base) + 1095 (topic) + 32*32 = 1095 + 1095 + 1024 = 3214 gas
+
+    1095 (base) + 1095 (topic) + 32*32 = 1095 + 1095 + 1024 = 3214 gas
 
 - A transaction using LOG2 with 64 bytes of data and 2 topics should cost:
-  - Before: 375 (base) + 2*375 (topics) + 64*8 = 375 + 750 + 512 = 1637 gas
-  - After: 1095 (base) + 2*1095 (topics) + 64*32 = 1095 + 2190 + 2048 = 5333 gas
 
-- A transaction using LOG0 with 0 bytes of data and 0 topics should cost:
-  - Before: 375 (base) = 375 gas
-  - After: 1095 (base) = 1095 gas
+    1095 (base) + 2*1095 (topics) + 64*32 = 1095 + 2190 + 2048 = 5333 gas
+
+- A transaction using LOG0 with 0 bytes of data and 0 topics should cost 
+    1095 (base) = 1095 gas
 
 - A transaction using LOG4 with 128 bytes of data and 4 topics should cost:
-  - Before: 375 (base) + 4*375 (topics) + 128*8 = 375 + 1500 + 1024 = 2899 gas
-  - After: 1095 (base) + 4*1095 (topics) + 128*32 = 1095 + 4380 + 4096 = 9571 gas
+    1095 (base) + 4*1095 (topics) + 128*32 = 1095 + 4380 + 4096 = 9571 gas
+```
 
 ## Copyright
 
