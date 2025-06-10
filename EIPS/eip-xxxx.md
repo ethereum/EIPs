@@ -1,6 +1,6 @@
 ---
 eip: XXXX
-title: Increase Maximum Contract Size to 32KB
+title: Increase Maximum Contract Size to 48KB
 status: Draft
 author: Giulio Rebuffo (@Giulio2002), Ben Adams (@badams)
 discussions-to: <URL or platform for discussion>
@@ -12,15 +12,15 @@ requires: 1
 
 ## Abstract
 
-This EIP proposes to raise the maximum allowed size for contract code deployed on Ethereum from 24,576 bytes (24KB) to 32,768 bytes (32KB).
+This EIP proposes to raise the maximum allowed size for contract code deployed on Ethereum from 24,576 bytes (24KB) to 48,768 bytes (48KB).
 
 ## Motivation
 
-The current 24KB contract size limit can be restrictive for complex contracts and applications. Increasing the limit to 32KB allows for more feature-rich contracts while maintaining reasonable constraints on block and state growth.
+The current 24KB contract size limit can be restrictive for complex contracts and applications. Increasing the limit to 48KB allows for more feature-rich contracts while maintaining reasonable constraints on block and state growth.
 
 ## Specification
 
-- The maximum size of contract code is 32,768 bytes.
+- The maximum size of contract code and initcode is 48,768 bytes.
 - All other rules and checks remain unchanged.
 
 ## Rationale
@@ -31,7 +31,7 @@ The current 24KB contract size limit can be restrictive for complex contracts an
 
 ## Backwards Compatibility
 
-This change is not backwards compatible and must be activated via a network upgrade (hard fork). Contracts larger than 24KB but up to 32KB will be deployable after activation.
+This change is not backwards compatible and must be activated via a network upgrade (hard fork). Contracts larger than 24KB but up to 48KB will be deployable after activation.
 
 ## Security Considerations
 
