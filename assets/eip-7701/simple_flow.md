@@ -5,9 +5,8 @@ actor "User"
 skinparam participantFontColor automatic
 participant "Ethereum" #darkgreen
 participant "AA_ENTRY_POINT" #darkgreen
-participant "Sender Contract:\nValidation Code Section" as SCVCS #darkorchid
-participant "Sender Contract:\nExecution Code Section" as SCECS #purple
-participant "Target Contract:\nExecution Code Section" as TCECS #darkred
+participant "Sender Contract" #darkorchid
+participant "Target Contract" #darkred
 
 "User" -> "Ethereum": Submit AA transaction
 note right of "Ethereum": execute\nAA transaction\nstate transition
@@ -15,16 +14,17 @@ note right of "Ethereum": execute\nAA transaction\nstate transition
 |||
 group Validation Phase
 |||
-"AA_ENTRY_POINT"->SCVCS: Validate AA Transaction\n""senderValidationData""
+"AA_ENTRY_POINT"->"Sender Contract": Validate AA Transaction\n""senderValidationData""
+note over "Sender Contract": ""ACCEPTROLE 0xA1""
 return valid: true
 |||
 end
 |||
-
 group Execution Phase
-"AA_ENTRY_POINT"->SCECS: Execute AA Transaction\n""senderExecutionData""
+"AA_ENTRY_POINT"->"Sender Contract": Execute AA Transaction\n""senderExecutionData""
+note over "Sender Contract": ""ACCEPTROLE 0xA3""
 |||
-SCECS->TCECS: AA Transaction\nExecution Body
+"Sender Contract"->"Target Contract": AA Transaction\nExecution Body
 |||
 end
 |||
