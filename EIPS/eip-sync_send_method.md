@@ -1,7 +1,7 @@
 ---
 title: eth_sendRawTransactionSync RPC Method for Lower Latency Transaction Submission
 description: Introduces a new JSON-RPC method to reduce transaction submission latency by allowing synchronous receipt of transaction hash and block inclusion.
-author: [Sam Battenally] (@SmoothBot), [Hai Nguyen] (@hai_rise), [Thanh Nguyen] (@LampardNguyen234)
+author: Sam Battenally (@SmoothBot), Hai Nguyen (@hai_rise), Thanh Nguyen (@LampardNguyen234)
 discussions-to: https://ethresear.ch/t/halving-transaction-submission-latency-with-eth-sendrawtransactionsync/22482
 status: Draft
 type: Standards Track
