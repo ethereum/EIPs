@@ -1,6 +1,6 @@
 ---
-title: eth_sendRawTransactionSync RPC Method for Lower Latency Transaction Submission
-description: Introduces a new JSON-RPC method to reduce transaction submission latency by allowing synchronous receipt of transaction hash and block inclusion.
+title: eth_sendRawTransactionSync Method
+description: A JSON-RPC method to reduce transaction submission latency by allowing synchronous receipt of transaction hash and block inclusion.
 author: Sam Battenally (@SmoothBot), Hai Nguyen (@hai_rise), Thanh Nguyen (@LampardNguyen234)
 discussions-to: https://ethresear.ch/t/halving-transaction-submission-latency-with-eth-sendrawtransactionsync/22482
 status: Draft
@@ -11,111 +11,165 @@ created: 2025-06-11
 
 ## Abstract
 
-This EIP proposes a new JSON-RPC method `eth_sendRawTransactionSync` which reduces the latency between transaction submission and user confirmation by blocking until the transaction has been included in a block or safely gossiped to peers. This method addresses the user experience gap in high-frequency applications by offering stronger delivery guarantees than `eth_sendRawTransaction`.
+This EIP proposes a new JSON-RPC method, `eth_sendRawTransactionSync`, which submits a signed raw transaction and waits synchronously for the transaction receipt or a configurable timeout before returning. This method addresses the user experience gap in high-frequency applications by offering stronger delivery guarantees than [`eth_sendRawTransaction`](https://docs.metamask.io/services/reference/ethereum/json-rpc-methods/eth_sendrawtransaction/).
 
 ## Motivation
 
-The current `eth_sendRawTransaction` method returns almost immediately after transaction pool admission, providing weak guarantees about propagation or block inclusion. This creates uncertainty and requires clients to implement repeated polling or optimistic UX patterns. By allowing clients to block until a transaction is known to be reliably propagated or included, we can reduce redundant queries and improve latency-sensitive use cases like account abstraction paymasters, rollup sequencers, and high-frequency trading systems.
+Currently, Ethereum clients submit signed transactions asynchronously using `eth_sendRawTransaction`. Clients receive a transaction hash immediately but must poll repeatedly for the transaction receipt, which increases latency and complicates client-side logic.
+
+This asynchronous approach is not efficient for high-frequency blockchains or Layer 2 solutions with fast block times and low latency, where rapid transaction throughput and quick confirmation feedback are critical. The need to separately poll for receipts results in increased network overhead, slower overall transaction confirmation feedback, and more complex client implementations.
+
+![Sync vs Async Transaction Sending](../assets/eip-sync_send_method/sync-vs-async.png)
+_In a low-latency blockchain, transaction receipts are often available right after the transactions land to the block producer’s mempool. Requiring an additional RPC call introduces unnecessary latency._
+
+`eth_sendRawTransactionSync` addresses these issues by combining transaction submission and receipt retrieval into a single RPC call. This helps
+
+- reduce total transaction submission and confirmation latency by approximately 50%;
+- simplify client implementations by eliminating the need for separate polling loops;
+- improve user experience by enabling more responsive dApps and wallets;
+- align blockchain interactions closer to traditional Web2 request-response patterns;
+- maintain backward-compatibility and optionality, preserving existing RPC methods and semantics.
 
 ## Specification
 
-A new JSON-RPC method is introduced:
+### Method Name
 
-```json
-eth_sendRawTransactionSync
-```
+`eth_sendRawTransactionSync`
 
 ### Parameters
+The parameters of this method is identical to the `eth_sendRawTransaction` method which contain a signed transaction data.
+- `DATA`. The signed transaction data.
 
-Identical to `eth_sendRawTransaction`:
+### Returns
+- **On success**. Return the transaction receipt object as defined by the [`eth_getTransactionReceipt`](https://docs.metamask.io/services/reference/ethereum/json-rpc-methods/eth_gettransactionreceipt/) method. If the transaction is not yet included in a block, the fields blockHash will be populated but all other fields will be `null` or omitted depending on the client implementation.
+- **On timeout error**. Return an error code `-32002` with a timeout message.
+- **On standard error**. Return A JSON-RPC error object consistent with existing RPC error formats.
 
-```json
-[
-  "0x..." // the raw transaction data
-]
-```
 ### Behavior
+Upon receiving an `eth_sendRawTransactionSync` request, the handler function performs the follow task.
+- Submit the signed transaction to the network as per the existing `eth_sendRawTransaction` semantics.
+- Poll for the transaction receipt at short intervals (e.g., every 10 milliseconds).
+- If the receipt is found within the specified timeout, return it immediately.
+- If the timeout expires without obtaining a receipt, return an error message with a timeout message.
+- If the transaction submission fails (e.g., due to invalid transaction data), return an error immediately.
 
-- Upon receiving the request, the client attempts to propagate the transaction.
-- The request blocks until one of the following occurs:
-  - The transaction is included in a block.
-  - A timeout (e.g. 1-2 seconds) elapses and the client confirms the transaction is in its pool and has been gossiped to peers.
-
-The client then returns the full transaction receipt object, as defined by the JSON-RPC `eth_getTransactionReceipt` method.
-
-If the transaction is not yet included in a block, the fields `blockHash` will be populated but all other feilds will be null or omitted depending on the client implementation.
-
-Example:
+### Example Request
 ```json
 {
-  "transactionHash": "0x...",
-  "transactionIndex": "0x1",
-  "blockHash": "0xabc123...",
-  "blockNumber": "0x5BAD55",
-  "from": "0x...",
-  "to": "0x...",
-  "cumulativeGasUsed": "0x...",
-  "gasUsed": "0x...",
-  "contractAddress": null,
-  "logs": [],
-  "logsBloom": "0x...",
-  "status": "0x1"
+  "jsonrpc": "2.0",
+  "method": "eth_sendRawTransactionSync",
+  "params": [
+    "0xf86c808504a817c80082520894ab... (signed tx hex)"
+  ],
+  "id": 1
 }
 ```
 
-### Network Sequence Comparison
+### Example Response (Success)
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "transactionHash": "0x1234abcd...",
+    "blockHash": "0xabcd1234...",
+    "blockNumber": "0x10d4f",
+    "cumulativeGasUsed": "0x5208",
+    "gasUsed": "0x5208",
+    "contractAddress": null,
+    "logs": [],
+    "status": "0x1"
+  }
+}
+```
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant User
-    participant Client
-    participant PeerNodes
-    participant Validator/Sequencer
+### Example Response (Timeout)
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "error": {
+    "code": -32002,
+    "message": "The transaction was added to the mempool but wasn't processed in 2s.",
+    "data": "0x1234abcd..."
+  }
+}
+```
 
-    Note over User,Client: Standard eth_sendRawTransaction
-    User->>Client: eth_sendRawTransaction(tx)
-    Client->>PeerNodes: Gossip tx
-    Client-->>User: tx hash (immediately)
-    PeerNodes->>Validator/Sequencer: tx
-    Validator/Sequencer->>Validator/Sequencer: include tx in block
-
-    Note over User,Client: Sync version: eth_sendRawTransactionSync
-    User->>Client: eth_sendRawTransactionSync(tx)
-    Client->>PeerNodes: Gossip tx
-    alt tx included quickly
-        PeerNodes->>Validator/Sequencer: tx
-        Validator/Sequencer->>Validator/Sequencer: include tx in block
-        Client-->>User: tx receipt
-    else timeout
-        Client-->>User: tx hash (no inclusion yet)
-    end
+### Example Response (Error)
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "error": {
+    "code": -32000,
+    "message": "Invalid transaction"
+  }
+}
 ```
 
 ## Rationale
-
 ### Why Not Extend Existing RPC?
 
 Modifying `eth_sendRawTransaction` to support this behavior would risk compatibility issues and ambiguity. A separate method makes the semantics explicit and opt-in.
 
 ### Blocking Behavior and Timeouts
 
-Clients SHOULD allow configuration of the timeout period, defaulting to 2 second. This balances responsiveness and propagation guarantees without creating excessive overhead in node clients.
+Clients SHOULD allow configuration of the timeout period, defaulting to 2 seconds (depending on the implementation). This balances responsiveness and propagation guarantees without creating excessive overhead in node clients.
+
+### Optionality
+
+This method is optional and does not replace or change existing asynchronous transaction submission methods. Clients and servers that do not implement this method will continue to operate normally using the standard asynchronous RPC methods.
+
+This RPC method is particularly suitable for EVM-compatible blockchains or L2 solutions with fast block times and low network latency, where synchronous receipt retrieval can significantly improve responsiveness. On high-latency or slower blockchains (e.g., Ethereum mainnet pre-sharding), the synchronous wait may cause longer RPC call durations or timeouts, making the method less practical.
+
+### Improved UX
+
+The synchronous receipt retrieval reduces the complexity of client applications by eliminating the need for separate polling logic.
 
 ## Backwards Compatibility
 
-This is a non-breaking addition. Clients not supporting the method will simply return `method not found`.
+This EIP introduces a new RPC method and does not modify or deprecate any existing methods. Clients and servers that do not implement this method will continue operating normally. Existing applications using `eth_sendRawTransaction` are unaffected. Clients not supporting the method will simply return `method not found`.
 
 ## Reference Implementation
 
-A prototype is being developed in reth:
-- [issue](https://github.com/paradigmxyz/reth/issues/16674)
-- [pull request](https://github.com/paradigmxyz/reth/pull/16683)
+A minimal reference implementation can be realized by wrapping existing `eth_sendRawTransaction` submission with a polling loop that queries `eth_getTransactionReceipt` at short intervals until receipt is found or timeout occurs. Polling intervals and timeout values can be tuned by client implementations to optimize performance.
+
+For example, in [Reth](https://github.com/paradigmxyz/reth), we can implement the handler for `eth_sendRawTransactionSync` as follows.
+```rust
+async fn send_raw_transaction_sync(&self, tx: Bytes) -> RpcResult<OpTransactionReceipt> {
+    const TIMEOUT_DURATION: Duration = Duration::from_secs(2);
+    const POLL_INTERVAL: Duration = Duration::from_millis(1);
+
+    let hash = self.inner.send_raw_transaction(tx).await?;
+
+    let start = Instant::now();
+    while start.elapsed() < TIMEOUT_DURATION {
+        if let Some(receipt) = self.pending_block.get_receipt(hash) {
+            return Ok(receipt);
+        }
+        tokio::time::sleep(POLL_INTERVAL).await;
+    }
+
+    Err(ErrorObject::owned(
+        -32002,
+        format!(
+            "The transaction was added to the mempool but wasn't processed in {TIMEOUT_DURATION:?}."
+        ),
+        Some(hash),
+    ))
+}
+```
+
+Other implementations such as [`go-ethereum`](https://github.com/ethereum/go-ethereum) can utilize channel to signify receipt availability instead of polling. A prototype is being developed in reth:
+- [Issue](https://github.com/paradigmxyz/reth/issues/16674)
+- [Pull request](https://github.com/paradigmxyz/reth/pull/16683)
 
 ## Security Considerations
-
-- **DoS Vector:** Care must be taken to avoid excessive blocking on RPC threads. Implementations should limit concurrency or isolate this method on separate workers.
-- **False Assurance:** Clients must make clear that “sync” only means gossiped or included, not finalized. Applications must still handle reorg risk.
+- This method does not introduce new security risks beyond those inherent in transaction submission.
+- The timeout prevents indefinite blocking of RPC calls, protecting clients and servers from hanging requests.
+- Clients should handle timeout responses gracefully and continue monitoring transaction status as needed.
+- Servers must ensure that the implementation does not degrade node performance or cause denial-of-service.
 
 ## Copyright
 
