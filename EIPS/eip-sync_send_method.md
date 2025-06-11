@@ -135,7 +135,7 @@ This EIP introduces a new RPC method and does not modify or deprecate any existi
 
 A minimal reference implementation can be realized by wrapping existing `eth_sendRawTransaction` submission with a polling loop that queries `eth_getTransactionReceipt` at short intervals until receipt is found or timeout occurs. Polling intervals and timeout values can be tuned by client implementations to optimize performance.
 
-For example, in [Reth](https://github.com/paradigmxyz/reth), we can implement the handler for `eth_sendRawTransactionSync` as follows.
+For example, in [reth](https://github.com/paradigmxyz/reth), we can implement the handler for `eth_sendRawTransactionSync` as follows.
 ```rust
 async fn send_raw_transaction_sync(&self, tx: Bytes) -> RpcResult<OpTransactionReceipt> {
     const TIMEOUT_DURATION: Duration = Duration::from_secs(2);
