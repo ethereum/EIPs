@@ -34,7 +34,6 @@ Identical to `eth_sendRawTransaction`:
   "0x..." // the raw transaction data
 ]
 ```
-
 ### Behavior
 
 - Upon receiving the request, the client attempts to propagate the transaction.
@@ -42,17 +41,27 @@ Identical to `eth_sendRawTransaction`:
   - The transaction is included in a block.
   - A timeout (e.g. 1-2 seconds) elapses and the client confirms the transaction is in its pool and has been gossiped to peers.
 
-The client then returns an object containing:
+The client then returns the full transaction receipt object, as defined by the JSON-RPC `eth_getTransactionReceipt` method.
 
+If the transaction is not yet included in a block, the fields `blockHash` will be populated but all other feilds will be null or omitted depending on the client implementation.
+
+Example:
 ```json
 {
   "transactionHash": "0x...",
-  "blockHash": "0x...", // optional, if included in a block
-  "blockNumber": "0x..." // optional, if included in a block
+  "transactionIndex": "0x1",
+  "blockHash": "0xabc123...",
+  "blockNumber": "0x5BAD55",
+  "from": "0x...",
+  "to": "0x...",
+  "cumulativeGasUsed": "0x...",
+  "gasUsed": "0x...",
+  "contractAddress": null,
+  "logs": [],
+  "logsBloom": "0x...",
+  "status": "0x1"
 }
 ```
-
-If the timeout elapses before block inclusion, `blockHash` and `blockNumber` are null.
 
 ### Network Sequence Comparison
 
@@ -77,7 +86,7 @@ sequenceDiagram
     alt tx included quickly
         PeerNodes->>Validator/Sequencer: tx
         Validator/Sequencer->>Validator/Sequencer: include tx in block
-        Client-->>User: tx hash + block number/hash
+        Client-->>User: tx receipt
     else timeout
         Client-->>User: tx hash (no inclusion yet)
     end
