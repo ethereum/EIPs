@@ -34,14 +34,15 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 This EIP introduces the following parameters:
 
 - `GAS_TLOAD` = 5 (tent.)
-- `GAS_TSTORE` = 8 (tent.)
+- `GAS_TSTORE` = 12 (tent.)
 - `GAS_WARM_SLOAD` = 5 (tent.)
 - `MAX_TRANSIENT_SLOTS` = 131072 (tent.)
+- `GAS_TSTORE_ALLOCATE` = 24 (tent.)
 
 ### Gas Cost Changes
 
 1. The gas cost for `TLOAD` (opcode `0x5c`) is reduced from 100 to `GAS_TLOAD`.
-2. The gas cost for `TSTORE` (opcode `0x5d`) is reduced from 100 to `GAS_TSTORE`.
+2. The base gas cost for `TSTORE` (opcode `0x5d`) is reduced from 100 to `GAS_TSTORE`.
 3. The gas cost for warm `SLOAD` (opcode `0x54`) is reduced from 100 to `GAS_WARM_SLOAD`.
 
 ### Transaction-Global Transient Storage Limit
@@ -73,8 +74,8 @@ This EIP implements constant pricing with a hard limit for several reasons:
 
 - `GAS_TLOAD` (5 gas): Transient storage reads require only memory access without disk I/O.
 - `GAS_WARM_SLOAD` (5 gas): Warm storage loads from cache have similar performance characteristics to transient storage reads.
-- `GAS_TSTORE` (8 gas): Transient storage writes require memory allocation and journaling for revert support.
-- `GAS_TSTORE_ALLOCATE` (16 gas): Writes to fresh slots require memory allocation, which is more expensive than writing to an existing slot.
+- `GAS_TSTORE` (12 gas): Transient storage writes require memory allocation and journaling for revert support.
+- `GAS_TSTORE_ALLOCATE` (24 gas): Writes to fresh slots require memory allocation, which is more expensive than writing to an existing slot.
 
 ### Hard Limit Selection
 
@@ -105,8 +106,8 @@ TBD
 # Pseudo-code for transaction execution with global transient storage limit
 
 GAS_TLOAD = 5
-GAS_TSTORE = 8
-GAS_TSTORE_ALLOCATE = 16
+GAS_TSTORE = 12
+GAS_TSTORE_ALLOCATE = 24
 GAS_WARM_SLOAD = 5
 MAX_TRANSIENT_SLOTS = 131072
 
