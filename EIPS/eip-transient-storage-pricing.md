@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Hard limit and cost reduction for transient storage allocation
 description: Decrease costs for TLOAD, TSTORE and warm SLOAD with a transaction-global limit
 author: Charles Cooper (@charles-cooper), Ben Adams (@benaadams)
-discussions-to: <to be assigned>
+discussions-to: https://ethereum-magicians.org/t/add-eip-hard-limit-and-cost-reduction-for-transient-storage-allocation/24542
 status: Draft
 type: Standards Track
 category: Core
