@@ -29,8 +29,8 @@ Modify the encoding for receipts in the `Receipts (0x10)` message as follows:
 
 - (eth/70): `[request-id: P, lastBlockIncomplete: {0,1}, [[receipt₁, receipt₂], ...]]`
 
-If the `lastBlockIncomplete` flag is set to true (`1`), the last block receipt list does
-not contain all receipts of the block, and the client will have to request the remaining
+If the `lastBlockIncomplete` flag is set to true (`1`), the last receipt list does not
+contain all receipts of the block, and the client will have to request the remaining
 receipts of that block in a new request.
 
 To support such partial queries, we also modify the `GetReceipts (0x0f)` message:
@@ -39,14 +39,12 @@ To support such partial queries, we also modify the `GetReceipts (0x0f)` message
 
 - (eth/70): `[request-id: P, firstBlockReceiptIndex: P, [blockhash₁: B_32, blockhash₂: B_32, ...]]`
 
-`firstBlockReceiptIndex` specifies an index into the block receipt list of the first
-block. For the first block in the list of requested block hashes, the server should omit
-receipts up to the given index from the response.
+For the first block in the list of requested block hashes, the server should omit receipts
+up to the `firstBlockReceiptIndex` from the response.
 
 Downloading block receipts across multiple messages creates new attack surface. In order
-to defend against malicious servers trying to overload syncing clients by supplying
-oversized receipts across many messages, implementations should perform additional
-validation for `Receipts` responses:
+to defend against malicious servers trying to overload syncing clients, implementations
+should perform additional validation for `Receipts` responses:
 
 - Verify the total number of delivered receipts matches the count of transactions.
 - Verify the size of each receipt against the gas limit of the corresponding transaction,
@@ -55,16 +53,16 @@ validation for `Receipts` responses:
 
 ## Rationale
 
+<!-- TODO: double check numbers -->
+
 Since [EIP-7825] caps the gas limit of a single transaction to 30M gas, a single
 transaction receipt will always be limited in size. Specifically, a transaction at can
 produce at most 30000000/8 = 3.75MB of log data.
 
-<!-- TODO: double check numbers -->
-
 However, a block can contain contain multiple transactions, and thus the entire block
 receipts list can be much larger. At a block gas limit of ~80M, the `Receipts` message
-could exceed 10MB. Clients typically reject such large messages because their validity can
-only be determined after fetching the complete message.
+could exceed 10MB. Clients typically reject messages above this size because their
+validity can only be determined after fetching the complete message.
 
 For a `Receipts` message, each block receipts list is validated by checking the full list
 against the tree root stored in the block header. When downloading a paginated list across
