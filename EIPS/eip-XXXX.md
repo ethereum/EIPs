@@ -45,8 +45,8 @@ receipts up to the given index from the response.
 
 Downloading block receipts across multiple messages creates new attack surface. In order
 to defend against malicious servers trying to overload syncing clients by supplying
-oversized receipts across many messages, the client should perform appropriate validation
-on block receipt lists in `Receipts` responses:
+oversized receipts across many messages, implementations should perform additional
+validation for `Receipts` responses:
 
 - Verify the total number of delivered receipts matches the count of transactions.
 - Verify the size of each receipt against the gas limit of the corresponding transaction,
