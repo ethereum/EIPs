@@ -56,7 +56,7 @@ should perform additional validation for `Receipts` responses:
 <!-- TODO: double check numbers -->
 
 Since [EIP-7825] caps the gas limit of a single transaction to 30M gas, a single
-transaction receipt will always be limited in size. Specifically, a transaction at can
+transaction receipt will always be limited in size. Specifically, a transaction can
 produce at most 30000000/8 = 3.75MB of log data.
 
 However, a block can contain contain multiple transactions, and thus the entire block
