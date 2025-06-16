@@ -1,0 +1,93 @@
+---
+eip: XXX
+title: eth/70 - partial receipt queries
+description: Adds a facility for paginating block receipts in the p2p protocol
+author: Felix Lange <fjl@ethereum.org>, Jochem Brouwer (@jochem-brouwer), Giulio Rebuffo (@Giulio2002)
+discussions-to:
+status: Final
+type: Standards Track
+category: Networking
+created: 2025-06-16
+requires: 7642, 7825
+---
+
+## Abstract
+
+This EIP modifies the 'eth' p2p protocol to allow requesting partial block receipt lists.
+
+## Motivation
+
+As Ethereum moves toward a higher block gas limit on mainnet, the worst-case total size of
+a block receipts list also becomes larger, and may eventually exceed the 10MB message size
+limit commonly applied in clients. This can lead to sync failures.
+
+## Specification
+
+Modify the encoding for receipts in the `Receipts (0x10)` message as follows:
+
+- (eth/69): `[request-id: P, [[receipt₁, receipt₂], ...]]`
+
+- (eth/70): `[request-id: P, lastBlockIncomplete: {0,1}, [[receipt₁, receipt₂], ...]]`
+
+If the `lastBlockIncomplete` flag is set to true (`1`), the last block receipt list does
+not contain all receipts of the block, and the client will have to request the remaining
+receipts of that block in a new request.
+
+To support such partial queries, we also modify the `GetReceipts (0x0f)` message:
+
+- (eth/69): `[request-id: P, [blockhash₁: B_32, blockhash₂: B_32, ...]]`
+
+- (eth/70): `[request-id: P, firstBlockReceiptIndex: P, [blockhash₁: B_32, blockhash₂: B_32, ...]]`
+
+`firstBlockReceiptIndex` specifies an index into the block receipt list of the first
+block. For the first block in the list of requested block hashes, the server should omit
+receipts up to the given index from the response.
+
+Downloading block receipts across multiple messages creates new attack surface. In order
+to defend against malicious servers trying to overload syncing clients by supplying
+oversized receipts across many messages, the client should perform appropriate validation
+on block receipt lists in `Receipts` responses:
+
+- Verify the total number of delivered receipts matches the count of transactions.
+- Verify the size of each receipt against the gas limit of the corresponding transaction,
+  i.e. reject if it is larger than gaslimit/8.
+- Verify the total downloaded receipts size is no larger than allowed by the block gas limit.
+
+## Rationale
+
+Since [EIP-7825] caps the gas limit of a single transaction to 30M gas, a single
+transaction receipt will always be limited in size. Specifically, a transaction at can
+produce at most 30000000/8 = 3.75MB of log data.
+
+<!-- TODO: double check numbers -->
+
+However, a block can contain contain multiple transactions, and thus the entire block
+receipts list can be much larger. At a block gas limit of ~80M, the `Receipts` message
+could exceed 10MB. Clients typically reject such large messages because their validity can
+only be determined after fetching the complete message.
+
+For a `Receipts` message, the validity of a block receipts list can only be determined
+checking the full list against the tree root stored in the block header. When downloading
+a paginated list across multiple requests, the client must potentially buffer more than
+10MB of unvalidated input. This is unavoidable since the protocol allows receipt lists of
+such size at a high block gas limit. However, we can at least bound the input by applying
+sanity checks as recommended in the specifcation section.
+
+## Backwards Compatibility
+
+This EIP changes the eth protocol and requires rolling out a new version, `eth/70`.
+Supporting multiple versions of a wire protocol is possible. Rolling out a new version
+does not break older clients immediately, since they can keep using protocol version
+`eth/69`.
+
+This EIP does not change consensus rules of the EVM and does not require a hard fork.
+
+## Security Considerations
+
+None
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
+[EIP-7825]: ./eip-7825.md
