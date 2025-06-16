@@ -66,12 +66,12 @@ receipts list can be much larger. At a block gas limit of ~80M, the `Receipts` m
 could exceed 10MB. Clients typically reject such large messages because their validity can
 only be determined after fetching the complete message.
 
-For a `Receipts` message, the validity of a block receipts list can only be determined
-checking the full list against the tree root stored in the block header. When downloading
-a paginated list across multiple requests, the client must potentially buffer more than
-10MB of unvalidated input. This is unavoidable since the protocol allows receipt lists of
-such size at a high block gas limit. However, we can at least bound the input by applying
-sanity checks as recommended in the specifcation section.
+For a `Receipts` message, each block receipts list is validated by checking the full list
+against the tree root stored in the block header. When downloading a paginated list across
+multiple requests, the client must potentially buffer more than 10MB of unvalidated input.
+This cannot be avoided, since the protocol allows receipt lists of such size at a high
+block gas limit. However, we can at least apply an upper bound on the size of the input by
+applying sanity checks as recommended in the specifcation section.
 
 ## Backwards Compatibility
 
