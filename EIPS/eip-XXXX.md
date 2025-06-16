@@ -1,6 +1,6 @@
 ---
 eip: XXX
-title: eth/70 - partial receipt queries
+title: eth/70 - partial block receipt lists
 description: Adds a facility for paginating block receipts in the p2p protocol
 author: Felix Lange <fjl@ethereum.org>, Jochem Brouwer (@jochem-brouwer), Giulio Rebuffo (@Giulio2002)
 discussions-to:
@@ -70,8 +70,8 @@ For a `Receipts` message, each block receipts list is validated by checking the 
 against the tree root stored in the block header. When downloading a paginated list across
 multiple requests, the client must potentially buffer more than 10MB of unvalidated input.
 This cannot be avoided, since the protocol allows receipt lists of such size at a high
-block gas limit. However, we can at least apply an upper bound on the size of the input by
-applying sanity checks as recommended in the specifcation section.
+block gas limit. However, we can at bound the input size by applying sanity checks as
+recommended in the specifcation section.
 
 ## Backwards Compatibility
 
