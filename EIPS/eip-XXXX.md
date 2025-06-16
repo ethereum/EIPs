@@ -70,8 +70,8 @@ For a `Receipts` message, each block receipts list is validated by checking the 
 against the tree root stored in the block header. When downloading a paginated list across
 multiple requests, the client must potentially buffer more than 10MB of unvalidated input.
 This cannot be avoided, since the protocol allows receipt lists of such size at a high
-block gas limit. However, we can at bound the input size by applying sanity checks as
-recommended in the specifcation section.
+block gas limit. However, we can at least bound the input size by applying sanity checks
+as recommended in the specification section.
 
 ## Backwards Compatibility
 
