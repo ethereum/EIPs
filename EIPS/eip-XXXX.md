@@ -4,7 +4,7 @@ title: eth/70 - partial block receipt lists
 description: Adds a facility for paginating block receipts in the p2p protocol
 author: Felix Lange <fjl@ethereum.org>, Jochem Brouwer (@jochem-brouwer), Giulio Rebuffo (@Giulio2002)
 discussions-to:
-status: Final
+status: Draft
 type: Standards Track
 category: Networking
 created: 2025-06-16
