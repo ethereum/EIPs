@@ -79,6 +79,16 @@ Wallet developers and node operators MUST update gas estimation handling to acco
 
 Users can maintain their usual workflows without modification, as wallet and RPC updates will handle these changes.
 
+## Test Cases
+
+Testing for this EIP should verify the correct application of the new calldata cost floor of 15/60 gas per zero/non-zero byte:
+
+1. **Data-heavy transactions**: Verify transactions with minimal EVM execution pay the floor cost of 15 gas per calldata token
+2. **EVM-heavy transactions**: Confirm transactions with significant computation continue using standard 4/16 gas per byte
+3. **Edge cases**: Test transactions at the boundary where execution gas equals or exceeds the floor cost
+4. **Gas estimation**: Validate that `eth_estimateGas` correctly accounts for the new `TOTAL_COST_FLOOR_PER_TOKEN` value
+5. **Invalid transactions**: Ensure transactions with insufficient gas limits are properly rejected
+
 ## Security Considerations
 
 As the maximum possible block size is further reduced compared to [EIP-7623](./eip-7623.md), no additional security concerns are introduced beyond those already addressed in the original proposal.
