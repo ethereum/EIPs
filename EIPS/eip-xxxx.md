@@ -3,7 +3,7 @@ eip: XXXX
 title: Further increase calldata cost
 description: Further increase calldata cost to 15/60 gas per byte to reduce maximum block size
 author: Toni Wahrstätter (@nerolation)
-discussions-to: https://ethereum-magicians.org/t/eip-xxxx-further-increase-calldata-cost/XXXXX
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-further-increase-calldata-cost/24597
 status: Draft
 type: Standards Track
 category: Core
