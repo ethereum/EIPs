@@ -25,6 +25,8 @@ A new opcode `TXHASH` is introduced at `0x4d`. It shall return one stack element
 
 One element `TransactionHash` is added to the stack; it is the 32 byte keccak-256 hash of the transaction currently being executed.
 
+In the case that this is a system call (i.e. there is no originating transaction), the opcode will return `0`.
+
 ### Gas Cost
 
 The gas cost for `TXHASH` is a fixed fee of `2`.
