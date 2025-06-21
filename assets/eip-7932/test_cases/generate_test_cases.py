@@ -101,7 +101,7 @@ def generate_fee_txs_gas() -> Tuple[bytes, bytes, bytes]:
 
 def generate_7702_tx(gas: int) -> Tuple[bytes, bytes, List[Tuple[int, bytes]], bytes]:
     from hexbytes import HexBytes
-    from web3 import Web3
+    from web3 import Web3, utils
     import rlp
 
     w3 = Web3()
@@ -137,7 +137,7 @@ def generate_7702_tx(gas: int) -> Tuple[bytes, bytes, List[Tuple[int, bytes]], b
 
     tx_signed_rlp[-4][1][-1] = HexBytes("0x")
     tx_signed_rlp[-4][1][-2] = HexBytes("0x")
-    tx_signed_rlp[-4][1][-3] = HexBytes("0x")
+    tx_signed_rlp[-4][1][-3] = Web3.keccak(b"\x00" + sig_data)
 
     tx_signed = tx_signed[:1] + rlp.encode(tx_signed_rlp)
 
@@ -245,6 +245,16 @@ mangled_auth_info[0] = (mangled_auth_info[0][0], b"\x00")
 cases.append({
     "name": "Invalid 7702 tx, bad signature",
     "tx": "0x" + (ALG_TX_TYPE + rlp.encode([0xff, b"", tx, mangled_auth_info])).hex(),
+    "output": None,
+})
+
+mangled_tx = rlp.decode(tx[1:])
+mangled_tx[-4][1][-3] = b"\x00"
+mangled_tx = tx[:1] + rlp.encode(mangled_tx)
+
+cases.append({
+    "name": "Invalid 7702 tx, bad signature",
+    "tx": "0x" + (ALG_TX_TYPE + rlp.encode([0xff, b"", mangled_tx, auth_info])).hex(),
     "output": None,
 })
 
