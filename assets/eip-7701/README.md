@@ -10,7 +10,7 @@ while keeping the [Specification](../../EIPS/eip-7701.md#specification) section 
 * **Sender**: the Smart Contract Account sending the current AA transaction.
 * **Paymaster**: a smart contract that is requested to pay gas fees for the current AA transaction on behalf of the
   `Sender` contract.
-* **Factory**: a smart contract that performs a deployment for a new `Sender` contract if necessary in the context of
+* **Deployer**: a smart contract that performs a deployment for a new `Sender` contract if necessary in the context of
   the current AA transaction.
 * **Entity**: a common term for any of the smart contracts mentioned above in the context of an EIP-7701 Transaction.
 * **Transaction Validity**:
