@@ -2,7 +2,7 @@
 title: Ed25519 transaction support
 description: Adds a EIP-7932 algorithm type for Ed25519 support of type `0x0`
 author: James Kempton (@SirSpudlington)
-discussions-to: todo
+discussions-to: https://ethereum-magicians.org/t/draft-eip-adding-ed25519-as-a-signature-scheme-to-test-eip-7932/24663
 status: Draft
 type: Standards Track
 category: Core
