@@ -31,13 +31,15 @@ The `TypeSelector` is an RLP encoded bit field, where each bit represents whethe
 
 The order of the transaction payload fields is determined by first including the fields of the base transaction type. The following fields of the extension types are then appended in order.
 
-By convention, the `x`th bit corresponds to enabling the fields from traditional type `x` transactions. As a simplified example, imagine we have introduced a new type `0x5` transaction which is equivalent to an [EIP-1559](./eip-1559) transaction type with some new fields. The equivalent type selector would be `0x00100100`. In this case, type `0x2` EIP-1559 type is first enabled as the base type, then `0x5` is an extension type, so the new fields for this type are appended afterwards. If another extension type was enabled by setting bit 6, then these fields would be appended after.
+By convention, the `x`th bit corresponds to enabling the fields from traditional type `x` transactions. As a simplified example, imagine we have introduced a new type `0x5` transaction which is equivalent to an [EIP-1559](./eip-1559) transaction type with some new fields. The equivalent type selector would be `0b00100100`. In this case, type `0x2` EIP-1559 type is first enabled as the base type, then `0x5` is an extension type, so the new fields for this type are appended afterwards. If another extension type was enabled by setting bit 6, then these fields would be appended after.
 
 Note that the fields from the base type are always included first, even if the base type is enabled at a later bit than an extension type.
 
 ### Existing Transaction Type definitions
 
 todo
+
+Since there is no need to support legacy (type `0x0`) transactions in the new format, the zero bit is repurposed. It is defined as a base type with the fields of a type `0x2` EIP-1559 transaction, with the added condition that the `to` field may not be nil. This allow it to be used as a base type for type `0x3` and `0x4` transactions.
 
 ## Rationale
 
