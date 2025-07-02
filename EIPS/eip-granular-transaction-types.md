@@ -3,7 +3,7 @@
 title: Granular Transaction Types
 description: Extends the capacity and granularity for new transaction types.
 author: Marc Harvey-Hill (@Marchhill)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-granular-transaction-types/24715
 status: Draft
 type: Standards Track
 category: Core
