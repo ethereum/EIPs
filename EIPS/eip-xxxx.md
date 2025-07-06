@@ -3,7 +3,7 @@ eip: xxxx
 title: Transaction Gas Limit Cap at 2^24
 description: Introduce a protocol-level cap on the maximum gas used by a transaction to 16.77 million.
 author: Toni Wahrstätter (@nerolation), Vitalik Buterin (@vbuterin)
-discussions-to: [Discussion URL]
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-transaction-gas-limit-cap-at-2-24/24746
 status: Draft
 type: Standards Track
 category: Core
@@ -51,6 +51,8 @@ By limiting individual transactions to a maximum of 16.77 million gas, we aim to
 ### Why 16.77 Million?
 
 The proposed cap of 16.77 million gas (2^24) provides a balance between allowing complex transactions while maintaining predictable execution bounds. This value enables most current use cases including contract deployments and advanced DeFi interactions while ensuring consistent performance characteristics.
+
+EIP-7825 is a first step in this direction, and this proposal continues that trajectory.
 
 ## Backwards Compatibility
 
