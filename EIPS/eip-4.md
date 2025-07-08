@@ -48,7 +48,7 @@ In a hard fork, structures that were invalid under the old rules become valid un
 
 # 2. Networking Layer
 
-The networking layer specifies the Ethereum wire protocol (eth) and the Light Ethereum Subprotocol (les).  RLPx is excluded and tracked in the [https://github.com/ethereum/devp2p devp2p repository].
+The networking layer specifies the Ethereum wire protocol (eth) and the Light Ethereum Subprotocol (les). RLPx is excluded and tracked in the [devp2p repository](https://github.com/ethereum/devp2p).
 
 Only a subset of subprotocols are required for basic node interoperability. Nodes can support further optional extensions.
 
