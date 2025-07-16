@@ -199,7 +199,7 @@ mangled_legacy_tx[-2] = b"erroneous data" # Invalid sig
 mangled_legacy_tx = rlp.encode(mangled_legacy_tx)
 
 cases.append({
-    "name": "Inalid tx decode legacy `r`, `s` fields are not `0x`",
+    "name": "Invalid tx decode legacy `r`, `s` fields are not `0x`",
     "tx": "0x" + (ALG_TX_TYPE + rlp.encode([0x0, legacy_tx_sig_data, mangled_legacy_tx])).hex(),
     "output": None,
 })
@@ -219,7 +219,7 @@ cases.append({
 tx, tx_sig_data, addr = generate_fee_txs_gas()
 
 cases.append({
-    "name": "Inalid tx not enough gas",
+    "name": "Invalid tx not enough gas",
     "tx": "0x" + (ALG_TX_TYPE + rlp.encode([0xfe, b"\x00" * 256, mangled_legacy_tx])).hex(),
     "output": None,
 })
