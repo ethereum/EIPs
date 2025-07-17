@@ -5,12 +5,10 @@ actor "User"
 skinparam participantFontColor automatic
 participant "Ethereum" #darkgreen
 participant "AA_ENTRY_POINT" #darkgreen
-participant "Deployer Contract:\nDeployer Code Section" as DCDCS #darkslateblue
-participant "Sender Contract:\nValidation Code Section" as SCVCS #darkorchid
-participant "Sender Contract:\nExecution Code Section" as SCECS #purple
-participant "Paymaster Contract:\nPaymaster Validation Code Section" as PCPVCS #olivedrab
-participant "Paymaster Contract:\nPaymaster PostOp Code Section" as PCPPCS #olive
-participant "Target Contract:\nExecution Code Section" as TCECS #darkred
+participant "Deployer Contract" as DC #darkslateblue
+participant "Sender Contract" as SC #darkorchid
+participant "Paymaster Contract" as PC #olivedrab
+participant "Target Contract" as TC #darkred
 
 "User" -> "Ethereum": Submit AA transaction
 note right of "Ethereum": execute\nAA transaction\nstate transition
@@ -20,32 +18,36 @@ note right of "Ethereum": execute\nAA transaction\nstate transition
 group Validation Phase
 |||
 opt Sender Deployment
-"AA_ENTRY_POINT"->DCDCS: Deploy AA Transaction Sender\n""deployerData""
-DCDCS -> SCVCS: Deploy Sender Contract\n""CREATE2""
-DCDCS-->"AA_ENTRY_POINT":deployed: true
+"AA_ENTRY_POINT"->DC: Deploy AA Transaction Sender\n""deployerData""
+note over DC: ""ACCEPTROLE 0xA0""
+DC -> SC: Deploy Sender Contract\n""CREATE2""
+DC-->"AA_ENTRY_POINT":deployed: true
 |||
 end
 |||
-"AA_ENTRY_POINT"->SCVCS: Validate AA Transaction\n""senderValidationData""
+"AA_ENTRY_POINT"->SC: Validate AA Transaction\n""senderValidationData""
+note over SC: ""ACCEPTROLE 0xA1""
 return valid: true
 |||
 
 opt Gas Abstraction
-"AA_ENTRY_POINT"->PCPVCS: Validate AA Transaction\n""paymasterData""
+"AA_ENTRY_POINT"->PC: Validate AA Transaction\n""paymasterData""
+note over PC: ""ACCEPTROLE 0xA2""
 return valid: true
 |||
 end
 |||
 end
-
 group Execution Phase
 |||
-"AA_ENTRY_POINT"->SCECS: Execute AA Transaction\n""senderExecutionData""
+"AA_ENTRY_POINT"->SC: Execute AA Transaction\n""senderExecutionData""
+note over SC: ""ACCEPTROLE 0xA3""
 |||
-SCECS->TCECS: AA Transaction\nExecution Body
+SC->TC: AA Transaction\nExecution Body
 |||
 opt PostOp 
-"AA_ENTRY_POINT"->PCPPCS: Paymaster PostOp Call
+"AA_ENTRY_POINT"->PC: Paymaster PostOp Call
+note over PC: ""ACCEPTROLE 0xA4""
 |||
 end
 |||
