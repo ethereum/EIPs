@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
-title: ERC-vTOKEN: Virtual Token Standard
-description: A non-transferable ERC-20-compatible token standard that exists only in smart contracts and auto-converts to native tokens upon transfer to EOAs.
+title: "ERC-vTOKEN: Virtual Token Standard"
+description: "A non-transferable ERC-20-compatible token standard that exists only in smart contracts and auto-converts to native tokens upon transfer to EOAs."
 author: Fukuhi <aethercycle@gmail.com>
 discussions-to: https://github.com/aethercycle/ERC-vTOKEN/issues
 status: Draft
