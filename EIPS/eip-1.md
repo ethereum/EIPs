@@ -507,6 +507,24 @@ See the [Citation Style Language Schema](https://resource.citationstyles.org/sch
 
 The top-level URL field must resolve to a copy of the referenced document which can be viewed at zero cost. Values under `additional-urls` must also resolve to a copy of the referenced document, but may charge a fee.
 
+### Execution API Specification
+
+Links to the Ethereum Execution API Specification may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution API Specification](https://github.com/ethereum/execution-apis/blob/dd00287101e368752ba264950585dde4b61cdc17/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution API Specification](https://github.com/ethereum/execution-apis/blob/dd00287101e368752ba264950585dde4b61cdc17/README.md)
+
+Permitted Execution API Specification URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ethereum/execution-apis/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-apis/tree/[0-9a-f]{40}/.*)$
+```
+
 ## Linking to other EIPs
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP as `./eip-1.md`.
