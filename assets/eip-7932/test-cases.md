@@ -12,7 +12,7 @@ These test cases contain a `tx: bytes` and a `output: null | bytes`, if the outp
 
 The tx test cases can be found [here](./test_cases/transactions.json).
 
-In addition there are [additional info](./test_cases/additional_info.json) test cases for EIP-7702 compatibilty (and future multi-signature transaction types), these have the same `tx: bytes` input, however the output is `output: null | bytes[]` with the first index being the tx signer and then any following signatures as they appear.
+In addition there are [additional info](./test_cases/additional_info.json) test cases for EIP-7702 compatibility (and future multi-signature transaction types), these have the same `tx: bytes` input, however the output is `output: null | bytes[]` with the first index being the tx signer and then any following signatures as they appear.
 
 ## Precompile test cases
 
