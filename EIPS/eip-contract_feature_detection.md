@@ -1,6 +1,6 @@
 ---
 title: Contract Feature Detection
-description: Standard method to publish and detect contract features which lack a public interface
+description: Standard method to publish and detect contract features that lack an ERC-165 interface
 author: raffy.eth (@adraffy)
 discussions-to: https://ethereum-magicians.org/t/an-erc165-like-interface-for-interface-free-features/24754
 status: Draft
@@ -11,7 +11,7 @@ requires: 165
 
 ## Abstract
 
-Creates a standard method to publish and detect what features a smart contract implements that lack a [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface.
+Creates a standard method to publish and detect what features a smart contract implements that lack an [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface.
 
 ## Motivation
 
