@@ -15,7 +15,7 @@ Creates a standard method to publish and detect what features a smart contract i
 
 ## Motivation
 
-ENS has maintained backwards compatibility with contracts created in 2016 through extensive use of ERC-165 interface.  Unfortunately, not all contract capabilities can be expressed through an unique interface.
+Ethereum Name Service (ENS) has maintained backwards compatibility with contracts created in 2016 through extensive use of ERC-165.  Unfortunately, not all contract capabilities can be expressed through an unique interface.
 
 Features allow expression of contract capabilities that preserve existing interfaces.  This proposal standardizes the concept of features and standardizes the identification (naming) of features.
 
