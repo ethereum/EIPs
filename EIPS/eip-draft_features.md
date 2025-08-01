@@ -2,7 +2,7 @@
 title: Contract Feature Detection
 description: Standard method to publish and detect contract features that lack an ERC-165 interface
 author: raffy.eth (@adraffy)
-discussions-to: https://ethereum-magicians.org/t/an-erc165-like-interface-for-interface-free-features/24754
+discussions-to: https://ethereum-magicians.org/t/eip-discussion-contract-feature-detection/24975
 status: Draft
 type: Informational
 created: 2025-07-07
