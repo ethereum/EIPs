@@ -11,11 +11,11 @@ requires: 165
 
 ## Abstract
 
-Creates a standard method to publish and detect what features a smart contract implements that lack a public interface.
+Creates a standard method to publish and detect what features a smart contract implements that lack a [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface.
 
 ## Motivation
 
-ENS has maintained backwards compatibility with contracts created in 2016 through extensive use of [EIP-165](https://eips.ethereum.org/EIPS/eip-165).  Unfortunately, not all contract capabilities can be expressed through an unique interface.
+ENS has maintained backwards compatibility with contracts created in 2016 through extensive use of ERC-165 interface.  Unfortunately, not all contract capabilities can be expressed through an unique interface.
 
 Features allow expression of contract capabilities that preserve existing interfaces.  This proposal standardizes the concept of features and standardizes the identification (naming) of features.
 
@@ -23,7 +23,7 @@ Features allow expression of contract capabilities that preserve existing interf
 
 ### How Interfaces are Identified
 
-For this standard, an *feature* is any property of a contract that cannot be expressed via [ERC-165](https://eips.ethereum.org/EIPS/eip-165).
+For this standard, an *feature* is any property of a contract that cannot be expressed via ERC-165.
 
 A feature name is a reverse domain name that uniquely defines its implication, eg. `eth.ens.resolver.extended.multicall` is the multicall feature for an extended ENS resolver contract.
 
