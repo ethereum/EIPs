@@ -23,11 +23,11 @@ Features allow expression of contract capabilities that preserve existing interf
 
 ### How Interfaces are Identified
 
-For this standard, an *feature* is any property of a contract that cannot be expressed via ERC-165.
+For this standard, a *feature* is any property of a contract that cannot be expressed via ERC-165.
 
-A feature name is a reverse domain name that uniquely defines its implication, eg. `eth.ens.resolver.extended.multicall` is the multicall feature for an extended ENS resolver contract.
+A feature name should be a reverse domain name that uniquely defines its implication, eg. `eth.ens.resolver.extended.multicall` is the multicall feature for an extended ENS resolver contract.
 
-A feature identifier is defined as the first four-bytes of the keccak256 hash of its name, eg. `bytes4(keccak256("eth.ens.resolver.extended.multicall")) = 0x96b62db8`.
+A feature identifier is defined as the first four-bytes of the keccak256-hash of its name, eg. `bytes4(keccak256("eth.ens.resolver.extended.multicall")) = 0x96b62db8`.
 
 ### How a Contract will Publish the Interfaces it Implements 
 
@@ -69,7 +69,7 @@ ENS already implements this EIP.
 
 ## Security Considerations
 
-As with EIP-165, declaring support for a feature does not guarantee that the contract implements it.
+As with ERC-165, declaring support for a feature does not guarantee that the contract implements it.
 
 ## Copyright
 
