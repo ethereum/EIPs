@@ -2,7 +2,7 @@
 title: Multi-chain Deterministic Deployment Factory
 description: A minimal `CREATE2` factory for use across EVM chains.
 author: Francisco Giordano (@frangio)
-discussions-to: https://ethereum-magicians.org/t/eip-tbd-multi-chain-deterministic-deployment-factory/24998
+discussions-to: https://ethereum-magicians.org/t/eip-7997-multi-chain-deterministic-deployment-factory/24998
 status: Draft
 type: Standards Track
 category: Core
