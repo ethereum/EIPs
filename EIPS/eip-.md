@@ -1,4 +1,5 @@
 ---
+eip: 7997
 title: Multi-chain Deterministic Deployment Factory
 description: A minimal `CREATE2` factory for use across EVM chains.
 author: Francisco Giordano (@frangio)
