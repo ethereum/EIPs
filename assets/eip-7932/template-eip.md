@@ -27,12 +27,14 @@ This EIP defines a new [EIP-7932](../../EIPS/eip-7932.md) algorithmic type with 
 | `MAX_SIZE` | `65` |
 
 ```python
-def verify(signature_info: bytes, parent_hash: bytes32) -> bytes20:
+def verify(signature_info: bytes, parent_hash: Hash32) -> ExecutionAddress:
   assert(len(signature_info) == 65)
   r, s, v = signature_info[0:32], signature_info[32:64], signature_info[64]
 
   # This assumes `ecrecover` is identical to the `ecrecover` function in solidity.
   signer = ecrecover(parent_hash, v, r, s)
+
+  assert signer != b""
 
   return signer
 ```
