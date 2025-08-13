@@ -1,5 +1,4 @@
-name: 'Merge EIPs and ERCs Repositories'
-description: 'Merges ERCs repository content into EIPs repository structure'
+name: Merge ERCs
 
 runs:
   using: 'composite'
