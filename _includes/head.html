@@ -39,6 +39,48 @@
       "@context": "https://schema.org"
     }
   </script>
+  
+  <!-- theme detection and immediate apply to prevent FOUC -->
+  <script>
+    (function() {
+      'use strict';
+      
+      const THEME_KEY = 'eips-theme-preference';
+      const THEME_AUTO = 'auto';
+      const THEME_LIGHT = 'light';
+      const THEME_DARK = 'dark';
+      
+      function getStoredTheme() {
+        try {
+          const stored = localStorage.getItem(THEME_KEY);
+          if (stored && [THEME_AUTO, THEME_LIGHT, THEME_DARK].includes(stored)) {
+            return stored;
+          }
+        } catch (e) {
+          // if localStorage is not available due to browser settings, use auto
+        }
+        return THEME_AUTO;
+      }
+      
+      function getSystemPreference() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? THEME_DARK : THEME_LIGHT;
+      }
+      
+      function applyThemeImmediately() {
+        const storedTheme = getStoredTheme();
+        const effectiveTheme = storedTheme === THEME_AUTO ? getSystemPreference() : storedTheme;
+        
+        document.documentElement.setAttribute('data-theme', effectiveTheme);
+        
+        const metaThemeColor = document.createElement('meta');
+        metaThemeColor.name = 'theme-color';
+        metaThemeColor.content = effectiveTheme === THEME_DARK ? '#212529' : '#ffffff';
+        document.head.appendChild(metaThemeColor);
+      }
+      
+      applyThemeImmediately();
+    })();
+  </script>
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
   <link rel="icon" type="image/png" href="{{ '/assets/images/favicon.png' | relative_url }}" />
   {%- feed_meta -%}
@@ -67,6 +109,7 @@
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js" integrity="sha384-/1zmJ1mBdfKIOnwPxpdG6yaRrxP6qu3eVYm0cz2nOx+AcL4d3AqEFrwcqGZVVroG" crossorigin="anonymous"></script>
+  <script src="{{ '/assets/js/theme-toggle.js' | relative_url }}" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/citation-js/0.6.7/citation.min.js" integrity="sha512-N+LDFMa9owHXGS+CyMrBvuxq2QuGl3fiB/7cys3aUEL7K6P1soHGqsS0sjHXZpwNd9Kz0m3R4IPy1HYRi6ROEQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script type="text/javascript">
     addEventListener('DOMContentLoaded', async () => {
