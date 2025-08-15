@@ -3,7 +3,7 @@ eip: TBD
 title: Encrypted Transaction Envelope (ETE) Typed Transaction
 description: Introduces a typed transaction carrying an encrypted payload and a zero-knowledge proof to enable mempool privacy and policy enforcement without altering L1 execution semantics.
 author: Tyler (@lengyeltyler), lengyeltyler@proton.me
-discussions-to: https://ethereum-magicians.org/t/eip-encrypted-transaction-envelope/0000
+discussions-to: https://ethereum-magicians.org/t/discussion-topic-for-eip-xxxx-encrypted-transaction-envelope-ete/25110?u=lengyeltyler
 status: Draft
 type: Standards Track
 category: Core
@@ -33,7 +33,7 @@ Private mempools exist, but they are proprietary and incompatible. Standardizing
 
 ### Transaction Type
 
-Allocates a new EIP-2718 type `0x4f`.
+This EIP requests assignment of a new EIP-2718 typed transaction (type value **TBD**, to be allocated by editors).
 
 RLP payload:
 
@@ -48,18 +48,17 @@ ETETransaction ::= [
     header: bytes,
     ciphertext: bytes,
     proof: bytes,
-    accessList?: [ … ], // EIP-2930 optional
-    v: uint256, r: bytes32, s: bytes32
+    accessList?: [...], // EIP-2930 optional
+    yParity: uint8, r: bytes32, s: bytes32
 ]
+ ```
 
 ### Header (RECOMMENDED encoding: CBOR)
 
 - `version: uint8`
-- `networkId: uint64`
-- `policyTag: bytes32` — commitment to the policy proven in proof
+- `policyTag: bytes32` — commitment to the policy proven in `proof`
 - `nonceCommitment: bytes32` — commitment to a private nonce
-- `vkLocator: bytes` — locator to retrieve the Viewing Public Key (e.g., VKReg address + key ID)  
-  - **Viewing Public Key**: A public key used solely for decrypting transaction contents. May be published in VKReg or another registry. It is distinct from the sender’s signing key to avoid cross-use compromises.
+- `vkLocator: bytes` — locator to retrieve the Viewing Public Key (e.g., VKReg address + key ID)
 - `feeHint: uint32` — OPTIONAL
 
 ### Ciphertext
@@ -80,12 +79,12 @@ ETETransaction ::= [
 
 Nodes MUST:
 
-- Validate RLP structure, fee fields, and that `header.networkId` matches.
-- Reject if `len(ciphertext) > MAX_CIPHERTEXT_BYTES` or `len(proof) > MAX_PROOF_BYTES`.
+- Validate RLP structure and fee fields.
+- Reject if `len(ciphertext)` > `MAX_CIPHERTEXT_BYTES` or `len(proof)` > `MAX_PROOF_BYTES`.
 - Perform cheap structural checks on proof before gossip.
 - Use `(sender, nonce)` from the outer signature for replacement rules.
 
-Non-supporting nodes ignore type `0x4f` in mempool but remain consensus-compatible.
+Non-supporting nodes ignore this typed transaction in mempool but remain consensus-compatible.
 
 Mempool gossip and validation rules are identical to EIP-1559 transactions except where specified herein.
 
@@ -100,20 +99,12 @@ Opt-in builders/proposers:
 
 EVM execution is unchanged; the chain never processes ciphertext.
 
-EVM execution is unchanged; the chain never processes ciphertext.
-
 **Flow Diagram:**
 
 ```text
 [Wallet] --encrypt+proof--> [ETE Tx] --gossip (opaque)--> [Builder]
            --> decrypt & verify --> [Standard Tx] --> [Block Inclusion] --> [Execution]
-
-**Signing**
-```markdown
-###Signing
-
-Signing root: 'keccak256( 0x4f || rlp([fields before v]) )'.
-'toCommitment' SHOULD be 'keccak256(targetAddress || domainSeparator)'.
+```
 
 ### Fees
 
@@ -134,20 +125,20 @@ If included, follows EIP-2930 encoding.
 
 ## Backwards Compatibility
 
-No impact on existing transaction types. Non-supporting clients simply won’t propagate type 0x4f.
+No impact on existing transaction types. Non-supporting clients simply won’t propagate this typed transaction.
 
 ## Security Considerations
 
-	-	DoS: enforce size caps, cheap checks, peer scoring.
-	-	Key compromise: rotate viewing keys; use per-tx ephemeral keys.
-	-	Replay: nonceCommitment + domain-separated toCommitment. These commitments MUST be bound to chainId to prevent cross-chain replay.
-	-	Censorship: multiple builders/relayers; does not solve consensus-layer censorship.
-	-	Privacy limit on L1: calldata visible after inclusion — full privacy requires L2 execution.
+- **DoS**: enforce size caps, cheap checks, peer scoring.
+- **Key compromise**: rotate viewing keys; use per-tx ephemeral keys.
+- **Replay**: `nonceCommitment` + domain-separated `toCommitment`. These commitments MUST be bound to `chainId` to prevent cross-chain replay.
+- **Censorship**: multiple builders/relayers; does not solve consensus-layer censorship.
+- **Privacy limit on L1**: calldata visible after inclusion — full privacy requires L2 execution.
 
-Reference Implementation
+## Reference Implementation
 
 TBD.
 
-Copyright
+## Copyright
 
 CC0
