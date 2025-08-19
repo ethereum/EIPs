@@ -29,7 +29,7 @@ There are various ways to reduce the need for dynamic jumps, some examples:
 
 This proposal introduces a minimal feature set - including the above - to allow compilers to use `RJUMP`/`RJUMPI`/`RJUMPSUB` exclusively.
 
-This functionality does not preclude the EVM from introducing other forms of control flow later on. `RJUMP`/`RJUMPI` can efficiently co-exists with a higher-level declaration of functions, where static relative jumps should be used for intra-function control flow.
+This functionality does not preclude the EVM from introducing other forms of control flow later on. `RJUMP`/`RJUMPI` can efficiently co-exists with a higher-level declaration of functions, where static relative jumps should be used for intra-function control flow.  This functionality also does not preclude the use of legacy code.
 
 The main benefit of these instruction is reduced gas cost (both at deploy and execution time), better performance and better static analysis properties.
 
@@ -114,7 +114,7 @@ There are two benefits here:
 1. Not wasting a byte for a `JUMPDEST` also means a saving of 200 gas during deployment, for each jump destination.
 2. Saving an extra 1 gas per jump during execution, given `JUMPDEST` itself cost 1 gas and is "executed" during jumping.
 
-### `RJUMPV` and ### `RJUMPSUBV` fallback cases
+### `RJUMPV` and `RJUMPSUBV` fallback cases
 
 If no match is found (i.e. the *default* case) in the `RJUMPV` or `RJUMPSUBV` instructions execution will continue without branching. This allows for gaps in the arguments to be filled with `0`s, and a choice of implementation by the programmer. Alternate options would include exceptional aborts in case of no match.
 
@@ -132,20 +132,20 @@ This change poses no risk to backwards compatibility.
     - `relative_offset` is positive/negative/`0`
 - `RJUMP`/`RJUMPI`/`RJUMPV` with instruction other than `JUMPDEST` as target
     - `relative_offset` is positive/negative/`0`
-- `RJUMPV` with various valid table sizes from 1 to 256
+- `RJUMPV` / `RJUMPSUBV` with various valid table sizes from 1 to 256
 - `RJUMP` as a final instruction in code section
 
 #### Invalid cases
 
 - `RJUMP`/`RJUMPI`/`RJUMPV` with truncated immediate
 - `RJUMPI`/`RJUMPV` as a final instruction in code section
-- `RJUMP`/`RJUMPI`/`RJUMPV` target outside of code section bounds
-- `RJUMP`/`RJUMPI`/`RJUMPV` target push data
-- `RJUMP`/`RJUMPI`/`RJUMPV` target another `RJUMP`/`RJUMPI`/`RJUMPV` immediate argument
+- `RJUMPSUB` / `RJUMPSUBV` target not `ENTERSUB`
+- `RJUMP`/`RJUMPI`/`RJUMPV` / `RJUMPSUB` / `RJUMPSUBV` target outside of code section bounds
+- `RJUMP`/`RJUMPI`/`RJUMPV` / `RJUMPSUB` / `RJUMPSUBV` target push data
+- `RJUMP`/`RJUMPI`/`RJUMPV` / `RJUMPSUB` / `RJUMPSUBV` target another `RJUMP`/`RJUMPI`/`RJUMPV` immediate argument
 
 ### Execution
 
-- `RJUMP`/`RJUMPI`/`RJUMPV` in legacy code aborts execution
 - `RJUMP`
     - `relative_offset` is positive/negative/`0`
 - `RJUMPI`
@@ -156,6 +156,17 @@ This change poses no risk to backwards compatibility.
     - `case` equals `0`
     - `case` does not equal `0` 
 - `RJUMPV` with table containing positive, negative, `0` offsets
+    - `case` equals `0`
+    - `case` does not equal `0` 
+    - `case` outside of table bounds (`case > max_index`, fallback case)
+    - `case` > 255
+
+- `RJUMPSUB`
+    - `relative_offset` is positive/negative/`0`
+- `RJUMPSUBV 0 relative_offset`
+    - `case` equals `0`
+    - `case` does not equal `0` 
+- `RJUMPSUBV` with table containing positive, negative, `0` offsets
     - `case` equals `0`
     - `case` does not equal `0` 
     - `case` outside of table bounds (`case > max_index`, fallback case)
