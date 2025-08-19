@@ -1,0 +1,174 @@
+---
+eip: nnnn
+title: Static relative jumps and calls
+description: Relative jump and call instructions with a signed immediate encoding the jump destination
+author: Greg Colvin (@gcolvin) Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)
+discussions-to: https://ethereum-magicians.org/t/eip-????-static-relative-jumps-and-calls/????
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-08-19
+requires: 7979
+---
+
+## Abstract
+
+Five new EVM jump instructions are introduced (`RJUMP`, `RJUMPI`, `RJUMPV`, RJUMPSUB, and RJUMPSUBV) which encode destinations as signed immediate values. These can be useful in almost all JUMP and JUMPI use cases and offer improvements in cost, performance, and static analysis.
+
+## Motivation
+
+A recurring discussion topic is that the EVM only has a mechanism for dynamic jumps. They provide a very flexible architecture with only 2 (!) instructions. This flexibility comes at a cost however: it makes analysis of code more complicated, often intractable, and it also (partially) resulted in the need to have the `JUMPDEST` marker.
+
+In a great many cases control flow is actually static and there is no need for any dynamic behaviour, though not every use case can be solved by static jumps.
+
+There are various ways to reduce the need for dynamic jumps, some examples:
+
+1. With native support for functions / subroutines
+2. A "return to caller" instruction -- a form of subroutine return
+3. A "switch-case" table with dynamic indexing
+
+This proposal introduces a minimal feature set - including the above - to allow compilers to use `RJUMP`/`RJUMPI`/`RJUMPSUB` exclusively.
+
+This functionality does not preclude the EVM from introducing other forms of control flow later on. `RJUMP`/`RJUMPI` can efficiently co-exists with a higher-level declaration of functions, where static relative jumps should be used for intra-function control flow.
+
+The main benefit of these instruction is reduced gas cost (both at deploy and execution time), better performance and better static analysis properties.
+
+## Specification
+
+We introduce five new instructions:
+
+1) relative jump:
+   * `RJUMP relative_offset`  (0xe0)
+     * sets the `PC` to `PC_post_instruction + relative_offset`.
+2) conditional relative jump:
+   * `RJUMPI relative_offset` (0xe2)
+     * pops a value (`condition`) from the stack, and
+     * sets the `PC` to `PC_post_instruction + ((condition == 0) ? 0 : relative_offset)`.
+3) relative jump via jump table:
+   * `RJUMPV max_index relative_offset+` (0xe2)
+     * pops a value (`case`) from the stack, and
+     * sets the `PC` to `PC_post_instruction + ((case > max_index) ? 0 : relative_offset[case])`.
+4) relative jump to subroutine:
+   * `RJUMPSUB relative_offset` (0xe3)
+     * pushes `PC_post_instruction` to the `return stack,` and
+     * sets the `PC` to `PC_post_instruction + relative_offset`.
+5) relative jump to subroutine via jump table:
+   * `RJUMPSUBV max_index relative_offset+` (0xe4)
+     * pops a value (`case`) from the stack,
+     * pushes `PC_post_instruction` to the `return stack`, and
+     * sets the `PC` to `PC_post_instruction + ((case > max_index) ? 0 : relative_offset[case])`.
+
+Note that the destination of `the JUMPSUB` and `JUMPSUBV` opcodes is an `ENTERSUB` and control is returned to a calling `JUMPSUB` via `RETURNSUB`. See [EIP-7979](./eip-7979.md).  That is, `JUMPSUB` provides more efficient access to the underlying `return stack` mechanism of the `CALLSUB` instruction.
+
+The immediate argument `relative_offset` is encoded as a 16-bit **signed** (two's-complement) big-endian value. Under `PC_post_instruction` we mean the `PC` position after the entire immediate value.
+
+The immediate encoding of `RJUMPV` and `RjUMPSUBV` are more special: the unsigned 8-bit `max_index` value determines the maximum index in the jump table. The number of `relative_offset` values following is `max_index+1`. This allows table sizes up to 256. The encoding of `RJUMPV` must have at least one `relative_offset` and thus it will take at minimum 4 bytes. Furthermore, the `case > max_index` condition falling through means that in many use cases, one would place the *default* path following the `RJUMPV` instruction. An interesting feature is that `RJUMPV 0 relative_offset` is an inverted-`RJUMPI`, which can be used in many cases instead of `ISZERO RJUMPI relative_offset`.
+
+We also extend the validation algorithm of [EIP-7979](./eip-7979.md) to verify that each `RJUMP`/`RJUMPI`/`RJUMPV`/`RJUMPSUB`/`RJUMPSUBV` has a `relative_offset` pointing to an instruction. This means it cannot point to an immediate data of `PUSHn`/`RJUMP`/`RJUMPI`/`RJUMPV`. It cannot point outside of code bounds. It is allowed to point to a `JUMPDEST`, but is not required to.  Further, each `RJUMPSUB` and `RJUMPSUBV` MUST have a `relative offset` pointing to an `ENTERSUB`.
+
+Because the destinations are validated upfront, the cost of these instructions are less than their dynamic counterparts: `RJUMP` should cost 2, `RJUMPI` and `RJUMPV` should cost 4. and `RJUMPSUB` and `RJUMPSUBV` should cost 5.
+
+## Rationale
+
+### Relative addressing
+
+We chose relative addressing in order to support code which is relocatable. This also means a code snippet can be injected. A technique seen used prior to this EIP to achieve the same goal was to inject code like `PUSHn PC ADD JUMPI`.
+
+We do not see any significant downside to relative addressing and it allows us to also deprecate the `PC` instruction.
+
+### Immediate size
+
+The signed 16-bit immediate means that the largest jump distance possible is 32767. In the case the bytecode at `PC=0` starts with an `RJUMP`, it will be possible to jump as far as `PC=32770`.
+
+Given `MAX_CODE_SIZE = 24576` (in [EIP-170](./eip-170.md)) and `MAX_INITCODE_SIZE = 49152` (in [EIP-3860](./eip-3860.md)), we think the 16-bit immediate is large enough.
+
+A version with an 8-bit immediate would only allow moving `PC` backward by 125 or forward by 127 bytes. While that seems to be a good enough distance for many for-loops, it is likely not good enough for cross-function jumps, and since the 16-bit immediate is the same size as what a dynamic jump would take in such cases (3 bytes: `JUMP PUSH1 n`), we think having less instructions is better.
+
+Should there be a need to have immediate encodings of other size (such as 8-bits, 24-bits or 32-bits), it would be possible to introduce new opcodes, similarly to how multiple `PUSH` instructions exist.
+
+### `PUSHn JUMP` sequences
+
+If we chose absolute addressing, then `RJUMP` could be viewed similar to the sequence `PUSHn JUMP` (and `RJUMPI` similar to `PUSHn JUMPI`). In that case one could argue that instead of introducing a new instruction, such sequences should get a discount, because EVMs could optimise them.
+
+We think this is a bad direction to go, and we leave defining the semantics of existing `PUSHn JUMP` sequences to EIP-7979 and do not attempt to optimize their gas cost here.
+
+1. It further complicates the already complex rules of gas calculation.
+2. And it either requires a consensus defined internal representation for EVM code, or forces EVM implementations to do optimisations on their own.
+
+Both of these are risky. Furthermore we think that EVM implementations should be free to chose what optimisations they apply, and the savings do not need to be passed down at all cost.
+
+Additionally it requires a potentially significant change to the current implementations which depend on a streaming one-by-one execution without a lookahead.
+
+
+### Lack of `JUMPDEST`
+
+`JUMPDEST` serves two purposes:
+
+1. To efficiently partition code -- this can be useful for pre-calculating total gas usage for a given *block* (i.e. instructions between `JUMPDEST`s), and for JIT/AOT translation.
+2. To explicitly show valid locations (otherwise any non-data location would be valid).
+
+This functionality is not needed for static jumps, as the analysers can easily tell destinations from the static jump immediates during jumpdest-analysis.
+
+There are two benefits here:
+
+1. Not wasting a byte for a `JUMPDEST` also means a saving of 200 gas during deployment, for each jump destination.
+2. Saving an extra 1 gas per jump during execution, given `JUMPDEST` itself cost 1 gas and is "executed" during jumping.
+
+### `RJUMPV` and ### `RJUMPSUBV` fallback cases
+
+If no match is found (i.e. the *default* case) in the `RJUMPV` or `RJUMPSUBV` instructions execution will continue without branching. This allows for gaps in the arguments to be filled with `0`s, and a choice of implementation by the programmer. Alternate options would include exceptional aborts in case of no match.
+
+## Backwards Compatibility
+
+This change poses no risk to backwards compatibility.
+
+## Test Cases
+
+### Validation
+
+#### Valid cases
+
+- `RJUMP`/`RJUMPI`/`RJUMPV` with `JUMPDEST` as target
+    - `relative_offset` is positive/negative/`0`
+- `RJUMP`/`RJUMPI`/`RJUMPV` with instruction other than `JUMPDEST` as target
+    - `relative_offset` is positive/negative/`0`
+- `RJUMPV` with various valid table sizes from 1 to 256
+- `RJUMP` as a final instruction in code section
+
+#### Invalid cases
+
+- `RJUMP`/`RJUMPI`/`RJUMPV` with truncated immediate
+- `RJUMPI`/`RJUMPV` as a final instruction in code section
+- `RJUMP`/`RJUMPI`/`RJUMPV` target outside of code section bounds
+- `RJUMP`/`RJUMPI`/`RJUMPV` target push data
+- `RJUMP`/`RJUMPI`/`RJUMPV` target another `RJUMP`/`RJUMPI`/`RJUMPV` immediate argument
+
+### Execution
+
+- `RJUMP`/`RJUMPI`/`RJUMPV` in legacy code aborts execution
+- `RJUMP`
+    - `relative_offset` is positive/negative/`0`
+- `RJUMPI`
+    - `relative_offset` is positive/negative/`0`
+        - `condition` equals `0`
+        - `condition` does not equal `0` 
+- `RJUMPV 0 relative_offset`
+    - `case` equals `0`
+    - `case` does not equal `0` 
+- `RJUMPV` with table containing positive, negative, `0` offsets
+    - `case` equals `0`
+    - `case` does not equal `0` 
+    - `case` outside of table bounds (`case > max_index`, fallback case)
+    - `case` > 255
+
+## Security Considerations
+
+Adding new instructions with immediate arguments should be carefully considered when implementing the EOF container validation algorithm.
+
+Static relative jump execution does not require runtime check of the jump destination. It greatly reduces execution cost. Therefore the gas cost of the new instructions can also be significantly reduced.
+
+The `RJUMPV`and `RJUMPSUBV` instruction relative offset tables can have up to 256 one-byte entries, so reading an offset cannot be a potential DoS attack surface.         
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
