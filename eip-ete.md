@@ -3,7 +3,7 @@ eip: 0
 title: Encrypted Transaction Envelope (ETE) Typed Transaction
 description: Introduces a typed transaction carrying an encrypted payload and a zero-knowledge proof to enable mempool privacy and policy enforcement without altering L1 execution semantics.
 author: Tyler (@lengyeltyler), lengyeltyler@proton.me
-discussions-to: https://ethereum-magicians.org/t/discussion-topic-for-eip-xxxx-encrypted-transaction-envelope-ete/25110?u=lengyeltyler
+discussions-to: https://ethereum-magicians.org/t/eip-8005-encrypted-transaction-envelope-ete-typed-transaction/25110
 status: Draft
 type: Standards Track
 category: Core
