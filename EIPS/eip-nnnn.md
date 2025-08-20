@@ -13,7 +13,7 @@ requires: 7979
 
 ## Abstract
 
-Five new EVM jump instructions are introduced (`RJUMP`, `RJUMPI`, `RJUMPV`, RJUMPSUB, and RJUMPSUBV) which encode destinations as signed immediate values. These can be useful in almost all JUMP and JUMPI use cases and offer improvements in cost, performance, and static analysis.
+Five new EVM jump instructions are introduced (`RJUMP`, `RJUMPI`, `RJUMPV`, `RJUMPSUB`, and `RJUMPSUBV`) which encode destinations as signed immediate values. These can be useful in almost all `JUMP` and `JUMPI` use cases and offer improvements in cost, performance, and static analysis.
 
 ## Motivation
 
@@ -38,27 +38,27 @@ The main benefit of these instruction is reduced gas cost (both at deploy and ex
 We introduce five new instructions:
 
 1) relative jump:
-   * `RJUMP relative_offset`  (0xe0)
+   * `RJUMP (0xe0) relative_offset`
      * sets the `PC` to `PC_post_instruction + relative_offset`.
 2) conditional relative jump:
-   * `RJUMPI relative_offset` (0xe2)
+   * `RJUMPI (0xe1) relative_offset`
      * pops a value (`condition`) from the stack, and
      * sets the `PC` to `PC_post_instruction + ((condition == 0) ? 0 : relative_offset)`.
 3) relative jump via jump table:
-   * `RJUMPV max_index relative_offset+` (0xe2)
+   * `RJUMPV (0xe2) max_index relative_offset+`
      * pops a value (`case`) from the stack, and
      * sets the `PC` to `PC_post_instruction + ((case > max_index) ? 0 : relative_offset[case])`.
 4) relative jump to subroutine:
-   * `RJUMPSUB relative_offset` (0xe3)
+   * `RJUMPSUB (0xe3) elative_offset`
      * pushes `PC_post_instruction` to the `return stack,` and
-     * sets the `PC` to `PC_post_instruction + relative_offset`.
+     * sets the `PC` to `PC_post_instruction + relative_offset`, an `ENTERSUB`, as if with `CALLSUB`.
 5) relative jump to subroutine via jump table:
-   * `RJUMPSUBV max_index relative_offset+` (0xe4)
+   * `RJUMPSUBV (0xe4) max_index relative_offset+
      * pops a value (`case`) from the stack,
      * pushes `PC_post_instruction` to the `return stack`, and
-     * sets the `PC` to `PC_post_instruction + ((case > max_index) ? 0 : relative_offset[case])`.
+     * sets the `PC` to `PC_post_instruction + ((case > max_index) ? 0 : relative_offset[case])`, an `ENTERSUB`, as if with `CALLSUB`.
 
-Note that the destination of `the JUMPSUB` and `JUMPSUBV` opcodes is an `ENTERSUB` and control is returned to a calling `JUMPSUB` via `RETURNSUB`. See [EIP-7979](./eip-7979.md).  That is, `JUMPSUB` provides more efficient access to the underlying `return stack` mechanism of the `CALLSUB` instruction.
+Note that the destination of the `JUMPSUB` and `JUMPSUBV` opcodes MUST be an `ENTERSUB` and control is returned to a calling `JUMPSUB` / `JUMPSUBV` via `RETURNSUB` (See [EIP-7979](./eip-7979.md)) -- these two forms of jump provide immediate access to the underlying "return-to-caller" mechanism of the `CALLSUB` instruction.
 
 The immediate argument `relative_offset` is encoded as a 16-bit **signed** (two's-complement) big-endian value. Under `PC_post_instruction` we mean the `PC` position after the entire immediate value.
 
@@ -66,7 +66,12 @@ The immediate encoding of `RJUMPV` and `RjUMPSUBV` are more special: the unsigne
 
 We also extend the validation algorithm of [EIP-7979](./eip-7979.md) to verify that each `RJUMP`/`RJUMPI`/`RJUMPV`/`RJUMPSUB`/`RJUMPSUBV` has a `relative_offset` pointing to an instruction. This means it cannot point to an immediate data of `PUSHn`/`RJUMP`/`RJUMPI`/`RJUMPV`. It cannot point outside of code bounds. It is allowed to point to a `JUMPDEST`, but is not required to.  Further, each `RJUMPSUB` and `RJUMPSUBV` MUST have a `relative offset` pointing to an `ENTERSUB`.
 
-Because the destinations are validated upfront, the cost of these instructions are less than their dynamic counterparts: `RJUMP` should cost 2, `RJUMPI` and `RJUMPV` should cost 4. and `RJUMPSUB` and `RJUMPSUBV` should cost 5.
+### Costs
+
+Because the destinations are validated upfront, the cost of these instructions are less than their dynamic counterparts:
+* `RJUMP` should cost 2,
+* `RJUMPI` and `RJUMPV` should cost 4. and
+* `RJUMPSUB` and `RJUMPSUBV` should cost 5.
 
 ## Rationale
 
