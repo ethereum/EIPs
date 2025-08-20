@@ -1,5 +1,5 @@
 ---
-eip: 0
+eip: 8005
 title: Encrypted Transaction Envelope (ETE) Typed Transaction
 description: Introduces a typed transaction carrying an encrypted payload and a zero-knowledge proof to enable mempool privacy and policy enforcement without altering L1 execution semantics.
 author: Tyler (@lengyeltyler), lengyeltyler@proton.me
