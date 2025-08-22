@@ -1,5 +1,5 @@
 ---
-eip: nnnn
+eip: 9999
 title: Static relative jumps and calls
 description: Relative jump and call instructions with a signed immediate encoding the jump destination
 author: Greg Colvin (@gcolvin) Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)
