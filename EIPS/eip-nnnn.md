@@ -1,6 +1,6 @@
 ---
 eip: 9999
-title: Static relative jumps and calls
+title: Static relative jumps and calls for the EVM
 description: Relative jump and call instructions with a signed immediate encoding the jump destination
 author: Greg Colvin (@gcolvin) Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)
 discussions-to: https://ethereum-magicians.org/t/eip-????-static-relative-jumps-and-calls/????
