@@ -84,7 +84,7 @@ layout: default
       {% if page.status != "Review" and page.status != "Last Call" and page.status != "Final" and page.discussions-to != undefined %}
         <tr>
           <th scope="row">Discussion Link</th>
-          <td><a href="{{ page.discussions-to | uri_escape }}" target="__blank">{{ page.discussions-to | xml_escape }}</a></td>
+          <td><a href="{{ page.discussions-to | uri_escape }}" target="_blank" rel="noopener">{{ page.discussions-to | xml_escape }}</a></td>
         </tr>
       {% endif %}
       {% if page.requires != undefined %}
@@ -101,7 +101,7 @@ layout: default
     <div class="alert alert-primary d-flex align-items-center" role="alert">
       <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:" style="width:2.5em;height:2.5em;"><use xlink:href="#bi-megaphone-fill"/></svg>
       <div class="text-center w-100">
-        <a href="{{ page.discussions-to | uri_escape }}" target="__blank">This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.</a>
+        <a href="{{ page.discussions-to | uri_escape }}" target="_blank" rel="noopener">This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.</a>
       </div>
     </div>
   {% endif %}
