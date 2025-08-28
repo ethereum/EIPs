@@ -129,7 +129,7 @@ jobs:
           skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
 
   eipw-validator:
-    name: EIP Walidator
+    name: EIP Validator
     runs-on: ubuntu-latest
 
     steps:
