@@ -6,6 +6,7 @@ The goal of the EIP project is to standardize and provide high-quality documenta
 
 The [status page](https://eips.ethereum.org/) tracks and lists EIPs, which can be divided into the following categories:
 
+
 - [Core EIPs](https://eips.ethereum.org/core) are improvements to the Ethereum consensus protocol.
 - [Networking EIPs](https://eips.ethereum.org/networking) specify the peer-to-peer networking layer of Ethereum.
 - [Interface EIPs](https://eips.ethereum.org/interface) standardize interfaces to Ethereum, which determine how users and applications interact with the blockchain.
