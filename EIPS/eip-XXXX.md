@@ -68,7 +68,7 @@ Simple ETH transfers drop from `21,000` to `8,000`. No opcode pricing changes. R
 
 ## Security Considerations
 
-As this more than doubles the pontential number of transactions per gaslimit that carries risk. 
+As this more than doubles the potential number of transactions per gaslimit that carries risk. 
 
 | Block gas limit | Old tx/bk (21k) | TPS @12s | TPS @6s | New tx/bk (8k) | TPS @12s | TPS @6s | % increase |
 | --------------: | --------------: | -------: | ------: | -------------: | -------: | ------: | ---------: |
