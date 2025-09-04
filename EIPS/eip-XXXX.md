@@ -58,8 +58,8 @@ EIP‑1559/2930/7702 transactions that currently reference the `21,000` base inh
 
 ## Rationale
 
-* Use EIP‑7702’s/precompile price for ecrecover = `3,000`.
-* Use EIP‑2930’s address entry price `2,400` as the canonical warming cost for sender and to.
+* Use [EIP-7702](./eip‑7702.md)'s & ecrecover precompile price = `3,000`.
+* Use [EIP-2930](./eip-2930.md)'s address entry price `2,400` as the canonical warming cost for sender and to.
 * Include two warm account updates at `100` each for gas debit and nonce increment.
 
 ## Backwards Compatibility
