@@ -54,6 +54,16 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 
+### Chain Specifics
+
+<!--
+  This subsection is optional.
+
+  The Chain Specifics section should describe the behaviour of the EIP in testnets, devnets, and other non-mainnet considerations. For example, the behavior of the proposal in a genesis block should be documented here.
+
+  TODO: Remove this comment before submitting.
+-->
+
 ## Rationale
 
 <!--
