@@ -205,70 +205,6 @@ describe('NTT Precompile Transaction Tests', () => {
       console.log(`🏗️ Block Number: ${result.blockNumber}`);
       console.log(`📊 Output: ${formatCoefficients(result.coefficients)}`);
     }, 60000);
-
-    it('should send successful transaction to Precomputed NTT precompile', async () => {
-      const { input } = getKnownTestVector();
-      const result = await sendNTTTransaction(
-        PRECOMPILE_ADDRESSES.PRECOMPUTED_NTT,
-        input
-      );
-
-      expect(result.success, `Transaction failed: ${result.error}`).toBe(true);
-      expect(result.txHash).toBeDefined();
-      expect(result.gasUsed).toBeDefined();
-      expect(result.blockNumber).toBeDefined();
-      expect(result.coefficients).toHaveLength(input.ringDegree);
-
-      console.log(`✅ Precomputed NTT Transaction: ${result.txHash}`);
-      console.log(`⛽ Gas Used: ${result.gasUsed}`);
-      console.log(`🏗️ Block Number: ${result.blockNumber}`);
-      console.log(`📊 Output: ${formatCoefficients(result.coefficients)}`);
-    }, 60000);
-
-    it('should produce identical results between Pure and Precomputed via transactions', async () => {
-      const { input } = getKnownTestVector();
-
-      // Execute sequentially to avoid nonce conflicts
-      const pureResult = await sendNTTTransaction(
-        PRECOMPILE_ADDRESSES.PURE_NTT,
-        input
-      );
-      const precomputedResult = await sendNTTTransaction(
-        PRECOMPILE_ADDRESSES.PRECOMPUTED_NTT,
-        input
-      );
-
-      expect(
-        pureResult.success,
-        `Pure NTT transaction failed: ${pureResult.error}`
-      ).toBe(true);
-      expect(
-        precomputedResult.success,
-        `Precomputed NTT transaction failed: ${precomputedResult.error}`
-      ).toBe(true);
-      expect(pureResult.coefficients).toEqual(precomputedResult.coefficients);
-
-      console.log(
-        `✅ Pure NTT Tx: ${pureResult.txHash} (${pureResult.gasUsed} gas)`
-      );
-      console.log(
-        `✅ Precomputed NTT Tx: ${precomputedResult.txHash} (${precomputedResult.gasUsed} gas)`
-      );
-      console.log(
-        `📊 Both produce identical output: ${formatCoefficients(
-          pureResult.coefficients
-        )}`
-      );
-
-      // Compare gas usage
-      if (pureResult.gasUsed && precomputedResult.gasUsed) {
-        const gasSavings = pureResult.gasUsed - precomputedResult.gasUsed;
-        const savingsPercent = Number((gasSavings * 100n) / pureResult.gasUsed);
-        console.log(
-          `⛽ Gas Savings: ${gasSavings} (${savingsPercent.toFixed(1)}%)`
-        );
-      }
-    }, 90000);
   });
 
   describe('Round-trip Transaction Tests', () => {
@@ -289,28 +225,10 @@ describe('NTT Precompile Transaction Tests', () => {
       console.log(`📥 Inverse Tx: ${result.inverseTx}`);
       console.log(`⛽ Total Gas: ${result.totalGas}`);
     }, 120000);
-
-    it('should perform successful round-trip transactions on Precomputed NTT', async () => {
-      const { input } = getKnownTestVector();
-      const result = await performTransactionRoundTrip(
-        PRECOMPILE_ADDRESSES.PRECOMPUTED_NTT,
-        input
-      );
-
-      expect(result.success, `Round-trip failed: ${result.error}`).toBe(true);
-      expect(result.forwardTx).toBeDefined();
-      expect(result.inverseTx).toBeDefined();
-      expect(result.totalGas).toBeDefined();
-
-      console.log(`✅ Precomputed NTT Round-trip Success`);
-      console.log(`📤 Forward Tx: ${result.forwardTx}`);
-      console.log(`📥 Inverse Tx: ${result.inverseTx}`);
-      console.log(`⛽ Total Gas: ${result.totalGas}`);
-    }, 120000);
   });
 
-  describe('Gas Cost Comparison via Transactions', () => {
-    it('should compare actual transaction gas costs between implementations', async () => {
+  describe('Gas Cost Analysis', () => {
+    it('should perform successful transactions with known test vector', async () => {
       const { input } = getKnownTestVector();
 
       // Execute sequentially to avoid nonce conflicts
@@ -318,49 +236,14 @@ describe('NTT Precompile Transaction Tests', () => {
         PRECOMPILE_ADDRESSES.PURE_NTT,
         input
       );
-      const precomputedRoundtrip = await performTransactionRoundTrip(
-        PRECOMPILE_ADDRESSES.PRECOMPUTED_NTT,
-        input
-      );
 
       expect(
         pureRoundtrip.success,
         `Pure round-trip failed: ${pureRoundtrip.error}`
       ).toBe(true);
-      expect(
-        precomputedRoundtrip.success,
-        `Precomputed round-trip failed: ${precomputedRoundtrip.error}`
-      ).toBe(true);
 
       console.log(`\n📊 Transaction Gas Cost Analysis:`);
       console.log(`⛽ Pure NTT Round-trip: ${pureRoundtrip.totalGas} gas`);
-      console.log(
-        `⛽ Precomputed NTT Round-trip: ${precomputedRoundtrip.totalGas} gas`
-      );
-
-      if (pureRoundtrip.totalGas && precomputedRoundtrip.totalGas) {
-        const gasSavings =
-          pureRoundtrip.totalGas - precomputedRoundtrip.totalGas;
-        const savingsPercent = Number(
-          (gasSavings * 100n) / pureRoundtrip.totalGas
-        );
-
-        console.log(
-          `💰 Total Gas Savings: ${gasSavings} (${savingsPercent.toFixed(1)}%)`
-        );
-        console.log(
-          `📈 Efficiency Improvement: ${(
-            Number(pureRoundtrip.totalGas) /
-            Number(precomputedRoundtrip.totalGas)
-          ).toFixed(2)}x`
-        );
-
-        // Validate gas savings
-        expect(precomputedRoundtrip.totalGas).toBeLessThan(
-          pureRoundtrip.totalGas
-        );
-        expect(savingsPercent).toBeGreaterThan(20); // Expect at least 20% savings
-      }
     }, 180000);
   });
 
@@ -378,20 +261,10 @@ describe('NTT Precompile Transaction Tests', () => {
 
       // Execute sequentially to avoid nonce conflicts
       const pureResult = await sendNTTTransaction(PRECOMPILE_ADDRESSES.PURE_NTT, input);
-      const precomputedResult = await sendNTTTransaction(PRECOMPILE_ADDRESSES.PRECOMPUTED_NTT, input);
 
       expect(pureResult.success, `Pure NTT failed: ${pureResult.error}`).toBe(true);
-      expect(precomputedResult.success, `Precomputed NTT failed: ${precomputedResult.error}`).toBe(true);
-      expect(pureResult.coefficients).toEqual(precomputedResult.coefficients);
 
       console.log(`✅ KYBER_128 Pure NTT: ${pureResult.txHash} (${pureResult.gasUsed} gas)`);
-      console.log(`✅ KYBER_128 Precomputed NTT: ${precomputedResult.txHash} (${precomputedResult.gasUsed} gas)`);
-      
-      if (pureResult.gasUsed && precomputedResult.gasUsed) {
-        const gasSavings = pureResult.gasUsed - precomputedResult.gasUsed;
-        const savingsPercent = Number((gasSavings * 100n) / pureResult.gasUsed);
-        console.log(`⛽ KYBER_128 Gas Savings: ${gasSavings} (${savingsPercent.toFixed(1)}%)`);
-      }
     }, 120000);
 
     it('should perform successful transactions with DILITHIUM_256 parameters', async () => {
@@ -407,20 +280,10 @@ describe('NTT Precompile Transaction Tests', () => {
 
       // Execute sequentially to avoid nonce conflicts
       const pureResult = await sendNTTTransaction(PRECOMPILE_ADDRESSES.PURE_NTT, input);
-      const precomputedResult = await sendNTTTransaction(PRECOMPILE_ADDRESSES.PRECOMPUTED_NTT, input);
 
       expect(pureResult.success, `Pure NTT failed: ${pureResult.error}`).toBe(true);
-      expect(precomputedResult.success, `Precomputed NTT failed: ${precomputedResult.error}`).toBe(true);
-      expect(pureResult.coefficients).toEqual(precomputedResult.coefficients);
 
       console.log(`✅ DILITHIUM_256 Pure NTT: ${pureResult.txHash} (${pureResult.gasUsed} gas)`);
-      console.log(`✅ DILITHIUM_256 Precomputed NTT: ${precomputedResult.txHash} (${precomputedResult.gasUsed} gas)`);
-      
-      if (pureResult.gasUsed && precomputedResult.gasUsed) {
-        const gasSavings = pureResult.gasUsed - precomputedResult.gasUsed;
-        const savingsPercent = Number((gasSavings * 100n) / pureResult.gasUsed);
-        console.log(`⛽ DILITHIUM_256 Gas Savings: ${gasSavings} (${savingsPercent.toFixed(1)}%)`);
-      }
     }, 120000);
 
     it('should perform successful transactions with FALCON_512 parameters', async () => {
@@ -436,20 +299,10 @@ describe('NTT Precompile Transaction Tests', () => {
 
       // Execute sequentially to avoid nonce conflicts
       const pureResult = await sendNTTTransaction(PRECOMPILE_ADDRESSES.PURE_NTT, input);
-      const precomputedResult = await sendNTTTransaction(PRECOMPILE_ADDRESSES.PRECOMPUTED_NTT, input);
 
       expect(pureResult.success, `Pure NTT failed: ${pureResult.error}`).toBe(true);
-      expect(precomputedResult.success, `Precomputed NTT failed: ${precomputedResult.error}`).toBe(true);
-      expect(pureResult.coefficients).toEqual(precomputedResult.coefficients);
 
       console.log(`✅ FALCON_512 Pure NTT: ${pureResult.txHash} (${pureResult.gasUsed} gas)`);
-      console.log(`✅ FALCON_512 Precomputed NTT: ${precomputedResult.txHash} (${precomputedResult.gasUsed} gas)`);
-      
-      if (pureResult.gasUsed && precomputedResult.gasUsed) {
-        const gasSavings = pureResult.gasUsed - precomputedResult.gasUsed;
-        const savingsPercent = Number((gasSavings * 100n) / pureResult.gasUsed);
-        console.log(`⛽ FALCON_512 Gas Savings: ${gasSavings} (${savingsPercent.toFixed(1)}%)`);
-      }
     }, 120000);
 
     it('should perform round-trip transactions with cryptographic standards', async () => {
@@ -471,9 +324,9 @@ describe('NTT Precompile Transaction Tests', () => {
             .map((_, i) => BigInt(i) % standard.modulus),
         };
 
-        // Test round-trip on Precomputed NTT (more efficient)
+        // Test round-trip on Pure NTT
         const roundtripResult = await performTransactionRoundTrip(
-          PRECOMPILE_ADDRESSES.PRECOMPUTED_NTT,
+          PRECOMPILE_ADDRESSES.PURE_NTT,
           input
         );
 

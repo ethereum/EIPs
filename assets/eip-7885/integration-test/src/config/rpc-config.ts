@@ -3,7 +3,6 @@ import { createPublicClient, http } from 'viem'
 /**
  * RPC configuration for NTT precompile testing
  * Uses the remote node that has NTT precompiles deployed
- * Note: This is a test server - configure your own endpoint in production
  */
 export const RPC_URL = process.env.RPC_URL || 'http://34.29.49.47:8545'
 
@@ -19,11 +18,10 @@ export const publicClient = createPublicClient({
 })
 
 /**
- * Precompile addresses as defined in EIP-7885
+ * Precompile addresses as defined in EIP-7885 (Pure NTT only)
  */
 export const PRECOMPILE_ADDRESSES = {
-  PURE_NTT: '0x0000000000000000000000000000000000000014' as const,
-  PRECOMPUTED_NTT: '0x0000000000000000000000000000000000000015' as const,
+  PURE_NTT: '0x0000000000000000000000000000000000000012' as const,
 } as const
 
 /**
