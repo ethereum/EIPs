@@ -46,24 +46,8 @@ jobs:
         with:
           repository: ethereum/EIPs
           path: ''
-      - name: Checkout ERCs
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with:
-          repository: ethereum/ERCs
-          path: ERCs
       - name: Merge Repos
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/ERCs/ERCS
-          mkdir -p $GITHUB_WORKSPACE/ERCs/EIPS
-          cp -rp $GITHUB_WORKSPACE/ERCs/ERCS/. $GITHUB_WORKSPACE/EIPS
-          cp -rp $GITHUB_WORKSPACE/ERCs/EIPS/. $GITHUB_WORKSPACE/EIPS
-          cp -rp $GITHUB_WORKSPACE/ERCs/assets/. $GITHUB_WORKSPACE/assets
-          cd $GITHUB_WORKSPACE/EIPS
-          find . -name "erc-*.md" -type f -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
-          cd $GITHUB_WORKSPACE/assets
-          find . -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
-          cd $GITHUB_WORKSPACE
-          rm -rf ERCs
+        uses: ./.github/actions/merge-repos
       - name: Setup Ruby
         uses: ruby/setup-ruby@fb404b9557c186e349162b0d8efb06e2bc36edea # v1.232.0
         with:
@@ -135,6 +119,8 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+      - name: Merge Repos
+        uses: ./.github/actions/merge-repos
 
       - uses: ethereum/eipw-action@be3fa642ec311d0b8e1fdb811e5c9b4ada3d3d93
         id: eipw
