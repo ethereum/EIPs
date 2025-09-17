@@ -3,7 +3,7 @@ eip: 9999
 title: Optional (zkEVM)Execution Proofs for attesters
 description: Introducing optional execution proofs on the consensus layer
 author: 
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/eip-optional-execution-proofs/25500
 status: Draft
 type: Standards Track
 category: Core
