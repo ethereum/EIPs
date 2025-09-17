@@ -1,0 +1,58 @@
+---
+eip: 9999
+title: Optional (zkEVM)Execution Proofs for attesters
+description: Introducing optional execution proofs on the consensus layer
+author: 
+discussions-to: 
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-09-17
+---
+
+## Abstract
+
+Optional execution proofs allow beacon nodes to verify the validity of the execution payload within a beacon block without running an execution layer client. The execution proofs are sent over the consensus layer's peer-to-peer network.
+
+## Motivation
+
+Optional execution proofs reduce the hardware and bandwidth requirements that are needed for an attester to verify a beacon block. Moreover, the cost to verify to a block no longer grows with the gas limit.
+
+Since these are optional, protocol upgrades cannot be based on the improvements in this EIP. This EIP allows us to safely test execution proofs without making it explicitly consensus critical.
+
+## Specification
+
+This is a consensus layer change only. 
+
+Validators will now be able to enable two new modes:
+
+- zkEVM Proof generating
+- Stateless validation
+
+When a proof generating node receives a beacon block, they will create the necessary proofs for the execution payload in the block and re-propagate them on the specified subnets.
+
+When a stateless validating node receives a beacon block, they will check to see if they have already received a valid execution proof for that execution payload from the specified subnet.
+
+The detailed specifications are on [ethereum/consensus-specs](https://github.com/ethereum/consensus-specs/pull/4591).
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+## Rationale
+
+TBD
+
+## Backwards Compatibility
+
+This is backwards compatible and does not require a hardfork.
+
+## Test Cases
+
+## Reference Implementation
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
