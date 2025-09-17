@@ -34,6 +34,7 @@ The EIP-7883 specification introduces three key changes:
 ### Input Size Distributions
 
 **Statistical Summary:**
+
 | Parameter | Min | Max | Mean | Median | Std Dev |
 |-----------|-----|-----|------|--------|---------|
 | Bsize | 32 | 385 | 32.0 | 32.0 | 2.7 |
@@ -41,6 +42,7 @@ The EIP-7883 specification introduces three key changes:
 | Msize | 32 | 384 | 32.0 | 32.0 | 2.7 |
 
 **Common Size Combinations:**
+
 | Base Size | Exponent Size | Modulus Size | Count | Percentage |
 |-----------|---------------|--------------|-------|------------|
 | 32 | 32 | 32 | 304,225 | 100.0% |
@@ -55,6 +57,7 @@ The EIP-7883 specification introduces three key changes:
 **Fermat Prime Usage**: 1,351 calls (0.4%)
 
 **Most Common Exponent Values:**
+
 | Rank | Exponent | Count | Percentage |
 |------|----------|-------|------------|
 | 1 | 0x30644e72... | 66,115 | 21.73% |
