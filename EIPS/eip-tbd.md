@@ -16,7 +16,7 @@ This EIP adds a new [EIP-7932](./eip-7932.md) algorithm of type `0x0` for suppor
 
 ## Motivation
 
-P256 (a.k.a secp256r1) is a widely-used NIST standarized algorithm that already has a presence within the Ethereum codebase. This makes it a great algorithm to write test
+P256 (a.k.a secp256r1) is a widely-used NIST standardized algorithm that already has a presence within the Ethereum codebase. This makes it a great algorithm to write test
 cases against implementations of [EIP-7932](./eip-7932.md).
 
 ## Specification
@@ -49,11 +49,11 @@ def verify(signature_info: bytes, payload_hash: Hash32) -> Bytes:
 
 ### Additional 500 gas penalty
 
-Much of this proposal is drawn from [RIP-7212](https://github.com/ethereum/RIPs/blob/master/RIPS/rip-7212.md). Some of the test cases in [RIP-7212](https://github.com/ethereum/RIPs/blob/master/RIPS/rip-7212.md) show that P256 is slower than secp256k1 and as such small penality has been added to combat the slowdown of verification.
+Much of this proposal is drawn from [RIP-7212](https://github.com/ethereum/RIPs/blob/master/RIPS/rip-7212.md). Some of the test cases in [RIP-7212](https://github.com/ethereum/RIPs/blob/master/RIPS/rip-7212.md) show that P256 is slower than secp256k1 and as such, a small penalty has been added to combat the slowdown of verification.
 
 ### Why P256?
 
-P256 or secp256r1, is used globally but (more importantly) has an existing implementation in all execution clients. This allows easy implementation of a known-safe algorithm; perfect for a test algorithm.
+P256 or secp256r1, is used globally but (more importantly) has an existing implementation in all execution clients. This allows easy implementation of a known-safe algorithm, which is perfect for a test algorithm.
 
 ## Backwards Compatibility
 
