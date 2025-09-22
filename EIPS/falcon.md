@@ -18,6 +18,11 @@ The signature scheme can be instantiated in two version:
 * Falcon, the standard signature scheme, fully compliant with the algorithm recommended by the NIST,
 * An EVM-friendly version where the hash function is efficiently computed in the Ethereum Virtual Machine.
 
+With this in mind, we propose three OPCODES:
+- `HASH_TO_POINT`, that implements the NIST-compliant HashToPoint as described in [Algorithm 3](https://falcon-sign.info/falcon.pdf) of Falcon.
+- `ETH_HASH_TO_POINT`, a EVM-friendly version of HashToPoint.
+- `FALCON_CORE`: the core algorithm of Falcon, that verifies the signature from the obtained (HashToPoint) challenge.
+
 ## 2. Motivation
 
 Quantum computers pose a long-term risk to classical cryptographic algorithms. In particular, signature algorithms based on the hardness of the Elliptic Curve Discrete Logarithm Problem (ECDLP) such as secp256k1, are widely used in Ethereum and threaten by quantum algorithms. This exposes potentially on-chain assets and critical infrastructure to quantum adversaries.
@@ -39,8 +44,10 @@ For FalconRec,
 -->
 
 In the context of the Ethereum Virtual Machine, a precompile for Keccak256 hash function is already available, making Falcon verification much faster when instantiated with an extendable output function derived from Keccak than with SHAKE256, as specified in NIST submission. We propose in this EIP to split the signature verification into two algorithms: 
-- `HASH_TO_POINT_CHALLENGE`, that can be instantiated with any eXtendable Output Function: we provide two versions with SHAKE256 (as recommmended by NIST) and Keccak-PRNG (a version that is more efficient when computed in the EVM). In the future, it is possible to define it for SNARK/STARK circuits. An appropriated hash function choice reduces drastically the circuit size and the proving time in the context of ZK applications.
-- `FALCON_CORE`, that does not require any hash computation. This sub-algorithm follows the NIST recommendation so that using the SHAKE256 `HASH_TO_POINT_CHALLENGE`, the signature is fully compliant with the NIST standard.
+- `HASH_TO_POINT` or `ETH_HASH_TO_POINT`, instantiated with a different eXtendable Output Function: we provide two versions with SHAKE256 (as recommended by NIST) and Keccak-PRNG (a version that is more efficient when computed in the EVM). In the future, it is possible to define it for SNARK/STARK circuits. An appropriated hash function choice reduces drastically the circuit size and the proving time in the context of ZK applications.
+- `FALCON_CORE`, that does not require any hash computation. This sub-algorithm follows the NIST recommendation so that:
+    - using the SHAKE256 `HASH_TO_POINT`, the signature is fully compliant with the NIST standard,
+    - using the KeccakPRNG `ETH_HASH_TO_POINT`, the verification can be efficient even in the EVM.
 
 Using this separation, we provide two important features: one version is fully compliant with the NIST specification, and other versions deviate from the standard in order to reduce the gas cost, and open up to possible computations of Falcon signature ZK proofs.
 
@@ -64,7 +71,7 @@ From a high level, a signature verification can be decomposed in two steps:
 - The **challenge computation**, that involves the message and the salt, and computes a challenge polynomial using a XOF (instantiated with SHAKE256 and a Keccak-base PRNG here),
 - The **core algorithm**, that compute polynomial arithmetic (with the challenge, the public key and the signature), and finally verify the shortness of the full signature $(s_1,s_2)$.
 
-The following pseudo-code highlights how these two algorithms are involved in a Falcon verification, and how the modularity of the `HASH_TO_POINT_CHALLENGE` opens two version of Falcon:
+The following pseudo-code highlights how these two algorithms are involved in a Falcon verification, and how the modularity of the challenge computation opens up to two version of Falcon:
 ```python
 def falcon512_verify(message: bytes, signature: Tuple[bytes, bytes], pubkey: bytes) -> bool:
     """
@@ -82,10 +89,10 @@ def falcon512_verify(message: bytes, signature: Tuple[bytes, bytes], pubkey: byt
     """
     
     # 1. Compute the Hash To Point Challenge (see 3.1.)
-    challenge = hash_to_point_challenge(message, signature)
+    challenge = HASH_TO_POINT(message, signature)
  
     # 2. Verify Falcon Core Algorithm (see 3.2.)
-    return falcon_core(signature, pubkey, challenge)
+    return FALCON_CORE(signature, pubkey, challenge)
 ```
 
 ```python
@@ -105,13 +112,13 @@ def ethfalcon512_verify(message: bytes, signature: Tuple[bytes, bytes], pubkey: 
     """
     
     # 1. Compute the Hash To Point Challenge (see 3.1.)
-    challenge = eth_hash_to_point_challenge(message, signature)
+    challenge = ETH_HASH_TO_POINT(message, signature)
  
     # 2. Verify Falcon Core Algorithm (see 3.2.)
-    return falcon_core(signature, pubkey, challenge)
+    return FALCON_CORE(signature, pubkey, challenge)
 ```
 
-The functions `falcon512_verify` and `ethfalcon512_verify` call the opcodes we present in the next sections: `hash_to_point_challenge`, `eth_hash_to_point_challenge` and `falcon_core`.
+The functions `falcon512_verify` and `ethfalcon512_verify` call the opcodes we present in the next sections: `HASH_TO_POINT`, `ETH_HASH_TO_POINT` and `FALCON_CORE`.
 
 
 ### 3.1. Hash To Point Challenge
@@ -166,7 +173,7 @@ The hash-to-point function computes eXtendable Output from a hash Function (XOF)
 
 Using one of the XOFs above (SHAKE256 or Keccak-PRNG), it is possible to instantiate two (opcode) algorithms for hashing into points:
 ```python
-def hash_to_point_challenge(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
+def HASH_TO_POINT(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
     """
     Compute the Hash To Point Falcon Challenge.
 
@@ -204,7 +211,7 @@ def hash_to_point_challenge(message: bytes32, signature: Tuple[bytes, bytes]) ->
 ```
 
 ```python
-def eth_hash_to_point_challenge(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
+def ETH_HASH_TO_POINT(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
     """
     Compute the Hash To Point Falcon Challenge using Keccak-PRNG.
 
@@ -263,7 +270,7 @@ def eth_hash_to_point_challenge(message: bytes32, signature: Tuple[bytes, bytes]
 
 The following code illustrates Falcon core algorithm:
 ```python
-def falcon_core(signature: Tuple[bytes, bytes], pubkey: bytes, challenge: bytes) -> bool:
+def FALCON_CORE(signature: Tuple[bytes, bytes], pubkey: bytes, challenge: bytes) -> bool:
     """
     Verify Falcon Core Algorithm
 
