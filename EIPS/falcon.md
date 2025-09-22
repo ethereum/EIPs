@@ -408,28 +408,31 @@ signature_info = Container[
 ]
 ```
 
-In the format of EIP-7932, a verification is implemented as follows:
-```python
-verify(signature_info: bytes, payload_hash: Hash32) -> ExecutionAddress:
-    assert len(signature_info) == 699
-    version      = signature_info[0]
-    signature    = signature_info[1:667]
-    pubkey_hash  = signature_info[667:687]
-    assert version == 0xFA
-    pubkey = lookup_pubkey(pubkey_hash)
-    assert falcon512_verify(pubkey, signature, payload_hash)
-    return ExecutionAddress(keccak256(pubkey)[12:])
-
-verify(signature_info: bytes, payload_hash: Hash32) -> ExecutionAddress:
-    assert len(signature_info) == 699
-    version      = signature_info[0]
-    signature    = signature_info[1:667]
-    pubkey_hash  = signature_info[667:687]
-    assert version == 0xFB
-    pubkey = lookup_pubkey(pubkey_hash)
-    assert ethfalcon512_verify(pubkey, signature, payload_hash)
-    return ExecutionAddress(keccak256(pubkey)[12:])
-```
+In the format of EIP-7932:
+- For the NIST-compliant version:
+    ```python
+    verify(signature_info: bytes, payload_hash: Hash32) -> ExecutionAddress:
+        assert len(signature_info) == 699
+        version      = signature_info[0]
+        signature    = signature_info[1:667]
+        pubkey_hash  = signature_info[667:687]
+        assert version == 0xFA
+        pubkey = lookup_pubkey(pubkey_hash)
+        assert falcon512_verify(pubkey, signature, payload_hash)
+        return ExecutionAddress(keccak256(pubkey)[12:])
+    ```
+- For the EVM-friendly version:
+    ```python
+    verify(signature_info: bytes, payload_hash: Hash32) -> ExecutionAddress:
+        assert len(signature_info) == 699
+        version      = signature_info[0]
+        signature    = signature_info[1:667]
+        pubkey_hash  = signature_info[667:687]
+        assert version == 0xFB
+        pubkey = lookup_pubkey(pubkey_hash)
+        assert ethfalcon512_verify(pubkey, signature, payload_hash)
+        return ExecutionAddress(keccak256(pubkey)[12:])
+    ```
 
 ## 7. Test Cases
 
