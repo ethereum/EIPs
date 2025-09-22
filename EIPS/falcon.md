@@ -414,10 +414,20 @@ verify(signature_info: bytes, payload_hash: Hash32) -> ExecutionAddress:
     assert len(signature_info) == 699
     version      = signature_info[0]
     signature    = signature_info[1:667]
-    pubkey_hash  = signature_info[667:699]
-    assert version == 0x01
+    pubkey_hash  = signature_info[667:687]
+    assert version == 0xFA
     pubkey = lookup_pubkey(pubkey_hash)
     assert falcon512_verify(pubkey, signature, payload_hash)
+    return ExecutionAddress(keccak256(pubkey)[12:])
+
+verify(signature_info: bytes, payload_hash: Hash32) -> ExecutionAddress:
+    assert len(signature_info) == 699
+    version      = signature_info[0]
+    signature    = signature_info[1:667]
+    pubkey_hash  = signature_info[667:687]
+    assert version == 0xFB
+    pubkey = lookup_pubkey(pubkey_hash)
+    assert ethfalcon512_verify(pubkey, signature, payload_hash)
     return ExecutionAddress(keccak256(pubkey)[12:])
 ```
 
@@ -430,7 +440,7 @@ TODO: We cannot use the official test vectors because they use shake256 in the h
 
 ## 8. Reference Implementation
 
-An implementation is provided in `assets`. For the NIST-compliant version, we provide tests for the KAT vectors of the NIST submission. 
+An implementation is provided in `assets` (TODO). For the NIST-compliant version, we provide tests for the KAT vectors of the NIST submission. 
 
 **TODO: We can modify geth to include falcon-512 as a reference. (Similar to secp256r1 signature verification)**
 
