@@ -3,7 +3,7 @@ eip: TBD
 title: MultiTrust Credential (MTC) — Verifiable Reputation Interface (Core)
 description: Minimal ERC interface for non-transferable reputation credentials with typed metrics, lifecycle events, and policy masks, without on-chain PII.
 author: Yuta Hoshino (@YutaHoshino) <y_hoshino@indiesquare.me>
-discussions-to: https://ethereum-magicians.org/t/mtc-core-discussion-tbd
+discussions-to: https://ethereum-magicians.org/t/discussion-erc-multitrust-credential-mtc-core-zk-proof-optional
 status: Draft
 type: Standards Track
 category: ERC

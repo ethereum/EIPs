@@ -3,7 +3,7 @@ eip: TBD
 title: MTC-ZK — Zero-Knowledge Presentation Interface for MultiTrust Credential
 description: Optional ERC interface to verify ZK proofs against MTC commitments via a fixed Groth16-style ABI, bound to the current anchor and the active comparison policy.
 author: Yuta Hoshino (@YutaHoshino) <y_hoshino@indiesquare.me>
-discussions-to: https://ethereum-magicians.org/t/mtc-zk-discussion-tbd
+discussions-to: https://ethereum-magicians.org/t/discussion-erc-multitrust-credential-mtc-core-zk-proof-optional
 status: Draft
 type: Standards Track
 category: ERC
