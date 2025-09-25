@@ -1,17 +1,3 @@
----
-eip: 10316
-title: AgroCrypto Quantum Governance — ESG Tokenization Protocol
-description: Standard for AI-native, compliance-grade, quantum-auditable asset tokenization with lifecycle integrity, provenance, and post-quantum security.
-author: Leandro Lemos (@agronetlabs) <leandro@agronet.io>
-discussions-to: https://ethereum-magicians.org/t/erc-esg-tokenization-protocol-agrocrypto/ADD-SLUG
-status: Draft
-type: Standards Track
-category: Core
-created: 2025-09-06
-requires: [20, 721, 1155]
-license: CC0-1.0
----
-
 # Ethereum Improvement Proposals (EIPs)
 
 > **_ATTENTION_**: The EIPs repository has recently [undergone](https://github.com/ethereum/EIPs/pull/7206) a separation of ERCs and EIPs. ERCs are now accessible at [https://github.com/ethereum/ercs](https://github.com/ethereum/ercs). All new ERCs and updates to existing ones must be directed at this new repository. The editors apologize for this inconvenience.
