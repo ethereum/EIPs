@@ -1,15 +1,16 @@
-[![ATF-AI Verified](https://img.shields.io/badge/ATF--AI-VERIFIED-2ea44f?style=for-the-badge&logo=vercel)](https://github.com/agronetlabs/AgroPay/blob/main/docs/agropay-core-attestation.md)
-[![Provenance Traceable](https://img.shields.io/badge/PROVENANCE-SIGNED-0f9d58?style=for-the-badge&logo=oci)](https://github.com/agronetlabs/AgroPay/blob/main/docs/agropay-core-attestation.md)
-[![Pull Shark](https://img.shields.io/badge/PULL--SHARK-ACTIVE-0066ff?style=for-the-badge&logo=github)](https://github.com/agronetlabs/AgroPay)
-
-
-[![Crates.io](https://img.shields.io/crates/v/agrocrypto-core.svg)](https://crates.io/crates/agrocrypto-core)
-[![License: MIT OR Apache-2.0](https://img.shields.io/crates/l/agrocrypto-core)](https://opensource.org/licenses)
-![Build](https://img.shields.io/badge/build-passing-brightgreen)
-![Status](https://img.shields.io/badge/project-Verified%20Blockchain%20Infra-orange)
-![Deployed](https://img.shields.io/badge/deployed-AWS-blue)
-![Deployed](https://img.shields.io/badge/deployed-Cloudflare-orange)
-![Deployed](https://img.shields.io/badge/deployed-OpenAI-black)
+---
+eip: 10316
+title: AgroCrypto Quantum Governance — ESG Tokenization Protocol
+description: Standard for AI-native, compliance-grade, quantum-auditable asset tokenization with lifecycle integrity, provenance, and post-quantum security.
+author: Leandro Lemos (@agronetlabs) <leandro@agronet.io>
+discussions-to: https://ethereum-magicians.org/t/erc-esg-tokenization-protocol-agrocrypto/ADD-SLUG
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-09-06
+requires: [20, 721, 1155]
+license: CC0-1.0
+---
 
 # Ethereum Improvement Proposals (EIPs)
 
