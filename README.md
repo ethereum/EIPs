@@ -82,6 +82,8 @@ eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
    bundle exec jekyll serve
    ```
 
+   **Note:** The site uses WEBrick for local development only. WEBrick is not intended for production use and has limitations. It is sufficient for previewing your changes locally, but should not be used to serve the site in a production environment.
+
 2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
 
 More information on Jekyll and GitHub Pages [here](https://docs.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
