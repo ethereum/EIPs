@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: On-chain Proof Verification Standard
 description: A minimal, proof-system-agnostic interface for on-chain verification of succinct zero-knowledge proofs (SNARKs/STARKs) and zkVM receipts, using field-aligned public inputs (bytes32[]).
 author: Walid Khemiri <walidelkhemiri@gmail.com>
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/erc-on-chain-proof-verification-standardization/25612
 status: Draft
 type: Standards Track
 category: ERC
