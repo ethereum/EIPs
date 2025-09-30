@@ -1,6 +1,6 @@
 # NTT Precompile Implementation for OP-Geth
 
-This directory contains a Go implementation of the Number Theoretic Transform (NTT) precompile for [EIP-7885](../../README.md), integrated into OP-Geth (Optimism's Ethereum client).
+This directory contains a Go implementation of the Number Theoretic Transform (NTT) precompile for [EIP-7885](../../../EIPS/eip-7885.md), integrated into OP-Geth (Optimism's Ethereum client).
 
 ## Overview
 
@@ -24,7 +24,7 @@ Fixed gas cost: **70,000** gas per operation (both forward and inverse NTT).
 ### Core Features
 
 - **Forward NTT**: Transforms polynomial coefficients to evaluation domain
-- **Inverse NTT**: Transforms evaluation points back to coefficient domain  
+- **Inverse NTT**: Transforms evaluation points back to coefficient domain
 - **Ring Support**: Configurable ring degree (power of 2, minimum 16)
 - **Prime Fields**: Support for NTT-friendly prime moduli
 - **Input Validation**: Comprehensive error checking and bounds validation
@@ -158,7 +158,7 @@ func (c *NTT) Run(input []byte) ([]byte, error) {
 The implementation performs comprehensive input validation:
 
 - Bounds checking on all parameters
-- NTT-friendly modulus verification  
+- NTT-friendly modulus verification
 - Coefficient range validation
 - Ring degree power-of-2 requirement
 
@@ -176,6 +176,6 @@ The complete implementation is available at: https://github.com/yhl125/op-geth/t
 
 ## References
 
-- [EIP-7885: Number Theoretic Transform Precompile](../../README.md)
+- [EIP-7885: Number Theoretic Transform Precompile](../../../EIPS/eip-7885.md)
 - [Lattigo Library](https://github.com/tuneinsight/lattigo/blob/main/ring/ntt.go)
 - [OP-Geth Documentation](https://docs.optimism.io/)
