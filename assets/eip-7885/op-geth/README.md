@@ -1,181 +1,146 @@
-# NTT Precompile Implementation for OP-Geth
+# Optimism-geth with NTT Precompiles
 
-This directory contains a Go implementation of the Number Theoretic Transform (NTT) precompile for [EIP-7885](../../../EIPS/eip-7885.md), integrated into OP-Geth (Optimism's Ethereum client).
+This is a fork of `op-geth` that implements [EIP-7885](../../../EIPS/eip-7885.md) precompiled contracts for Number Theoretic Transform (NTT) operations and vectorized modular arithmetic.
 
-## Overview
+## Precompiled Contracts
 
-This implementation adds NTT support to the Ethereum Virtual Machine as a native precompiled contract, following the EIP-7885 specification with OP-Geth specific optimizations.
+Three precompiled contracts are added at addresses `0x12`, `0x13`, and `0x14` in the **Optimism Isthmus** hardfork:
+
+- **`0x12`: NTT**: Number Theoretic Transform operations using the Lattigo library. Supports both forward and inverse NTT transformations.
+- **`0x13`: VECMULMOD**: Vectorized element-wise modular multiplication in the NTT domain using Barrett reduction.
+- **`0x14`: VECADDMOD**: Vectorized element-wise modular addition in the NTT domain.
 
 ## Implementation Details
 
-### Precompile Address
+### NTT Precompile (0x12)
 
-The NTT precompile is deployed at address `0x12` in the Optimism Isthmus hardfork.
+The NTT precompile accepts input in the following format:
 
-### Gas Cost
+- `operation` (1 byte): `0x00` for forward NTT, `0x01` for inverse NTT
+- `ring_degree` (4 bytes): Power of 2, minimum 16
+- `modulus` (8 bytes): NTT-friendly prime where `q ≡ 1 (mod 2N)`
+- `coefficients` (8\*N bytes): Ring coefficients as 64-bit integers
 
-Fixed gas cost: **70,000** gas per operation (both forward and inverse NTT).
+**Gas Costing**: A fixed gas cost of 70,000 is applied, targeting approximately 50 mgas/s performance to maintain consistency with existing precompiles like `ecrecover`.
 
-### Dependencies
+### VECMULMOD Precompile (0x13)
 
-- **Lattigo v6**: High-performance lattice cryptography library for Go
-- **OP-Geth**: Optimism's Ethereum client implementation
+Performs element-wise modular multiplication of two vectors in the NTT domain: `result[i] = (a[i] * b[i]) mod q`
 
-### Core Features
+Input format:
 
-- **Forward NTT**: Transforms polynomial coefficients to evaluation domain
-- **Inverse NTT**: Transforms evaluation points back to coefficient domain
-- **Ring Support**: Configurable ring degree (power of 2, minimum 16)
-- **Prime Fields**: Support for NTT-friendly prime moduli
-- **Input Validation**: Comprehensive error checking and bounds validation
+- `ring_degree` (4 bytes): Power of 2, minimum 16
+- `modulus` (8 bytes): NTT-friendly prime where `q ≡ 1 (mod 2N)`
+- `vector_a` (8\*N bytes): First vector coefficients
+- `vector_b` (8\*N bytes): Second vector coefficients
 
-## Interface Specification
-
-### Input Format
-
-The precompile expects binary input with the following structure:
+**Gas Costing**: Uses a memory-aware formula reflecting the dominant overhead of memory allocation, targeting approximately 50 mgas/s performance:
 
 ```
-| Field        | Size    | Description                           |
-|--------------|---------|---------------------------------------|
-| operation    | 1 byte  | 0 = forward NTT, 1 = inverse NTT    |
-| ring_degree  | 4 bytes | Ring degree (big-endian, power of 2) |
-| modulus      | 8 bytes | Prime modulus (big-endian)           |
-| coefficients | N*8     | N coefficients (8 bytes each)       |
+Gas = BASE_COST + (COMPUTE_COST_PER_ELEMENT × N)
+    = 72,000 + (7 × N)
 ```
 
-**Total Input Size**: `13 + (ring_degree * 8)` bytes
+Where:
 
-### Constraints
+- `BASE_COST` (72,000 gas): Memory allocation overhead
+- `COMPUTE_COST_PER_ELEMENT` (7 gas): Barrett reduction multiplication per element
 
-1. **Ring Degree**: Must be a power of 2 and e 16
-2. **Modulus**: Must be prime and satisfy `modulus a 1 (mod 2*ring_degree)`
-3. **Coefficients**: Each coefficient must be `< modulus`
-4. **Operation**: Must be 0 (forward) or 1 (inverse)
+### VECADDMOD Precompile (0x14)
 
-### Output Format
+Performs element-wise modular addition of two vectors: `result[i] = (a[i] + b[i]) mod q`
 
-Returns `ring_degree * 8` bytes containing the transformed coefficients (8 bytes each, big-endian).
+Input format: Same as VECMULMOD (0x13)
 
-### Error Conditions
+**Gas Costing**: Uses the same memory-aware formula with cheaper compute cost, targeting approximately 50 mgas/s performance:
 
-The precompile returns errors for:
-
-- Input too short (< 13 bytes)
-- Invalid operation code (not 0 or 1)
-- Invalid ring degree (not power of 2 or < 16)
-- Zero modulus
-- Non NTT-friendly modulus
-- Coefficient exceeding modulus
-- Input length mismatch
-
-## Usage Examples
-
-### Forward NTT (Ring Degree 16)
-
-```go
-// Input: operation=0, ring_degree=16, modulus=97, coefficients=[1,2,3,...,16]
-input := "00000000100000000000000061" +
-         "0000000000000001" + "0000000000000002" + "0000000000000003" +
-         // ... (16 coefficients total)
-         "0000000000000010"
-
-result, err := contract.Run(common.Hex2Bytes(input))
+```
+Gas = BASE_COST + (COMPUTE_COST_PER_ELEMENT × N)
+    = 72,000 + (5 × N)
 ```
 
-### Inverse NTT (Ring Degree 16)
+## Tests and Benchmarks
 
-```go
-// Input: operation=1, ring_degree=16, modulus=97, coefficients=[NTT output]
-input := "01000000100000000000000061" +
-         "0000000000000045" + "0000000000000028" + "000000000000001d" +
-         // ... (16 NTT coefficients)
-         "0000000000000038"
+Comprehensive tests and benchmarks are implemented in `core/vm/contracts_test.go`, including:
 
-result, err := contract.Run(common.Hex2Bytes(input))
-// Should recover original [1,2,3,...,16]
-```
+### NTT Tests (0x12)
 
-## Testing
+- **Malformed Input Tests**: 8 test cases covering invalid operations, ring degrees, moduli, and coefficients
+- **Forward/Inverse NTT Tests**: Round-trip validation ensuring `INTT(NTT(x)) = x`
+- **Crypto Standards Benchmarks**: Performance testing with real-world parameters from Falcon-512, Kyber-128, and Dilithium-256
 
-### Running Tests
+### Vector Operations Tests (0x13, 0x14)
+
+- **Unified Malformed Input Tests**: 7 test cases covering invalid ring degrees, moduli, and input lengths for both VECMULMOD and VECADDMOD
+- **Functional Tests**: Validates correct element-wise operations with small test vectors
+- **Crypto Standards Benchmarks**: Performance testing with Falcon-512, Kyber-128, and Dilithium-256 parameters
+
+### Benchmark Results
+
+Benchmarks were run on an Intel(R) Xeon(R) CPU @ 2.20GHz. For detailed results, please see the files below:
+
+- [Ecrecover Benchmark Test Results](./benchmark_results/BenchmarkPrecompiledEcrecover)
+- [NTT Benchmark Test Results](./benchmark_results/BenchmarkPrecompiledNTTCryptoStandards)
+- [Vector Operations Benchmark Test Results](./benchmark_results/BenchmarkPrecompiledNTTVecOpsCryptoStandards)
+
+## Running Tests
+
+### Unit Tests
 
 ```bash
-# Run NTT precompile tests
+# Run all NTT-related tests
 go test ./core/vm -v -run TestPrecompiledNTT
 
 # Run malformed input tests
 go test ./core/vm -v -run TestPrecompileNTTMalformedInput
+
+# Run vector operations tests
+go test ./core/vm -v -run TestPrecompiledNTTVecOps
+
+# Run unified malformed input tests for vector operations
+go test ./core/vm -v -run TestPrecompileNTTVecOpsMalformedInput
 ```
-
-### Test Coverage
-
-The test suite includes:
-
-1. **Malformed Input Tests**: 8 different error conditions
-2. **Valid Operation Tests**: Forward and inverse NTT with ring degree 16
-3. **Cryptographic Standards**: Tests with real-world parameters
 
 ### Benchmark Tests
 
 ```bash
-# Basic NTT benchmark
-go test ./core/vm -bench BenchmarkPrecompiledNTT
-
-# Crypto standards benchmarks (Falcon-512, Kyber-128, Dilithium-256)
+# Run NTT benchmarks
 go test ./core/vm -bench BenchmarkPrecompiledNTTCryptoStandards
+
+# Run vector operations benchmarks
+go test ./core/vm -bench BenchmarkPrecompiledNTTVecOpsCryptoStandards
 ```
-
-### Hardfork Activation
-
-The NTT precompile is activated in the **Optimism Isthmus** hardfork:
-
-```go
-var PrecompiledContractsIsthmus = map[common.Address]PrecompiledContract{
-    // ... other precompiles
-    common.BytesToAddress([]byte{0x12}): &NTT{},
-}
-```
-
-### Contract Registration
-
-```go
-type NTT struct{}
-
-func (c *NTT) RequiredGas(input []byte) uint64 {
-    return 70000  // Fixed gas cost
-}
-
-func (c *NTT) Run(input []byte) ([]byte, error) {
-    // Implementation using Lattigo library
-}
-```
-
-## Security Considerations
-
-### Input Validation
-
-The implementation performs comprehensive input validation:
-
-- Bounds checking on all parameters
-- NTT-friendly modulus verification
-- Coefficient range validation
-- Ring degree power-of-2 requirement
-
-### Side-Channel Resistance
-
-The Lattigo library provides some protection against timing attacks through:
-
-- Constant-time modular arithmetic
-- Consistent memory access patterns
-- Uniform execution paths
 
 ## Source Code
 
 The complete implementation is available at: https://github.com/yhl125/op-geth/tree/feat/minimal-ntt-precompile
 
+### Key Files
+
+- **contracts.go**: Implementation of NTT, VECMULMOD, and VECADDMOD precompiles
+- **contracts_test.go**: Comprehensive test suite including unit tests and benchmarks
+- **benchmark_results/**: Detailed benchmark outputs for performance analysis
+
+## Dependencies
+
+- **Lattigo v6**: High-performance lattice cryptography library for Go
+- **OP-Geth**: Optimism's Ethereum client implementation based on go-ethereum
+
+## Integration with Optimism Isthmus
+
+The precompiles are activated in the Optimism Isthmus hardfork:
+
+```go
+var PrecompiledContractsIsthmus = map[common.Address]PrecompiledContract{
+    // ... existing precompiles
+    common.BytesToAddress([]byte{0x12}): &NTT{},
+    common.BytesToAddress([]byte{0x13}): &nttVecMulMod{},
+    common.BytesToAddress([]byte{0x14}): &nttVecAddMod{},
+}
+```
+
 ## References
 
 - [EIP-7885: Number Theoretic Transform Precompile](../../../EIPS/eip-7885.md)
-- [Lattigo Library](https://github.com/tuneinsight/lattigo/blob/main/ring/ntt.go)
+- [Lattigo Library](https://github.com/tuneinsight/lattigo)
 - [OP-Geth Documentation](https://docs.optimism.io/)
