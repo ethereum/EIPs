@@ -46,20 +46,39 @@ event MaskFrozenSet(bytes32 id, bool frozen);
 
 ### Data Structures (normative ABI)
 ```solidity
-struct Metric       { uint32 value; uint256 leafFull; uint32 timestamp; }
-// `timestamp` MUST be expressed in unix seconds and SHOULD reflect the block timestamp
-// at which the metric was last written.
-struct MetricInput  { bytes32 metricId; uint32 value; uint256 leafFull; string uri; }
-struct MetricUpdate { bytes32 metricId; uint32 newValue; uint256 leafFull; uint256 deadline; }
-// `deadline` MUST be a unix timestamp (seconds). If `block.timestamp > deadline`, the update MUST revert.
-// If an implementation does not use deadline semantics, it MUST set `deadline` to 0 and treat 0 as "no expiry".
-struct MintItem     { address to; bytes32 metricId; uint32 value; uint256 leafFull; string uri; }
-struct UpdateItem   { uint256 tokenId; bytes32 metricId; uint32 newValue; uint256 leafFull; }
-// Batch updates are immediate-only; `UpdateItem` intentionally omits `deadline`.
+/**
+* @dev Stored metric (per tokenId, metricId).
+* - `value`     : current numeric value (or placeholder if commitment-only)
+* - `leafFull`  : commitment/hash (circuit-dependent)
+* - `timestamp` : last update time (seconds)
+* - `expiresAt` : deadline of this metric. 0 indicates no expiration date.
+*/
+struct Metric { uint32 value; uint256 leafFull; uint32 timestamp; uint32 expiresAt; }
+
+/**
+* @dev Input for single mint.
+* - `uri` is set as tokenURI on first mint for the address.
+*/
+struct MetricInput  { bytes32 metricId; uint32 value; uint256 leafFull; string uri; uint32 expiresAt; }
+
+/**
+* @dev Input for an update.
+*/
+struct MetricUpdate { bytes32 metricId; uint32 newValue; uint256 leafFull; uint32 expiresAt; }
+
+/**
+* @dev Batch mint item; creates token if absent and sets tokenURI on first write.
+*/
+struct MintItem { address to; bytes32 metricId; uint32 value; uint256 leafFull; string uri; uint32 expiresAt; }
+
+/**
+* @dev Batch update item for an existing token.
+*/
+struct UpdateItem { uint256 tokenId; bytes32 metricId; uint32 newValue; uint256 leafFull; uint32 expiresAt; }
 ```
 
 ### Compare Mask Domain (normative)
-Valid mask values are limited to the bitwise subset of `{ GTE = 1, LTE = 2, EQ = 4 }`.
+Valid mask values are limited to the bitwise subset of `{ GT = 1, LT = 2, EQ = 4 }`.
 Implementations **MUST** revert if a mask contains undefined bits.
 After `setMaskFrozen(id, true)` for a given `id`, subsequent `setCompareMask(id, …)` **MUST** revert.
 
@@ -118,12 +137,22 @@ All state-changing functions (`registerMetric`, `setCompareMask`, `setMaskFrozen
 
 ### Policy Mask (informative)
 ```solidity
-// Bit flags: GTE=1, LTE=2, EQ=4 (combinable)
+/**
+ * @dev Bit mask for allowed comparison operators in zk checks.
+ * GT=1, LT=2, EQ=4 .. combinations allowed (e.g., 1|4).
+ */
 library CompareMask {
-    uint8 internal constant NONE = 0;
-    uint8 internal constant GTE  = 1;
-    uint8 internal constant LTE  = 2;
-    uint8 internal constant EQ   = 4;
+    // Bit flags (base)
+    uint16 internal constant GT  = 1 << 0; // 0b0001
+    uint16 internal constant LT  = 1 << 1; // 0b0010
+    uint16 internal constant EQ  = 1 << 2; // 0b0100
+    uint16 internal constant IN  = 1 << 3; // 0b1000 (allowlist membership)
+    // Aliases / composites
+    uint16 internal constant NONE = 0;           // KYC-only (no compare)
+    uint16 internal constant NE   = GT | LT;     // not equal
+    uint16 internal constant GTE  = GT | EQ;
+    uint16 internal constant LTE  = LT | EQ;
+    uint16 internal constant ALL  = GT | LT | EQ;
 }
 ```
 
@@ -131,7 +160,6 @@ library CompareMask {
 - **Event stability**: Canonical events enable uniform indexing across chains.
 - **Struct-based ABI**: Minimizes app/SDK glue and preserves upgrade flexibility.
 - **Mask governance**: Freezing masks allows ossifying comparison policies post-audit.
-- **Batch vs single update**: Batch updates omit `deadline` to keep calldata small and semantics simple (immediate application).
 
 ## Backwards Compatibility
 MTC does not conflict with ERC-721/1155 and can co-exist with ERC-4973/5192 when tokens represent badges. This specification does not define transfer or approval events and SHOULD NOT be confused with token transfer standards.

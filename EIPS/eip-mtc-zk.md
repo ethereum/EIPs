@@ -65,7 +65,7 @@ interface IMultiTrustCredentialZK {
 This EIP fixes the order of `publicSignals` to match the reference circuit and verifier:
 
 ```
-publicSignals[0] = mode        // operator code: 1: ≥ (GTE), 2: ≤ (LTE), 3: = (EQ); 0 is disallowed
+publicSignals[0] = mode        // operator code: 1: > (GT), 2: < (LT), 3: = (EQ); 0 is disallowed
 publicSignals[1] = root        // Merkle root (must equal the Core anchor for the metric)
 publicSignals[2] = nullifier   // circuit-defined nullifier
 publicSignals[3] = addr        // holder address as field element
@@ -76,18 +76,18 @@ publicSignals[5] = leaf        // committed value (private); used inside the cir
 ### Binding Requirements (normative)
 Implementations of `proveMetric` **MUST** guarantee that a successful proof is **bound to the current MTC anchor and policy** for `(tokenId, metricId)`:
 
-- Implementations **MUST** obtain the **current** `leafFull` by calling the MTC Core contract (e.g., `getMetric(tokenId, metricId)`) and **MUST** verify `publicSignals[1] == leafFull`.  
+- Implementations **MUST** obtain the **current** `leafFull` by calling the MTC Core contract (e.g., `getMetric(tokenId, metricId)`) and **MUST** verify `publicSignals[1] == leafFull`.
   If the metric is revoked, per Core specification, `getMetric` **MUST** revert; ZK verification **MUST NOT** succeed for revoked metrics.
-- Implementations **MUST** enforce the **active comparison mask** from Core for the metric schema (CompareMask domain: `GTE=1, LTE=2, EQ=4`).  
+- Implementations **MUST** enforce the **active comparison mask** from Core for the metric schema (CompareMask domain: `GT=1, LT=2, EQ=4`).  
   The operator encoded by `publicSignals[0]` (**mode**) **MUST** be permitted by the mask; otherwise `proveMetric` **MUST** revert. `mode == 0` **MUST** revert.
 - Implementations **MUST** verify `tokenId == tokenIdOf(address(uint160(publicSignals[3])))`, interpreting `publicSignals[3]` as a **big-endian field element whose lower 160 bits map to the EVM address**. If no token exists for that address, the call **MUST** revert.
 
 ### Comparison Semantics (normative)
 Let `value` denote the committed metric value proven inside the circuit. Implementations **MUST** interpret operators as:
 
-- GTE (`mode==1`): `value ≥ threshold` (inclusive)  
-- LTE (`mode==2`): `value ≤ threshold` (inclusive)  
-- EQ  (`mode==3`): `value == threshold` (exact match)
+- GT (`mode==1`): `value > threshold` (greater than)  
+- LT (`mode==2`): `value < threshold` (lower than)  
+- EQ (`mode==3`): `value == threshold` (exact match)
 
 `value` and `threshold` are treated as **unsigned 256-bit integers**; units/scaling are defined by the metric schema.
 
