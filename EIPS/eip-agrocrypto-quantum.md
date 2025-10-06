@@ -17,6 +17,15 @@ license: CC0-1.0
 This EIP defines a compliance-grade, AI-native protocol for ESG-compliant asset tokenization, governed by ATF-AI and protected by post-quantum cryptography.  
 It codifies lifecycle, metadata, and auditability for compliance-grade deployment, aligns with UN SDGs, and enforces machine-verifiable governance for public, audit-ready markets.
 
+# Motivation
+
+Current tokenization standards (ERC-20, ERC-721, ERC-1155) do not provide out-of-the-box mechanisms for deterministic auditability, ESG alignment, and compliance-first lifecycle controls demanded by institutional environments.  
+This proposal defines a governance and metadata framework to:
+- Enforce lifecycle integrity (issue, audit, retire).
+- Guarantee immutable, verifiable, and attestable metadata.
+- Enable machine-verifiable attestations under ATF-AI.
+- Provide forward security posture with post-quantum readiness.
+
 # Specification
 
 ## Metadata Structure
@@ -62,17 +71,18 @@ event Retired(uint256 indexed tokenId, uint256 amount, string reason);
 ### JSON-RPC Example
 
 ```json
-eth_call [
-  "0xContractAddress",
-  "mintESGToken",
-  {
-    "metadata": {
-      "category": "carbon",
-      "geo": "BR-RS",
-      "digest": "sha3-512:..."
-    }
-  }
-]
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "eth_call",
+  "params": [
+    {
+      "to": "0xContractAddress",
+      "data": "mintESGToken(encodedMetadata)"
+    },
+    "latest"
+  ]
+}
 ```
 
 ### Mapping & Compatibility
@@ -114,7 +124,7 @@ Migration tools can wrap legacy tokens with compliant metadata, enabling gradual
 - Digest (SHA3-512) ensures audit integrity.
 - Quantum-ready primitives recommended for all bridges.
 - Retirement is irreversible; physical seals MUST validate against digest.
-- All inputs and off-chain docs must be hashed and publicly referenced.
+- All inputs and off-chain docs MUST be hashed and publicly referenced.
 
 # Reference Implementation
 
@@ -125,16 +135,10 @@ Migration tools can wrap legacy tokens with compliant metadata, enabling gradual
 - Manifesto: Human+AI (published with hash)
 
 **Hashes:**
-
 - 201672f1605f30a361254cacbb073d8de7b806ba392ef82ca4723e17f4d39dd6
 - f81783bcda0f70958b05732651fb7ca30a0cef4c3acf0bf45ca4dfa3e7a23645
 
 **Timestamp:** 2025-09-06T08:21:00 PDT
-
-# Copyright
-
-Copyright and related rights waived via CC0-1.0.  
-© 2023–2025 AgroCrypto Labs LLC — compliance-grade framework.
 
 # Changelog
 
@@ -172,4 +176,7 @@ f81783bcda0f70958b05732651fb7ca30a0cef4c3acf0bf45ca4dfa3e7a23645
 - Hashes are published publicly and timestamped.
 - No retroactive edits permitted without changelog entry.
 
+# Copyright
+
+Copyright and related rights waived via CC0-1.0.  
 © 2023–2025 AgroCrypto Labs LLC — compliance-grade framework.
