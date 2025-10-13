@@ -374,9 +374,9 @@ The precompiled contract FALCON_CORE is proposed with the following input and ou
 
 ### 4.3. Precompiled Contract Gas Usage
 
-The cost of the **HASH_TO_POINT** contract is dominated by the call to the underlying hash function. It represents in average 35 calls to the hash function. Taking linearly the cost of keccak256, and avoiding the context switching it represents 1000 gas.
+The cost of the **HASH_TO_POINT** function is dominated by the call to the underlying hash function. It represents in average 35 calls to the hash function. Taking linearly the cost of keccak256, and avoiding the context switching it represents 1000 gas.
     
-The cost of **FALCON_CORE** is dominated by performing 2 NTTs and 1 inverse NTT. One of these NTTs is for the public key and can be precomputed so that the contract requires to perform only 1 NTT and 1 inverse NTT. An estimation of the cost is given by 2000 gas.
+The cost of **FALCON_CORE** function is dominated by performing 2 NTTs and 1 inverse NTT. One of these NTTs is for the public key and can be precomputed so that the contract requires to perform only 1 NTT and 1 inverse NTT. An estimation of the cost is given by 2000 gas.
 
 ## 5. Rationale
 
