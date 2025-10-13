@@ -353,7 +353,7 @@ The precompiled contract HASH_TO_POINT is proposed with the following input and 
     - the polynomial Hash To Point challenge as (14*512 = ) 897 bytes.
 
 #### Error Cases
-- Invalid input length (not comliant to described input)
+- Invalid input length (not compliant to described input)
 
 ### 4.2. Falcon Core precompiled contract
 The precompiled contract FALCON_CORE is proposed with the following input and outputs, which are big-endian values:
@@ -367,10 +367,9 @@ The precompiled contract FALCON_CORE is proposed with the following input and ou
     - If the core algorithm process fails, it does not return any output data.
 
 #### Error Cases
-- Invalid input length (not comliant to described input)
+- Invalid input length (not compliant to described input)
 - Invalid field element encoding (≥ q)
 - Invalid norm  bound 
-- Invalid public key (point at infinity or not on curve)
 - Signature verification failure
 
 ### 4.3. Precompiled Contract Gas Usage
