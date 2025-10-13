@@ -156,7 +156,7 @@ The hash-to-point function computes eXtendable Output from a hash Function (XOF)
         def KeccakPRNG_inject(data):
             buffer.append(data)
 
-        defe KeccakPRNG_flip():
+        def KeccakPRNG_flip():
             state = Keccak256(buffer) # fixed 32-byte state
             counter = 0
 
