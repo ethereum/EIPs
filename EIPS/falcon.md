@@ -393,8 +393,6 @@ Falcon offers several advantages over traditional cryptographic signatures such 
 
 Given the increasing urgency of transitioning to quantum-resistant cryptographic primitives or even having them ready in the event that research into quantum computers speeds up. 
 
-The choice of a precompiled contract, rather than an opcode, aligns with existing approaches to signature verification, such as ecrecover for secp256k1 and P256VERIFY for secp256r1.
-
 
 ## 6. Backwards Compatibility
 
