@@ -250,7 +250,7 @@ A set of test vectors for verifying implementations is located in a separate fil
 
 ## 8. Reference Implementation
 
-An implementation is provided in `assets` (TODO). For the NIST-compliant version, KAT vectors of the NIST submission are valid. 
+An implementation is provided in `assets/eip-dilithium/`. For the NIST-compliant version, KAT vectors of the NIST submission are valid.
 
 ## 9. Security Considerations
 
