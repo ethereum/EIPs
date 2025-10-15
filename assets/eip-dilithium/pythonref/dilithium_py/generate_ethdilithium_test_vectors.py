@@ -54,7 +54,7 @@ def solidity_compact_mat(h, name):
 
 XOF = Keccak256PRNG
 file = open(
-    "../test/ZKNOX_ethdilithium.t.sol", 'w')
+    "../solidity/test/ZKNOX_ethdilithium.t.sol", 'w')
 file.write("""
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;

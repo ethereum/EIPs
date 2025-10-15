@@ -19,8 +19,6 @@ example:
 generate_test_vectors:
 	$(PYTHON) -m dilithium_py.generate_ethdilithium_test_vectors
 	$(PYTHON) -m dilithium_py.generate_dilithium_test_vectors
-	$(PYTHON) -m dilithium_py.generate_KAT_example
-	$(PYTHON) -m dilithium_py.generate_sampleinball_keccak_test_vectors
 	forge fmt
 	
 clean:
