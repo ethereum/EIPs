@@ -1,6 +1,6 @@
 ---
-title: Account Abstraction via Enshrined Validation
-description: Enable account abstraction through protocol-level validation mechanisms
+title: Account Abstraction via Account Configurations
+description: Enable account abstraction through account configurations.
 author: Chris Hunter (@)
 discussions-to: <URL>
 status: Draft
@@ -14,7 +14,7 @@ requires:
 
 We propose a validation mechanism for account abstraction that enshrines wallet validation standards through account configuration. Each account specifies its accepted keys and key types through an onchain configuration rather than arbitrary validation code. A new transaction type enables native gas abstraction, allowing transactions to be paid for by parties other than the sender.
 
-Unlike [EIP-7702](./eip-7702.md), which supports arbitrary code for validation, this approach is intentionally opinionated and strict about what validation logic is possible. By constraining validation to a well-defined set of key types and validation rules, the proposal maintains protocol simplicity while enabling secure account abstraction and effective block building, especially when paired with [EIP-7928](./eip-7928). This design also provides a clear path for future expansion to quantum-safe cryptographic algorithms and is compatible with existing AA mechanisms like EIP-7702 and ERC-4337.
+Unlike [EIP-7701](./eip-7701.md), which supports arbitrary code for validation, this approach is defines what validation logic is possible. By constraining validation to a well-defined set of key types and validation rules, the proposal maintains protocol simplicity while enabling secure account abstraction and effective block building as no code is needed to be executed within the evm. The block building advantages are especially apparent when paired with [EIP-7928](./eip-7928). This design also provides a clear path for future expansion to quantum-safe cryptographic algorithms and is compatible with existing AA mechanisms like EIP-7702 and ERC-4337.
 
 
 
@@ -32,7 +32,7 @@ Current account abstraction implementations face several significant challenges:
 - Introduces an entrypoint contract that adds gas costs to every transaction
 - Creates a separate infrastructure/protocol that must be maintained alongside the standard transaction pool
 
-**[EIP-7702](./eip-7702.md)** and **[EIP-7701](./eip-7701.md)** enable protocol-level account abstraction but allow arbitrary validation code:
+**[EIP-7701](./eip-7701.md)** enable protocol-level account abstraction but allow arbitrary validation code:
 - Block builders must execute arbitrary EVM code before knowing who will pay for gas, creating DoS attack vectors
 - Unpredictable gas costs during validation complicate block building
 - Difficult to optimize transaction ordering and parallel execution
@@ -48,7 +48,7 @@ By enshrining specific validation logic rather than supporting arbitrary code, b
 
 #### 2. Simple Mempool Operation
 
-Unlike arbitraty code excution AA protocols, this proposal does not require complex [ERC-7562](./eip-7562.md) validation rules. Mempool operators can validate transactions using simple, well-defined rules that are part of the protocol, not application-level heuristics. This allows standard Ethereum mempools to handle account abstraction transactions without separate infrastructure.
+Unlike arbitraty code excution AA protocols, this proposal does not require complex [ERC-7562](./eip-7562.md) validation rules. Mempool operators can validate transactions using simple, well-defined rules that are part of the protocol, not application-level heuristics. They only need access to onchain state.
 
 #### 3. Standardized Authentication Mechanisms
 
@@ -79,7 +79,7 @@ This proposal enables:
 - **Key management**: Accounts can specify multiple authorized keys with different key types, enabling key rotation and recovery without changing the account address
 - **Gas sponsorship**: Transactions can be paid for by accounts other than the sender. The payer is able to ensure they will not be griefed.
 - **Unopinionated execution**: The proposal does not prescribe execution logic—batching and other execution features are supported at the wallet implementation level, providing maximum flexibility.
-- **Compatibility**: Works alongside existing account abstraction approaches including [EIP-7702](./eip-7702.md), [EIP-4337](./eip-4337.md), and [ERC-1271](./eip-1271.md), allowing gradual migration and interoperability
+- **Compatibility**: Works alongside existing account abstraction frameworks including [EIP-7702](./eip-7702.md) and [EIP-4337](./eip-4337.md). Support for [ERC-1271](./eip-1271.md) remains.
 
 ## Specification
 
@@ -89,6 +89,7 @@ This proposal enables:
 |--------------------------|-------------------|---------|
 | `AA_TX_TYPE`             | TBD               | [EIP-2718](./eip-2718.md) transaction type |
 | `AA_BASE_COST`           | TBD               | Base gas cost for AA transaction |
+| `ACCOUNT_CONFIG_PRECOMPILE` | TBD            | Address of the Account Configuration precompile |
 
 
 ### Account Configuration
@@ -135,74 +136,43 @@ Note we expect this behaviour to be removed in the future during quantum migrati
 
 #### Configuration Storage
 
-> **Open Design Question**: We are seeking feedback on the best approach for storing and managing account configuration.
+Account configurations are stored and managed through a canonical **Account Configuration Precompile** at a designated address (TBD).
 
-There are two primary options under consideration:
+**Interface:**
 
-##### Option 1: New Opcodes and Account State
+```solidity
+interface IAccountConfiguration {
+    /// @notice Set or update a key at the specified index
+    /// @dev Restricted to msg.sender (accounts can only configure themselves)
+    function setKey(uint8 index, uint8 keyType, bytes calldata publicKey) external;
+    
+    /// @notice Remove a key at the specified index
+    function removeKey(uint8 index) external;
+    
+    /// @notice Get the complete configuration for an account
+    function getConfiguration(address account) external view returns (
+        uint8[] memory keyTypes,
+        bytes[] memory publicKeys
+    );
+    
+    /// @notice Get a specific key by index
+    function getKey(address account, uint8 index) external view returns (
+        uint8 keyType,
+        bytes memory publicKey
+    );
+}
+```
 
-Add new opcodes for managing authentication configuration:
+**Benefits:**
 
-**`SETAUTH` opcode**:
-- Signature: `setAuth(index, key_type, public_key)`
-- Restricted to `msg.sender` access only (accounts can only configure themselves)
-- Sets or updates the key at the specified index in the account's configuration array
-- Gas cost: TBD
+- **Performance**: The precompile address is kept warm in the access list, minimizing gas costs for configuration reads during validation
+- **Standardization**: Provides a canonical interface that wallets, block builders, and tooling can rely on across all chains
+- **Efficiency**: Dedicated storage optimized for key configurations, separate from contract storage
+- **Compatibility**: Works immediately on all chains that adopt this EIP without requiring new opcodes
 
-**`GETAUTH` opcode**:
-- Signature: `getAuth(address) → (uint8 keyType, bytes publicKey)[]`
-- Returns the complete authentication configuration for the specified address
-- Gas cost: TBD (similar to storage reads based on array size)
+**Access Control:**
 
-The configuration data would be held in a dedicated slot in the account state trie, separate from regular contract storage.
-
-**Advantages**:
-- Clean separation between account configuration and contract storage
-- Type-safe operations at the protocol level
-- Cannot conflict with contract storage layout
-- Potentially more efficient gas costs
-
-**Disadvantages**:
-- Requires new opcodes and client implementation changes
-- More complex upgrade path
-- Not be available on all chains immediately
-- Wallet providers need to have different implementations for chains
-
-##### Option 2: Standard Account Storage
-
-Use a specific storage slot for authentication configuration:
-
-**Storage Layout**:
-- A designated storage slot holds the authentication configuration
-- Configuration is encoded as standard storage data (e.g., using SSZ or RLP encoding)
-- Accounts update their configuration using standard `SSTORE` operations
-- Reading configuration uses standard `SLOAD` operations
-
-**Advantages**:
-- No new opcodes needed
-- Works on all chains immediately
-- Compatible with existing tooling and infrastructure
-- Easier to implement and deploy
-- Natural compatibility with [EIP-4337](./eip-4337.md) and [ERC-1271](./eip-1271.md)
-
-**Disadvantages**:
-- Uses contract storage, which may risk with some contract layouts
-- Less explicit/discoverable than dedicated opcodes
-- Standard storage gas costs (not optimized for this use case)
-
-##### Recommendation (Pending Feedback)
-
-We are leaning toward **Option 2 (Standard Account Storage)** due to:
-- Immediate deployability without client upgrades
-- Better compatibility with existing AA infrastructure ([EIP-4337](./eip-4337.md), [ERC-1271](./eip-1271.md))
-- Easier for wallets and smart contracts to read configuration on-chain
-- Simpler for cross-chain deployments (especially L2s)
-
-However, we welcome community feedback on this decision, particularly regarding:
-- Gas efficiency concerns
-- Storage slot conflicts
-- Developer experience
-- Long-term protocol cleanliness
+Only `msg.sender` can modify their own configuration. Calls to `setKey` or `removeKey` revert if `msg.sender != account` being configured. This prevents unauthorized modification while allowing smart contract wallets to manage their own keys through their execution logic.
 
 ### Key Types
 
@@ -413,6 +383,12 @@ For gas abstraction to work safely, wallet implementations must follow these gui
 
 This pattern ensures that if the transaction doesn't have enough gas, it fails early before consuming significant gas, or if it does proceed, it reserves enough gas to complete the payment to the payer.
 
+**Revert-Handling**: Wallets must handle reverts safely to protect the payer from losing gas without compensation. This is achieved by separating payer payment from user operation execution.
+
+The key principle: **Payer payment must occur in a non-revertible context, even if user operations fail.** 
+
+This design protects payers from griefing while allowing user operations to fail safely 
+
 #### Payer Profitability Guarantees
 
 With `required_pre_state` enforcing:
@@ -462,7 +438,8 @@ Each `required_pre_state` entry consists of:
 If the block builder provides other endpoints such as revert protection, eth_sendRawTransactionConditional this can be skipped for save on data usage but the payer should just relay the transaction itself. 
 (todo - could also have configurations.)
 
-This data should compress well outside of the slot value (32 bytes).
+This data should compress well outside of the slot value (32 bytes) but the protocol could also denote common conditions in a compressed state (ie top tokens, wallet implemenations). 
+
 
 #### Block Builder 
 Block builders can validate `required_pre_state` conditions without executing EVM code, simply by reading the specified storage slots and performing comparisons. When combined with EIP-7928, it becomes easy for mempools to maintain valid transaction sets. 
