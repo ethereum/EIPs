@@ -204,7 +204,7 @@ The following key types are supported:
 | `R1` | `0x02` | secp256r1 / P-256 (ECDSA) | 33 bytes (compressed) or 65 bytes (uncompressed) | 64 bytes (r, s) | 5000 |
 | `WEBAUTHN` | `0x03` | WebAuthn / Passkey | 65 bytes (uncompressed P-256) | Variable (includes authenticator data) | 7000 |
 | `BLS` | `0x04` | BLS12-381 | 48 bytes (compressed G1) | 96 bytes (G2 signature) | 7000 |
-| `EXTERNAL` | `0x05` | Delegated validation | 20 bytes (account address) | Variable (depends on delegated account) | 5000 |
+| `DELEGATE` | `0x05` | Delegated validation | 20 bytes (account address) | Variable (depends on delegated account) | 5000 |
 
 #### Additional information
 
@@ -250,7 +250,8 @@ AA_TX_TYPE || rlp([
   access_list,
   required_pre_state,
   calldata,
-  signatures
+  sender_signature,
+  payer_signature
 ])
 ```
 
@@ -272,36 +273,70 @@ AA_TX_TYPE || rlp([
 
 **`access_list`** (list): [EIP-2930](./eip-2930.md) style access list for pre-warming storage slots and addresses.
 
-**`required_pre_state`** (list): State conditions that must be satisfied for the transaction to be valid. Tuple length determines type:
+**`required_pre_state`** (list): State conditions that must be satisfied for the transaction to be valid. Each entry can be either a standard or explicit condition. This is only used for payer sponsored transactions and is only signed by the payer.
 
-**Standard condition** (3 elements, ~53 bytes):
-- `condition_id` (uint16): Standard condition code (e.g., `0x00` = wallet implementation, `0x01` = from address mapping at slot 0)
-- `address` (address): The contract/implementation address
-- `value` (uint256): Minimum value or expected implementation
+**Standard Condition** (3 elements, ~53 bytes):
+```
+(condition_id, address, value)
+```
 
-Nodes validate standard conditions using enshrined logic (e.g., check ERC20 balance at known slot, verify wallet implementation via EIP-7702/ERC-1967/direct code).
+Where `condition_id` is a uint16 (2 bytes) encoding the check type:
+- **First byte**: Base type
+- **Second byte**: Specific check
 
-A node can choose to enable explicit conditions, though it makes mass invalidation risk more prevalent. 
-**Explicit condition** (4 elements, 85 bytes):
+Standard conditions use enshrined logic to validate common patterns efficiently:
+
+| Condition ID | First Byte | Second Byte | Description | Address Field | Value Field | Comparison |
+|--------------|------------|-------------|-------------|---------------|-------------|------------|
+| `0x0000` | `0x00` (special) | `0x00` | Wallet implementation | Account to check | Expected implementation address or code hash | `==` |
+| `0x0100` | `0x01` (mapping) | `0x00` | Mapping at slot 0 | Contract address | Minimum value | `>=` |
+| `0x0101` | `0x01` (mapping) | `0x01` | Mapping at slot 1 | Contract address | Minimum value | `>=` |
+| `0x0102` | `0x01` (mapping) | `0x02` | Mapping at slot 2 | Contract address | Minimum value | `>=` |
+| ... | ... | ... | ... | ... | ... | ... |
+| `0x01FF` | `0x01` (mapping) | `0xFF` | Mapping at slot 255 | Contract address | Minimum value | `>=` |
+
+**Base Type `0x00` (Special Checks)**:
+- `0x0000`: Wallet implementation check via EIP-7702 delegation, ERC-1967 proxy slot, or direct code comparison
+
+**Base Type `0x01` (Mapping Checks)**:
+
+For mapping conditions, the actual storage slot is calculated as:
+```
+actual_slot = keccak256(from_address || base_slot)
+```
+
+Where `base_slot` is the second byte of the condition ID (e.g., `0x0100` → slot 0, `0x0101` → slot 1, etc.) and `from_address` is the transaction sender. This enables efficient validation of ERC-20 balances and similar mapping-based checks.
+
+All mapping conditions use `>=` comparison, checking that the value at the computed slot is at least the specified minimum.
+
+**Extensibility**: The 2-byte encoding provides 256 base types with 256 variants each, allowing future EIPs to define additional standard condition types (e.g., `0x02XX` for different patterns).
+
+**Note**: Chains MAY choose to support explicit conditions at some mass invalidation risk. 
+**Explicit Condition** (4 elements, 85 bytes):
+```
+(address, slot, value, comparison)
+```
+
 - `address` (address): The account to check
 - `slot` (uint256): The storage slot to check
 - `value` (uint256): The expected value
-- `condition` (uint8): Comparison operator (`0x00` = `==`, `0x01` = `>=`, `0x02` = `<=`)
+- `comparison` (uint8): Comparison operator (`0x00` = `==`, `0x01` = `>=`, `0x02` = `<=`)
 
-If any condition fails, the transaction is invalid. If it becomes invalid at any point it may be dropped from the mempool.
+If any condition fails, the transaction is invalid and may be dropped from the mempool.
 
 **`calldata`** (bytes): The data to be executed. The interpretation depends on the `from` account's implementation. For EOAs with AA configuration, this typically specifies the operations to perform.
 The calldata is sent to the `from` address from itself (tx.orgin is `from` address as well).
 
-**`signatures`** (list): Signatures authorizing the transaction. Contains two entries: `[sender_signature, payer_signature]`.
-
-Each signature can be one of two formats:
-1. **EOA signature**: Standard ECDSA signature as `[v, r, s]` for accounts without AA configuration
-2. **Configured key signature**: `[key_index, signature_data]` for accounts with AA configuration, where:
-   - `key_index` (uint8): Index into the account's configured key list
+**`sender_signature`** (bytes): Signature authorizing the transaction from the sender. Encoding is:
+- **For EOA key**: Raw 65-byte ECDSA signature `(r || s || v)` where r and s are 32 bytes each, v is 1 byte
+- **For configured key**: `0xFF || key_index || signature_data` where:
+  - `0xFF` is a 1-byte prefix indicating configured key signature
+  - `key_index` (uint8): Index into the sender's configured key list  
    - `signature_data` (bytes): The actual signature data, format depends on the key type at that index
 
-If the `payer` field is empty, then only one signature is included and the transaction is self-paying (the `from` address pays gas fees).
+The `0xFF` prefix distinguishes configured key signatures from EOA signatures (which never start with `0xFF` since `r` values are always less than the curve order).
+
+**`payer_signature`** (bytes): Signature from the payer authorizing gas payment. Uses the same encoding as `sender_signature`. If the `payer` field is empty (self-paying transaction), this field MUST be empty bytes `0x`.
 
 #### Signature Payloads
 
@@ -695,7 +730,7 @@ The upgrade requires network-wide adoption through a scheduled hard fork to enab
 
 **Mempool DoS Protection**: Mempool operators limit pending sponsored transactions per payer based on ETH balance, preventing spam attacks with unpayable transactions.
 
-### Authorization Security
+### Authorization Security  
 
 **Signature Verification**: All signatures are verified using enshrined cryptographic algorithms with well-established security properties. Verification follows standard practices for each key type (ECDSA for K1/R1, BLS12-381 for BLS, WebAuthn standards for passkeys).
 
@@ -703,7 +738,7 @@ The upgrade requires network-wide adoption through a scheduled hard fork to enab
 
 **Multi-Key Security**: When multiple keys are configured, any single authorized key can sign transactions. Account implementations should implement additional logic (multisig, thresholds, etc.) in their execution layer if multiple approvals are desired.
 
-**Delegation Risks**: The `EXTERNAL` key type delegates validation to another account. This delegation is limited to 1 hop to prevent complex delegation chains. Accounts should carefully consider the security implications before delegating validation authority.
+**Delegation Risks**: The `DELEGATE` key type delegates validation to another account. This delegation is limited to 1 hop to prevent complex delegation chains. Accounts should carefully consider the security implications before delegating validation authority.
 
 ### MEV Considerations
 
