@@ -70,6 +70,27 @@ This matches the standard Ethereum transaction cost when using secp256k1 keys fo
 
 Each account can optionally configure a list of authorized keys that are permitted to sign transactions on its behalf. This configuration consists of an ordered array of key entries, where each entry specifies a key type and the public key data.
 
+#### Configuration Storage
+
+Account configurations are stored and managed through a canonical **Account Configuration Precompile** at a designated address (TBD).
+
+It provides:
+- key management
+- account configuration getters
+
+With access control only provided to `msg.sender`, enabling all account types to manage their auth config.
+
+
+The precompile can also offer initial account creation by providing counter factual addresses and validation.  
+
+**Benefits:**
+
+- **Performance**: The precompile address can be kept warm for cheap lookups during validation
+- **Standardization**: Provides a canonical interface that wallets, block builders, and tooling can rely on across all chains
+- **Efficiency**: Dedicated storage optimized for key configurations, separate from contract storage
+- **Compatibility**: Works immediately on all chains that adopt this EIP without requiring new opcodes
+
+
 #### Configuration Format
 
 The account configuration is stored as an array of key entries:
@@ -107,26 +128,6 @@ When validating a transaction signature, the protocol checks:
 2. If not, check if the signature matches any configured key in the account's key list
 
 Note we expect this behaviour to be removed in the future during quantum migration. 
-
-#### Configuration Storage
-
-Account configurations are stored and managed through a canonical **Account Configuration Precompile** at a designated address (TBD).
-
-It provides:
-- key management
-- account configuration getters
-
-With access control only provided to `msg.sender`, enabling all account types to manage their auth config.
-
-
-The precompile can also offer initial account creation by providing counter factual addresses and validation.  
-
-**Benefits:**
-
-- **Performance**: The precompile address can be kept warm for cheap lookups during validation
-- **Standardization**: Provides a canonical interface that wallets, block builders, and tooling can rely on across all chains
-- **Efficiency**: Dedicated storage optimized for key configurations, separate from contract storage
-- **Compatibility**: Works immediately on all chains that adopt this EIP without requiring new opcodes
 
 
 ### Key Types
