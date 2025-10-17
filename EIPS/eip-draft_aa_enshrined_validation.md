@@ -1,6 +1,6 @@
 ---
-title: Account Abstraction via Account Configurations
-description: Enable account abstraction through account configurations.
+title: Standardized Account Abstraction with Onchain Key Configurations
+description: Enable account abstraction through onchain account configurations.
 author: Chris Hunter (@)
 discussions-to: <URL>
 status: Draft
@@ -12,74 +12,32 @@ requires:
 
 ## Abstract
 
-We propose a validation mechanism for account abstraction that enshrines wallet validation standards through account configuration. Each account specifies its accepted keys and key types through an onchain configuration rather than arbitrary validation code. A new transaction type enables native gas abstraction, allowing transactions to be paid for by parties other than the sender.
-
-Unlike [EIP-7701](./eip-7701.md), which supports arbitrary code for validation, this approach is defines what validation logic is possible. By constraining validation to a well-defined set of key types and validation rules, the proposal maintains protocol simplicity while enabling secure account abstraction and effective block building as no code is needed to be executed within the evm. The block building advantages are especially apparent when paired with [EIP-7928](./eip-7928). This design also provides a clear path for future expansion to quantum-safe cryptographic algorithms and is compatible with existing AA mechanisms like EIP-7702 and ERC-4337.
-
+This proposal introduces a standardized validation mechanism for account abstraction, utilizing onchain account configurations to define accepted keys and key types. Unlike EIP-7701, which permits arbitrary validation code, this approach restricts validation to a predefined set of key types and rules, ensuring protocol simplicity and secure account abstraction without requiring EVM code execution. A new transaction type supports native gas abstraction, enabling third-party transaction fee payments. When combined with EIP-7928, this design enhances block building efficiency. It also supports future integration of quantum-safe cryptographic algorithms and maintains compatibility with existing account abstraction mechanisms, such as EIP-7702 and ERC-4337.
 
 
 ## Motivation
 
-Account abstraction has been a long-standing goal for Ethereum, aiming to provide users with more flexible and secure account management. This proposal aims to enable all the standard benefits of account abstraction—including batching, gas sponsorship, privilege de-escalation, and custom authentication—while addressing critical implementation challenges that have hindered adoption of existing solutions.
+Account abstraction has been a long-standing goal for Ethereum, aiming to provide users with more flexible and secure account management. This proposal aims to enable all the benefits of account abstraction—including batching, gas sponsorship, custom authentication and programable account logic—while addressing critical implementation challenges that have hindered adoption of existing solutions.
 
-### Problems with Existing Approaches
+## Rationale
 
-Current account abstraction implementations face several significant challenges:
+This solution implements transaction validation at the protocol level, separating account logic from gas payment. It supports arbitrary account code but only post post-gas validation while defining initial transaction inclusion through a predefined, extensible set of per-account authentication standards.
 
-**[EIP-4337](./eip-4337.md)** provides account abstraction at the application layer but introduces substantial complexity:
-- Requires complex [ERC-7562](./eip-7562.md) validation rules for mempool operation
-- Adds significant gas overhead through UserOperation validation, execution, and post-operation phases
-- Introduces an entrypoint contract that adds gas costs to every transaction
-- Creates a separate infrastructure/protocol that must be maintained alongside the standard transaction pool
+| Solution | Challenges | Limitations |
+|----------|------------|-------------|
+| [EIP-4337](./eip-4337.md) | Application-layer abstraction | Complex mempool rules ([ERC-7562](./eip-7562.md)), high gas overhead, entrypoint contract costs, separate infrastructure |
+| [EIP-7701](./eip-7701.md) | Protocol-level abstraction with arbitrary code | Complex mempool rules ([ERC-7562](./eip-7562.md)), major protocol changes, complex block building |
 
-**[EIP-7701](./eip-7701.md)** enable protocol-level account abstraction but allow arbitrary validation code:
-- Block builders must execute arbitrary EVM code before knowing who will pay for gas, creating DoS attack vectors
-- Unpredictable gas costs during validation complicate block building
-- Difficult to optimize transaction ordering and parallel execution
-- Complex interaction with block building optimizations like [EIP-7928](./eip-7928.md)
+This proposal addresses these by:
+- **Simplifying Validation**: Uses predefined key types, eliminating EVM execution during validation.
+- **Enhancing Block Building**: Block builders able to efficiently validate transactions with only state look ups.
+- **Maintain AA Benefits** Keep all standard account abstraction benefits.
+- **Reducing Gas Costs**: Eliminates entrypoint contracts and gas overheads.
+- **No changes to the EVM**: No evm changes required.
+- **Ensuring Extensibility**: Supports future quantum-safe algorithms via new key types.
+- **Maintaining Compatibility**: Coexists with EIP-7702 and ERC-4337.
+- **Improving Compressibility**: Structured validation fields reduce calldata costs for Layer 2 rollups.
 
-### Goals of This Proposal
-
-This proposal takes an intentionally constrained approach to address these issues while maintaining the key benefits of account abstraction:
-
-#### 1. Simple Block Building
-
-By enshrining specific validation logic rather than supporting arbitrary code, block builders can validate transactions without calling into the EVM prior to gas payment. The payer is deterministically known when the transaction is included in the block, eliminating DoS risks where malicious transactions could consume builder resources without paying.
-
-#### 2. Simple Mempool Operation
-
-Unlike arbitraty code excution AA protocols, this proposal does not require complex [ERC-7562](./eip-7562.md) validation rules. Mempool operators can validate transactions using simple, well-defined rules that are part of the protocol, not application-level heuristics. They only need access to onchain state.
-
-#### 3. Standardized Authentication Mechanisms
-
-Rather than allowing arbitrary validation code, this proposal enshrines a well-defined set of key types and validation mechanisms. This approach:
-- Ensures best practices for signature validation are followed
-- Makes security auditing and formal verification more tractable
-- Reduces implementation complexity and bug surface area
-- Provides a clear framework for adding new key types (including quantum-safe algorithms) through protocol upgrades
-
-#### 4. Gas Efficiency
-
-By eliminating the need for:
-- Separate validation and post-operation execution phases
-- Entrypoint contract overhead
-- Extra CALL operations for validation logic
-
-This proposal reduces the gas cost of account abstraction transactions compared to other approaches.
-
-#### 5. Transaction Compressibility
-
-The structured, predictable format of validation configuration enables better transaction compression, which is particularly valuable for Layer 2 rollups where calldata costs dominate. Unlike arbitrary validation code, enshrined validation fields can be efficiently compressed and deduplicated. 
-
-The new transaction type structure allows for transaction data to be effectively compressed enabling large data availability savings, furthermore the protocol supports aggregatable signatures (BLS).
-
-### Key Features
-
-This proposal enables:
-- **Key management**: Accounts can specify multiple authorized keys with different key types, enabling key rotation and recovery without changing the account address
-- **Gas sponsorship**: Transactions can be paid for by accounts other than the sender. The payer is able to ensure they will not be griefed.
-- **Unopinionated execution**: The proposal does not prescribe execution logic—batching and other execution features are supported at the wallet implementation level, providing maximum flexibility.
-- **Compatibility**: Works alongside existing account abstraction frameworks including [EIP-7702](./eip-7702.md) and [EIP-4337](./eip-4337.md). Support for [ERC-1271](./eip-1271.md) remains.
 
 ## Specification
 
@@ -154,43 +112,22 @@ Note we expect this behaviour to be removed in the future during quantum migrati
 
 Account configurations are stored and managed through a canonical **Account Configuration Precompile** at a designated address (TBD).
 
-**Interface:**
+It provides:
+- key management
+- account configuration getters
 
-```solidity
-interface IAccountConfiguration {
-    /// @notice Set or update a key at the specified index
-    /// @dev Restricted to msg.sender (accounts can only configure themselves)
-    function setKey(uint8 index, uint8 keyType, bytes calldata publicKey) external;
-    
-    /// @notice Remove a key at the specified index
-    function removeKey(uint8 index) external;
-    
-    /// @notice Get the complete configuration for an account
-    function getConfiguration(address account) external view returns (
-        uint8[] memory keyTypes,
-        bytes[] memory publicKeys
-    );
-    
-    /// @notice Get a specific key by index
-    function getKey(address account, uint8 index) external view returns (
-        uint8 keyType,
-        bytes memory publicKey
-    );
-}
-```
+With access control only provided to `msg.sender`, enabling all account types to manage their auth config.
+
 
 The precompile can also offer initial account creation by providing counter factual addresses and validation.  
 
 **Benefits:**
 
-- **Performance**: The precompile address is kept warm in the access list, minimizing gas costs for configuration reads during validation
+- **Performance**: The precompile address can be kept warm for cheap lookups during validation
 - **Standardization**: Provides a canonical interface that wallets, block builders, and tooling can rely on across all chains
 - **Efficiency**: Dedicated storage optimized for key configurations, separate from contract storage
 - **Compatibility**: Works immediately on all chains that adopt this EIP without requiring new opcodes
 
-**Access Control:**
-
-Only `msg.sender` can modify their own configuration. Calls to `setKey` or `removeKey` revert if `msg.sender != account` being configured. This prevents unauthorized modification while allowing smart contract wallets to manage their own keys through their execution logic.
 
 ### Key Types
 
@@ -206,29 +143,9 @@ The following key types are supported:
 | `BLS` | `0x04` | BLS12-381 | 48 bytes (compressed G1) | 96 bytes (G2 signature) | 7000 |
 | `DELEGATE` | `0x05` | Delegated validation | 20 bytes (account address) | Variable (depends on delegated account) | 5000 |
 
-#### Additional information
-
-##### `BLS` - BLS12-381 (0x04)
-
-BLS signature using the BLS12-381 curve. This signature scheme enables signature aggregation, allowing multiple signatures to be combined into a single signature for DA efficiency.
-
-##### `DELEGATE` - Delegated Validation (0x05)
-
-Delegates signature validation to another account. The "public key" is actually an Ethereum address, and validation is performed by checking if that account's authentication configuration accepts the provided signature.
-
-Note: Only 1 hop is allowed. (If other account specifies external as well, it will fail)
-
-
-#### Adding New Key Types
-
-New key types can be added through subsequent EIPs following this specification pattern. Each new key type must define:
-- Unique identifier (uint8)
-- Public key format and size
-- Signature format and size
-- Validation algorithm
-- Intrinsic gas cost
-
-This extensibility enables the protocol to adopt quantum-safe cryptographic algorithms in the future without requiring fundamental changes to the account abstraction mechanism.
+- **BLS**: Supports signature aggregation for data availability efficiency.
+- **DELEGATE**: Delegates validation to another account (1-hop limit).
+- **Extensibility**: New key types can be added via future EIPs.
 
 
 ### New Transaction Type
@@ -317,11 +234,6 @@ All mapping conditions use `>=` comparison, checking that the value at the compu
 (address, slot, value, comparison)
 ```
 
-- `address` (address): The account to check
-- `slot` (uint256): The storage slot to check
-- `value` (uint256): The expected value
-- `comparison` (uint8): Comparison operator (`0x00` = `==`, `0x01` = `>=`, `0x02` = `<=`)
-
 If any condition fails, the transaction is invalid and may be dropped from the mempool.
 
 **`calldata`** (bytes): The data to be executed. The interpretation depends on the `from` account's implementation. For EOAs with AA configuration, this typically specifies the operations to perform.
@@ -380,58 +292,11 @@ The nonce is always taken from the `from` address. The `payer` account does not 
 
 This proposal enables native gas abstraction through the separation of the transaction sender (`from`) and the gas payer (`payer`). This allows third-party accounts to sponsor transactions outright or in exchange for payment in ERC-20 tokens or other assets.
 
-#### Payer Protection Mechanism
+#### Expected Wallet Implementation Requirements
 
-The critical challenge with gas abstraction is preventing **griefing attacks** where a malicious sender causes the payer to spend gas without receiving payment. This proposal solves this through the `required_pre_state` field, which gives the payer strong guarantees about the transaction's execution environment.
+For gas abstraction in exchange for erc20 to work safely, payers should trust who they are sponsoring. In the case they cannot, they can trust a set of wallet implementations. Payers are recommended to trust wallets that follow these guidelines.
 
-#### Typical Protection Pattern
-
-A payer typically uses `required_pre_state` to verify two critical conditions before agreeing to pay for a transaction:
-
-**1. Wallet Code Implementation**
-
-The payer checks that the `from` account uses an approved wallet implementation:
-
-```python
-required_pre_state.append({
-  'address': from_account,
-  'slot': code_hash_slot,  # Storage slot containing code hash or implementation pointer
-  'value': approved_wallet_code_hash,
-  'condition': 0x00  # Equal
-})
-```
-
-By validating the wallet implementation, the payer ensures:
-- The wallet follows expected payment logic
-- The wallet implements proper OOG (out-of-gas) error handling
-- The wallet will not maliciously consume gas without paying
-
-**2. ERC-20 Balance**
-
-The payer checks that the `from` account has sufficient ERC-20 token balance to pay for the transaction:
-
-```python
-required_pre_state.append({
-  'address': erc20_token_address,
-  'slot': balance_slot_for_from_account,  # Computed storage slot for balance mapping
-  'value': minimum_payment_amount,
-  'condition': 0x01  # Greater than or equal
-})
-```
-
-This ensures the sender has funds available to pay the payer for the gas sponsorship.
-
-#### Wallet Implementation Requirements
-
-For gas abstraction to work safely, payers should trust who they are sponsoring. In the case they cannot, they can trust a set of wallet implementations. Payers are recommended to trust wallets that follow these guidelines:
-
-**Out-of-Gas Handling**: Wallets should implement early revert logic when detecting insufficient gas to complete execution. This prevents situations where:
-- The wallet starts executing the calldata
-- Runs out of gas mid-execution
-- Reverts without completing the payment to the payer
-- The payer loses gas without compensation
-
-This pattern ensures that if the transaction doesn't have enough gas, it fails early before consuming significant gas, or if it does proceed, it reserves enough gas to complete the payment to the payer.
+**Out-of-Gas Handling**: Wallets should implement early revert logic when detecting insufficient gas to complete execution.
 
 **Revert-Handling**: Wallets must handle reverts safely to protect the payer from losing gas without compensation. This is achieved by separating payer payment from user operation execution.
 
@@ -439,98 +304,14 @@ The key principle: **Payer payment must occur in a non-revertible context, even 
 
 This design protects payers from griefing while allowing user operations to fail safely 
 
-#### Payer Profitability Guarantees
-
-With `required_pre_state` enforcing:
-1. Known wallet implementation (with proper OOG handling)
-2. Sufficient ERC-20 balance
-
-The payer can be confident that:
-- **Payment is guaranteed**: The wallet code will execute the payment logic
-- **No griefing**: The wallet will revert early if it cannot complete + pay
-- **Predictable costs**: The wallet implementation's gas usage is known
-- **Profitable operation**: The ERC-20 payment exceeds the gas costs
-
 #### Payer as Relay
 
-This design naturally supports a **payer + relay model**:
+This design naturally supports a payer attaching a sponsorship after the sender signs.
 
-1. User signs transaction with their key (sender signature) and specifies the relayer's payer address as payer.
-2. User sends transaction to relayer service off-chain
-3. Payer validates the transaction would be profitable and either adds `required_pre_state` conditions or is interacting with a node that has revert protection or eth_sendRawTransactionConditional capabilities that it can leverage. 
-    1. conditions are expected to ensure sender's ERC20 balance does not drop below send amount, the wallet implemenation doesn't change and is in a trusted set to the payer. 
-4. Paymaster adds their signature (payer signature) and submits to mempool
-5. Transaction executes, wallet pays paymaster in ERC-20
-6. Payer has paid ETH for gas, received ERC-20 payment
-
+The sender can fill in the payer field and add any conditons to its calldata (ie. send 1 cent to address), sign it and send it to the relayer who will sponsor and then relay the tx to the node reducing 1 typical hop. 
 The payer service acts as a relay service that:
 - Accepts ERC20 tokens to land it for gas payment
 - Faces minimal griefing risk due to `required_pre_state` protections
-
-#### Required Pre-State Limitations
-
-To prevent DoS attacks on block builders, the `required_pre_state` field is limited:
-
-- **Maximum entries**: `MAX_REQUIRED_PRESTATE_ENTRIES` (3 entries per transaction)
-- **Maximum total size**: ~255 bytes (3 entries × 85 bytes per entry)
-
-**Typical Entry Sizes:**
-
-Each `required_pre_state` entry consists of:
-- `address`: 20 bytes
-- `slot`: 32 bytes
-- `value`: 32 bytes
-- `condition`: 1 byte
-- **Total per entry**: 85 bytes (plus minimal RLP encoding overhead)
-
-**L2 Considerations:**
-If the block builder provides other endpoints such as revert protection, eth_sendRawTransactionConditional this can be skipped for save on data usage but the payer should just relay the transaction itself. 
-(todo - could also have configurations.)
-
-#### Consideration: Payer Configuration Precompile
-
-A Payer Configuration Precompile at `PAYER_CONFIG_PRECOMPILE` can compress `required_pre_state` from 170 bytes to ~1-4 bytes via reusable config references. This may also enable a type of permissionless sponsorship in the future where an account can specify its required_pre_state in onchain configuration with calldata requirements and then have a no-op signature only for gas sponsorship. 
-
-Details can be specified in a follow-up EIP.
-
-#### Mass Invalidation Mitigation
-
-**Attack vector:** A malicious payer could sponsor many transactions, then change state to invalidate them all simultaneously, wasting block builder resources.
-
-**Key mitigation:** `required_pre_state` checks are unique per sender. This makes attacks expensive:
-
-- **Sender ERC-20 balance**: Payer cannot directly change sender's token balance
-- **Sender wallet implementation**: Payer cannot change sender's code/proxy
-
-To invalidate transactions, an attacker would need to:
-1. Control or manipulate multiple sender accounts (expensive/difficult)
-2. Coordinate state changes across many accounts simultaneously
-
-**Additional protections:**
-
-**Mempool limits per payer:**
-```
-max_sponsored_txs = min(
-    payer_eth_balance / avg_gas_cost,
-    MAX_SPONSORED_PER_PAYER  // e.g., 1000
-)
-```
-
-Block builders limit pending sponsored transactions based on payer's ETH balance, ensuring payers can cover at least some portion of pending transactions.
-
-**Restricted condition types (initial deployment):**
-
-To further reduce attack surface, initial deployment could restrict `required_pre_state` to:
-- Sender ERC20 balance checks (any slot) via mapping(address) calculation
-- Sender wallet implementation checks
-
-This prevents payer-controlled state from being used in conditions, eliminating the most direct invalidation vector. Future EIPs can expand allowed conditions after observing usage patterns.
-
-**EIP-7928 synergy:** Transaction invalidation tracking combined with simple state lookups makes mempool management efficient even with sponsored transactions.
-
-#### Block Builder 
-Block builders validate `required_pre_state` conditions via storage reads without EVM execution. Combined with mempool limits and EIP-7928, this enables efficient handling of sponsored transactions. 
-
 
 ### Transaction Validation and Execution Flow
 
@@ -574,7 +355,6 @@ While this proposal constrains **validation** to enshrined key types, it does no
 
 **Validation (Enshrined)**:
 - Authorization of the transaction is determined by the account's configured keys
-- Uses protocol-defined signature verification for specific key types
 - Must pass validation before any execution begins
 - Ensures gas payment authorization is clear to block builders
 
@@ -582,14 +362,13 @@ While this proposal constrains **validation** to enshrined key types, it does no
 - Once validated, the account's code can implement any logic
 - Supports multisig, timelock, spending limits, session keys, or any custom logic
 - The `calldata` field is always delivered TO the `from` account
-- The account interprets and executes the calldata as it sees fit
 
 
 #### Calldata Delivery
 
 The `calldata` field in an AA transaction is **always delivered to the `from` account**. The account is free to interpret this data however it wishes:
 
-- **EOA (no code)**: Calldata might be ignored (no code to orchastrate actions with)
+- **EOA (no code)**: Calldata might be ignored (no code to orchestrate actions with)
 - **Smart contract account**: Calldata encodes actions for the wallet to take
 
 This unopinionated approach to execution maximizes compatibility and flexibility while maintaining the simplicity of enshrined validation.
@@ -602,15 +381,15 @@ Accounts can be initialized by
 - calling from an existing smart contract wallet implementation
 - setting 7702 code and using an EOA to make first transaction, allowing additional keys
 
-The auth precompile can also enable account initialization by providing counter factuctual addresses and owner setup.
+The auth precompile can also enable account initialization by providing counter factual addresses and owner setup.
 
 ### Standard RPCs
 
-Standard Ethereum RPC methods work seamlessly with validation transactions with minimal modifications:
+Standard Ethereum RPC methods work seamlessly with AA transactions with minimal modifications:
 
 #### `eth_estimateGas`
 
-Works as-is with validation transactions. Accounts can estimate gas for their transaction using the standard RPC call. For accounts that have not yet been initialized, wallet providers can use state overrides to temporarily inject the wallet code during estimation.
+Works as-is with AA transactions. Accounts can estimate gas for their transaction using the standard RPC call. For accounts that have not yet been initialized, wallet providers can use state overrides to temporarily inject the wallet code during estimation.
 
 #### `eth_sendRawTransaction`
 
@@ -618,62 +397,10 @@ Works as-is using the new validation transaction type (`VALIDATION_TX_TYPE`). Th
 
 #### `eth_getTransactionReceipt`
 
-Works as-is but **SHOULD** include an additional `payer` field in the receipt to indicate which address paid for the transaction gas. This is important for validation transactions where the `from` address may differ from the actual gas payer:
+Works as-is but **SHOULD** include an additional `payer` field in the receipt to indicate which address paid for the transaction gas. This is important for AA transactions where the `from` address may differ from the actual gas payer:
 
 The `payer` field helps wallets, indexers, and users accurately track which account paid for transaction execution.
 
-### Security Properties
-
-This proposal provides security guarantees for three key participants: senders, payers, and block builders.
-
-#### Sender Security
-
-**Account Control**: Senders maintain full control over their account's authentication configuration. The account owner can add or remove keys at any time through the Account Configuration precompile.
-
-**EOA Privilege**: The account's original EOA key always retains authorization regardless of configuration changes. This provides a guaranteed recovery mechanism—accounts cannot be permanently locked out through misconfiguration. Users who prefer maximum security can choose to maintain this EOA option, while others can opt into pure smart account implementations that do not have this property.
-
-**Delegation Safety**: Account implementations should exercise caution with `DELEGATECALL` operations, as delegated code could potentially bypass intended authorization controls. Standard wallet implementations should follow security best practices and undergo thorough auditing.
-
-**Replay Protection**: Transactions include `chain_id` and `nonce` fields, providing standard Ethereum replay protection. The `expiry` field adds time-based replay protection, preventing old transactions from being executed indefinitely.
-
-#### Payer Security
-
-**Execution Guarantees**: Payers receive strong guarantees through the `required_pre_state` mechanism. By validating both the wallet implementation and account state (such as ERC-20 balances), payers can ensure:
-- The sender's wallet follows expected payment logic
-- Sufficient funds exist to compensate the payer
-- The transaction will execute as anticipated
-
-**State and Code Validation**: The combination of wallet implementation checks and state conditions gives payers confidence that they will receive payment for their gas sponsorship. 
-
-**Extensibility**: While initially designed for ERC20 token transfers in exchange for sponsorship, the model extends to other payment mechanisms and use cases. Any account can act as a sponsor.
-
-**Payment Flexibility**: On cost-efficient Layer 2 networks where gas costs are minimal (e.g., $0.01 per transaction), simple transfer-based payment models become practical. Wallet/sponsor pairs may implement refund mechanisms for unused gas, or use fixed-price sponsorship models depending on their business requirements.
-
-#### Block Builder Security
-
-**Efficient Validation**: Block builders validate transactions using the warm Account Configuration precompile address, minimizing gas costs and enabling fast validation without EVM execution.
-
-**Simple State Checks**: The `required_pre_state` conditions allow builders to verify transaction validity through simple storage reads. No arbitrary code execution is required before determining if gas will be paid.
-
-**Efficient Invalidation Tracking**: Transactions can be efficiently invalidated by monitoring:
-- Payer balance updates
-- Account authentication configuration changes  
-- Any `required_pre_state` condition changes
-
-This enables efficient mempool management, especially when combined with [EIP-7928](./eip-7928.md) for state diff tracking.
-
-**DoS Protection**: The constrained validation model prevents DoS attacks where malicious transactions consume builder resources without paying for gas. The payer is always known before execution begins, and signature validation is performed using enshrined logic rather than arbitrary code. Mass invalidation is difficult due to restricted prestateChecks where multiple accounts won't be marking the same slot.
-
-#### Gas Abstraction Security
-
-**Payer Protection Model**: Gas sponsors are expected to ensure they receive adequate compensation to cover gas costs. The `required_pre_state` mechanism provides the tools to enforce this:
-- Validate wallet implementation is trusted
-- Verify sufficient token balance exists
-- Confirm other critical state conditions (in the future)
-
-**Griefing Resistance**: Properly configured `required_pre_state` conditions prevent griefing attacks where senders might attempt to cause payers to waste gas without receiving payment. Payers should only sponsor transactions for trusted wallet implementations or accounts they control.
-
-**Mempool Economics**: Mempool operators limit pending sponsored transactions per payer based on the payer's ETH balance, preventing a single payer from flooding the mempool with transactions they cannot afford to execute.
 
 ## Backwards Compatibility
 
@@ -704,77 +431,38 @@ The upgrade requires network-wide adoption through a scheduled hard fork to enab
 
 ## Security Considerations
 
-### Validation Security
+### Validation & Replay Protection
 
-**Protection from Bypass**: Validation logic is enshrined at the protocol level and cannot be bypassed. Signature verification happens before any EVM execution begins, ensuring that only authorized keys can create valid transactions. The Account Configuration precompile enforces access controls—only `msg.sender` can modify their own configuration.
-
-**Validation Failure**: If signature validation fails, the transaction is rejected before entering the mempool or being included in a block. No gas is consumed and no state changes occur. This is a clean rejection at the protocol level.
+**Enshrined Validation**: Validation logic is enshrined at the protocol level and cannot be bypassed. Signature verification happens before any EVM execution begins, using well-established cryptographic algorithms (ECDSA for K1/R1, BLS12-381 for BLS, WebAuthn standards for passkeys). If validation fails, the transaction is rejected before entering the mempool—no gas is consumed and no state changes occur.
 
 **Replay Protection**: Transactions include `chain_id`, `nonce`, and `expiry` fields:
 - `chain_id` prevents cross-chain replay attacks
 - `nonce` provides standard Ethereum sequential replay protection
-- `expiry` prevents stale transactions from being executed indefinitely
+- `expiry` prevents stale transactions from being executed indefinitely and allows users to limit exposure to delayed execution attacks
 
-**Front-Running**: Standard MEV front-running concerns apply as with any Ethereum transaction. The `expiry` field allows users to limit the time window during which their transaction is valid, reducing exposure to delayed execution attacks.
+### Authorization & Key Management
 
-### Gas Security
+**Account Control**: Account owners maintain full control over their authentication configuration through the Account Configuration precompile. Keys can be added or removed at any time, with access control enforced by the protocol—only `msg.sender` can modify their own configuration.
 
-**Bounded Validation Costs**: Gas consumption for validation is bounded by enshrined intrinsic gas costs for each key type. Block builders can compute exact validation costs without executing arbitrary code.
+**EOA Recovery**: The account's original EOA key always retains authorization regardless of configuration changes, providing a guaranteed recovery mechanism. Accounts cannot be permanently locked out through misconfiguration. Users who prefer maximum security can maintain this EOA option, while others can opt into pure smart account implementations.
 
-**No Arbitrary Execution Before Payment**: Unlike proposals with arbitrary validation code, this proposal ensures the gas payer is known before any EVM execution occurs. This prevents DoS attacks where malicious transactions consume validator resources without paying.
+**Delegation Risks**: The `DELEGATE` key type delegates validation to another account (limited to 1 hop). Accounts should carefully consider security implications before delegating validation authority. Account implementations should also exercise caution with `DELEGATECALL` operations, as delegated code could potentially bypass intended authorization controls.
 
-**Payer Griefing Protection**: The `required_pre_state` mechanism protects payers from griefing:
-- Payers verify wallet implementation is trusted before sponsoring
-- State conditions ensure sender has funds to compensate payer
-- Wallet implementations should handle out-of-gas conditions safely
+**Gas Spending Risk**: Compromised keys can authorize transactions with excessively high gas values, putting the account's ETH at risk. Multisigs holding large ETH balances should implement appropriate mitigations in their execution layer.
 
-**Mempool DoS Protection**: Mempool operators limit pending sponsored transactions per payer based on ETH balance, preventing spam attacks with unpayable transactions.
+### Stakeholder Protections
 
-### Authorization Security  
+**Payer Security**: Gas sponsors receive strong guarantees through the `required_pre_state` mechanism. By validating wallet implementations and account state (such as ERC-20 balances), payers can ensure the sender's wallet follows expected payment logic, sufficient funds exist for compensation, and transactions will execute as anticipated. Payers should only sponsor transactions for trusted wallet implementations or accounts they control to prevent griefing attacks.
 
-**Signature Verification**: All signatures are verified using enshrined cryptographic algorithms with well-established security properties. Verification follows standard practices for each key type (ECDSA for K1/R1, BLS12-381 for BLS, WebAuthn standards for passkeys).
+**Block Builder Security**: Builders validate transactions using the warm Account Configuration precompile address, enabling fast validation without EVM execution. The `required_pre_state` conditions allow simple storage reads to verify validity—no arbitrary code execution is required. Mass invalidation is prevented since `required_pre_state` only works for slots that reference the account's address/code. Transactions can be efficiently invalidated by monitoring payer balances, account configuration changes, and `required_pre_state` conditions. This enables efficient mempool management, especially when combined with [EIP-7928](./eip-7928.md) for state diff tracking. The constrained validation model prevents DoS attacks where malicious transactions consume builder resources without paying for gas.
 
-**Key Management**: Account owners maintain full control over their key configuration. Keys can be added or removed at any time. The original EOA key always retains authorization as a recovery mechanism, preventing permanent lockout from misconfiguration.
-
-**Multi-Key Security**: When multiple keys are configured, any single authorized key can sign transactions. Account implementations should implement additional logic (multisig, thresholds, etc.) in their execution layer if multiple approvals are desired.
-
-**Delegation Risks**: The `DELEGATE` key type delegates validation to another account. This delegation is limited to 1 hop to prevent complex delegation chains. Accounts should carefully consider the security implications before delegating validation authority.
-
-### MEV Considerations
-
-**Standard MEV Risks**: AA transactions face standard MEV risks including front-running, back-running, and sandwich attacks. The `expiry` field provides some protection by allowing users to specify time bounds.
-
-**Sponsored Transaction MEV**: Gas-sponsored transactions may create MEV opportunities:
-- Payers might selectively delay transactions to optimize their own profitability
-- Payers could potentially censor transactions that compete with their interests
-- Users should consider these risks when choosing sponsors
-
-
-### Interaction Risks
+### Interaction with Other Proposals
 
 **EIP-7702 Compatibility**: This proposal works well with [EIP-7702](./eip-7702.md). EOAs can use 7702 to temporarily set code, enabling smart wallet functionality. The Account Configuration precompile provides authentication while 7702 provides execution logic.
 
-**EIP-4337 Coexistence**: [EIP-4337](./eip-4337.md) infrastructure continues to operate unchanged. Some users may prefer native AA transactions for gas efficiency, while others may prefer 4337's application-layer approach. Both can coexist and accounts can use both pathways if desired.
+**EIP-4337 Coexistence**: [EIP-4337](./eip-4337.md) infrastructure continues to operate unchanged. Both can coexist and accounts can use both pathways if desired.
 
 **Contract Assumptions**: Existing contracts that make assumptions about `tx.origin` or `msg.sender` behavior continue to work correctly. The `tx.origin` is always the `from` address in AA transactions.
-
-**State Dependencies**: Contracts relying on `required_pre_state` should understand that transactions may be invalidated if state changes. This is similar to standard transaction nonce invalidation but extends to storage slot monitoring.
-
-### Implementation Risks
-
-**Wallet Implementation Security**: The security of gas-sponsored transactions depends heavily on wallet implementation quality:
-
-**Out-of-Gas Handling**: Wallets must implement proper OOG protection to prevent griefing payers
-
-**Payment Logic**: Payer payment must occur in a non-revertible context
-
-**DELEGATECALL Safety**: Wallets using `DELEGATECALL` must carefully audit delegated code. Malicious delegated code could bypass authentication controls or manipulate payment logic.
-
-### Quantum Resistance
-
-**Future-Proofing**: The design explicitly supports adding new key types through future EIPs. When quantum-safe cryptographic algorithms are needed, they can be added as new key types without changing the core AA mechanism.
-
-**Migration Path**: When quantum threats become imminent, the EOA key default authorization may need to be phased out, as noted in the specification. Users would transition to quantum-safe key types through the configuration mechanism.
 
 ## Copyright
 
