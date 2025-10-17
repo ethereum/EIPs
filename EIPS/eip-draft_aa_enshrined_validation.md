@@ -1,7 +1,7 @@
 ---
 title: Standardized Account Abstraction with Onchain Key Configurations
 description: Enable account abstraction through onchain account configurations.
-author: Chris Hunter (@)
+author: Chris Hunter (@_chunter)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
@@ -463,6 +463,10 @@ The upgrade requires network-wide adoption through a scheduled hard fork to enab
 **EIP-4337 Coexistence**: [EIP-4337](./eip-4337.md) infrastructure continues to operate unchanged. Both can coexist and accounts can use both pathways if desired.
 
 **Contract Assumptions**: Existing contracts that make assumptions about `tx.origin` or `msg.sender` behavior continue to work correctly. The `tx.origin` is always the `from` address in AA transactions.
+
+## Future Considerations
+
+A dedicated **payer configuration precompile** could be introduced to reduce the calldata overhead of `required_pre_state` checks. By allowing payers to register commonly-used state validation conditions onchain, transactions could reference these configurations by ID rather than including full condition data in each transaction. This would significantly reduce calldata costs and potentially enable permissionless payer models where standardized validation patterns can be shared across the network.
 
 ## Copyright
 
