@@ -2,7 +2,7 @@
 eip: ..
 title: Precompile for ML-DSA signature verification
 description: Proposal to add precompiled contracts that perform signature verifications using the NIST-standard FIPS-204 ML-DSA (Module Lattice Digital Signature Algorithm) family of lattice-based signatures, in two instantiations (NIST-style SHAKE256-based XOF and an EVM-friendly Keccak-PRNG-based XOF, with a modified public key format to store one polynomial already in the NTT domain to save one NTT for verifiers).
-author: Renaud Dubois, Simon Masson 
+author: Renaud Dubois (@rdubois-crypto), Simon Masson (@simonmasson) 
 discussions-to: ...
 status: Draft
 type: Standards Track
