@@ -3,7 +3,7 @@ eip: 9999
 title: Precompile for Falcon support
 description: Proposal to add a precompiled contract that performs signature verifications using the Falcon signature scheme.
 author: Renaud Dubois, Simon Masson, Antonio Sanso (@asanso), Marius Van Der Wijden, Kevaundray Wedderburn, Zhenfei Zhang
-discussions-to: https://ethereum-magicians.org/t/any-migration-plans-for-post-quantum-cryptographic-digital-signature/21293
+discussions-to: https://ethereum-magicians.org/t/eip-for-a-modular-fndsa/25860
 status: Draft
 type: Standards Track
 category: Core
@@ -76,21 +76,19 @@ The following pseudo-code highlights how these two algorithms are involved in a 
 def falcon512_verify(message: bytes, signature: Tuple[bytes, bytes], pubkey: bytes) -> bool:
     """
     Verify a Falcon Signature following NIST standard
-
     Args:
         message (bytes): The message to sign.
         signature (Tuple[bytes, bytes]): A tuple (r, s), where:
             - r (bytes): The salt.
             - s (bytes): The signature vector.
         pubkey (bytes): The Falcon public key.
-
     Returns:
         bool: True if the signature is valid, False otherwise.
     """
-    
+
     # 1. Compute the Hash To Point Challenge (see 3.1.)
     challenge = HASH_TO_POINT(message, signature)
- 
+
     # 2. Verify Falcon Core Algorithm (see 3.2.)
     return FALCON_CORE(signature, pubkey, challenge)
 ```
@@ -99,21 +97,19 @@ def falcon512_verify(message: bytes, signature: Tuple[bytes, bytes], pubkey: byt
 def ethfalcon512_verify(message: bytes, signature: Tuple[bytes, bytes], pubkey: bytes) -> bool:
     """
     Verify a Falcon Signature (EVM-friendly mode)
-
     Args:
         message (bytes): The message to sign.
         signature (Tuple[bytes, bytes]): A tuple (r, s), where:
             - r (bytes): The salt.
             - s (bytes): The signature vector.
         pubkey (bytes): The Falcon public key.
-
     Returns:
         bool: True if the signature is valid, False otherwise.
     """
-    
+
     # 1. Compute the Hash To Point Challenge (see 3.1.)
     challenge = ETH_HASH_TO_POINT(message, signature)
- 
+
     # 2. Verify Falcon Core Algorithm (see 3.2.)
     return FALCON_CORE(signature, pubkey, challenge)
 ```
@@ -176,20 +172,18 @@ Using one of the XOFs above (SHAKE256 or Keccak-PRNG), it is possible to instant
 def HASH_TO_POINT(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
     """
     Compute the Hash To Point Falcon Challenge.
-
     Args:
         message (bytes32): The original message (hash).
         signature (Tuple[bytes, bytes]): A tuple (r, s), where:
             - r (bytes): The salt.
             - s (bytes): The signature vector.
-
     Returns:
         c: The Hash To Point polynomial challenge as a vector.
     """
-    
+
     # Constants
     q = 12289  # Falcon modulus
-    
+
     # Step 1: Parse Input Data
     r, s2_compressed = signature  # Extract salt and compressed signature vector
 
@@ -214,20 +208,18 @@ def HASH_TO_POINT(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
 def ETH_HASH_TO_POINT(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
     """
     Compute the Hash To Point Falcon Challenge using Keccak-PRNG.
-
     Args:
         message (bytes32): The original message (hash).
         signature (Tuple[bytes, bytes]): A tuple (r, s), where:
             - r (bytes): The salt.
             - s (bytes): The signature vector.
-
     Returns:
         c: The Hash To Point polynomial challenge as a vector.
     """
-    
+
     # Constants
     q = 12289  # Falcon modulus
-    
+
     # Step 1: Parse Input Data
     r, s2_compressed = signature  # Extract salt and compressed signature vector
 
@@ -259,9 +251,8 @@ def ETH_HASH_TO_POINT(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
     -  $c$ is the Hash To Point challenge,
     -  $h$ is the public key, represented in the ntt domain 
     -  $s_2$ is the signature vector.
-    
-    > Note: since $h$ and $s_2$ are polynomials, the operation $*$ is the polynomial multiplication and can be sped up using the Number Theoretic Transform (NTT).
 
+    > Note: since $h$ and $s_2$ are polynomials, the operation $*$ is the polynomial multiplication and can be sped up using the Number Theoretic Transform (NTT).
 4. **Check $L^2$ norm Bound:** Verify that the signature is _short_ by checking the following equation:
     $$ ||(s_1, s_2) ||_2^2 < \lfloor\beta^2\rfloor$$
     where $\beta^2$ is the acceptance bound. For Falcon-512, it is $\lfloor\beta^2\rfloor = 34034726$.
@@ -272,22 +263,20 @@ The following code illustrates Falcon core algorithm:
 def FALCON_CORE(signature: Tuple[bytes, bytes], h: bytes, challenge: bytes) -> bool:
     """
     Verify Falcon Core Algorithm
-
     Args:
         signature (Tuple[bytes, bytes]): A tuple (r, s), where:
             - r (bytes): The salt.
             - s (bytes): The signature vector.
             - h (bytes): The Falcon public key in the ntt domain, computed as h=ntt(pubkey) externally.
             - challenge (bytes): The Falcon Hash To Point Challenge.
-
     Returns:
         bool: True if the signature is valid, False otherwise.
     """
-    
+
     # Constants
     q = 12289  # Falcon modulus
     ACCEPTANCE_BOUND = 34034726  # Falcon-512 acceptance bound
-    
+
     # Step 1: Parse Input Data
     r, s2_compressed = signature  # Extract salt and compressed signature vector
 
@@ -302,15 +291,15 @@ def FALCON_CORE(signature: Tuple[bytes, bytes], h: bytes, challenge: bytes) -> b
 
     # Step 4: Convert to Evaluation domain (NTT)
     s2_ntt = ntt(s2)
-    
+
     # Step 5: Compute the Verification Equation
     tmp_ntt = hadamard_product(s2_ntt, h)  # Element-wise product
     tmp = intt(tmp_ntt) # Convert back to coefficient form (INTT)
     s1 = challenge - tmp
-    
+
     # Step 6: Normalize s1 coefficients to be in the range [-q/2, q/2]
     s1 = normalize_coefficients(s1, q)
-    
+
     # Step 7: Compute Norm Bound Check
     s1_squared = square_each_element(s1)
     s2_squared = square_each_element(s2)
@@ -374,9 +363,11 @@ The precompiled contract FALCON_CORE is proposed with the following input and ou
 
 ### 4.3. Precompiled Contract Gas Usage
 
-The cost of the **HASH_TO_POINT** and **HASH_TO_POINT_ETH** functions is dominated by the call to the underlying hash function. It represents in average 35 calls to the hash function. Taking linearly the cost of keccak256, and avoiding the context switching it represents 1000 gas.
-    
-The cost of **FALCON_CORE** function is dominated by performing 2 NTTs and 1 inverse NTT. One of these NTTs is for the public key and can be precomputed so that the contract requires to perform only 1 NTT and 1 inverse NTT. An estimation of the cost is given by 2000 gas.
+The cost of the **HASH_TO_POINT** and **HASH_TO_POINT_ETH** is set to 1000 gas.
+
+The cost of **FALCON_CORE** is set to 2000 gas.
+
+Thus, the total cost of the signature is 3000 gas.
 
 ## 5. Rationale
 
@@ -393,6 +384,14 @@ Falcon offers several advantages over traditional cryptographic signatures such 
 
 Given the increasing urgency of transitioning to quantum-resistant cryptographic primitives or even having them ready in the event that research into quantum computers speeds up. 
 
+### 5.1 Gas cost explanations
+
+
+The cost of the **HASH_TO_POINT** and **HASH_TO_POINT_ETH** functions is dominated by the call to the underlying hash function. It represents in average 35 calls to the hash function. Taking linearly the cost of keccak256, and avoiding the context switching it represents 1000 gas.
+
+The cost of **FALCON_CORE** function is dominated by performing 2 NTTs and 1 inverse NTT. One of these NTTs is for the public key and can be precomputed so that the contract requires to perform only 1 NTT and 1 inverse NTT. An estimation of the cost is given by 2000 gas.
+
+The cost is interpolated using rule of thumb from SUPERCOPS signatures benchmark results.
 
 ## 6. Backwards Compatibility
 
