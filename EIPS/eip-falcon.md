@@ -1,13 +1,13 @@
 ---
-eip: ????
+eip: 9999
 title: Precompile for Falcon support
 description: Proposal to add a precompiled contract that performs signature verifications using the Falcon signature scheme.
 author: Renaud Dubois, Simon Masson, Antonio Sanso (@asanso), Marius Van Der Wijden, Kevaundray Wedderburn, Zhenfei Zhang
-discussions-to: ...
+discussions-to: https://ethereum-magicians.org/t/any-migration-plans-for-post-quantum-cryptographic-digital-signature/21293
 status: Draft
 type: Standards Track
 category: Core
-created: ????-??-??
+created: 2025-10-17
 ---
 
 # Falcon EIP
