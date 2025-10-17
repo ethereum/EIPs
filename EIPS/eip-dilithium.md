@@ -3,7 +3,7 @@ eip: 9999
 title: Precompile for ML-DSA signature verification
 description: Proposal to add precompiled contracts that perform signature verifications using the NIST-standard FIPS-204 ML-DSA and an EVM-friendly variant 
 author: Renaud Dubois (@rdubois-crypto), Simon Masson (@simonmasson)
-discussions-to: https://ethereum-magicians.org/t/any-migration-plans-for-post-quantum-cryptographic-digital-signature/21293
+discussions-to: https://ethereum-magicians.org/t/add-eip-ml-dsa-verification/25857
 status: Draft
 type: Standards Track
 category: Core
