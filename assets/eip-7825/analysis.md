@@ -11,6 +11,7 @@
 ## Impact Metrics
 
 ### Transaction Impact
+
 | Metric | Value |
 |--------|-------|
 | Affected transactions | 96,564 |
@@ -19,6 +20,7 @@
 | Avg transactions per affected address | 21.0 |
 
 ### Gas Analysis (of Affected)
+
 | Metric | Value |
 |--------|-------|
 | Average gas limit (affected txs) | 24,734,127 |
@@ -29,6 +31,7 @@
 | Transactions with unnecessary high limits | 18,490 (19.15%) |
 
 ### Economic Impact
+
 | Metric | Value |
 |--------|-------|
 | Total additional gas cost | 2,095,905,000 gas units |
@@ -39,6 +42,7 @@
 ## Distribution Analysis
 
 ### Concentration
+
 | Metric | Value |
 |--------|-------|
 | Gini coefficient | 0.870 |
@@ -54,6 +58,7 @@
 - **Blocks**: 1,317,600 (183 days)
 
 ### Distribution
+
 | Gas Limit | Cumulative % | Transaction Count |
 |-----------|--------------|-------------------|
 | ≤21,000 | 26.02% | 63,660,952 |
@@ -71,6 +76,7 @@
 ## Address Analysis
 
 ### Top 10 From Addresses
+
 | Rank | Address | Transactions | Avg Gas Limit | Max Gas Limit |
 |------|---------|--------------|---------------|---------------|
 | 1 | 0x22dcb...e1 | 2,555 | 19,940,819 | 20,025,269 |
@@ -85,6 +91,7 @@
 | 10 | 0xb5b3f...d9 | 1,089 | 19,461,632 | 34,508,005 |
 
 ### Top 10 To Addresses
+
 | Rank | Address | Transactions | % of Total |
 |------|---------|--------------|------------|
 | 1 | 0x06450...f6 | 9,443 | 9.8% |
@@ -99,6 +106,7 @@
 | 10 | 0x22e4a...ad | 2,369 | 2.5% |
 
 ### Concentration Ratios
+
 | Metric | Value |
 |--------|-------|
 | Unique from addresses | 4,601 |
@@ -111,12 +119,14 @@
 ## Migration Analysis
 
 ### Transaction Splitting Requirements
+
 | Splits Required | Address Count | Percentage |
 |-----------------|---------------|------------|
 | 2 | 4,502 | 97.8% |
 | 3 | 99 | 2.2% |
 
 ### Gas Cost Distribution
+
 | Percentile | Additional Gas per Transaction | ETH Cost (Historical) |
 |------------|-------------------------------|----------------------|
 | Min | 21,000 | 0.00000636 |
