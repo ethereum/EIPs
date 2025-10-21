@@ -261,6 +261,8 @@ The smoothstep curve over 63 blocks is gentle. Discount remains close to
 maximum for roughly the first 12 to 16 blocks and decays toward zero near the
 far edge of the window.
 
+![Gas discount percentage graph](../assets/eip-803x/gas_discount_percentage.png)
+
 #### Storage slot (SLOAD) first-access pricing
 
 (warm = 100, cold surcharge = 2100, window = 63)
