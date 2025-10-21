@@ -343,7 +343,26 @@ This mechanism does not correlate across account and storage accesses. Each
 item's discount is independent. Repeated touches within the window do not stack
 beyond updating the last-access block used to compute the distance.
 
+#### Coordinated multi-EOA warm-up behaviour
 
+Because the temporal discount depends on prior-block access only, a coordinated
+actor controlling multiple EOAs may sequence transactions to exploit the
+maximum discount. For example, a lightweight "warm-up" transaction from one
+EOA in block N can touch the relevant storage or account, and mutliple
+transactions from another EOAs in block N+1 (the same operator) can then execute
+at the fully warm-equivalent cost for those items.
+
+This inter-block pipelining is predictable and legitimate. It does not break
+consensus or fairness; it simply encourages temporal clustering of related
+activity. The gas saved is modest compared with the coordination overhead and
+priority fee costs, so it is unlikely to dominate behaviour except for highly
+automated systems.
+
+If desired, network parameters could be tuned to reduce this incentive (for
+example, setting `D_max` slightly below the cold surcharge so that d = 1
+accesses remain marginally more expensive than truly warm accesses). This EIP
+accepts the small, predictable incentive as a reasonable trade-off for
+encouraging efficient state reuse across blocks.
 
 ## Backwards compatibility
 
