@@ -1,8 +1,8 @@
 ---
 eip: 803x
-title: Temporal Locality Gas Discounts
+title: Block Temporal Locality Gas Discounts
 description: Multi‑block temporal locality discounts for state and account access
-author: Ben Adams (@benaadams), Toni Wahrstätter (@nerolation), Amirul Ashraf (@asdacap)
+author: Ben Adams (@benaadams), Toni Wahrstätter (@nerolation), Maria Inês Silva (@misilva73), Amirul Ashraf (@asdacap)
 discussions-to: https://ethereum-magicians.org/
 status: Draft
 type: Standards Track
