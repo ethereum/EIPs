@@ -167,7 +167,9 @@ This proposal requires a scheduled network upgrade but is designed to be forward
 - No changes to state trie structure or database schema required
 - No changes to transaction parsing or RLP encoding
 
-## Example Transaction
+## Reference Implementation
+
+### Example Transaction
 
 Deploying a contract with the same bytecode as the contract at `0x1234...5678`:
 
