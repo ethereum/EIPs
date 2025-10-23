@@ -55,14 +55,11 @@ Where:
 When a contract creation transaction or opcode (`CREATE`/`CREATE2`) successfully completes and returns bytecode `B` of length `L`, compute `H = keccak256(B)` and apply the following gas charges:
 
 **Deduplication check:**
-- If `H ∈ W`: Bytecode is a duplicate
-  - Do NOT charge `GAS_CODE_DEPOSIT * L`
-  - Link the new account's `codeHash` to the existing code hash `H`
-  - The bytecode `B` is NOT persisted (it already exists and it's the current behaviour)
 - If `H ∉ W`: Bytecode is new
   - Charge `GAS_CODE_DEPOSIT * L`
   - Persist bytecode `B` under hash `H`
   - Link the new account's `codeHash` to `H`
+- Otherwise, link the new account's `codeHash` to the existing code hash `H`
 
 **Gas costs:**
 - The cost of reading `codeHash` for access-listed addresses is already covered by EIP-2929/2930 access costs (intrinsic access-list cost and cold→warm state access charges).
@@ -143,7 +140,7 @@ Builds on EIP-2930 access lists and EIP-2929 access costs, requiring minimal pro
 Any address included in the access list automatically contributes to deduplication. This provides automatic gas optimization without requiring explicit flags or special handling.
 
 5. Avoids chain split risks:
-Since no new transaction structure is introduced, pre-fork and post-fork nodes handle the same transactions identically (just with different gas accounting post-fork). This eliminates the risk of chain splits from nodes rejecting transactions with unknown fields.
+Since no new transaction structure is introduced, there's no risk of nodes rejecting transactions with unknown fields. The same transaction format works before and after the fork, with only the gas accounting rules changing at fork activation.
 
 6. Forward compatibility:
 All nodes enforce identical behavior. Wallets can add addresses to access lists to optimize gas, but this doesn't change transaction validity.
