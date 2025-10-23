@@ -1,10 +1,9 @@
 ---
-eip: 9999
+eip: 8052
 title: Precompile for Falcon support
 description: Proposal to add a precompiled contract that performs signature verifications using the Falcon signature scheme.
 author: Renaud Dubois, Simon Masson, Antonio Sanso (@asanso), Marius van der Wijden, Kevaundray Wedderburn, Zhenfei Zhang, Nicolas Consigny
-discussions-to: https://ethereum-magicians.org/t/any-migration-plans-for-post-quantum-cryptographic-digital-signature/21293
-discussions-to: https://ethereum-magicians.org/t/eip-for-a-modular-fndsa/25860
+discussions-to: https://ethereum-magicians.org/t/eip-8052-precompile-for-falcon-support/25860
 status: Draft
 type: Standards Track
 category: Core
