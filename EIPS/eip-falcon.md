@@ -119,7 +119,7 @@ def ethfalcon512_verify(message: bytes, signature: Tuple[bytes, bytes], pubkey: 
     return FALCON_CORE(signature, pubkey, challenge)
 ```
 
-The functions `falcon512_verify` and `ethfalcon512_verify` call the opcodes specified in the next sections: `FALCON_HASH_TO_POINT_SHAKE256`, `FALCON_HASH_TO_POINT_KECCAKPRNG` and `FALCON_CORE`.
+The functions `falcon512_verify` and `ethfalcon512_verify` call the precompiles specified in the next sections: `FALCON_HASH_TO_POINT_SHAKE256`, `FALCON_HASH_TO_POINT_KECCAKPRNG` and `FALCON_CORE`.
 
 
 ### 3.1. Hash-to-Point challenge (normative)
@@ -172,7 +172,7 @@ The hash-to-point function computes eXtendable Output from a hash Function (XOF)
         ```
         Precompile of `Keccak256` are available in the Ethereum Virtual Machine, making this XOF very efficient in the EVM.
 
-Using one of the XOFs above (SHAKE256 or Keccak-PRNG), it is possible to instantiate two (opcode) algorithms for hashing into points:
+Using one of the XOFs above (SHAKE256 or Keccak-PRNG), it is possible to instantiate two (precompiles) algorithms for hashing into points:
 ```python
 def FALCON_HASH_TO_POINT_SHAKE256(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
     """
@@ -340,8 +340,9 @@ it shall also be burned if an error happens during decompression (incorrect enco
 
 
 ## 4. Precompiled Contract Specification
+The precompiled contracts are proposed with the following input and outputs, which are big-endian values:
 
-### 4.1. `FALCON_HASH_TO_POINT_SHAKE256`
+### 4.1. `FALCON_HASH_TO_POINT_SHAKE256` 
 **Input**
 * 32 bytes: message hash `m`
 * 666 bytes: Falcon-512 compressed signature `(r || s2_compressed)`
@@ -352,7 +353,6 @@ it shall also be burned if an error happens during decompression (incorrect enco
 Same I/O as §4.1, but the XOF is Keccak-PRNG. The construction is normative and MUST define: state initialization, domain-separation (if any), counter width and endianness, and block concatenation order.
 
 ### 4.3. `FALCON_CORE`
-The precompiled contract FALCON_CORE is proposed with the following input and outputs, which are big-endian values:
 
 - **Input data**
     - 666 bytes for Falcon-512 compressed signature
