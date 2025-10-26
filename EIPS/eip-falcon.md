@@ -1,0 +1,454 @@
+---
+eip: 9999
+title: Precompile for Falcon support
+description: Proposal to add a precompiled contract that performs signature verifications using the Falcon signature scheme.
+author: Renaud Dubois, Simon Masson, Antonio Sanso (@asanso), Marius Van Der Wijden, Kevaundray Wedderburn, Zhenfei Zhang
+discussions-to: https://ethereum-magicians.org/t/eip-for-a-modular-fndsa/25860
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-10-17
+---
+
+# Falcon EIP
+
+## 1. Abstract
+This proposal creates a precompiled contract that performs signature verifications using the Falcon-512 signature scheme by given parameters of the message hash, signature, and public key. This allows any EVM chain -- principally Ethereum roll-ups -- to integrate this precompiled contract easily.
+The signature scheme can be instantiated in two version:
+* Falcon, the standard signature scheme, fully compliant with the algorithm recommended by the NIST,
+* An EVM-friendly version where the hash function is efficiently computed in the Ethereum Virtual Machine.
+
+Three OPCODES are specified:
+- `HASH_TO_POINT`, that implements the NIST-compliant HashToPoint as described in [Algorithm 3](https://falcon-sign.info/falcon.pdf) of Falcon.
+- `ETH_HASH_TO_POINT`, a EVM-friendly version of HashToPoint.
+- `FALCON_CORE`: the core algorithm of Falcon, that verifies the signature from the obtained (HashToPoint) challenge.
+
+## 2. Motivation
+
+Quantum computers pose a long-term risk to classical cryptographic algorithms. In particular, signature algorithms based on the hardness of the Elliptic Curve Discrete Logarithm Problem (ECDLP) such as secp256k1, are widely used in Ethereum and threaten by quantum algorithms. This exposes potentially on-chain assets and critical infrastructure to quantum adversaries.
+
+Integrating post-quantum signature schemes is crucial to future-proof Ethereum and other EVM-based environments. It shall be noted that infrastructure for post-quantum signatures should be deployed *before* quantum adversaries are known to be practical because it takes on the order of years for existing applications to integrate.
+
+Falcon, a lattice-based scheme standardized by NIST, offers high security against both classical and quantum adversaries. Its compact signature size (~666 bytes for Falcon-512) and its efficient verification algorithm make it well-suited for blockchain applications, where gas usage and transaction throughput are critical considerations.
+<!-- When the public key is also stored together with the signature, it leads to 666 + 897 = 1563 bytes.
+Using the recovery mode, it can be reduced to 1292 + 32 = 1324 bytes. -->
+<!--
+For Falcon,
+    σ=666 (40 bytes of salt, ~626 bytes for s2)
+    pk = 897,
+    TOTAL=1563
+For FalconRec,
+    σ=1292 (40 bytes of salt, ~626 bytes for s1, ~626 bytes for s2),
+    pk = 32,
+    TOTAL=1324
+-->
+
+In the context of the Ethereum Virtual Machine, a precompile for Keccak256 hash function is already available, making Falcon verification much faster when instantiated with an extendable output function derived from Keccak than with SHAKE256, as specified in NIST submission. This EIP specifies a split of the signature verification into two sub procedures: 
+- `HASH_TO_POINT` or `ETH_HASH_TO_POINT`, instantiated with a different eXtendable Output Function: the first with SHAKE256 (as recommended by NIST), the second with Keccak-PRNG (a version that is more efficient when computed in the EVM). In the future, it is possible to define it for SNARK/STARK circuits. An appropriated hash function choice reduces drastically the circuit size and the proving time in the context of ZK applications.
+- `FALCON_CORE`, that does not require any hash computation. This sub-algorithm follows the NIST recommendation so that:
+    - using the SHAKE256 `HASH_TO_POINT`, the signature is fully compliant with the NIST standard,
+    - using the KeccakPRNG `ETH_HASH_TO_POINT`, the verification can be efficient even in the EVM.
+
+Using this separation, two important features are provided: one version being fully compliant with the NIST specification, the other deviating from the standard in order to reduce the gas cost, and opening up to possible computations of Falcon signature ZK proofs.
+
+## 3. Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+Falcon can be instantiated with polynomials of degree $512$ or $1024$, leading to a different security level.  Falcon-512 is chosen, leading to a security level equivalent to RSA2048.
+This setting leads to the following size for signatures and keys:
+
+| Parameter | Falcon |
+| -------- | -------- | 
+| **n** (lattice dimension)     | `512`     |
+| **q** (modulus)     | `12289`     | 
+| Padded signature size      | `666` bytes     | 
+| Public Key size     | `897` bytes     |
+| Private key size     | `1281` bytes     | 
+
+
+From a high level, a signature verification can be decomposed in two steps:
+- The **challenge computation**, that involves the message and the salt, and computes a challenge polynomial using a XOF (instantiated with SHAKE256 and a Keccak-base PRNG here),
+- The **core algorithm**, that compute polynomial arithmetic (with the challenge, the public key and the signature), and finally verify the shortness of the full signature $(s_1,s_2)$.
+
+The following pseudo-code highlights how these two algorithms are involved in a Falcon verification, and how the modularity of the challenge computation opens up to two version of Falcon:
+```python
+def falcon512_verify(message: bytes, signature: Tuple[bytes, bytes], pubkey: bytes) -> bool:
+    """
+    Verify a Falcon Signature following NIST standard
+    Args:
+        message (bytes): The message to sign.
+        signature (Tuple[bytes, bytes]): A tuple (r, s), where:
+            - r (bytes): The salt.
+            - s (bytes): The signature vector.
+        pubkey (bytes): The Falcon public key.
+    Returns:
+        bool: True if the signature is valid, False otherwise.
+    """
+
+    # 1. Compute the Hash To Point Challenge (see 3.1.)
+    challenge = HASH_TO_POINT(message, signature)
+
+    # 2. Verify Falcon Core Algorithm (see 3.2.)
+    return FALCON_CORE(signature, pubkey, challenge)
+```
+
+```python
+def ethfalcon512_verify(message: bytes, signature: Tuple[bytes, bytes], pubkey: bytes) -> bool:
+    """
+    Verify a Falcon Signature (EVM-friendly mode)
+    Args:
+        message (bytes): The message to sign.
+        signature (Tuple[bytes, bytes]): A tuple (r, s), where:
+            - r (bytes): The salt.
+            - s (bytes): The signature vector.
+        pubkey (bytes): The Falcon public key.
+    Returns:
+        bool: True if the signature is valid, False otherwise.
+    """
+
+    # 1. Compute the Hash To Point Challenge (see 3.1.)
+    challenge = ETH_HASH_TO_POINT(message, signature)
+
+    # 2. Verify Falcon Core Algorithm (see 3.2.)
+    return FALCON_CORE(signature, pubkey, challenge)
+```
+
+The functions `falcon512_verify` and `ethfalcon512_verify` call the opcodes specified in the next sections: `HASH_TO_POINT`, `ETH_HASH_TO_POINT` and `FALCON_CORE`.
+
+
+### 3.1. Hash To Point Challenge
+
+1. **Parse Input Data:** Check the byte sizes and then extract the message and the signature. The parsed signature is a tuple of values $(r, s_2)$. $r$ is denoted as the salt and contains bytes, and $s_2$ is denoted as the signature vector, a vector of elements mod $q$.
+2. **Verify Well-formedness:** Verify that the signature contains 40 bytes of salt for $r$.
+<!-- See the `Required Checks in Verification` section for more details. -->
+3. **Compute the challenge $c$:** the challenge is obtained from hash-to-point on the salt $r$ of the signature and the message. The output $c$ is a polynomial of degree 512, stored in 896 bytes.
+The hash-to-point function computes eXtendable Output from a hash Function (XOF). This EIP provides two instantiations of a XOF:
+    - SHAKE256 is the XOF provided in NIST submission, a sponge construction derived from SHA256. Extracting bytes using SHAKE256 calls the `Keccak_f` permutation:
+        ```python
+        def SHAKE256_init():
+            create an empty sponge state
+
+        def SHAKE256_inject(data):
+            absorb into Keccak sponge state
+
+        def SHAKE256_flip():
+            pad input and finalize sponge
+            (no fixed-length digest yet)
+
+        def SHAKE256_extract(state, length):
+            output = []
+            while output.size < length:
+                block = Keccak_f(state) # apply permutation
+                output.append(state_part) # take r-bit "rate" portion
+            return first 'length' bytes of output
+        ```
+        While this construction is standardized, it is expensive when computed in the Ethereum Virtual Machine because `Keccak_f` has no EVM opcode.
+    - Keccak-PRNG is a XOF that is build from a counter-mode PRNG based on Keccak256. Generating new chunks of bytes requires an incrementing counter.
+        ```python
+        def KeccakPRNG_init():
+            create an empty buffer
+
+        def KeccakPRNG_inject(data):
+            buffer.append(data)
+
+        def KeccakPRNG_flip():
+            state = Keccak256(buffer) # fixed 32-byte state
+            counter = 0
+
+        def KeccakPRNG_extract(state, length):
+            output = []
+            counter = 0
+            while output.size < length:
+                block = Keccak256(state || counter)
+                output.append(block)
+                counter = counter + 1
+            return first 'length' bytes of output
+        ```
+        Precompile of `Keccak256` are available in the Ethereum Virtual Machine, making this XOF very efficient in the EVM.
+
+Using one of the XOFs above (SHAKE256 or Keccak-PRNG), it is possible to instantiate two (opcode) algorithms for hashing into points:
+```python
+def HASH_TO_POINT(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
+    """
+    Compute the Hash To Point Falcon Challenge.
+    Args:
+        message (bytes32): The original message (hash).
+        signature (Tuple[bytes, bytes]): A tuple (r, s), where:
+            - r (bytes): The salt.
+            - s (bytes): The signature vector.
+    Returns:
+        c: The Hash To Point polynomial challenge as a vector.
+    """
+
+    # Constants
+    q = 12289  # Falcon modulus
+
+    # Step 1: Parse Input Data
+    r, s2_compressed = signature  # Extract salt and compressed signature vector
+
+    # Step 2: Verify Well-formedness
+    if not is_valid_signature_format(s2_compressed, pubkey):
+        return False
+
+    # Step 3: Compute the challenge vector HashToPoint(r || message)
+    c = [0 for i in range(n)]
+    SHAKE256_init()
+    SHAKE256_inject(r+message)
+    i = 0
+    while i < n do
+        t = SHAKE256_extract(16)
+        if t < 61445 then
+            c_i = t mod q
+            i = i + 1
+    return c
+```
+
+```python
+def ETH_HASH_TO_POINT(message: bytes32, signature: Tuple[bytes, bytes]) -> bool:
+    """
+    Compute the Hash To Point Falcon Challenge using Keccak-PRNG.
+    Args:
+        message (bytes32): The original message (hash).
+        signature (Tuple[bytes, bytes]): A tuple (r, s), where:
+            - r (bytes): The salt.
+            - s (bytes): The signature vector.
+    Returns:
+        c: The Hash To Point polynomial challenge as a vector.
+    """
+
+    # Constants
+    q = 12289  # Falcon modulus
+
+    # Step 1: Parse Input Data
+    r, s2_compressed = signature  # Extract salt and compressed signature vector
+
+    # Step 2: Verify Well-formedness
+    if not is_valid_signature_format(s2_compressed, pubkey):
+        return False
+
+    # Step 3: Compute the challenge vector HashToPoint(r || message)
+    c = [0 for i in range(n)]
+    KeccakPRNG_init()
+    KeccakPRNG_inject(r+message)
+    i = 0
+    while i < n do
+        t = KeccakPRNG_extract(16)
+        if t < 61445 then
+            c_i = t mod q
+            i = i + 1
+    return c
+```
+
+### 3.2 Core algorithm
+
+1. **Parse Input Data:** Check the byte sizes and then extract the public key, the Hash To Point Challenge and the signature.
+    - The parsed public key  $h$, interpreted as a vector of elements mod $q$,
+    - The parsed signature  $(r, s_2)$. $r$ is denoted as the salt and $s_2$ is denoted as the signature vector, made of elements mod $q$.
+2. **Verify Well-formedness:** Verify that the signature, Hash To Point Challenge and public key have the correct number of elements and is canonical.
+<!-- See the `Required Checks in Verification` section for more details. -->
+3. **Compute $s_1$ from $s_2$ and $h$.** $s_1 = c - h * s_2$ where:
+    -  $c$ is the Hash To Point challenge,
+    -  $h$ is the public key, represented in the ntt domain 
+    -  $s_2$ is the signature vector.
+
+    > Note: since $h$ and $s_2$ are polynomials, the operation $*$ is the polynomial multiplication and can be sped up using the Number Theoretic Transform (NTT).
+4. **Check $L^2$ norm Bound:** Verify that the signature is _short_ by checking the following equation:
+    $$ ||(s_1, s_2) ||_2^2 < \lfloor\beta^2\rfloor$$
+    where $\beta^2$ is the acceptance bound. For Falcon-512, it is $\lfloor\beta^2\rfloor = 34034726$.
+
+
+The following code illustrates Falcon core algorithm:
+```python
+def FALCON_CORE(signature: Tuple[bytes, bytes], h: bytes, challenge: bytes) -> bool:
+    """
+    Verify Falcon Core Algorithm
+    Args:
+        signature (Tuple[bytes, bytes]): A tuple (r, s), where:
+            - r (bytes): The salt.
+            - s (bytes): The signature vector.
+            - h (bytes): The Falcon public key in the ntt domain, computed as h=ntt(pubkey) externally.
+            - challenge (bytes): The Falcon Hash To Point Challenge.
+    Returns:
+        bool: True if the signature is valid, False otherwise.
+    """
+
+    # Constants
+    q = 12289  # Falcon modulus
+    ACCEPTANCE_BOUND = 34034726  # Falcon-512 acceptance bound
+
+    # Step 1: Parse Input Data
+    r, s2_compressed = signature  # Extract salt and compressed signature vector
+
+    # Step 2: Verify Well-formedness
+    if not is_valid_signature_format(s2_compressed, pubkey):
+        return False
+
+    # Step 3: Decompress Signature Vector
+    s2 = decompress(s2_compressed)  # Convert compressed signature to full form
+    if s2 is None: # Reject invalid encodings 
+        return False
+
+    # Step 4: Convert to Evaluation domain (NTT)
+    s2_ntt = ntt(s2)
+
+    # Step 5: Compute the Verification Equation
+    tmp_ntt = hadamard_product(s2_ntt, h)  # Element-wise product
+    tmp = intt(tmp_ntt) # Convert back to coefficient form (INTT)
+    s1 = challenge - tmp
+
+    # Step 6: Normalize s1 coefficients to be in the range [-q/2, q/2]
+    s1 = normalize_coefficients(s1, q)
+
+    # Step 7: Compute Norm Bound Check
+    s1_squared = square_each_element(s1)
+    s2_squared = square_each_element(s2)
+
+    total_norm = sum(s1_squared) + sum(s2_squared)
+
+    # Step 8: Compare with Acceptance Bound
+    # To ensure signature is short
+    return total_norm < ACCEPTANCE_BOUND  # Falcon-512: β² = 34,034,726
+```
+
+### 3.3. Required Checks in Falcon Verification
+The following requirements MUST be checked by the precompiled contract to verify signature components are valid:
+
+**Raw Input data**
+- Verify that the message is 32-bytes long,
+- Verify that the public key is 897-bytes long,
+- Verify that the signature is 666-bytes long.
+
+**Parsed Input data**
+- Verify that the public key consists of 512 elements, where each element is between $[0, q-1]$,
+- Verify that the signature vector in the signature consists of 512 elements, where each element is between $[0, q-1]$,
+- Verify that the salt in the signature is 40-bytes long.
+
+**Gas burning on error**
+if one of the above condition is not met then all the gas supplied along with a CALL or STATICCALL is burned.
+it shall also be burned if an error happens during decompression (incorrect encodings).
+
+
+## 4. Precompiled Contract Specification
+
+### 4.1. Hash To Point precompiled contract
+The precompiled contract HASH_TO_POINT is proposed with the following input and outputs, which are big-endian values:
+
+- **Input data**
+    - 32 bytes for the message
+    - 666 bytes for Falcon-512 compressed signature
+    <!-- - 897 bytes for Falcon-512 public key -->
+- **Output data**:
+    - the polynomial Hash To Point challenge as (14*512 = ) 897 bytes.
+
+#### Error Cases
+- Invalid input length (not compliant to described input)
+
+### 4.2. Falcon Core precompiled contract
+The precompiled contract FALCON_CORE is proposed with the following input and outputs, which are big-endian values:
+
+- **Input data**
+    - 666 bytes for Falcon-512 compressed signature
+    - 897 bytes for Falcon-512 public key
+    - 897 bytes for the Hash To Point Challenge
+- **Output data**:
+    - If the core algorithm process succeeds, it returns 1 in 32 bytes format.
+    - If the core algorithm process fails, it does not return any output data.
+
+#### Error Cases
+- Invalid input length (not compliant to described input)
+- Invalid field element encoding (≥ q)
+- Invalid norm  bound 
+- Signature verification failure
+
+### 4.3. Precompiled Contract Gas Usage
+
+The cost of the **HASH_TO_POINT** and **HASH_TO_POINT_ETH** is set to 1000 gas.
+
+The cost of **FALCON_CORE** is set to 2000 gas.
+
+Thus, the total cost of the signature is 3000 gas.
+
+## 5. Rationale
+
+The Falcon signature scheme was selected as a NIST-standardized post-quantum cryptographic algorithm due to its strong security guarantees and efficiency.
+
+Falcon is a signature algorithm build from lattice-based cryptography. Specifically, its hardness relies on the Short Integer Solution (SIS) problem over NTRU lattices, which is believed to be hard for both classical and quantum computers. 
+
+Falcon offers several advantages over traditional cryptographic signatures such as secp256k1 and secp256r1:
+
+- **Efficiency**: Falcon is highly optimized for constrained environments, offering small signature sizes (666 bytes for Falcon-512) and fast verification time. This makes it well-suited for Ethereum, where gas costs and computational efficiency are critical factors.
+- **NIST Standardization**: Falcon was selected as part of NIST Post-Quantum Cryptography Standardization process, ensuring that it meets rigorous security and performance criteria.
+- **Enabling Future-Proof Smart Contracts**: With the integration of Falcon, Ethereum roll-ups and smart contract applications can start adopting quantum-secure schemes that remain secure even when we have quantum computers.
+- **Compatibility with Existing EVM Designs**: While Falcon operates on fundamentally different cryptographic assumptions than elliptic curves, its verification process can be efficiently implemented as a precompiled contract with similar APIs to classical signature schemes like secp256r1.
+
+Given the increasing urgency of transitioning to quantum-resistant cryptographic primitives or even having them ready in the event that research into quantum computers speeds up. 
+
+### 5.1 Gas cost explanations
+
+
+The cost of the **HASH_TO_POINT** and **HASH_TO_POINT_ETH** functions is dominated by the call to the underlying hash function. It represents in average 35 calls to the hash function. Taking linearly the cost of keccak256, and avoiding the context switching it represents 1000 gas.
+
+The cost of **FALCON_CORE** function is dominated by performing 2 NTTs and 1 inverse NTT. One of these NTTs is for the public key and can be precomputed so that the contract requires to perform only 1 NTT and 1 inverse NTT. An estimation of the cost is given by 2000 gas.
+
+The cost is interpolated using rule of thumb from SUPERCOPS signatures benchmark results.
+
+## 6. Backwards Compatibility
+
+In compliance with EIP-7932,  the necessary parameters and structure for its integration are provided. `ALG_TYPE = 0xFA`  uniquely identifies Falcon-512 transactions, set MAX_SIZE = 699 bytes to accommodate the fixed-length signature_info container (comprising a 1-byte version tag, a 666-byte Falcon signature, and a 32-byte public key hash), and recommend a `GAS_PENALTY` of approximately `3000` gas subject to benchmarking. The verification function follows the EIP-7932 model, parsing the signature_info, recovering the corresponding Falcon public key, verifying the signature against the transaction payload hash, and deriving the signer’s Ethereum address as the last 20 bytes of keccak256(pubkey). This definition ensures that Falcon-512 can be cleanly adopted within the `AlgorithmicTransaction` container specified by EIP-7932.
+
+```python
+signature_info = Container[
+    # 0xFA for Falcon-512 NIST-compliant,
+    # 0xFB for Falcon-512 for the EVM-friendly version,
+    version: uint8
+    # Falcon-512 signature, padded if shorter
+    signature: ByteVector[666]
+    # keccak256(pubkey)[12:]
+    pubkey_hash: ByteVector[20]
+]
+```
+
+In the format of EIP-7932:
+- For the NIST-compliant version:
+    ```python
+    verify(signature_info: bytes, payload_hash: Hash32) -> ExecutionAddress:
+        assert len(signature_info) == 699
+        version      = signature_info[0]
+        signature    = signature_info[1:667]
+        pubkey_hash  = signature_info[667:687]
+        assert version == 0xFA
+        pubkey = lookup_pubkey(pubkey_hash)
+        assert falcon512_verify(pubkey, signature, payload_hash)
+        return ExecutionAddress(keccak256(pubkey)[12:])
+    ```
+- For the EVM-friendly version:
+    ```python
+    verify(signature_info: bytes, payload_hash: Hash32) -> ExecutionAddress:
+        assert len(signature_info) == 699
+        version      = signature_info[0]
+        signature    = signature_info[1:667]
+        pubkey_hash  = signature_info[667:687]
+        assert version == 0xFB
+        pubkey = lookup_pubkey(pubkey_hash)
+        assert ethfalcon512_verify(pubkey, signature, payload_hash)
+        return ExecutionAddress(keccak256(pubkey)[12:])
+    ```
+
+## 7. Test Cases
+
+A set of test vectors for verifying implementations is located in a separate file (to be provided for each opcode). For the NIST compliant version, KATS are reproduced.
+
+
+## 8. Reference Implementation
+
+An implementation is provided in `assets` (TODO). For the NIST-compliant version, KAT vectors of the NIST submission are valid. 
+
+**TODO: We can modify geth to include falcon-512 as a reference. (Similar to secp256r1 signature verification)**
+
+## 9. Security Considerations
+
+The derivation path to obtain the private key from the seed is (tbd).
+
+## 10. Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
