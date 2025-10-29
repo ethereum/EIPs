@@ -3,7 +3,7 @@ eip: [to-be-assigned]
 title: Upgrade Mascots
 description: Process for assigning a mascot to each Ethereum network upgrade
 author: Jordan Holberg (@eviljordan), Andrew B Coathup (@abcoathup)
-discussions-to: https://ethereum-magicians.org/
+discussions-to: https://ethereum-magicians.org/t/eip-tba-upgrade-mascots/26009
 status: Draft
 type: Meta
 created: 2024-10-29
