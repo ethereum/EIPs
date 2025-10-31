@@ -15,7 +15,7 @@ This EIP extends the existing `eth_subscribe` JSON-RPC method with a new subscri
 
 ## Motivation
 
-Current transaction submission workflows require separate calls to `eth_sendRawTransaction` followed by repeated polling of `eth_getTransactionReceipt`, creating unnecessary latency and network overhead. While [EIP-7966](https://github.com/SmoothBot/EIPs/blob/master/EIPS/eip-7966.md) proposes `eth_sendRawTransactionSync` to address this through a synchronous blocking approach, blocking HTTP connections presents significant drawbacks:
+Current transaction submission workflows require separate calls to `eth_sendRawTransaction` followed by repeated polling of `eth_getTransactionReceipt`, creating unnecessary latency and network overhead. While [EIP-7966](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7966.md) proposes `eth_sendRawTransactionSync` to address this through a synchronous blocking approach, blocking HTTP connections presents significant drawbacks:
 
 - **Connection hogging**: Each transaction blocks one HTTP connection until confirmation or timeout
 - **Limited scalability**: Cannot efficiently monitor multiple transactions over a single connection
