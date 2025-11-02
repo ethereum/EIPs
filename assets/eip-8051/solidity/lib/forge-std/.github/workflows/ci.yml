@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Print forge version
+        run: forge --version
+
+      # Backwards compatibility checks:
+      # - the oldest and newest version of each supported minor version
+      # - versions with specific issues
+      - name: Check compatibility with latest
+        if: always()
+        run: |
+          output=$(forge build --skip test)
+          if echo "$output" | grep -q "Warning"; then
+            echo "$output"
+            exit 1
+          fi
+
+      - name: Check compatibility with 0.8.0
+        if: always()
+        run: |
+          output=$(forge build --skip test --use solc:0.8.0)
+          if echo "$output" | grep -q "Warning"; then
+            echo "$output"
+            exit 1
+          fi
+
+      - name: Check compatibility with 0.7.6
+        if: always()
+        run: |
+          output=$(forge build --skip test --use solc:0.7.6)
+          if echo "$output" | grep -q "Warning"; then
+            echo "$output"
+            exit 1
+          fi
+
+      - name: Check compatibility with 0.7.0
+        if: always()
+        run: |
+          output=$(forge build --skip test --use solc:0.7.0)
+          if echo "$output" | grep -q "Warning"; then
+            echo "$output"
+            exit 1
+          fi
+
+      - name: Check compatibility with 0.6.12
+        if: always()
+        run: |
+          output=$(forge build --skip test --use solc:0.6.12)
+          if echo "$output" | grep -q "Warning"; then
+            echo "$output"
+            exit 1
+          fi
+
+      - name: Check compatibility with 0.6.2
+        if: always()
+        run: |
+          output=$(forge build --skip test --use solc:0.6.2)
+          if echo "$output" | grep -q "Warning"; then
+            echo "$output"
+            exit 1
+          fi
+
+      # via-ir compilation time checks.
+      - name: Measure compilation time of Test with 0.8.17 --via-ir
+        if: always()
+        run: forge build --skip test --contracts test/compilation/CompilationTest.sol --use solc:0.8.17 --via-ir
+
+      - name: Measure compilation time of TestBase with 0.8.17 --via-ir
+        if: always()
+        run: forge build --skip test --contracts test/compilation/CompilationTestBase.sol --use solc:0.8.17 --via-ir
+
+      - name: Measure compilation time of Script with 0.8.17 --via-ir
+        if: always()
+        run: forge build --skip test --contracts test/compilation/CompilationScript.sol --use solc:0.8.17 --via-ir
+
+      - name: Measure compilation time of ScriptBase with 0.8.17 --via-ir
+        if: always()
+        run: forge build --skip test --contracts test/compilation/CompilationScriptBase.sol --use solc:0.8.17 --via-ir
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Print forge version
+        run: forge --version
+
+      - name: Run tests
+        run: forge test -vvv
+
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Print forge version
+        run: forge --version
+
+      - name: Check formatting
+        run: forge fmt --check

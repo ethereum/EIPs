@@ -1,0 +1,12 @@
+{
+  "vsId": 42,
+  "algorithm": "ML-DSA",
+  "mode": "sigVer",
+  "revision": "FIPS204",
+  "isSample": false,
+  "parameterSets": [
+    "ML-DSA-44",
+    "ML-DSA-65",
+    "ML-DSA-87"
+  ]
+}
