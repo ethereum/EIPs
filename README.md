@@ -85,3 +85,5 @@ eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
 2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
 
 More information on Jekyll and GitHub Pages [here](https://docs.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
+
+> **Note**: If you encounter issues with Ruby version compatibility, consider using a Ruby version manager like `rbenv` or `rvm` to manage multiple Ruby versions.
