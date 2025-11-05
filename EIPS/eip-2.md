@@ -14,11 +14,11 @@ created: 2015-11-15
 
 ### Parameters
 
-|   FORK_BLKNUM   | CHAIN_NAME  |
-|-----------------|-------------|
-|    1,150,000    | Main net    |
-|   494,000       | Morden      |
-|    0            | Future testnets    |
+| HOMESTEAD_FORK_BLKNUM | CHAIN_NAME       |
+|-----------------------|------------------|
+| 1,150,000             | Main net         |
+| 494,000               | Morden           |
+| 0                     | Future testnets  |
 
 # Specification
 
