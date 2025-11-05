@@ -24,7 +24,6 @@ This EIP defines a new [EIP-7932](../../EIPS/eip-7932.md) algorithmic type with 
 | - | - |
 | `ALG_TYPE` | `Bytes1(0x0)` |
 | `GAS_PENALTY`| `0` |
-| `MAX_SIZE` | `65` |
 
 ```python
 def verify(signature_info: bytes, parent_hash: Hash32) -> ExecutionAddress:
