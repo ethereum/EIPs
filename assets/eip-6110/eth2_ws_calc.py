@@ -4,11 +4,10 @@ This script calculates the Eth2 Weak Subjectivity period as defined by eth2.0-sp
 
 from eth2spec.phase0.mainnet import (
     uint64, Ether,
-    ETH_TO_GWEI, 
-    MAX_DEPOSITS, 
-    MAX_EFFECTIVE_BALANCE,  
-    SLOTS_PER_EPOCH, 
-    config, 
+    ETH_TO_GWEI,
+    MAX_EFFECTIVE_BALANCE,
+    SLOTS_PER_EPOCH,
+    config,
 )
 
 MIN_VALIDATOR_WITHDRAWABILITY_DELAY = config.MIN_VALIDATOR_WITHDRAWABILITY_DELAY
