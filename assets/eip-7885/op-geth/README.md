@@ -1,146 +1,148 @@
-# Optimism-geth with NTT Precompiles
+# Optimism-geth with NTT Precompiles (liboqs Implementation)
 
-This is a fork of `op-geth` that implements [EIP-7885](../../../EIPS/eip-7885.md) precompiled contracts for Number Theoretic Transform (NTT) operations and vectorized modular arithmetic.
+Fork of `op-geth` with precompiled contracts for Number Theoretic Transform (NTT) operations using [liboqs](https://github.com/open-quantum-safe/liboqs) via CGO bindings, enabling efficient on-chain post-quantum cryptographic operations.
 
 ## Precompiled Contracts
 
-Three precompiled contracts are added at addresses `0x12`, `0x13`, and `0x14` in the **Optimism Isthmus** hardfork:
+| Address | Name | Description |
+|---------|------|-------------|
+| `0x12` | NTT_FW | Forward NTT using liboqs (Falcon-512/1024, ML-DSA) |
+| `0x13` | NTT_INV | Inverse NTT using liboqs (same schemes as NTT_FW) |
+| `0x14` | VECMULMOD | Element-wise modular multiplication: `result[i] = (a[i] * b[i]) mod q` |
+| `0x15` | VECADDMOD | Element-wise modular addition: `result[i] = (a[i] + b[i]) mod q` |
 
-- **`0x12`: NTT**: Number Theoretic Transform operations using the Lattigo library. Supports both forward and inverse NTT transformations.
-- **`0x13`: VECMULMOD**: Vectorized element-wise modular multiplication in the NTT domain using Barrett reduction.
-- **`0x14`: VECADDMOD**: Vectorized element-wise modular addition in the NTT domain.
+### Supported Schemes
 
-## Implementation Details
+| Scheme | Ring Degree | Modulus | Element Size |
+|--------|-------------|---------|--------------|
+| Falcon-512 | 512 | 12289 | uint16 (2 bytes) |
+| Falcon-1024 | 1024 | 12289 | uint16 (2 bytes) |
+| ML-DSA | 256 | 8380417 | int32 (4 bytes) |
 
-### NTT Precompile (0x12)
+## Installation
 
-The NTT precompile accepts input in the following format:
+### 1. Install liboqs with NTT CGO Bindings
 
-- `operation` (1 byte): `0x00` for forward NTT, `0x01` for inverse NTT
-- `ring_degree` (4 bytes): Power of 2, minimum 16
-- `modulus` (8 bytes): NTT-friendly prime where `q ≡ 1 (mod 2N)`
-- `coefficients` (8\*N bytes): Ring coefficients as 64-bit integers
+```bash
+# Clone and install dependencies
+git clone -b feature/ntt-cgo-bindings https://github.com/yhl125/liboqs.git
+sudo apt install astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind pkg-config
 
-**Gas Costing**: A fixed gas cost of 70,000 is applied, targeting approximately 50 mgas/s performance to maintain consistency with existing precompiles like `ecrecover`.
-
-### VECMULMOD Precompile (0x13)
-
-Performs element-wise modular multiplication of two vectors in the NTT domain: `result[i] = (a[i] * b[i]) mod q`
-
-Input format:
-
-- `ring_degree` (4 bytes): Power of 2, minimum 16
-- `modulus` (8 bytes): NTT-friendly prime where `q ≡ 1 (mod 2N)`
-- `vector_a` (8\*N bytes): First vector coefficients
-- `vector_b` (8\*N bytes): Second vector coefficients
-
-**Gas Costing**: Uses a memory-aware formula reflecting the dominant overhead of memory allocation, targeting approximately 50 mgas/s performance:
-
-```
-Gas = BASE_COST + (COMPUTE_COST_PER_ELEMENT × N)
-    = 72,000 + (7 × N)
+# Build liboqs and Go bindings
+cd liboqs/bindings/go
+make all
 ```
 
-Where:
+### 2. Configure Environment
 
-- `BASE_COST` (72,000 gas): Memory allocation overhead
-- `COMPUTE_COST_PER_ELEMENT` (7 gas): Barrett reduction multiplication per element
-
-### VECADDMOD Precompile (0x14)
-
-Performs element-wise modular addition of two vectors: `result[i] = (a[i] + b[i]) mod q`
-
-Input format: Same as VECMULMOD (0x13)
-
-**Gas Costing**: Uses the same memory-aware formula with cheaper compute cost, targeting approximately 50 mgas/s performance:
-
-```
-Gas = BASE_COST + (COMPUTE_COST_PER_ELEMENT × N)
-    = 72,000 + (5 × N)
+```bash
+# Set paths (adjust to your installation directory)
+export PKG_CONFIG_PATH=/path/to/liboqs/bindings/go/.config:$PKG_CONFIG_PATH
+export DYLD_LIBRARY_PATH=/path/to/liboqs/build/lib:$DYLD_LIBRARY_PATH  # macOS
+export LD_LIBRARY_PATH=/path/to/liboqs/build/lib:$LD_LIBRARY_PATH      # Linux
 ```
 
-## Tests and Benchmarks
+### 3. Build op-geth
 
-Comprehensive tests and benchmarks are implemented in `core/vm/contracts_test.go`, including:
+```bash
+make geth
+```
 
-### NTT Tests (0x12)
+**Requirements:** Go 1.23+, pkg-config, CMake, Ninja
 
-- **Malformed Input Tests**: 8 test cases covering invalid operations, ring degrees, moduli, and coefficients
-- **Forward/Inverse NTT Tests**: Round-trip validation ensuring `INTT(NTT(x)) = x`
-- **Crypto Standards Benchmarks**: Performance testing with real-world parameters from Falcon-512, Kyber-128, and Dilithium-256
+**Detailed instructions:** [liboqs Go bindings README](https://github.com/yhl125/liboqs/tree/feature/ntt-cgo-bindings/bindings/go)
 
-### Vector Operations Tests (0x13, 0x14)
+## API Reference
 
-- **Unified Malformed Input Tests**: 7 test cases covering invalid ring degrees, moduli, and input lengths for both VECMULMOD and VECADDMOD
-- **Functional Tests**: Validates correct element-wise operations with small test vectors
-- **Crypto Standards Benchmarks**: Performance testing with Falcon-512, Kyber-128, and Dilithium-256 parameters
+### NTT_FW (0x12) - Forward Transform
+
+Transforms coefficients into NTT domain using liboqs.
+
+**Input:**
+```
+[0:4]   ring_degree (uint32, big-endian)
+[4:12]  modulus (uint64, big-endian)
+[12:*]  coefficients (Falcon: uint16×N, ML-DSA: int32×N, big-endian)
+```
+
+**Output:** NTT-transformed coefficients (same format as input)
+
+**Gas Cost:**
+- Falcon-512: 500 gas (~9.4μs, 53 mgas/s)
+- Falcon-1024: 1,080 gas (~20.4μs, 53 mgas/s)
+- ML-DSA: 256 gas (~4.8μs, 53 mgas/s)
+
+### NTT_INV (0x13) - Inverse Transform
+
+Transforms NTT domain coefficients back to standard representation.
+
+**Input:** Same as NTT_FW (coefficients in NTT domain)
+
+**Output:** Coefficients in standard representation
+
+**Gas Cost:**
+- Falcon-512: 500 gas (~9.4μs, 53 mgas/s)
+- Falcon-1024: 1,080 gas (~20.3μs, 53 mgas/s)
+- ML-DSA: 340 gas (~6.4μs, 53 mgas/s)
+
+### VECMULMOD (0x14) - Vector Multiplication
+
+Element-wise modular multiplication in NTT domain.
+
+**Input:**
+```
+[0:4]   ring_degree (uint32, big-endian)
+[4:12]  modulus (uint64, big-endian)
+[12:12+n*size] vector_a
+[12+n*size:*]  vector_b
+```
+
+**Output:** Element-wise product `(a[i] * b[i]) mod q`
+
+**Gas Cost:** `ceil(0.32 × n)`
+- Falcon-512: 164 gas (~2.9μs, 56 mgas/s)
+- Falcon-1024: 328 gas (~6.0μs, 55 mgas/s)
+- ML-DSA: 82 gas (~2.0μs, 42 mgas/s)
+
+### VECADDMOD (0x15) - Vector Addition
+
+Element-wise modular addition.
+
+**Input:** Same as VECMULMOD
+
+**Output:** Element-wise sum `(a[i] + b[i]) mod q`
+
+**Gas Cost:** `ceil(0.3 × n)`
+- Falcon-512: 154 gas (~2.8μs, 55 mgas/s)
+- Falcon-1024: 308 gas (~5.8μs, 53 mgas/s)
+- ML-DSA: 77 gas (~1.6μs, 47 mgas/s)
+
+## Testing
+
+```bash
+cd core/vm
+
+# All NTT tests
+go test -v -run TestPrecompiled.*NTT
+
+# Specific tests
+go test -v -run TestPrecompiledNTT_FW
+go test -v -run TestPrecompiledNTT_VECMULMOD
+
+# Benchmarks
+go test -bench=BenchmarkPrecompiledNTT -benchtime=5s
+```
+
+**Test Coverage:**
+- Scheme detection (Falcon-512/1024, ML-DSA)
+- Input validation (malformed inputs, invalid parameters)
+- Round-trip verification (`INTT(NTT(x)) = x`)
+- Cross-scheme isolation
+- Performance benchmarks with crypto standards
 
 ### Benchmark Results
 
 Benchmarks were run on an Intel(R) Xeon(R) CPU @ 2.20GHz. For detailed results, please see the files below:
 
 - [Ecrecover Benchmark Test Results](./benchmark_results/BenchmarkPrecompiledEcrecover)
-- [NTT Benchmark Test Results](./benchmark_results/BenchmarkPrecompiledNTTCryptoStandards)
-- [Vector Operations Benchmark Test Results](./benchmark_results/BenchmarkPrecompiledNTTVecOpsCryptoStandards)
-
-## Running Tests
-
-### Unit Tests
-
-```bash
-# Run all NTT-related tests
-go test ./core/vm -v -run TestPrecompiledNTT
-
-# Run malformed input tests
-go test ./core/vm -v -run TestPrecompileNTTMalformedInput
-
-# Run vector operations tests
-go test ./core/vm -v -run TestPrecompiledNTTVecOps
-
-# Run unified malformed input tests for vector operations
-go test ./core/vm -v -run TestPrecompileNTTVecOpsMalformedInput
-```
-
-### Benchmark Tests
-
-```bash
-# Run NTT benchmarks
-go test ./core/vm -bench BenchmarkPrecompiledNTTCryptoStandards
-
-# Run vector operations benchmarks
-go test ./core/vm -bench BenchmarkPrecompiledNTTVecOpsCryptoStandards
-```
-
-## Source Code
-
-The complete implementation is available at: https://github.com/yhl125/op-geth/tree/feat/minimal-ntt-precompile
-
-### Key Files
-
-- **contracts.go**: Implementation of NTT, VECMULMOD, and VECADDMOD precompiles
-- **contracts_test.go**: Comprehensive test suite including unit tests and benchmarks
-- **benchmark_results/**: Detailed benchmark outputs for performance analysis
-
-## Dependencies
-
-- **Lattigo v6**: High-performance lattice cryptography library for Go
-- **OP-Geth**: Optimism's Ethereum client implementation based on go-ethereum
-
-## Integration with Optimism Isthmus
-
-The precompiles are activated in the Optimism Isthmus hardfork:
-
-```go
-var PrecompiledContractsIsthmus = map[common.Address]PrecompiledContract{
-    // ... existing precompiles
-    common.BytesToAddress([]byte{0x12}): &NTT{},
-    common.BytesToAddress([]byte{0x13}): &nttVecMulMod{},
-    common.BytesToAddress([]byte{0x14}): &nttVecAddMod{},
-}
-```
-
-## References
-
-- [EIP-7885: Number Theoretic Transform Precompile](../../../EIPS/eip-7885.md)
-- [Lattigo Library](https://github.com/tuneinsight/lattigo)
-- [OP-Geth Documentation](https://docs.optimism.io/)
+- [NTT & NTT Vector Operations Benchmark Test Results](./benchmark_results/BenchmarkPrecompiledNTT)
