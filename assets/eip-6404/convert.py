@@ -1,6 +1,7 @@
 from rlp import decode
 from rlp_types import *
 from ssz_types import *
+from ssz_helpers import *
 
 def upgrade_rlp_transaction_to_ssz(tx_bytes: bytes):
     type_ = tx_bytes[0]
