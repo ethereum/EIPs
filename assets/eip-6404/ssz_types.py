@@ -1,9 +1,11 @@
-from typing import Optional, Type
+from typing import Callable, Dict, Optional, Type
+from dataclasses import dataclass
+from enum import IntEnum
 from eth_hash.auto import keccak
 from remerkleable.basic import uint8, uint64, uint256
-from remerkleable.byte_arrays import ByteList, ByteVector, Bytes32
-from remerkleable.complex import Container, List
-from remerkleable.stable_container import Profile, StableContainer
+from remerkleable.byte_arrays import ByteVector, Bytes32
+from remerkleable.complex import Container
+from remerkleable.progressive import CompatibleUnion, ProgressiveByteList, ProgressiveContainer, ProgressiveList
 from secp256k1 import ECDSA, PublicKey
 
 class Hash32(Bytes32):
@@ -15,241 +17,302 @@ class ExecutionAddress(ByteVector[20]):
 class VersionedHash(Bytes32):
     pass
 
-SECP256K1_SIGNATURE_SIZE = 32 + 32 + 1
-MAX_EXECUTION_SIGNATURE_FIELDS = uint64(2**3)
+class ExecutionSignature(ProgressiveByteList):
+    pass
 
-class ExecutionSignature(StableContainer[MAX_EXECUTION_SIGNATURE_FIELDS]):
-    secp256k1: Optional[ByteVector[SECP256K1_SIGNATURE_SIZE]]
+class ExecutionSignatureAlgorithm(uint8):
+    pass
 
-class Secp256k1ExecutionSignature(Profile[ExecutionSignature]):
-    secp256k1: ByteVector[SECP256K1_SIGNATURE_SIZE]
+@dataclass
+class ExecutionSignatureAttributes(object):
+    validate: Callable[[ExecutionSignature], None]
+    recover_signer: Callable[[ExecutionSignature, Hash32], ExecutionAddress]
 
-def secp256k1_pack(r: uint256, s: uint256, y_parity: uint8) -> ByteVector[SECP256K1_SIGNATURE_SIZE]:
-    return r.to_bytes(32, 'big') + s.to_bytes(32, 'big') + bytes([y_parity])
+execution_signature_registry: Dict[ExecutionSignatureAlgorithm, ExecutionSignatureAttributes] = {}
 
-def secp256k1_unpack(signature: ByteVector[SECP256K1_SIGNATURE_SIZE]) -> tuple[uint256, uint256, uint8]:
-    r = uint256.from_bytes(signature[0:32], 'big')
-    s = uint256.from_bytes(signature[32:64], 'big')
-    y_parity = signature[64]
+def validate_execution_signature(
+    signature: ExecutionSignature,
+    expected_algorithm: Optional[ExecutionSignatureAlgorithm]=None,
+):
+    assert len(signature) > 0
+    algorithm = signature[0]
+    if expected_algorithm is not None:
+        assert algorithm == expected_algorithm
+    assert algorithm in execution_signature_registry
+    execution_signature_registry[algorithm].validate(signature)
+
+def recover_execution_signer(signature: ExecutionSignature, sig_hash: Hash32) -> ExecutionAddress:
+    algorithm = signature[0]
+    return execution_signature_registry[algorithm].recover_signer(signature, sig_hash)
+
+SECP256K1_ALGORITHM = ExecutionSignatureAlgorithm(0x01)
+SECP256K1_SIGNATURE_SIZE = 1 + 32 + 32 + 1
+
+def secp256k1_pack(r: uint256, s: uint256, y_parity: uint8) -> ExecutionSignature:
+    return (
+        bytes([SECP256K1_ALGORITHM]) +
+        r.to_bytes(32, 'big') + s.to_bytes(32, 'big') + bytes([y_parity])
+    )
+
+def secp256k1_unpack(signature: ExecutionSignature) -> tuple[uint256, uint256, uint8]:
+    assert len(signature) == SECP256K1_SIGNATURE_SIZE
+    assert signature[0] == SECP256K1_ALGORITHM
+    r = uint256.from_bytes(signature[1:33], 'big')
+    s = uint256.from_bytes(signature[33:65], 'big')
+    y_parity = signature[65]
     return (r, s, y_parity)
 
-def secp256k1_validate(signature: ByteVector[SECP256K1_SIGNATURE_SIZE]):
-    SECP256K1N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
+def secp256k1_validate(signature: ExecutionSignature):
     r, s, y_parity = secp256k1_unpack(signature)
+    SECP256K1N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
     assert 0 < r < SECP256K1N
     assert 0 < s <= SECP256K1N // 2
     assert y_parity in (0, 1)
 
-def secp256k1_recover_signer(signature: ByteVector[SECP256K1_SIGNATURE_SIZE],
-                             sig_hash: Hash32) -> ExecutionAddress:
+def secp256k1_recover_signer(signature: ExecutionSignature, sig_hash: Hash32) -> ExecutionAddress:
     ecdsa = ECDSA()
-    recover_sig = ecdsa.ecdsa_recoverable_deserialize(signature[0:64], signature[64])
+    recover_sig = ecdsa.ecdsa_recoverable_deserialize(signature[1:65], signature[65])
     public_key = PublicKey(ecdsa.ecdsa_recover(sig_hash, recover_sig, raw=True))
     uncompressed = public_key.serialize(compressed=False)
     return ExecutionAddress(keccak(uncompressed[1:])[12:])
 
-MAX_FEES_PER_GAS_FIELDS = uint64(2**4)
-MAX_CALLDATA_SIZE = uint64(2**24)
-MAX_ACCESS_LIST_STORAGE_KEYS = uint64(2**19)
-MAX_ACCESS_LIST_SIZE = uint64(2**19)
-MAX_BLOB_COMMITMENTS_PER_BLOCK = uint64(2**12)
-MAX_AUTHORIZATION_PAYLOAD_FIELDS = uint64(2**4)
-MAX_AUTHORIZATION_LIST_SIZE = uint64(2**16)
-MAX_TRANSACTION_PAYLOAD_FIELDS = uint64(2**5)
+execution_signature_registry[SECP256K1_ALGORITHM] = ExecutionSignatureAttributes(
+    validate=secp256k1_validate,
+    recover_signer=secp256k1_recover_signer,
+)
+
+class FeePerGas(uint256):
+    pass
+
+class BasicFeesPerGas(ProgressiveContainer(active_fields=[1])):
+    regular: FeePerGas
+
+class BlobFeesPerGas(ProgressiveContainer(active_fields=[1, 1])):
+    regular: FeePerGas
+    blob: FeePerGas
 
 class TransactionType(uint8):
     pass
 
-class ChainId(uint64):
+class ChainId(uint256):
     pass
 
 class GasAmount(uint64):
     pass
 
-class FeePerGas(uint256):
-    pass
+class RlpLegacyReplayableBasicTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 0, 1, 1, 1, 1, 1, 1])
+):
+    type_: TransactionType  # 0x00
+    nonce: uint64
+    max_fees_per_gas: BasicFeesPerGas
+    gas: GasAmount
+    to: ExecutionAddress
+    value: uint256
+    input_: ProgressiveByteList
 
-class FeesPerGas(StableContainer[MAX_FEES_PER_GAS_FIELDS]):
-    regular: Optional[FeePerGas]
+class RlpLegacyReplayableCreateTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 0, 1, 1, 1, 0, 1, 1])
+):
+    type_: TransactionType  # 0x00
+    nonce: uint64
+    max_fees_per_gas: BasicFeesPerGas
+    gas: GasAmount
+    value: uint256
+    input_: ProgressiveByteList
 
-    # EIP-4844
-    blob: Optional[FeePerGas]
+class RlpLegacyBasicTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 1, 1, 1])
+):
+    type_: TransactionType  # 0x00
+    chain_id: ChainId
+    nonce: uint64
+    max_fees_per_gas: BasicFeesPerGas
+    gas: GasAmount
+    to: ExecutionAddress
+    value: uint256
+    input_: ProgressiveByteList
+
+class RlpLegacyCreateTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 0, 1, 1])
+):
+    type_: TransactionType  # 0x00
+    chain_id: ChainId
+    nonce: uint64
+    max_fees_per_gas: BasicFeesPerGas
+    gas: GasAmount
+    value: uint256
+    input_: ProgressiveByteList
+
+RlpLegacyTransactionPayload = (
+    RlpLegacyReplayableBasicTransactionPayload |
+    RlpLegacyReplayableCreateTransactionPayload |
+    RlpLegacyBasicTransactionPayload |
+    RlpLegacyCreateTransactionPayload
+)
 
 class AccessTuple(Container):
     address: ExecutionAddress
-    storage_keys: List[Hash32, MAX_ACCESS_LIST_STORAGE_KEYS]
+    storage_keys: ProgressiveList[Hash32]
 
-class AuthorizationPayload(StableContainer[MAX_AUTHORIZATION_PAYLOAD_FIELDS]):
-    magic: Optional[TransactionType]
-    chain_id: Optional[ChainId]
-    address: Optional[ExecutionAddress]
-    nonce: Optional[uint64]
-
-class Authorization(Container):
-    payload: AuthorizationPayload
-    signature: ExecutionSignature
-
-class TransactionPayload(StableContainer[MAX_TRANSACTION_PAYLOAD_FIELDS]):
-    # EIP-2718
-    type_: Optional[TransactionType]
-
-    # EIP-155
-    chain_id: Optional[ChainId]
-
-    nonce: Optional[uint64]
-    max_fees_per_gas: Optional[FeesPerGas]
-    gas: Optional[GasAmount]
-    to: Optional[ExecutionAddress]
-    value: Optional[uint256]
-    input_: Optional[ByteList[MAX_CALLDATA_SIZE]]
-
-    # EIP-2930
-    access_list: Optional[List[AccessTuple, MAX_ACCESS_LIST_SIZE]]
-
-    # EIP-1559
-    max_priority_fees_per_gas: Optional[FeesPerGas]
-
-    # EIP-4844
-    blob_versioned_hashes: Optional[List[VersionedHash, MAX_BLOB_COMMITMENTS_PER_BLOCK]]
-
-    # EIP-7702
-    authorization_list: Optional[List[Authorization, MAX_AUTHORIZATION_LIST_SIZE]]
-
-class Transaction(Container):
-    payload: TransactionPayload
-    signature: ExecutionSignature
-
-class BasicFeesPerGas(Profile[FeesPerGas]):
-    regular: FeePerGas
-
-class BlobFeesPerGas(Profile[FeesPerGas]):
-    regular: FeePerGas
-    blob: FeePerGas
-
-class RlpLegacyTransactionPayload(Profile[TransactionPayload]):
-    type_: TransactionType
-    chain_id: Optional[ChainId]
-    nonce: uint64
-    max_fees_per_gas: BasicFeesPerGas
-    gas: GasAmount
-    to: Optional[ExecutionAddress]
-    value: uint256
-    input_: ByteList[MAX_CALLDATA_SIZE]
-
-class RlpLegacyTransaction(Container):
-    payload: RlpLegacyTransactionPayload
-    signature: Secp256k1ExecutionSignature
-
-class RlpAccessListTransactionPayload(Profile[TransactionPayload]):
-    type_: TransactionType
+class RlpAccessListBasicTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+):
+    type_: TransactionType  # 0x01
     chain_id: ChainId
     nonce: uint64
     max_fees_per_gas: BasicFeesPerGas
     gas: GasAmount
-    to: Optional[ExecutionAddress]
+    to: ExecutionAddress
     value: uint256
-    input_: ByteList[MAX_CALLDATA_SIZE]
-    access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
+    input_: ProgressiveByteList
+    access_list: ProgressiveList[AccessTuple]
 
-class RlpAccessListTransaction(Container):
-    payload: RlpAccessListTransactionPayload
-    signature: Secp256k1ExecutionSignature
-
-class RlpFeeMarketTransactionPayload(Profile[TransactionPayload]):
-    type_: TransactionType
+class RlpAccessListCreateTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 0, 1, 1, 1])
+):
+    type_: TransactionType  # 0x01
     chain_id: ChainId
     nonce: uint64
     max_fees_per_gas: BasicFeesPerGas
     gas: GasAmount
-    to: Optional[ExecutionAddress]
     value: uint256
-    input_: ByteList[MAX_CALLDATA_SIZE]
-    access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
+    input_: ProgressiveByteList
+    access_list: ProgressiveList[AccessTuple]
+
+RlpAccessListTransactionPayload = (
+    RlpAccessListBasicTransactionPayload |
+    RlpAccessListCreateTransactionPayload
+)
+
+class RlpBasicTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+):
+    type_: TransactionType  # 0x02
+    chain_id: ChainId
+    nonce: uint64
+    max_fees_per_gas: BasicFeesPerGas
+    gas: GasAmount
+    to: ExecutionAddress
+    value: uint256
+    input_: ProgressiveByteList
+    access_list: ProgressiveList[AccessTuple]
     max_priority_fees_per_gas: BasicFeesPerGas
 
-class RlpFeeMarketTransaction(Container):
-    payload: RlpFeeMarketTransactionPayload
-    signature: Secp256k1ExecutionSignature
+class RlpCreateTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 0, 1, 1, 1, 1])
+):
+    type_: TransactionType  # 0x02
+    chain_id: ChainId
+    nonce: uint64
+    max_fees_per_gas: BasicFeesPerGas
+    gas: GasAmount
+    value: uint256
+    input_: ProgressiveByteList
+    access_list: ProgressiveList[AccessTuple]
+    max_priority_fees_per_gas: BasicFeesPerGas
 
-class RlpBlobTransactionPayload(Profile[TransactionPayload]):
-    type_: TransactionType
+RlpFeeMarketTransactionPayload = (
+    RlpBasicTransactionPayload |
+    RlpCreateTransactionPayload
+)
+
+class RlpBlobTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+):
+    type_: TransactionType  # 0x03
     chain_id: ChainId
     nonce: uint64
     max_fees_per_gas: BlobFeesPerGas
     gas: GasAmount
     to: ExecutionAddress
     value: uint256
-    input_: ByteList[MAX_CALLDATA_SIZE]
-    access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
-    max_priority_fees_per_gas: BlobFeesPerGas
-    blob_versioned_hashes: List[VersionedHash, MAX_BLOB_COMMITMENTS_PER_BLOCK]
+    input_: ProgressiveByteList
+    access_list: ProgressiveList[AccessTuple]
+    max_priority_fees_per_gas: BasicFeesPerGas
+    blob_versioned_hashes: ProgressiveList[VersionedHash]
 
-class RlpBlobTransaction(Container):
-    payload: RlpBlobTransactionPayload
-    signature: Secp256k1ExecutionSignature
-
-class RlpSetCodeAuthorizationPayload(Profile[AuthorizationPayload]):
-    magic: TransactionType
-    chain_id: Optional[ChainId]
+class RlpReplayableBasicAuthorizationPayload(ProgressiveContainer(active_fields=[1, 0, 1, 1])):
+    magic: TransactionType  # 0x05
     address: ExecutionAddress
     nonce: uint64
 
+class RlpBasicAuthorizationPayload(ProgressiveContainer(active_fields=[1, 1, 1, 1])):
+    magic: TransactionType  # 0x05
+    chain_id: ChainId
+    address: ExecutionAddress
+    nonce: uint64
+
+class RlpSetCodeAuthorizationPayload(CompatibleUnion({
+    0x01: RlpReplayableBasicAuthorizationPayload,
+    0x02: RlpBasicAuthorizationPayload,
+})):
+    pass
+
 class RlpSetCodeAuthorization(Container):
     payload: RlpSetCodeAuthorizationPayload
-    signature: Secp256k1ExecutionSignature
+    signature: ExecutionSignature
 
-class RlpSetCodeTransactionPayload(Profile[TransactionPayload]):
-    type_: TransactionType
+class RlpSetCodeTransactionPayload(
+    ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1])
+):
+    type_: TransactionType  # 0x04
     chain_id: ChainId
     nonce: uint64
     max_fees_per_gas: BasicFeesPerGas
     gas: GasAmount
     to: ExecutionAddress
     value: uint256
-    input_: ByteList[MAX_CALLDATA_SIZE]
-    access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
+    input_: ProgressiveByteList
+    access_list: ProgressiveList[AccessTuple]
     max_priority_fees_per_gas: BasicFeesPerGas
-    authorization_list: List[Authorization, MAX_AUTHORIZATION_LIST_SIZE]
+    authorization_list: ProgressiveList[RlpSetCodeAuthorization]
 
-class RlpSetCodeTransaction(Container):
-    payload: RlpSetCodeTransactionPayload
-    signature: Secp256k1ExecutionSignature
+class TransactionPayload(CompatibleUnion({
+    0x01: RlpLegacyReplayableBasicTransactionPayload,
+    0x02: RlpLegacyReplayableCreateTransactionPayload,
+    0x03: RlpLegacyBasicTransactionPayload,
+    0x04: RlpLegacyCreateTransactionPayload,
+    0x05: RlpAccessListBasicTransactionPayload,
+    0x06: RlpAccessListCreateTransactionPayload,
+    0x07: RlpBasicTransactionPayload,
+    0x08: RlpCreateTransactionPayload,
+    0x09: RlpBlobTransactionPayload,
+    0x0a: RlpSetCodeTransactionPayload,
+})):
+    pass
 
-LEGACY_TX_TYPE = TransactionType(0x00)
-ACCESS_LIST_TX_TYPE = TransactionType(0x01)
-FEE_MARKET_TX_TYPE = TransactionType(0x02)
-BLOB_TX_TYPE = TransactionType(0x03)
-SET_CODE_TX_TYPE = TransactionType(0x04)
-SET_CODE_TX_MAGIC = TransactionType(0x05)
+class Transaction(Container):
+    payload: TransactionPayload
+    signature: ExecutionSignature
 
-def identify_authorization_profile(auth: Authorization) -> Type[Profile]:
-    if auth.payload.magic == SET_CODE_TX_MAGIC:
-        if auth.payload.chain_id == 0:
-            raise Exception(f'Unsupported chain ID in Set Code RLP authorization: {auth}')
-        return RlpSetCodeAuthorization
+class RlpTxType(IntEnum):
+    LEGACY = 0x00
+    ACCESS_LIST = 0x01
+    FEE_MARKET = 0x02
+    BLOB = 0x03
+    SET_CODE = 0x04
+    SET_CODE_MAGIC = 0x05
 
-    raise Exception(f'Unsupported authorization: {auth}')
-
-def identify_transaction_profile(tx: Transaction) -> Type[Profile]:
-    if tx.payload.type_ == SET_CODE_TX_TYPE:
-        for auth in tx.payload.authorization_list or []:
-            auth = identify_authorization_profile(auth).from_base(auth)
-            if not isinstance(auth, RlpSetCodeAuthorization):
-                raise Exception(f'Unsupported authorization in Set Code RLP transaction: {tx}')
-        return RlpSetCodeTransaction
-
-    if tx.payload.type_ == BLOB_TX_TYPE:
-        if (tx.payload.max_priority_fees_per_gas or FeesPerGas()).blob != 0:
-            raise Exception(f'Unsupported blob priority fee in Blob RLP transaction: {tx}')
-        return RlpBlobTransaction
-
-    if tx.payload.type_ == FEE_MARKET_TX_TYPE:
-        return RlpFeeMarketTransaction
-
-    if tx.payload.type_ == ACCESS_LIST_TX_TYPE:
-        return RlpAccessListTransaction
-
-    if tx.payload.type_ == LEGACY_TX_TYPE:
-        return RlpLegacyTransaction
-
-    raise Exception(f'Unsupported transaction: {tx}')
+def validate_transaction(tx: Transaction):
+    tx_data = tx.payload.data()
+    match tx_data.type_:
+        case RlpTxType.LEGACY:
+            assert isinstance(tx_data, RlpLegacyTransactionPayload)
+        case RlpTxType.ACCESS_LIST:
+            assert isinstance(tx_data, RlpAccessListTransactionPayload)
+        case RlpTxType.FEE_MARKET:
+            assert isinstance(tx_data, RlpFeeMarketTransactionPayload)
+        case RlpTxType.BLOB:
+            assert isinstance(tx_data, RlpBlobTransactionPayload)
+        case RlpTxType.SET_CODE:
+            assert isinstance(tx_data, RlpSetCodeTransactionPayload)
+            for auth in tx_data.authorization_list:
+                auth_data = auth.payload.data()
+                assert auth_data.magic == RlpTxType.SET_CODE_MAGIC
+                if hasattr(auth_data, "chain_id"):
+                    assert auth_data.chain_id != 0
+                validate_execution_signature(auth.signature, expected_algorithm=SECP256K1_ALGORITHM)
+        case _:
+            assert False
+    validate_execution_signature(tx.signature, expected_algorithm=SECP256K1_ALGORITHM)
