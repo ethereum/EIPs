@@ -1,11 +1,11 @@
-from remerkleable.basic import uint8, uint
+from remerkleable.basic import uint8, uint256, uint
 from remerkleable.byte_arrays import ByteVector
 
 from eth_hash.auto import keccak
 from eth_typing import Hash32
 
 
-from registry import algorithm_registry
+from .registry import algorithm_registry
 
 
 class ExecutionAddress(ByteVector[20]):
@@ -20,15 +20,7 @@ def pubkey_to_address(public_key: bytes, algorithm_id: uint8) -> ExecutionAddres
     return ExecutionAddress(keccak(bytes(algorithm_id) + public_key)[12:])
 
 
-def signature_to_address(signature_info: bytes, hash: Hash32) -> ExecutionAddress:
-    assert len(signature_info) > 0
-    assert uint8(signature_info[0]) in algorithm_registry
-
-    key = algorithm_registry[uint8(signature_info[0])].verify(signature_info, hash)
-    return pubkey_to_address(key, uint8(signature_info[0]))
-
-
-def signature_to_gas_cost(signature_info: bytes) -> uint:
+def calculate_penalty(signature_info: bytes) -> uint:
     GAS_PER_ADDITIONAL_VERIFICATION_BYTE = 16
     SECP256K1_SIGNATURE_SIZE = 65
 
@@ -43,4 +35,4 @@ def signature_to_gas_cost(signature_info: bytes) -> uint:
         gas_penalty_base + algorithm_registry[uint8(signature_info[0])].GAS_PENALTY
     )
 
-    return uint(total_gas_penalty)
+    return uint256(total_gas_penalty)
