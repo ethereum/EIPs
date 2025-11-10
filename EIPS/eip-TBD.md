@@ -1,6 +1,6 @@
 ---
-eip: 0000
-title: "ZKMeta Metadata Interface"
+eip: 0
+title: ZKMeta Metadata Interface
 status: Draft
 type: Standards Track
 category: Interface
