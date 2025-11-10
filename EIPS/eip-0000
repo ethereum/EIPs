@@ -1,0 +1,120 @@
+---
+eip: draft
+title: ERC-ZKMeta: Zero-Knowledge Proof Metadata Standard
+description: A minimal interface for describing metadata about zero-knowledge proofs required by Ethereum smart contracts.
+author: cococay (@zwowo1997)
+discussions-to: https://ethereum-magicians.org/t/eip-0000-standardized-zk-metadata-interface/26511
+status: Draft
+type: Standards Track
+category: ERC
+created: 2025-11-10
+---
+
+## Abstract
+
+This EIP introduces **ERC-ZKMeta**, a minimal standard interface for smart contracts that verify or consume zero-knowledge proofs. It defines a universal schema for the proof system identifier, circuit identifier, circuit versioning, public-input schema discovery, and verification-key discovery. The standard aims to make ZK-aware tooling interoperable across chains, relayers, wallets, and explorers without constraining the underlying proof format.
+
+## Motivation
+
+Ethereum increasingly relies on a diverse set of zero-knowledge proof systems such as Groth16, Plonk, Halo2, zkSNARK variants, zkSTARKs, and zkVMs.
+Today, each project:
+
+- defines its own proof format
+- encodes public inputs differently
+- exposes verification keys inconsistently
+- lacks circuit versioning
+- has no common way to signal the proof system being used
+
+This fragmentation increases integration costs and complicates automated tooling. Wallets, smart accounts, explorers, and relayers cannot reliably determine how to parse a proof, which verification key is required, what the expected public inputs are, whether a circuit has changed, or how to interoperate across different ZK systems.
+
+**ERC-ZKMeta standardizes metadata discovery** without dictating how proofs themselves must be formatted or verified. It creates the foundational "ZK ABI" layer needed for cross-system interoperability—similar to what ERC-20 did for tokens.
+
+## Specification
+
+The keywords “MUST”, “MUST NOT”, “SHOULD”, and “MAY” in this section are to be interpreted as described in RFC 2119.
+
+### Interface Definition
+
+```solidity
+interface IZKMetadata {
+    /// Emitted whenever any metadata getter would return a different value than before.
+    event CircuitMetadataUpdated(bytes32 indexed circuitId, uint64 circuitVersion, bytes4 proofSystem);
+
+    /// Unique content-addressed identifier for the circuit definition artifact.
+    function circuitId() external view returns (bytes32);
+
+    /// Monotonically increasing semver-style version number for the circuit (major.minor encoded as uint32.uint32).
+    function circuitVersion() external view returns (uint64);
+
+    /// Hash of the canonical schema describing the ordering and meaning of public inputs.
+    function publicInputsSchemaHash() external view returns (bytes32);
+
+    /// URI that resolves to the canonical schema document for public inputs.
+    function publicInputsSchemaURI() external view returns (string memory);
+
+    /// URI for verification key discovery. Must include a content hash for integrity.
+    function verificationKeyURI() external view returns (string memory);
+
+    /// Identifier of the proof system (e.g., 0x0001 = Groth16, 0x0002 = Plonk, 0x0003 = Halo2).
+    function proofSystem() external view returns (bytes4);
+}
+```
+
+### Proof-System Registry
+
+Implementations MUST interpret the return value of `proofSystem()` using the ERC-ZKMeta proof-system registry:
+
+| Identifier | Proof System | Notes |
+|------------|--------------|-------|
+| `0x0001`   | Groth16      | BN254 curve, as in `snarkjs` |
+| `0x0002`   | Plonk        | BN254 curve variant |
+| `0x0003`   | Halo2        | KZG commitment scheme |
+| `0x0004`   | zkSTARK      | General STARK provers |
+| `0x0005`   | zkVM         | Includes Jolt, RISC Zero |
+
+Additional identifiers MUST be proposed through the discussions thread and MUST NOT collide with existing entries. Unknown identifiers SHOULD result in tooling treating the metadata as unsupported.
+
+### Metadata Retrieval Requirements
+
+- `circuitId()` MUST return the content hash (e.g., keccak256) of the artifact used to generate the verification key.
+- `circuitVersion()` MUST increase whenever either the constraint system or the public-input schema changes. Projects SHOULD treat the high 32 bits as the major version and the low 32 bits as the minor version.
+- `publicInputsSchemaHash()` MUST match the canonical schema document fetched via `publicInputsSchemaURI()`.
+- `publicInputsSchemaURI()` and `verificationKeyURI()` MUST be content-addressed URIs (`ipfs://`, `ar://`, `bzz://`) or HTTPS URLs that append `#<hex-encoded-hash>` to guarantee immutability.
+- Emitting `CircuitMetadataUpdated` MUST occur before the new metadata values become observable by tooling.
+
+Contracts MAY cache metadata on-chain or source it from proxy contracts. Tooling SHOULD cache content-addressed metadata locally once retrieved.
+
+## Rationale
+
+- **Separate schema hash and URI:** Teams already store schema documents off-chain. Returning both a hash and a URI preserves integrity guarantees while enabling automatic discovery.
+- **Event-based updates:** Indexers and explorers avoid polling by listening for `CircuitMetadataUpdated`, mirroring patterns established by ERC-20 and ERC-721.
+- **Semver encoding:** Tooling differentiates breaking vs. non-breaking circuit updates by reading a single `uint64`. This matches expectations from ZK teams that already track major/minor versions.
+- **Registry of proof systems:** A 4-byte code preserves space in calldata while leaving room for growth. The registry is intentionally simple so the community can extend it without redeploying interfaces.
+
+## Backwards Compatibility
+
+- Projects that already expose metadata through bespoke view functions MAY wrap their existing getters with a thin adapter that implements `IZKMetadata`.
+- Legacy contracts can add a read-only facade contract or an off-chain "metadata router" that implements the interface for downstream tooling.
+- No existing ERC interfaces are modified by this proposal.
+
+## Security Considerations
+
+- Tooling MUST validate that `publicInputsSchemaHash()` matches the schema fetched via `publicInputsSchemaURI()`.
+- Tooling MUST confirm that `verificationKeyURI()` resolves to a verification key whose content hash matches the URI’s hash component before using it.
+- Contracts SHOULD emit `CircuitMetadataUpdated` from upgradeable proxies within the same transaction that modifies stored metadata to prevent race conditions.
+- Consumers SHOULD treat unknown `proofSystem()` identifiers as unsafe.
+
+## Test Cases
+
+- A contract implementing `IZKMetadata` updates its circuit version from `0x00000001_00000005` to `0x00000002_00000000`, emits `CircuitMetadataUpdated`, and tooling observes the change.
+- Tooling fetches a schema document from `ipfs://...#<hash>` and verifies that the keccak256 matches `publicInputsSchemaHash()`.
+- An integration rejects a proof when the provided verification key does not match the hash embedded in `verificationKeyURI()`.
+
+## Reference Implementation
+
+- An example implementation is available at `examples/zkmeta/ZKMetadataAdapter.sol`. It demonstrates emitting `CircuitMetadataUpdated`, storing metadata behind upgradeable proxies, and enforcing semver increments on updates.
+- Tooling examples showing how to resolve URIs and validate content hashes are available at `examples/zkmeta/tooling/`.
+
+## Copyright
+
+Copyright and related rights waived via CC0.
