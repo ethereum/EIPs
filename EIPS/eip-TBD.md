@@ -1,6 +1,6 @@
 ---
 eip: 0000
-title: "ERC-ZKMeta Metadata Interface"
+title: "ZKMeta Metadata Interface"
 status: Draft
 type: Standards Track
 category: Interface
@@ -97,12 +97,6 @@ Contracts MAY cache metadata on-chain or source it from proxy contracts. Tooling
 - Legacy contracts can add a read-only facade contract or an off-chain "metadata router" that implements the interface for downstream tooling.
 - No existing ERC interfaces are modified by this proposal.
 
-## Security Considerations
-
-- Tooling MUST validate that `publicInputsSchemaHash()` matches the schema fetched via `publicInputsSchemaURI()`.
-- Tooling MUST confirm that `verificationKeyURI()` resolves to a verification key whose content hash matches the URI’s hash component before using it.
-- Contracts SHOULD emit `CircuitMetadataUpdated` from upgradeable proxies within the same transaction that modifies stored metadata to prevent race conditions.
-- Consumers SHOULD treat unknown `proofSystem()` identifiers as unsafe.
 
 ## Test Cases
 
@@ -114,6 +108,13 @@ Contracts MAY cache metadata on-chain or source it from proxy contracts. Tooling
 
 - An example implementation is available at `examples/zkmeta/ZKMetadataAdapter.sol`. It demonstrates emitting `CircuitMetadataUpdated`, storing metadata behind upgradeable proxies, and enforcing semver increments on updates.
 - Tooling examples showing how to resolve URIs and validate content hashes are available at `examples/zkmeta/tooling/`.
+
+## Security Considerations
+
+- Tooling MUST validate that `publicInputsSchemaHash()` matches the schema fetched via `publicInputsSchemaURI()`.
+- Tooling MUST confirm that `verificationKeyURI()` resolves to a verification key whose content hash matches the URI’s hash component before using it.
+- Contracts SHOULD emit `CircuitMetadataUpdated` from upgradeable proxies within the same transaction that modifies stored metadata to prevent race conditions.
+- Consumers SHOULD treat unknown `proofSystem()` identifiers as unsafe.
 
 ## Copyright
 
