@@ -3,11 +3,11 @@ eip: 0
 title: ZKMeta Metadata Interface
 description: A minimal interface for describing metadata about zero-knowledge proofs required by Ethereum smart contracts.
 author: cococay (@zwowo1997)
+discussions-to: https://ethereum-magicians.org/t/eip-0000-standardized-zk-metadata-interface/26511
 status: Draft
 type: Standards Track
 category: Interface
 created: 2025-11-10
-discussions-to: https://ethereum-magicians.org/t/eip-0000-standardized-zk-metadata-interface/26511
 ---
 
 ## Abstract
