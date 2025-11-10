@@ -1,5 +1,5 @@
 ---
-eip: TBA
+eip: 8077
 title: eth/XX - announce transactions with nonce
 description: Adds source and nonce to transaction announcements
 author: Csaba Kiraly (@cskiraly)
