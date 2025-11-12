@@ -111,10 +111,6 @@ class RlpLegacyReplayableBasicTransactionPayload(
     value: uint256
     input_: ProgressiveByteList
 
-class RlpLegacyReplayableBasicTransaction(Container):
-    payload: RlpLegacyReplayableBasicTransactionPayload
-    signature: ExecutionSignature
-
 class RlpLegacyReplayableCreateTransactionPayload(
     ProgressiveContainer(active_fields=[1, 0, 1, 1, 1, 0, 1, 1])
 ):
@@ -124,10 +120,6 @@ class RlpLegacyReplayableCreateTransactionPayload(
     gas: GasAmount
     value: uint256
     input_: ProgressiveByteList
-
-class RlpLegacyReplayableCreateTransaction(Container):
-    payload: RlpLegacyReplayableCreateTransactionPayload
-    signature: ExecutionSignature
 
 class RlpLegacyBasicTransactionPayload(
     ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 1, 1, 1])
@@ -141,10 +133,6 @@ class RlpLegacyBasicTransactionPayload(
     value: uint256
     input_: ProgressiveByteList
 
-class RlpLegacyBasicTransaction(Container):
-    payload: RlpLegacyBasicTransactionPayload
-    signature: ExecutionSignature
-
 class RlpLegacyCreateTransactionPayload(
     ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 0, 1, 1])
 ):
@@ -156,9 +144,12 @@ class RlpLegacyCreateTransactionPayload(
     value: uint256
     input_: ProgressiveByteList
 
-class RlpLegacyCreateTransaction(Container):
-    payload: RlpLegacyCreateTransactionPayload
-    signature: ExecutionSignature
+RlpLegacyTransactionPayload = (
+    RlpLegacyReplayableBasicTransactionPayload |
+    RlpLegacyReplayableCreateTransactionPayload |
+    RlpLegacyBasicTransactionPayload |
+    RlpLegacyCreateTransactionPayload
+)
 
 class AccessTuple(Container):
     address: ExecutionAddress
@@ -177,10 +168,6 @@ class RlpAccessListBasicTransactionPayload(
     input_: ProgressiveByteList
     access_list: ProgressiveList[AccessTuple]
 
-class RlpAccessListBasicTransaction(Container):
-    payload: RlpAccessListBasicTransactionPayload
-    signature: ExecutionSignature
-
 class RlpAccessListCreateTransactionPayload(
     ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 0, 1, 1, 1])
 ):
@@ -193,9 +180,10 @@ class RlpAccessListCreateTransactionPayload(
     input_: ProgressiveByteList
     access_list: ProgressiveList[AccessTuple]
 
-class RlpAccessListCreateTransaction(Container):
-    payload: RlpAccessListCreateTransactionPayload
-    signature: ExecutionSignature
+RlpAccessListTransactionPayload = (
+    RlpAccessListBasicTransactionPayload |
+    RlpAccessListCreateTransactionPayload
+)
 
 class RlpBasicTransactionPayload(
     ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
@@ -211,10 +199,6 @@ class RlpBasicTransactionPayload(
     access_list: ProgressiveList[AccessTuple]
     max_priority_fees_per_gas: BasicFeesPerGas
 
-class RlpBasicTransaction(Container):
-    payload: RlpBasicTransactionPayload
-    signature: ExecutionSignature
-
 class RlpCreateTransactionPayload(
     ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 0, 1, 1, 1, 1])
 ):
@@ -228,9 +212,10 @@ class RlpCreateTransactionPayload(
     access_list: ProgressiveList[AccessTuple]
     max_priority_fees_per_gas: BasicFeesPerGas
 
-class RlpCreateTransaction(Container):
-    payload: RlpCreateTransactionPayload
-    signature: ExecutionSignature
+RlpFeeMarketTransactionPayload = (
+    RlpBasicTransactionPayload |
+    RlpCreateTransactionPayload
+)
 
 class RlpBlobTransactionPayload(
     ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
@@ -247,18 +232,10 @@ class RlpBlobTransactionPayload(
     max_priority_fees_per_gas: BasicFeesPerGas
     blob_versioned_hashes: ProgressiveList[VersionedHash]
 
-class RlpBlobTransaction(Container):
-    payload: RlpBlobTransactionPayload
-    signature: ExecutionSignature
-
 class RlpReplayableBasicAuthorizationPayload(ProgressiveContainer(active_fields=[1, 0, 1, 1])):
     magic: TransactionType  # 0x05
     address: ExecutionAddress
     nonce: uint64
-
-class RlpReplayableBasicAuthorization(Container):
-    payload: RlpReplayableBasicAuthorizationPayload
-    signature: ExecutionSignature
 
 class RlpBasicAuthorizationPayload(ProgressiveContainer(active_fields=[1, 1, 1, 1])):
     magic: TransactionType  # 0x05
@@ -266,15 +243,15 @@ class RlpBasicAuthorizationPayload(ProgressiveContainer(active_fields=[1, 1, 1, 
     address: ExecutionAddress
     nonce: uint64
 
-class RlpBasicAuthorization(Container):
-    payload: RlpBasicAuthorizationPayload
-    signature: ExecutionSignature
-
-class RlpSetCodeAuthorization(CompatibleUnion({
-    0x01: RlpReplayableBasicAuthorization,
-    0x02: RlpBasicAuthorization,
+class RlpSetCodeAuthorizationPayload(CompatibleUnion({
+    0x01: RlpReplayableBasicAuthorizationPayload,
+    0x02: RlpBasicAuthorizationPayload,
 })):
     pass
+
+class RlpSetCodeAuthorization(Container):
+    payload: RlpSetCodeAuthorizationPayload
+    signature: ExecutionSignature
 
 class RlpSetCodeTransactionPayload(
     ProgressiveContainer(active_fields=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1])
@@ -291,40 +268,23 @@ class RlpSetCodeTransactionPayload(
     max_priority_fees_per_gas: BasicFeesPerGas
     authorization_list: ProgressiveList[RlpSetCodeAuthorization]
 
-class RlpSetCodeTransaction(Container):
-    payload: RlpSetCodeTransactionPayload
-    signature: ExecutionSignature
-
-class Transaction(CompatibleUnion({
-    0x01: RlpLegacyReplayableBasicTransaction,
-    0x02: RlpLegacyReplayableCreateTransaction,
-    0x03: RlpLegacyBasicTransaction,
-    0x04: RlpLegacyCreateTransaction,
-    0x05: RlpAccessListBasicTransaction,
-    0x06: RlpAccessListCreateTransaction,
-    0x07: RlpBasicTransaction,
-    0x08: RlpCreateTransaction,
-    0x09: RlpBlobTransaction,
-    0x0a: RlpSetCodeTransaction,
+class TransactionPayload(CompatibleUnion({
+    0x01: RlpLegacyReplayableBasicTransactionPayload,
+    0x02: RlpLegacyReplayableCreateTransactionPayload,
+    0x03: RlpLegacyBasicTransactionPayload,
+    0x04: RlpLegacyCreateTransactionPayload,
+    0x05: RlpAccessListBasicTransactionPayload,
+    0x06: RlpAccessListCreateTransactionPayload,
+    0x07: RlpBasicTransactionPayload,
+    0x08: RlpCreateTransactionPayload,
+    0x09: RlpBlobTransactionPayload,
+    0x0a: RlpSetCodeTransactionPayload,
 })):
     pass
 
-RlpLegacyTransaction = (
-    RlpLegacyReplayableBasicTransaction |
-    RlpLegacyReplayableCreateTransaction |
-    RlpLegacyBasicTransaction |
-    RlpLegacyCreateTransaction
-)
-
-RlpAccessListTransaction = (
-    RlpAccessListBasicTransaction |
-    RlpAccessListCreateTransaction
-)
-
-RlpFeeMarketTransaction = (
-    RlpBasicTransaction |
-    RlpCreateTransaction
-)
+class Transaction(Container):
+    payload: TransactionPayload
+    signature: ExecutionSignature
 
 class RlpTxType(IntEnum):
     LEGACY = 0x00
@@ -335,24 +295,24 @@ class RlpTxType(IntEnum):
     SET_CODE_MAGIC = 0x05
 
 def validate_transaction(tx: Transaction):
-    tx_data = tx.data()
-    match tx_data.payload.type_:
+    tx_data = tx.payload.data()
+    match tx_data.type_:
         case RlpTxType.LEGACY:
-            assert isinstance(tx_data, RlpLegacyTransaction)
+            assert isinstance(tx_data, RlpLegacyTransactionPayload)
         case RlpTxType.ACCESS_LIST:
-            assert isinstance(tx_data, RlpAccessListTransaction)
+            assert isinstance(tx_data, RlpAccessListTransactionPayload)
         case RlpTxType.FEE_MARKET:
-            assert isinstance(tx_data, RlpFeeMarketTransaction)
+            assert isinstance(tx_data, RlpFeeMarketTransactionPayload)
         case RlpTxType.BLOB:
-            assert isinstance(tx_data, RlpBlobTransaction)
+            assert isinstance(tx_data, RlpBlobTransactionPayload)
         case RlpTxType.SET_CODE:
-            assert isinstance(tx_data, RlpSetCodeTransaction)
-            for auth in tx_data.payload.authorization_list:
-                auth_data = auth.data()
-                assert auth_data.payload.magic == RlpTxType.SET_CODE_MAGIC
-                if hasattr(auth_data.payload, "chain_id"):
-                    assert auth_data.payload.chain_id != 0
-                validate_execution_signature(auth_data.signature, expected_algorithm=SECP256K1_ALGORITHM)
+            assert isinstance(tx_data, RlpSetCodeTransactionPayload)
+            for auth in tx_data.authorization_list:
+                auth_data = auth.payload.data()
+                assert auth_data.magic == RlpTxType.SET_CODE_MAGIC
+                if hasattr(auth_data, "chain_id"):
+                    assert auth_data.chain_id != 0
+                validate_execution_signature(auth.signature, expected_algorithm=SECP256K1_ALGORITHM)
         case _:
             assert False
-    validate_execution_signature(tx_data.signature, expected_algorithm=SECP256K1_ALGORITHM)
+    validate_execution_signature(tx.signature, expected_algorithm=SECP256K1_ALGORITHM)
