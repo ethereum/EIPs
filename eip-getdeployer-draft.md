@@ -22,7 +22,8 @@ By providing a way to verify the deployer of the target contract, `GETDEPLOYER` 
 
 Beyond delegatecall safety, provenance information has broader security utility. Upgradeable smart-contract patterns (proxies, admin-controlled upgrades, and factory-deployed modules) benefit when callers can quickly verify that a newly deployed implementation was created by a trusted deployer before switching or forwarding calls. This reduces reliance on off-chain coordination or event monitoring and allows on-chain policy (for example, deny-by-default until a deployer is verified) to be enforced atomically.
 
-Other uses include:
+### Additional Uses
+
 - Factory verification: factories that produce many instances can be verified by deployer address rather than checking each instance's code.
 - Monitoring and forensics: on-chain tooling can flag changes in deployer provenance as an indicator of potentially suspicious redeploys.
 - Lightweight provenance checks: GETDEPLOYER provides a cheaper, semantic lookup complementary to code-hash checks when implementers prefer deployer-level governance.
