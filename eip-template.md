@@ -11,6 +11,20 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 ---
 
 <!--
+  EXAMPLES FOR COMMON FIELDS:
+  
+  title: Simple SSZ Container Type
+  description: This EIP defines a new SSZ container type for representing simple data structures.
+  author: Vitalik Buterin (@vbuterin), Ethereum Foundation <team@ethereum.org>
+  discussions-to: https://ethereum-magicians.org/t/eip-xxxx-simple-ssz-container/1234
+  status: Draft
+  type: Standards Track
+  category: Core
+  created: 2024-01-15
+  requires: 3076
+-->
+
+<!--
   READ EIP-1 (https://eips.ethereum.org/EIPS/eip-1) BEFORE USING THIS TEMPLATE!
 
   This is the suggested template for new EIPs. After you have filled in the requisite fields, please delete these comments.
@@ -26,6 +40,11 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 
 <!--
   The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
+
+  Example:
+  This EIP introduces a new SSZ container type that allows for efficient serialization and deserialization
+  of simple data structures. The container supports up to 32 fields and provides built-in validation
+  for common data types.
 
   TODO: Remove this comment before submitting
 -->
