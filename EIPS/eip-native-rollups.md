@@ -16,7 +16,7 @@ Expose the state transition function to the execution layer via a new `EXECUTE` 
 
 ## Motivation
 
-Today, EVM-equivalent rollups need to implement and maintain complex proof systems just to be able to replicate what Ethereum already provides on L1. Such complexity significantly increases the probability of encountering bugs and prevents projects from getting rid of security councils and from moving to [Stage 2](https://forum.l2beat.com/t/the-stages-framework/291). EVM-equivalent projects are not similar enough and lack the proper incentives to benefit from each other efforts, significantly delaying multi-proof systems.
+Today, EVM-equivalent rollups need to implement and maintain complex proof systems just to be able to replicate what Ethereum already provides on L1. Such complexity significantly increases the probability of encountering bugs and prevents projects from getting rid of security councils and from moving to Stage 2. EVM-equivalent projects are not similar enough and lack the proper incentives to benefit from each other efforts, significantly delaying multi-proof systems.
 
 Moreover, to maintain feature parity with Ethereum, rollups need to implement bespoke governance systems that can't be forced to follow Ethereum's governance decisions, and thus are free to arbitrarily diverge from it. Because of this, the best that an EVM-equivalent rollup can do is to provide long exit windows for their users, to protect them from its governance going rogue. No finite (and reasonable) exit window can protect all use-cases, especially those that rely on timelocks (governance, staking contracts, vesting contracts). Longer exit windows protect more use-cases, at the cost of increase un-equivalence time.
 
