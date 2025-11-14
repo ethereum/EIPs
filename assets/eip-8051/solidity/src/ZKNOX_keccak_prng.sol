@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {console} from "forge-std/Test.sol";
-
 struct KeccakPRNG {
     bytes32 state; // keccak256(input)
     uint64 counter; // block counter
