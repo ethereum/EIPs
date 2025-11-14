@@ -1,3 +1,0 @@
-[tool.ruff.lint]
-# Avoid enforcing Ambiguous variable name (`E741`)
-ignore = ["E741"]
