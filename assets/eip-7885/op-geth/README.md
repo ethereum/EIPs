@@ -1,181 +1,148 @@
-# NTT Precompile Implementation for OP-Geth
+# Optimism-geth with NTT Precompiles (liboqs Implementation)
 
-This directory contains a Go implementation of the Number Theoretic Transform (NTT) precompile for [EIP-7885](../../README.md), integrated into OP-Geth (Optimism's Ethereum client).
+Fork of `op-geth` with precompiled contracts for Number Theoretic Transform (NTT) operations using [liboqs](https://github.com/open-quantum-safe/liboqs) via CGO bindings, enabling efficient on-chain post-quantum cryptographic operations.
 
-## Overview
+## Precompiled Contracts
 
-This implementation adds NTT support to the Ethereum Virtual Machine as a native precompiled contract, following the EIP-7885 specification with OP-Geth specific optimizations.
+| Address | Name | Description |
+|---------|------|-------------|
+| `0x12` | NTT_FW | Forward NTT using liboqs (Falcon-512/1024, ML-DSA) |
+| `0x13` | NTT_INV | Inverse NTT using liboqs (same schemes as NTT_FW) |
+| `0x14` | VECMULMOD | Element-wise modular multiplication: `result[i] = (a[i] * b[i]) mod q` |
+| `0x15` | VECADDMOD | Element-wise modular addition: `result[i] = (a[i] + b[i]) mod q` |
 
-## Implementation Details
+### Supported Schemes
 
-### Precompile Address
+| Scheme | Ring Degree | Modulus | Element Size |
+|--------|-------------|---------|--------------|
+| Falcon-512 | 512 | 12289 | uint16 (2 bytes) |
+| Falcon-1024 | 1024 | 12289 | uint16 (2 bytes) |
+| ML-DSA | 256 | 8380417 | int32 (4 bytes) |
 
-The NTT precompile is deployed at address `0x12` in the Optimism Isthmus hardfork.
+## Installation
 
-### Gas Cost
+### 1. Install liboqs with NTT CGO Bindings
 
-Fixed gas cost: **70,000** gas per operation (both forward and inverse NTT).
+```bash
+# Clone and install dependencies
+git clone -b feature/ntt-cgo-bindings https://github.com/yhl125/liboqs.git
+sudo apt install astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind pkg-config
 
-### Dependencies
-
-- **Lattigo v6**: High-performance lattice cryptography library for Go
-- **OP-Geth**: Optimism's Ethereum client implementation
-
-### Core Features
-
-- **Forward NTT**: Transforms polynomial coefficients to evaluation domain
-- **Inverse NTT**: Transforms evaluation points back to coefficient domain  
-- **Ring Support**: Configurable ring degree (power of 2, minimum 16)
-- **Prime Fields**: Support for NTT-friendly prime moduli
-- **Input Validation**: Comprehensive error checking and bounds validation
-
-## Interface Specification
-
-### Input Format
-
-The precompile expects binary input with the following structure:
-
-```
-| Field        | Size    | Description                           |
-|--------------|---------|---------------------------------------|
-| operation    | 1 byte  | 0 = forward NTT, 1 = inverse NTT    |
-| ring_degree  | 4 bytes | Ring degree (big-endian, power of 2) |
-| modulus      | 8 bytes | Prime modulus (big-endian)           |
-| coefficients | N*8     | N coefficients (8 bytes each)       |
+# Build liboqs and Go bindings
+cd liboqs/bindings/go
+make all
 ```
 
-**Total Input Size**: `13 + (ring_degree * 8)` bytes
+### 2. Configure Environment
 
-### Constraints
-
-1. **Ring Degree**: Must be a power of 2 and e 16
-2. **Modulus**: Must be prime and satisfy `modulus a 1 (mod 2*ring_degree)`
-3. **Coefficients**: Each coefficient must be `< modulus`
-4. **Operation**: Must be 0 (forward) or 1 (inverse)
-
-### Output Format
-
-Returns `ring_degree * 8` bytes containing the transformed coefficients (8 bytes each, big-endian).
-
-### Error Conditions
-
-The precompile returns errors for:
-
-- Input too short (< 13 bytes)
-- Invalid operation code (not 0 or 1)
-- Invalid ring degree (not power of 2 or < 16)
-- Zero modulus
-- Non NTT-friendly modulus
-- Coefficient exceeding modulus
-- Input length mismatch
-
-## Usage Examples
-
-### Forward NTT (Ring Degree 16)
-
-```go
-// Input: operation=0, ring_degree=16, modulus=97, coefficients=[1,2,3,...,16]
-input := "00000000100000000000000061" +
-         "0000000000000001" + "0000000000000002" + "0000000000000003" +
-         // ... (16 coefficients total)
-         "0000000000000010"
-
-result, err := contract.Run(common.Hex2Bytes(input))
+```bash
+# Set paths (adjust to your installation directory)
+export PKG_CONFIG_PATH=/path/to/liboqs/bindings/go/.config:$PKG_CONFIG_PATH
+export DYLD_LIBRARY_PATH=/path/to/liboqs/build/lib:$DYLD_LIBRARY_PATH  # macOS
+export LD_LIBRARY_PATH=/path/to/liboqs/build/lib:$LD_LIBRARY_PATH      # Linux
 ```
 
-### Inverse NTT (Ring Degree 16)
+### 3. Build op-geth
 
-```go
-// Input: operation=1, ring_degree=16, modulus=97, coefficients=[NTT output]
-input := "01000000100000000000000061" +
-         "0000000000000045" + "0000000000000028" + "000000000000001d" +
-         // ... (16 NTT coefficients)
-         "0000000000000038"
-
-result, err := contract.Run(common.Hex2Bytes(input))
-// Should recover original [1,2,3,...,16]
+```bash
+make geth
 ```
+
+**Requirements:** Go 1.23+, pkg-config, CMake, Ninja
+
+**Detailed instructions:** [liboqs Go bindings README](https://github.com/yhl125/liboqs/tree/feature/ntt-cgo-bindings/bindings/go)
+
+## API Reference
+
+### NTT_FW (0x12) - Forward Transform
+
+Transforms coefficients into NTT domain using liboqs.
+
+**Input:**
+```
+[0:4]   ring_degree (uint32, big-endian)
+[4:12]  modulus (uint64, big-endian)
+[12:*]  coefficients (Falcon: uint16×N, ML-DSA: int32×N, big-endian)
+```
+
+**Output:** NTT-transformed coefficients (same format as input)
+
+**Gas Cost:**
+- Falcon-512: 500 gas (~9.4μs, 53 mgas/s)
+- Falcon-1024: 1,080 gas (~20.4μs, 53 mgas/s)
+- ML-DSA: 256 gas (~4.8μs, 53 mgas/s)
+
+### NTT_INV (0x13) - Inverse Transform
+
+Transforms NTT domain coefficients back to standard representation.
+
+**Input:** Same as NTT_FW (coefficients in NTT domain)
+
+**Output:** Coefficients in standard representation
+
+**Gas Cost:**
+- Falcon-512: 500 gas (~9.4μs, 53 mgas/s)
+- Falcon-1024: 1,080 gas (~20.3μs, 53 mgas/s)
+- ML-DSA: 340 gas (~6.4μs, 53 mgas/s)
+
+### VECMULMOD (0x14) - Vector Multiplication
+
+Element-wise modular multiplication in NTT domain.
+
+**Input:**
+```
+[0:4]   ring_degree (uint32, big-endian)
+[4:12]  modulus (uint64, big-endian)
+[12:12+n*size] vector_a
+[12+n*size:*]  vector_b
+```
+
+**Output:** Element-wise product `(a[i] * b[i]) mod q`
+
+**Gas Cost:** `ceil(0.32 × n)`
+- Falcon-512: 164 gas (~2.9μs, 56 mgas/s)
+- Falcon-1024: 328 gas (~6.0μs, 55 mgas/s)
+- ML-DSA: 82 gas (~2.0μs, 42 mgas/s)
+
+### VECADDMOD (0x15) - Vector Addition
+
+Element-wise modular addition.
+
+**Input:** Same as VECMULMOD
+
+**Output:** Element-wise sum `(a[i] + b[i]) mod q`
+
+**Gas Cost:** `ceil(0.3 × n)`
+- Falcon-512: 154 gas (~2.8μs, 55 mgas/s)
+- Falcon-1024: 308 gas (~5.8μs, 53 mgas/s)
+- ML-DSA: 77 gas (~1.6μs, 47 mgas/s)
 
 ## Testing
 
-### Running Tests
-
 ```bash
-# Run NTT precompile tests
-go test ./core/vm -v -run TestPrecompiledNTT
+cd core/vm
 
-# Run malformed input tests
-go test ./core/vm -v -run TestPrecompileNTTMalformedInput
+# All NTT tests
+go test -v -run TestPrecompiled.*NTT
+
+# Specific tests
+go test -v -run TestPrecompiledNTT_FW
+go test -v -run TestPrecompiledNTT_VECMULMOD
+
+# Benchmarks
+go test -bench=BenchmarkPrecompiledNTT -benchtime=5s
 ```
 
-### Test Coverage
+**Test Coverage:**
+- Scheme detection (Falcon-512/1024, ML-DSA)
+- Input validation (malformed inputs, invalid parameters)
+- Round-trip verification (`INTT(NTT(x)) = x`)
+- Cross-scheme isolation
+- Performance benchmarks with crypto standards
 
-The test suite includes:
+### Benchmark Results
 
-1. **Malformed Input Tests**: 8 different error conditions
-2. **Valid Operation Tests**: Forward and inverse NTT with ring degree 16
-3. **Cryptographic Standards**: Tests with real-world parameters
+Benchmarks were run on an Intel(R) Xeon(R) CPU @ 2.20GHz. For detailed results, please see the files below:
 
-### Benchmark Tests
-
-```bash
-# Basic NTT benchmark
-go test ./core/vm -bench BenchmarkPrecompiledNTT
-
-# Crypto standards benchmarks (Falcon-512, Kyber-128, Dilithium-256)
-go test ./core/vm -bench BenchmarkPrecompiledNTTCryptoStandards
-```
-
-### Hardfork Activation
-
-The NTT precompile is activated in the **Optimism Isthmus** hardfork:
-
-```go
-var PrecompiledContractsIsthmus = map[common.Address]PrecompiledContract{
-    // ... other precompiles
-    common.BytesToAddress([]byte{0x12}): &NTT{},
-}
-```
-
-### Contract Registration
-
-```go
-type NTT struct{}
-
-func (c *NTT) RequiredGas(input []byte) uint64 {
-    return 70000  // Fixed gas cost
-}
-
-func (c *NTT) Run(input []byte) ([]byte, error) {
-    // Implementation using Lattigo library
-}
-```
-
-## Security Considerations
-
-### Input Validation
-
-The implementation performs comprehensive input validation:
-
-- Bounds checking on all parameters
-- NTT-friendly modulus verification  
-- Coefficient range validation
-- Ring degree power-of-2 requirement
-
-### Side-Channel Resistance
-
-The Lattigo library provides some protection against timing attacks through:
-
-- Constant-time modular arithmetic
-- Consistent memory access patterns
-- Uniform execution paths
-
-## Source Code
-
-The complete implementation is available at: https://github.com/yhl125/op-geth/tree/feat/minimal-ntt-precompile
-
-## References
-
-- [EIP-7885: Number Theoretic Transform Precompile](../../README.md)
-- [Lattigo Library](https://github.com/tuneinsight/lattigo/blob/main/ring/ntt.go)
-- [OP-Geth Documentation](https://docs.optimism.io/)
+- [Ecrecover Benchmark Test Results](./benchmark_results/BenchmarkPrecompiledEcrecover)
+- [NTT & NTT Vector Operations Benchmark Test Results](./benchmark_results/BenchmarkPrecompiledNTT)

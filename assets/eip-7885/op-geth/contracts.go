@@ -30,6 +30,7 @@ import (
 	"github.com/consensys/gnark-crypto/ecc/bls12-381/fp"
 	"github.com/consensys/gnark-crypto/ecc/bls12-381/fr"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/bitutil"
 	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/blake2b"
@@ -37,7 +38,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/kzg4844"
 	"github.com/ethereum/go-ethereum/crypto/secp256r1"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/tuneinsight/lattigo/v6/ring"
+	ntt "github.com/yhl125/liboqs/bindings/go/ntt"
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -47,6 +48,7 @@ import (
 type PrecompiledContract interface {
 	RequiredGas(input []byte) uint64  // RequiredPrice calculates the contract gas use
 	Run(input []byte) ([]byte, error) // Run runs the precompiled contract
+	Name() string
 }
 
 // PrecompiledContracts contains the precompiled contracts supported at the given fork.
@@ -223,7 +225,10 @@ var PrecompiledContractsIsthmus = map[common.Address]PrecompiledContract{
 	common.BytesToAddress([]byte{0x0f}):       &bls12381PairingIsthmus{},
 	common.BytesToAddress([]byte{0x10}):       &bls12381MapG1{},
 	common.BytesToAddress([]byte{0x11}):       &bls12381MapG2{},
-	common.BytesToAddress([]byte{0x12}):       &NTT{},
+	common.BytesToAddress([]byte{0x12}):       &NTT_FW{},
+	common.BytesToAddress([]byte{0x13}):       &NTT_INV{},
+	common.BytesToAddress([]byte{0x14}):       &NTT_VECMULMOD{},
+	common.BytesToAddress([]byte{0x15}):       &NTT_VECADDMOD{},
 	common.BytesToAddress([]byte{0x01, 0x00}): &p256VerifyFjord{},
 }
 
@@ -369,7 +374,7 @@ func (c *ecrecover) Run(input []byte) ([]byte, error) {
 	v := input[63] - 27
 
 	// tighter sig s values input homestead only apply to tx sigs
-	if !allZero(input[32:63]) || !crypto.ValidateSignatureValues(v, r, s, false) {
+	if bitutil.TestBytes(input[32:63]) || !crypto.ValidateSignatureValues(v, r, s, false) {
 		return nil, nil
 	}
 	// We must make sure not to modify the 'input', so placing the 'v' along with
@@ -388,6 +393,10 @@ func (c *ecrecover) Run(input []byte) ([]byte, error) {
 	return common.LeftPadBytes(crypto.Keccak256(pubKey[1:])[12:], 32), nil
 }
 
+func (c *ecrecover) Name() string {
+	return "ECREC"
+}
+
 // SHA256 implemented as a native contract.
 type sha256hash struct{}
 
@@ -401,6 +410,10 @@ func (c *sha256hash) RequiredGas(input []byte) uint64 {
 func (c *sha256hash) Run(input []byte) ([]byte, error) {
 	h := sha256.Sum256(input)
 	return h[:], nil
+}
+
+func (c *sha256hash) Name() string {
+	return "SHA256"
 }
 
 // RIPEMD160 implemented as a native contract.
@@ -419,6 +432,10 @@ func (c *ripemd160hash) Run(input []byte) ([]byte, error) {
 	return common.LeftPadBytes(ripemd.Sum(nil), 32), nil
 }
 
+func (c *ripemd160hash) Name() string {
+	return "RIPEMD160"
+}
+
 // data copy implemented as a native contract.
 type dataCopy struct{}
 
@@ -431,6 +448,10 @@ func (c *dataCopy) RequiredGas(input []byte) uint64 {
 }
 func (c *dataCopy) Run(in []byte) ([]byte, error) {
 	return common.CopyBytes(in), nil
+}
+
+func (c *dataCopy) Name() string {
+	return "ID"
 }
 
 // bigModExp implements a native big integer exponential modular operation.
@@ -580,22 +601,27 @@ func (c *bigModExp) RequiredGas(input []byte) uint64 {
 
 func (c *bigModExp) Run(input []byte) ([]byte, error) {
 	var (
-		baseLen = new(big.Int).SetBytes(getData(input, 0, 32)).Uint64()
-		expLen  = new(big.Int).SetBytes(getData(input, 32, 32)).Uint64()
-		modLen  = new(big.Int).SetBytes(getData(input, 64, 32)).Uint64()
+		baseLenBig       = new(big.Int).SetBytes(getData(input, 0, 32))
+		expLenBig        = new(big.Int).SetBytes(getData(input, 32, 32))
+		modLenBig        = new(big.Int).SetBytes(getData(input, 64, 32))
+		baseLen          = baseLenBig.Uint64()
+		expLen           = expLenBig.Uint64()
+		modLen           = modLenBig.Uint64()
+		inputLenOverflow = max(baseLenBig.BitLen(), expLenBig.BitLen(), modLenBig.BitLen()) > 64
 	)
 	if len(input) > 96 {
 		input = input[96:]
 	} else {
 		input = input[:0]
 	}
+
+	// enforce size cap for inputs
+	if c.eip7823 && (inputLenOverflow || max(baseLen, expLen, modLen) > 1024) {
+		return nil, errors.New("one or more of base/exponent/modulus length exceeded 1024 bytes")
+	}
 	// Handle a special case when both the base and mod length is zero
 	if baseLen == 0 && modLen == 0 {
 		return []byte{}, nil
-	}
-	// enforce size cap for inputs
-	if c.eip7823 && max(baseLen, expLen, modLen) > 1024 {
-		return nil, errors.New("one or more of base/exponent/modulus length exceeded 1024 bytes")
 	}
 	// Retrieve the operands and execute the exponentiation
 	var (
@@ -615,6 +641,10 @@ func (c *bigModExp) Run(input []byte) ([]byte, error) {
 		v = base.Exp(base, exp, mod).Bytes()
 	}
 	return common.LeftPadBytes(v, int(modLen)), nil
+}
+
+func (c *bigModExp) Name() string {
+	return "MODEXP"
 }
 
 // newCurvePoint unmarshals a binary blob into a bn256 elliptic curve point,
@@ -666,6 +696,10 @@ func (c *bn256AddIstanbul) Run(input []byte) ([]byte, error) {
 	return runBn256Add(input)
 }
 
+func (c *bn256AddIstanbul) Name() string {
+	return "BN254_ADD"
+}
+
 // bn256AddByzantium implements a native elliptic curve point addition
 // conforming to Byzantium consensus rules.
 type bn256AddByzantium struct{}
@@ -677,6 +711,10 @@ func (c *bn256AddByzantium) RequiredGas(input []byte) uint64 {
 
 func (c *bn256AddByzantium) Run(input []byte) ([]byte, error) {
 	return runBn256Add(input)
+}
+
+func (c *bn256AddByzantium) Name() string {
+	return "BN254_ADD"
 }
 
 // runBn256ScalarMul implements the Bn256ScalarMul precompile, referenced by
@@ -704,6 +742,10 @@ func (c *bn256ScalarMulIstanbul) Run(input []byte) ([]byte, error) {
 	return runBn256ScalarMul(input)
 }
 
+func (c *bn256ScalarMulIstanbul) Name() string {
+	return "BN254_MUL"
+}
+
 // bn256ScalarMulByzantium implements a native elliptic curve scalar
 // multiplication conforming to Byzantium consensus rules.
 type bn256ScalarMulByzantium struct{}
@@ -715,6 +757,10 @@ func (c *bn256ScalarMulByzantium) RequiredGas(input []byte) uint64 {
 
 func (c *bn256ScalarMulByzantium) Run(input []byte) ([]byte, error) {
 	return runBn256ScalarMul(input)
+}
+
+func (c *bn256ScalarMulByzantium) Name() string {
+	return "BN254_MUL"
 }
 
 var (
@@ -778,6 +824,10 @@ func (c *bn256PairingGranite) Run(input []byte) ([]byte, error) {
 	return runBn256Pairing(input)
 }
 
+func (c *bn256PairingGranite) Name() string {
+	return "BN254_PAIRING"
+}
+
 // bn256PairingIstanbul implements a pairing pre-compile for the bn256 curve
 // conforming to Istanbul consensus rules.
 type bn256PairingIstanbul struct{}
@@ -791,6 +841,10 @@ func (c *bn256PairingIstanbul) Run(input []byte) ([]byte, error) {
 	return runBn256Pairing(input)
 }
 
+func (c *bn256PairingIstanbul) Name() string {
+	return "BN254_PAIRING"
+}
+
 // bn256PairingByzantium implements a pairing pre-compile for the bn256 curve
 // conforming to Byzantium consensus rules.
 type bn256PairingByzantium struct{}
@@ -802,6 +856,10 @@ func (c *bn256PairingByzantium) RequiredGas(input []byte) uint64 {
 
 func (c *bn256PairingByzantium) Run(input []byte) ([]byte, error) {
 	return runBn256Pairing(input)
+}
+
+func (c *bn256PairingByzantium) Name() string {
+	return "BN254_PAIRING"
 }
 
 type blake2F struct{}
@@ -865,6 +923,10 @@ func (c *blake2F) Run(input []byte) ([]byte, error) {
 	return output, nil
 }
 
+func (c *blake2F) Name() string {
+	return "BLAKE2F"
+}
+
 var (
 	errBLS12381InvalidInputLength          = errors.New("invalid input length")
 	errBLS12381InvalidFieldElementTopBytes = errors.New("invalid field element top bytes")
@@ -925,8 +987,16 @@ func (c *bls12381G1MultiExpIsthmus) Run(input []byte) ([]byte, error) {
 
 	return new(bls12381G1MultiExp).Run(input)
 }
+func (c *bls12381G1MultiExpIsthmus) Name() string {
+	return "BLS12_G1MSM"
+}
 
 // bls12381G1MultiExp implements EIP-2537 G1MultiExp precompile for Prague (no size limits).
+func (c *bls12381G1Add) Name() string {
+	return "BLS12_G1ADD"
+}
+
+// bls12381G1MultiExp implements EIP-2537 G1MultiExp precompile.
 type bls12381G1MultiExp struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
@@ -986,6 +1056,10 @@ func (c *bls12381G1MultiExp) Run(input []byte) ([]byte, error) {
 	return encodePointG1(r), nil
 }
 
+func (c *bls12381G1MultiExp) Name() string {
+	return "BLS12_G1MSM"
+}
+
 // bls12381G2Add implements EIP-2537 G2Add precompile.
 type bls12381G2Add struct{}
 
@@ -1023,6 +1097,10 @@ func (c *bls12381G2Add) Run(input []byte) ([]byte, error) {
 	return encodePointG2(r), nil
 }
 
+func (c *bls12381G2Add) Name() string {
+	return "BLS12_G2ADD"
+}
+
 type bls12381G2MultiExpIsthmus struct {
 }
 
@@ -1036,6 +1114,10 @@ func (c *bls12381G2MultiExpIsthmus) Run(input []byte) ([]byte, error) {
 	}
 
 	return new(bls12381G2MultiExp).Run(input)
+}
+
+func (c *bls12381G2MultiExpIsthmus) Name() string {
+	return "BLS12_G2MSM"
 }
 
 // bls12381G2MultiExp implements EIP-2537 G2MultiExp precompile.
@@ -1098,6 +1180,10 @@ func (c *bls12381G2MultiExp) Run(input []byte) ([]byte, error) {
 	return encodePointG2(r), nil
 }
 
+func (c *bls12381G2MultiExp) Name() string {
+	return "BLS12_G2MSM"
+}
+
 type bls12381PairingIsthmus struct {
 }
 
@@ -1111,6 +1197,10 @@ func (c *bls12381PairingIsthmus) Run(input []byte) ([]byte, error) {
 	}
 
 	return new(bls12381Pairing).Run(input)
+}
+
+func (c *bls12381PairingIsthmus) Name() string {
+	return "BLS12_PAIRING_CHECK"
 }
 
 // bls12381Pairing implements EIP-2537 Pairing precompile.
@@ -1174,6 +1264,10 @@ func (c *bls12381Pairing) Run(input []byte) ([]byte, error) {
 		out[31] = 1
 	}
 	return out, nil
+}
+
+func (c *bls12381Pairing) Name() string {
+	return "BLS12_PAIRING_CHECK"
 }
 
 func decodePointG1(in []byte) (*bls12381.G1Affine, error) {
@@ -1294,6 +1388,10 @@ func (c *bls12381MapG1) Run(input []byte) ([]byte, error) {
 	return encodePointG1(&r), nil
 }
 
+func (c *bls12381MapG1) Name() string {
+	return "BLS12_MAP_FP_TO_G1"
+}
+
 // bls12381MapG2 implements EIP-2537 MapG2 precompile.
 type bls12381MapG2 struct{}
 
@@ -1325,6 +1423,10 @@ func (c *bls12381MapG2) Run(input []byte) ([]byte, error) {
 
 	// Encode the G2 point to 256 bytes
 	return encodePointG2(&r), nil
+}
+
+func (c *bls12381MapG2) Name() string {
+	return "BLS12_MAP_FP2_TO_G2"
 }
 
 // kzgPointEvaluation implements the EIP-4844 point evaluation precompile.
@@ -1383,6 +1485,10 @@ func (b *kzgPointEvaluation) Run(input []byte) ([]byte, error) {
 	return common.Hex2Bytes(blobPrecompileReturnValue), nil
 }
 
+func (b *kzgPointEvaluation) Name() string {
+	return "KZG_POINT_EVALUATION"
+}
+
 // kZGToVersionedHash implements kzg_to_versioned_hash from EIP-4844
 func kZGToVersionedHash(kzg kzg4844.Commitment) common.Hash {
 	h := sha256.Sum256(kzg[:])
@@ -1433,92 +1539,516 @@ func (c *p256Verify) Run(input []byte) ([]byte, error) {
 	return nil, nil
 }
 
-// NTT implements pure NTT without caching (original implementation)
-type NTT struct{}
-
-// RequiredGas returns the gas required to execute the pure NTT operation
-func (c *NTT) RequiredGas(input []byte) uint64 {
-	// Higher gas cost for pure NTT due to no optimization
-	return 70000
+func (c *p256Verify) Name() string {
+	return "P256VERIFY"
 }
 
-// Run executes the pure NTT transformation without caching
-func (c *NTT) Run(input []byte) ([]byte, error) {
-	// Input format: operation (1 byte) + ring_degree (4 bytes) + modulus (8 bytes) + coefficients (ring_degree * 8 bytes)
-	// operation: 0 = forward NTT, 1 = inverse NTT
+// NTT_FW implements forward NTT for Falcon and ML-DSA (Dilithium) parameters.
+//
+// This precompile automatically detects the cryptographic scheme based on
+// ring degree and modulus, then dispatches to the appropriate liboqs forward NTT function.
+//
+// Supported parameters:
+//   - Falcon-512:  ringDegree=512,  modulus=12289
+//   - Falcon-1024: ringDegree=1024, modulus=12289
+//   - ML-DSA (all): ringDegree=256,  modulus=8380417
+//
+// Input format:
+//
+//	[0:4]   ring_degree (uint32, big-endian)
+//	[4:12]  modulus (uint64, big-endian)
+//	[12:*]  coefficients (ringDegree elements)
+//	        - Falcon: uint16 values (2 bytes each, big-endian)
+//	        - ML-DSA: int32 values (4 bytes each, big-endian, signed as uint32)
+//
+// Output format:
+//
+//	[0:*]   NTT-transformed coefficients (same encoding as input)
+//	        - Falcon: ringDegree × uint16 (2 bytes each, big-endian)
+//	        - ML-DSA: ringDegree × int32 (4 bytes each, big-endian, signed as uint32)
+//
+// Example (Falcon-512):
+//
+//	Input:  00000200 0000000000003001 0001 0002 0003 ... (512 uint16 values)
+//	Output: 0feb 0760 0836 ... (512 uint16 values in NTT domain)
+//
+// Example (ML-DSA):
+//
+//	Input:  00000100 0000000000007fe101 00000001 00000002 ... (256 int32 values)
+//	Output: ffc0e5f5 ffccf7a7 ... (256 int32 values in NTT domain)
+//
+// Gas cost: Variable based on scheme (256-1080 gas, calibrated for ~50 mgas/s)
+type NTT_FW struct{}
 
-	if len(input) < 13 {
-		return nil, errors.New("input too short")
+func (c *NTT_FW) RequiredGas(input []byte) uint64 {
+	if len(input) < 12 {
+		return 0
 	}
 
-	operation := input[0]
-	if operation > 1 {
-		return nil, errors.New("invalid operation: must be 0 (forward) or 1 (inverse)")
+	ringDegree := binary.BigEndian.Uint32(input[0:4])
+	modulus := binary.BigEndian.Uint64(input[4:12])
+
+	// Detect scheme and return appropriate gas cost
+	// Gas costs calibrated for 50 mgas/s throughput
+	switch {
+	case ringDegree == 512 && modulus == 12289:
+		return 500 // Falcon-512
+	case ringDegree == 1024 && modulus == 12289:
+		return 1080 // Falcon-1024
+	case ringDegree == 256 && modulus == 8380417:
+		return 256 // ML-DSA
+	default:
+		return 0 // Invalid parameters
+	}
+}
+
+func (c *NTT_FW) Run(input []byte) ([]byte, error) {
+	// Validate minimum input length
+	if len(input) < 12 {
+		return nil, errors.New("input too short: minimum 12 bytes required")
 	}
 
-	// Extract ring degree (4 bytes, big endian)
-	ringDegree := binary.BigEndian.Uint32(input[1:5])
+	// Parse ring degree and modulus
+	ringDegree := binary.BigEndian.Uint32(input[0:4])
+	modulus := binary.BigEndian.Uint64(input[4:12])
 
-	// Validate ring degree (must be power of 2, >= 16)
-	if ringDegree < 16 || (ringDegree&(ringDegree-1)) != 0 {
-		return nil, errors.New("invalid ring degree: must be power of 2 >= 16")
+	// Detect scheme and dispatch to appropriate implementation
+	switch {
+	case ringDegree == 512 && modulus == 12289:
+		return c.runFalconNTT(input[12:], ntt.Falcon512LogN)
+	case ringDegree == 1024 && modulus == 12289:
+		return c.runFalconNTT(input[12:], ntt.Falcon1024LogN)
+	case ringDegree == 256 && modulus == 8380417:
+		return c.runMLDSANTT(input[12:])
+	default:
+		return nil, fmt.Errorf("unsupported parameters: ringDegree=%d, modulus=%d (only Falcon-512/1024 and ML-DSA supported)", ringDegree, modulus)
+	}
+}
+
+func (c *NTT_FW) runFalconNTT(coeffData []byte, logn uint) ([]byte, error) {
+	n := 1 << logn // 512 or 1024
+	expectedLen := n * 2
+	if len(coeffData) != expectedLen {
+		return nil, fmt.Errorf("invalid coefficient data length for Falcon: expected %d bytes, got %d", expectedLen, len(coeffData))
 	}
 
-	// Extract modulus (8 bytes, big endian)
-	modulus := binary.BigEndian.Uint64(input[5:13])
-
-	// Validate modulus (must be non-zero and NTT-friendly prime)
-	if modulus == 0 {
-		return nil, errors.New("modulus cannot be zero")
+	// Parse uint16 coefficients
+	poly := make(ntt.FalconPolynomial, n)
+	for i := 0; i < n; i++ {
+		poly[i] = binary.BigEndian.Uint16(coeffData[i*2 : (i+1)*2])
 	}
 
-	// Check if modulus is congruent to 1 mod 2*ringDegree (NTT-friendly condition)
-	if modulus%(2*uint64(ringDegree)) != 1 {
-		return nil, errors.New("modulus must be congruent to 1 mod 2*ringDegree")
+	// Execute Falcon forward NTT
+	if err := ntt.Falcon_NTT(&poly, logn); err != nil {
+		return nil, fmt.Errorf("Falcon_NTT failed: %v", err)
 	}
 
-	// Check input length matches expected coefficient count
-	expectedLen := 13 + int(ringDegree)*8
-	if len(input) != expectedLen {
-		return nil, fmt.Errorf("input length mismatch: expected %d, got %d", expectedLen, len(input))
-	}
-
-	// Extract coefficients (8 bytes each, big endian)
-	coeffs := make([]uint64, ringDegree)
-	for i := 0; i < int(ringDegree); i++ {
-		coeffs[i] = binary.BigEndian.Uint64(input[13+i*8 : 13+(i+1)*8])
-		// Ensure coefficient is within modulus for predictable behavior
-		if coeffs[i] >= modulus {
-			return nil, fmt.Errorf("coefficient %d exceeds modulus", i)
-		}
-	}
-
-	// Create new ring each time (no caching for pure NTT)
-	r, err := ring.NewRing(int(ringDegree), []uint64{modulus})
-	if err != nil {
-		return nil, fmt.Errorf("failed to create ring: %v", err)
-	}
-
-	// Create input and output polynomials
-	input_poly := r.NewPoly()
-	output_poly := r.NewPoly()
-
-	// Copy coefficients to input polynomial
-	copy(input_poly.Coeffs[0], coeffs)
-
-	// Perform NTT operation
-	switch operation {
-	case 0: // Forward NTT
-		r.NTT(input_poly, output_poly)
-	case 1: // Inverse NTT
-		r.INTT(input_poly, output_poly)
-	}
-
-	// Convert result back to bytes
-	result := make([]byte, int(ringDegree)*8)
-	for i := 0; i < int(ringDegree); i++ {
-		binary.BigEndian.PutUint64(result[i*8:(i+1)*8], output_poly.Coeffs[0][i])
+	// Encode result
+	result := make([]byte, n*2)
+	for i := 0; i < n; i++ {
+		binary.BigEndian.PutUint16(result[i*2:(i+1)*2], poly[i])
 	}
 
 	return result, nil
+}
+
+func (c *NTT_FW) runMLDSANTT(coeffData []byte) ([]byte, error) {
+	const n = 256
+	expectedLen := n * 4
+	if len(coeffData) != expectedLen {
+		return nil, fmt.Errorf("invalid coefficient data length for ML-DSA: expected %d bytes, got %d", expectedLen, len(coeffData))
+	}
+
+	// Parse int32 coefficients
+	var poly ntt.MLDSAPolynomial
+	for i := 0; i < n; i++ {
+		poly[i] = int32(binary.BigEndian.Uint32(coeffData[i*4 : (i+1)*4]))
+	}
+
+	// Execute ML-DSA forward NTT
+	// Note: All ML-DSA security levels use the same NTT, so we use MLDSA44 as default
+	if err := ntt.MLDSA_NTT(&poly, ntt.MLDSA44); err != nil {
+		return nil, fmt.Errorf("MLDSA_NTT failed: %v", err)
+	}
+
+	// Encode result
+	result := make([]byte, n*4)
+	for i := 0; i < n; i++ {
+		binary.BigEndian.PutUint32(result[i*4:(i+1)*4], uint32(poly[i]))
+	}
+
+	return result, nil
+}
+
+func (c *NTT_FW) Name() string {
+	return "NTT_FW"
+}
+
+// NTT_INV implements inverse NTT for Falcon and ML-DSA (Dilithium) parameters.
+//
+// This precompile automatically detects the cryptographic scheme based on
+// ring degree and modulus, then dispatches to the appropriate liboqs inverse NTT function.
+//
+// Supported parameters:
+//   - Falcon-512:  ringDegree=512,  modulus=12289
+//   - Falcon-1024: ringDegree=1024, modulus=12289
+//   - ML-DSA (all): ringDegree=256,  modulus=8380417
+//
+// Input format:
+//
+//	[0:4]   ring_degree (uint32, big-endian)
+//	[4:12]  modulus (uint64, big-endian)
+//	[12:*]  coefficients (ringDegree elements)
+//	        - Falcon: uint16 values (2 bytes each)
+//	        - ML-DSA: int32 values (4 bytes each)
+//
+// Output format:
+//
+//	[0:*]   transformed coefficients (same format as input)
+//
+// Gas cost: Variable based on scheme (340-1080 gas, calibrated for ~50 mgas/s)
+type NTT_INV struct{}
+
+func (c *NTT_INV) RequiredGas(input []byte) uint64 {
+	if len(input) < 12 {
+		return 0
+	}
+
+	ringDegree := binary.BigEndian.Uint32(input[0:4])
+	modulus := binary.BigEndian.Uint64(input[4:12])
+
+	// Detect scheme and return appropriate gas cost
+	// Gas costs calibrated for 50 mgas/s throughput
+	switch {
+	case ringDegree == 512 && modulus == 12289:
+		return 500 // Falcon-512
+	case ringDegree == 1024 && modulus == 12289:
+		return 1080 // Falcon-1024
+	case ringDegree == 256 && modulus == 8380417:
+		return 340 // ML-DSA
+	default:
+		return 0 // Invalid parameters
+	}
+}
+
+func (c *NTT_INV) Run(input []byte) ([]byte, error) {
+	// Validate minimum input length
+	if len(input) < 12 {
+		return nil, errors.New("input too short: minimum 12 bytes required")
+	}
+
+	// Parse ring degree and modulus
+	ringDegree := binary.BigEndian.Uint32(input[0:4])
+	modulus := binary.BigEndian.Uint64(input[4:12])
+
+	// Detect scheme and dispatch to appropriate implementation
+	switch {
+	case ringDegree == 512 && modulus == 12289:
+		return c.runFalconINTT(input[12:], ntt.Falcon512LogN)
+	case ringDegree == 1024 && modulus == 12289:
+		return c.runFalconINTT(input[12:], ntt.Falcon1024LogN)
+	case ringDegree == 256 && modulus == 8380417:
+		return c.runMLDSAINTT(input[12:])
+	default:
+		return nil, fmt.Errorf("unsupported parameters: ringDegree=%d, modulus=%d (only Falcon-512/1024 and ML-DSA supported)", ringDegree, modulus)
+	}
+}
+
+func (c *NTT_INV) runFalconINTT(coeffData []byte, logn uint) ([]byte, error) {
+	n := 1 << logn // 512 or 1024
+	expectedLen := n * 2
+	if len(coeffData) != expectedLen {
+		return nil, fmt.Errorf("invalid coefficient data length for Falcon: expected %d bytes, got %d", expectedLen, len(coeffData))
+	}
+
+	// Parse uint16 coefficients
+	poly := make(ntt.FalconPolynomial, n)
+	for i := 0; i < n; i++ {
+		poly[i] = binary.BigEndian.Uint16(coeffData[i*2 : (i+1)*2])
+	}
+
+	// Execute Falcon inverse NTT
+	if err := ntt.Falcon_InvNTT(&poly, logn); err != nil {
+		return nil, fmt.Errorf("Falcon_INTT failed: %v", err)
+	}
+
+	// Encode result
+	result := make([]byte, n*2)
+	for i := 0; i < n; i++ {
+		binary.BigEndian.PutUint16(result[i*2:(i+1)*2], poly[i])
+	}
+
+	return result, nil
+}
+
+func (c *NTT_INV) runMLDSAINTT(coeffData []byte) ([]byte, error) {
+	const n = 256
+	expectedLen := n * 4
+	if len(coeffData) != expectedLen {
+		return nil, fmt.Errorf("invalid coefficient data length for ML-DSA: expected %d bytes, got %d", expectedLen, len(coeffData))
+	}
+
+	// Parse int32 coefficients
+	var poly ntt.MLDSAPolynomial
+	for i := 0; i < n; i++ {
+		poly[i] = int32(binary.BigEndian.Uint32(coeffData[i*4 : (i+1)*4]))
+	}
+
+	// Execute ML-DSA inverse NTT
+	// Note: All ML-DSA security levels use the same NTT, so we use MLDSA44 as default
+	if err := ntt.MLDSA_InvNTT(&poly, ntt.MLDSA44); err != nil {
+		return nil, fmt.Errorf("MLDSA_INTT failed: %v", err)
+	}
+
+	// Encode result
+	result := make([]byte, n*4)
+	for i := 0; i < n; i++ {
+		binary.BigEndian.PutUint32(result[i*4:(i+1)*4], uint32(poly[i]))
+	}
+
+	return result, nil
+}
+
+func (c *NTT_INV) Name() string {
+	return "NTT_INV"
+}
+
+// NTT_VECMULMOD implements vectorized modular multiplication for Falcon and ML-DSA.
+//
+// This precompile performs element-wise modular multiplication of two vectors
+// in the ring R = Fq[X]/(X^n + 1), supporting both Falcon and ML-DSA parameters.
+//
+// Implementation uses direct modular multiplication (a*b % q) with compile-time constant
+// modulus values. The Go compiler optimizes constant modulus operations (% 12289, % 8380417)
+// to magic multiply + shift at compile time, avoiding division instructions. This provides
+// better performance than Montgomery multiplication while avoiding the complexity of two
+// conversion calls (standard→Montgomery→standard) required for API compatibility with
+// standard residue representation.
+//
+// Supported parameters:
+//   - Falcon-512:  ringDegree=512,  modulus=12289
+//   - Falcon-1024: ringDegree=1024, modulus=12289
+//   - ML-DSA (all): ringDegree=256,  modulus=8380417
+//
+// Input format:
+//
+//	[0:4]   ring_degree (uint32, big-endian)
+//	[4:12]  modulus (uint64, big-endian)
+//	[12:12+n*elem_size] first vector coefficients
+//	[12+n*elem_size:*]  second vector coefficients
+//
+// Element encoding:
+//   - Falcon: uint16 (2 bytes each, big-endian)
+//   - ML-DSA: int32 as uint32 (4 bytes each, big-endian)
+//
+// Output format:
+//
+//	[0:*]   Element-wise product (a[i] * b[i] mod q) for i=0..n-1
+//
+// Gas cost: ceil(0.32 * n) where n is the ring degree
+type NTT_VECMULMOD struct{}
+
+func (c *NTT_VECMULMOD) RequiredGas(input []byte) uint64 {
+	if len(input) < 12 {
+		return 0
+	}
+	n := binary.BigEndian.Uint32(input[0:4])
+	if n == 0 || (n&(n-1)) != 0 {
+		return 0
+	}
+
+	// O(n)
+	const Cmul_num = 32 // 0.32
+	const Cmul_den = 100
+	gas := (uint64(n)*Cmul_num + Cmul_den - 1) / Cmul_den // ceil(0.32*n)
+	if gas == 0 {
+		gas = 1
+	}
+	return gas
+}
+
+func (c *NTT_VECMULMOD) Run(input []byte) ([]byte, error) {
+	// Validate minimum input length
+	if len(input) < 12 {
+		return nil, errors.New("input too short: minimum 12 bytes required")
+	}
+
+	// Parse ring degree and modulus
+	ringDegree := binary.BigEndian.Uint32(input[0:4])
+	modulus := binary.BigEndian.Uint64(input[4:12])
+
+	// Validate ring degree is power of 2
+	if ringDegree == 0 || (ringDegree&(ringDegree-1)) != 0 {
+		return nil, errors.New("ring degree must be a power of 2")
+	}
+
+	// Dispatch based on modulus
+	switch modulus {
+	case 12289:
+		return runFalconVecMul(input[12:], int(ringDegree))
+	case 8380417:
+		return runMLDSAVecMul(input[12:], int(ringDegree))
+	default:
+		return nil, fmt.Errorf("unsupported modulus: %d (only 12289 and 8380417 supported)", modulus)
+	}
+}
+
+func runFalconVecMul(data []byte, n int) ([]byte, error) {
+	expectedLen := n * 2 * 2
+	if len(data) != expectedLen {
+		return nil, fmt.Errorf("invalid data length: expected %d bytes, got %d", expectedLen, len(data))
+	}
+	const Q = uint32(12289)
+
+	out := make([]byte, n*2)
+	for i := range n {
+		a := binary.BigEndian.Uint16(data[i*2 : (i+1)*2])
+		b := binary.BigEndian.Uint16(data[(n+i)*2 : (n+i+1)*2])
+		p := (uint32(a) * uint32(b)) % Q
+		binary.BigEndian.PutUint16(out[i*2:(i+1)*2], uint16(p))
+	}
+	return out, nil
+}
+
+func runMLDSAVecMul(data []byte, n int) ([]byte, error) {
+	expectedLen := n * 4 * 2
+	if len(data) != expectedLen {
+		return nil, fmt.Errorf("invalid data length: expected %d bytes, got %d", expectedLen, len(data))
+	}
+	const Q = int64(8380417)
+
+	out := make([]byte, n*4)
+	for i := range n {
+		a := int32(binary.BigEndian.Uint32(data[i*4 : (i+1)*4]))
+		b := int32(binary.BigEndian.Uint32(data[(n+i)*4 : (n+i+1)*4]))
+		p := (int64(a) * int64(b)) % Q
+		if p < 0 {
+			p += Q
+		}
+		binary.BigEndian.PutUint32(out[i*4:(i+1)*4], uint32(p))
+	}
+	return out, nil
+}
+
+func (c *NTT_VECMULMOD) Name() string {
+	return "NTT_VECMULMOD"
+}
+
+// NTT_VECADDMOD implements vectorized modular addition for Falcon and ML-DSA.
+//
+// This precompile performs element-wise modular addition of two vectors
+// in the ring R = Fq[X]/(X^n + 1), supporting both Falcon and ML-DSA parameters.
+//
+// Implementation uses simple conditional subtraction (if sum >= q then sum -= q),
+// which provides equivalent performance to bit-manipulation based conditional reduction
+// with clearer, more maintainable code.
+//
+// Supported parameters:
+//   - Falcon-512:  ringDegree=512,  modulus=12289
+//   - Falcon-1024: ringDegree=1024, modulus=12289
+//   - ML-DSA (all): ringDegree=256,  modulus=8380417
+//
+// Input format: Same as NTT_VECMULMOD
+//
+//	[0:4]   ring_degree (uint32, big-endian)
+//	[4:12]  modulus (uint64, big-endian)
+//	[12:*]  two vectors concatenated
+//
+// Output format:
+//
+//	[0:*]   Element-wise sum (a[i] + b[i] mod q) for i=0..n-1
+//
+// Gas cost: ceil(0.3 * n) where n is the ring degree
+type NTT_VECADDMOD struct{}
+
+func (c *NTT_VECADDMOD) RequiredGas(input []byte) uint64 {
+	if len(input) < 12 {
+		return 0
+	}
+	n := binary.BigEndian.Uint32(input[0:4])
+	if n == 0 || (n&(n-1)) != 0 {
+		return 0
+	}
+
+	// O(n)
+	const Cadd_num = 30 // 0.3
+	const Cadd_den = 100
+	gas := (uint64(n)*Cadd_num + Cadd_den - 1) / Cadd_den // ceil(0.3*n)
+	if gas == 0 {
+		gas = 1
+	}
+	return gas
+}
+
+func (c *NTT_VECADDMOD) Run(input []byte) ([]byte, error) {
+	// Validate minimum input length
+	if len(input) < 12 {
+		return nil, errors.New("input too short: minimum 12 bytes required")
+	}
+
+	// Parse ring degree and modulus
+	ringDegree := binary.BigEndian.Uint32(input[0:4])
+	modulus := binary.BigEndian.Uint64(input[4:12])
+
+	// Validate ring degree is power of 2
+	if ringDegree == 0 || (ringDegree&(ringDegree-1)) != 0 {
+		return nil, errors.New("ring degree must be a power of 2")
+	}
+
+	// Dispatch based on modulus
+	switch modulus {
+	case 12289:
+		return runUint16VecAdd(input[12:], int(ringDegree), uint16(modulus))
+	case 8380417:
+		return runInt32VecAdd(input[12:], int(ringDegree), int32(modulus))
+	default:
+		return nil, fmt.Errorf("unsupported modulus: %d (only 12289 and 8380417 supported)", modulus)
+	}
+}
+
+func runUint16VecAdd(data []byte, n int, q uint16) ([]byte, error) {
+	expectedLen := n * 2 * 2
+	if len(data) != expectedLen {
+		return nil, fmt.Errorf("invalid data length: expected %d bytes, got %d", expectedLen, len(data))
+	}
+
+	out := make([]byte, n*2)
+	for i := range n {
+		a := binary.BigEndian.Uint16(data[i*2 : (i+1)*2])
+		b := binary.BigEndian.Uint16(data[(n+i)*2 : (n+i+1)*2])
+		sum := uint32(a) + uint32(b)
+		if sum >= uint32(q) {
+			sum -= uint32(q)
+		}
+		binary.BigEndian.PutUint16(out[i*2:(i+1)*2], uint16(sum))
+	}
+
+	return out, nil
+}
+
+func runInt32VecAdd(data []byte, n int, q int32) ([]byte, error) {
+	expectedLen := n * 4 * 2
+	if len(data) != expectedLen {
+		return nil, fmt.Errorf("invalid data length: expected %d bytes, got %d", expectedLen, len(data))
+	}
+
+	out := make([]byte, n*4)
+	for i := range n {
+		a := int32(binary.BigEndian.Uint32(data[i*4 : (i+1)*4]))
+		b := int32(binary.BigEndian.Uint32(data[(n+i)*4 : (n+i+1)*4]))
+		sum := a + b
+		if sum >= q {
+			sum -= q
+		}
+		if sum < 0 {
+			sum += q
+		}
+		binary.BigEndian.PutUint32(out[i*4:(i+1)*4], uint32(sum))
+	}
+
+	return out, nil
+}
+
+func (c *NTT_VECADDMOD) Name() string {
+	return "NTT_VECADDMOD"
 }
