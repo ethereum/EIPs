@@ -2,7 +2,7 @@
 eip: 8078
 title: GETDEPLOYER Opcode
 description: A lookup opcode that returns the deployer address of a contract
-author: nolan wang (https://x.com/ma1fan)
+author: Nolan Wang (@ma1fan)
 discussions-to: https://ethereum-magicians.org/t/introduce-sdelegatecall-opcode-for-enhanced-delegatecall-security/23045/
 status: Draft
 type: Standards Track
