@@ -1,5 +1,5 @@
 ---
-eip: xxxx
+eip: 8078
 title: GETDEPLOYER Opcode
 description: A lookup opcode that returns the deployer address of a contract
 author: nolan wang (https://x.com/ma1fan)
