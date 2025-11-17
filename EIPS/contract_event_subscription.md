@@ -1,5 +1,5 @@
 ---
-eip: 8078
+eip: draft
 title: Contract Event Subscription
 description: Allows contracts to subscribe to and react to events emitted by other contracts with gas-bounded execution
 author: Lucas Cullen (@bitcoinbrisbane) <lucas@bitcoinbrisbane.com.au>
