@@ -1,6 +1,7 @@
-on:
+onhttps://github.com/ethereum/EIPs/blob/37954f91ddcec725a03c9e7fa6dabf782c36a9af/.github/workflows/rerun-bot-pull-request-review.yml.
+:
   schedule:
-    # A job that runs every sunday at 00:00
+    # A job that runs every sunday at 00
     - cron:  '0 0 * * 0'
   workflow_dispatch:
 
