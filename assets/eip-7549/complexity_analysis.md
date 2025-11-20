@@ -2,13 +2,13 @@
 
 ## Network aggregates
 
-Data complexity of the network aggregtes does not increase as the new validity condition for the `beacon_aggregate_and_proof` gossipsub topic ensures that every network aggregate comprises a single committee.
+Data complexity of the network aggregates does not increase as the new validity condition for the `beacon_aggregate_and_proof` gossipsub topic ensures that every network aggregate comprises a single committee.
 
 ## On chain aggregates
 
 ![image](./on_chain_aggregates.png)
 
-The above plot shows potential optimisation effect of the proposed change. Namely, it is roughly 18KB to 4KB reduction in the size of a 64-committee aggregate for a 1 million validator set. Note that these numbers assumes perfect aggregation.
+The above plot shows potential optimisation effect of the proposed change. Namely, it is roughly 18KB to 4KB reduction in the size of a 64-committee aggregate for a 1 million validator set. Note that these numbers assume perfect aggregation.
 
 ### `MAX_ATTESTATIONS`
 
@@ -20,7 +20,7 @@ The above plot suggests `MAX_ATTESTATIONS = 8` as a reasonable limitation. Which
 
 ## Attester slashing
 
-The plot below shows different variations of attester slashing data complexity. Numbers e.g. 64 vs 64 mean a number of committees which validator indices are respresented by the corresponding `IndexedAttestation` structure. For instance, today every on chain aggregate comprises a single committee thus the worst case attester slashing produced from on chain aggregates will have two indexed attestations with `1_000_000 / 32 / 64 = 488` validator indices each, which is roughly `8 KB` of uncompressed data. With the proposed change an attester slashing obtained in the same way could require `488 KB` of uncompressed data because it could contain indices from up to 64 committees instead of just 1.
+The plot below shows different variations of attester slashing data complexity. Numbers e.g. 64 vs 64 mean a number of committees which validator indices are represented by the corresponding `IndexedAttestation` structure. For instance, today every on chain aggregate comprises a single committee thus the worst case attester slashing produced from on chain aggregates will have two indexed attestations with `1_000_000 / 32 / 64 = 488` validator indices each, which is roughly `8 KB` of uncompressed data. With the proposed change an attester slashing obtained in the same way could require `488 KB` of uncompressed data because it could contain indices from up to 64 committees instead of just 1.
 
 ![image](./attester_slashing.png)
 
