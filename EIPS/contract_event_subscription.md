@@ -1,9 +1,9 @@
 ---
-eip: draft
+eip: 8082
 title: Contract Event Subscription
 description: Allows contracts to subscribe to and react to events emitted by other contracts with gas-bounded execution
 author: Lucas Cullen (@bitcoinbrisbane) <lucas@bitcoinbrisbane.com.au>
-discussions-to: https://ethereum-magicians.org/t/xxxxx
+discussions-to: https://ethereum-magicians.org/t/eip-to-be-assigned-contract-event-subscription/26575
 status: Draft
 type: Standards Track
 category: Core
