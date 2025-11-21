@@ -1,11 +1,9 @@
 from typing import Optional
 from enum import IntEnum
-from eth_hash.auto import keccak
 from remerkleable.basic import uint8, uint64, uint256, uint
 from remerkleable.byte_arrays import ByteVector, Bytes32
 from remerkleable.complex import Container
 from remerkleable.progressive import CompatibleUnion, ProgressiveByteList, ProgressiveContainer, ProgressiveList
-from secp256k1 import ECDSA, PublicKey
 
 from algorithm_registry.helpers import pubkey_to_address, calculate_penalty
 from algorithm_registry.registry import algorithm_registry
@@ -41,17 +39,20 @@ def get_signature_gas_cost(
 
 def validate_execution_signature(
     signature: ExecutionSignature,
-    signature_hash: Hash32,
     expected_algorithm: Optional[ExecutionSignatureAlgorithm]=None,
-) -> ExecutionAddress:
+):
     assert len(signature) > 0
 
     if expected_algorithm is not None:
         assert signature[0] == expected_algorithm
 
-    public_key = algorithm_registry[signature[0]].verify(signature, signature_hash)
-    return pubkey_to_address(public_key, signature[0])
+    assert(signature[0] in algorithm_registry)
 
+def recover_execution_signer(signature: ExecutionSignature, sig_hash: Hash32) -> ExecutionAddress:
+    assert len(signature) > 0
+
+    public_key = algorithm_registry[signature[0]].verify(signature, sig_hash)
+    return pubkey_to_address(public_key, signature[0])
 
 SECP256K1_ALGORITHM = ExecutionSignatureAlgorithm(0xFF)
 SECP256K1_SIGNATURE_SIZE = 1 + 32 + 32 + 1
@@ -283,3 +284,51 @@ class RlpTxType(IntEnum):
     SET_CODE = 0x04
     SET_CODE_MAGIC = 0x05
 
+def calculate_base_gas_usage(tx: Transaction) -> uint:
+    tx_data = tx.payload.data()
+
+    TX_BASE_COST = 21000 # FIXME
+    gas_cost = TX_BASE_COST
+
+    if hasattr(tx_data, "authorization_list"):
+        for auth in tx_data.authorization_list:
+            gas_cost += get_signature_gas_cost(auth.signature)
+
+    gas_cost += get_signature_gas_cost(tx.signature)
+
+    return uint256(gas_cost)
+
+def validate_transaction(tx: Transaction):
+    tx_data = tx.payload.data()
+
+    expected_signature_algorithm = None
+    assert tx_data.gas >= calculate_base_gas_usage(tx)
+
+    if hasattr(tx_data, "type_"):
+        expected_signature_algorithm = SECP256K1_ALGORITHM
+        match tx_data.type_:
+            case RlpTxType.LEGACY:
+                assert isinstance(tx_data, RlpLegacyTransactionPayload)
+            case RlpTxType.ACCESS_LIST:
+                assert isinstance(tx_data, RlpAccessListTransactionPayload)
+            case RlpTxType.FEE_MARKET:
+                assert isinstance(tx_data, RlpFeeMarketTransactionPayload)
+            case RlpTxType.BLOB:
+                assert isinstance(tx_data, RlpBlobTransactionPayload)
+            case RlpTxType.SET_CODE:
+                assert isinstance(tx_data, RlpSetCodeTransactionPayload)
+            case _:
+                assert False
+
+    if hasattr(tx_data, "authorization_list"):
+        for auth in tx_data.authorization_list:
+            auth_data = auth.payload.data()
+
+            if hasattr(auth_data, "magic"):
+                assert auth_data.magic == RlpTxType.SET_CODE_MAGIC
+            if hasattr(auth_data, "chain_id"):
+                assert auth_data.chain_id != 0
+
+            validate_execution_signature(auth.signature, expected_algorithm=expected_signature_algorithm)
+
+    validate_execution_signature(tx.signature, expected_algorithm=expected_signature_algorithm)
