@@ -18,6 +18,11 @@ layout: default
 </svg>
 
 <div class="home">
+  {% assign nonfinal_statuses = "Draft,Stagnant,Withdrawn,Review,Last Call" | split: "," %}
+  {% assign is_nonfinal = false %}
+  {% if page.status %}
+    {% assign is_nonfinal = nonfinal_statuses contains page.status %}
+  {% endif %}
   <span class="h5">
     {% if page.status == "Stagnant" %}
       <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
@@ -48,7 +53,7 @@ layout: default
   <h1 class="page-heading">
     {% if page.category == "ERC" %}
       ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    {% elsif page.category != "ERC" %}
+    {% else %}
       EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
     {% endif %}
     <a href="{{ page.discussions-to | uri_escape }}" class="no-underline">
@@ -119,8 +124,7 @@ layout: default
   IEEE specification for reference formatting:
   https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
   {% endcomment %}
-  <p>{% include authorlist.html authors=page.author %}, "{% if page.category == "ERC" %}ERC{% else %}EIP{% endif %}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
-</div>
+  <p>{% include authorlist.html authors=page.author %}, "{% if page.category == "ERC" %}ERC{% else %}EIP{% endif %}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if is_nonfinal %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p></div>
 {% comment %}
 Article schema specification:
 https://schema.org/TechArticle
@@ -130,11 +134,9 @@ https://schema.org/TechArticle
     "@context": "http://schema.org",
     "@type": "TechArticle",
     {% if page.category == "ERC" %}
-    "headline": "ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
-    "name": "ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
+    "headline": "ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if is_nonfinal %} [DRAFT]{% endif %}",
     {% else %}
-    "headline": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
-    "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
+    "headline": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if is_nonfinal %} [DRAFT]{% endif %}",
     {% endif %}
     "author": "{{ page.author }}",
     "dateCreated": "{{ page.created | date: "%Y-%m-%d" }}",
