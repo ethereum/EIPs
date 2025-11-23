@@ -13,6 +13,8 @@ class Test:
     from_: ExecutionAddress
     authorities: list[ExecutionAddress]
 
+# FIXME: Make the tests work. i.e. change the algorithm_id from `0x01` -> `0xFF`
+# Also the tx with a gas value of `5`, isn't that inherently invalid?
 tests = [
     Test(
         tx_payload_selector=0x01,
@@ -110,8 +112,8 @@ for test in tests:
     assert compute_tx_hash(tx) == test.rlp_tx_hash
     assert tx.hash_tree_root() == test.ssz_tx_root
 
-    assert secp256k1_recover_signer(tx.signature, compute_sig_hash(tx)) == test.from_
+    assert recover_execution_signer(tx.signature, compute_sig_hash(tx)) == test.from_
     assert [
-        secp256k1_recover_signer(auth.signature, compute_auth_hash(auth))
+        recover_execution_signer(auth.signature, compute_auth_hash(auth))
         for auth in getattr(tx.payload.data(), 'authorization_list', [])
     ] == test.authorities
