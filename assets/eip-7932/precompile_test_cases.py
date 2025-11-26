@@ -19,32 +19,32 @@ test_cases = [
     """
     
     # Invalid algorithm (without data)
-    (b"\x00" * 32 + b"\xFE", (INVALID, 3000)),
+    (b"\xFE" + b"\x20" + b"\x00" * 32, (INVALID, 3000)),
 
     # Invalid algorithm (with data at secp256k1 size)
-    (b"\x00" * 32 + b"\xFE" + b"\x01" * 65, (INVALID, 3000)), 
+    (b"\xFE" + b"\x01" * 65 + b"\x20" + b"\x00" * 32, (INVALID, 3000)), 
     
     # Invalid algorithm (with data greater than secp256k1 size)
-    (b"\x00" * 32 + b"\xFE" + b"\x01" * 66, (INVALID, 3016)),
+    (b"\xFE" + b"\x01" * 66 + b"\x20" + b"\x00" * 32, (INVALID, 3016)),
 
     """
     secp256k1
     """
 
     # secp256k1 (without data)
-    (b"\x00" * 32 + b"\xFF", (INVALID, 3000)),
+    (b"\xFF" + b"\x20" + b"\x00" * 32, (INVALID, 3000)),
 
     # secp256k1 (too little data)
-    (b"\x00" * 32 + b"\xFF" + b"\xFE" * 64, (INVALID, 3000)),
+    (b"\xFF" + b"\xFE" * 64 + b"\x20" + b"\x00" * 32, (INVALID, 3000)),
     
     # secp256k1 (erroneous data)
-    (b"\x00" * 32 + b"\xFF" + b"\xFE" * 67, (INVALID, 3032)),
+    (b"\xFF" + b"\xFE" * 67 + b"\x20" + b"\x00" * 32, (INVALID, 3032)),
 
     # secp256k1 (invalid signature)
-    (b"\x00" * 32 + b"\xFF" + b"\xFE" * 65, (INVALID, 3000)),
+    (b"\xFF" + b"\xFE" * 65 + b"\x20" + b"\x00" * 32, (INVALID, 3000)),
 
     # secp256k1 (valid signature)
-    (b"\x00" * 32 + b"\xFF" + zero_sig, (address, 3000)),
+    (b"\xFF" + zero_sig + b"\x20" + b"\x00" * 32, (address, 3000)),
 ]
 
 
