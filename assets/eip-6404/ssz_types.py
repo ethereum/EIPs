@@ -284,7 +284,7 @@ class RlpTxType(IntEnum):
     SET_CODE = 0x04
     SET_CODE_MAGIC = 0x05
 
-def calculate_base_gas_usage(tx: Transaction) -> uint:
+def calculate_transaction_intrinsic_gas(tx: Transaction) -> uint:
     tx_data = tx.payload.data()
 
     TX_BASE_COST = 21000 # FIXME
@@ -302,7 +302,6 @@ def validate_transaction(tx: Transaction):
     tx_data = tx.payload.data()
 
     expected_signature_algorithm = None
-    assert tx_data.gas >= calculate_base_gas_usage(tx)
 
     if hasattr(tx_data, "type_"):
         expected_signature_algorithm = SECP256K1_ALGORITHM

@@ -13,8 +13,6 @@ class Test:
     from_: ExecutionAddress
     authorities: list[ExecutionAddress]
 
-# FIXME: Make the tests work. i.e. change the algorithm_id from `0x01` -> `0xFF`
-# Also the tx with a gas value of `5`, isn't that inherently invalid?
 tests = [
     Test(
         tx_payload_selector=0x01,
