@@ -72,7 +72,6 @@ func BenchmarkOpDecExp(b *testing.B) {
 	// opDecExp benchmark depends on steps
 	steps := uint256.NewInt(10)
 	intArgs := []*uint256.Int{steps, PRECISION, uint256.NewInt(0), uint256.NewInt(1)}
-	fmt.Println("BenchmarkOpDecExp steps=", steps)
 	benchmarkOpDec(b, intArgs, opDecExp)
 }
 
@@ -80,7 +79,6 @@ func BenchmarkOpDecLn(b *testing.B) {
 	// opDecExp benchmark depends on steps
 	steps := uint256.NewInt(10)
 	intArgs := []*uint256.Int{steps, PRECISION, uint256.NewInt(0), uint256.NewInt(2)}
-	fmt.Println("BenchmarkOpDecLn steps=", steps)
 	benchmarkOpDec(b, intArgs, opDecLn)
 }
 
@@ -88,7 +86,6 @@ func BenchmarkOpDecSin(b *testing.B) {
 	// opDecExp benchmark depends on precision
 	steps := uint256.NewInt(10)
 	intArgs := []*uint256.Int{steps, PRECISION, uint256.NewInt(0), uint256.NewInt(1)}
-	fmt.Println("BenchmarkOpDecSin steps=", steps)
 	benchmarkOpDec(b, intArgs, opDecSin)
 }
 
@@ -120,8 +117,7 @@ func TestSignedCmp(t *testing.T) {
 
 	a := new(uint256.Int).Neg(uint256.NewInt(14))
 	b := new(uint256.Int).Neg(uint256.NewInt(15))
-	c := signedCmp(a, b, &gas)
-	fmt.Println(c)
+	signedCmp(a, b, &gas)
 }
 
 func TestDecAdd(t *testing.T) {
