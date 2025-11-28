@@ -25,14 +25,13 @@ def calculate_penalty(signature_info: bytes) -> uint:
     SECP256K1_SIGNATURE_SIZE = 65
 
     assert len(signature_info) > 0
-    assert uint8(signature_info[0]) in algorithm_registry
-
-    gas_penalty_base = (
+    
+    gas_penalty = (
         max(len(signature_info) - (SECP256K1_SIGNATURE_SIZE + 1), 0)
         * GAS_PER_ADDITIONAL_VERIFICATION_BYTE
     )
-    total_gas_penalty = (
-        gas_penalty_base + algorithm_registry[uint8(signature_info[0])].GAS_PENALTY
-    )
+    
+    if uint8(signature_info[0]) in algorithm_registry:
+        gas_penalty += algorithm_registry[uint8(signature_info[0])].GAS_PENALTY
 
-    return uint256(total_gas_penalty)
+    return uint256(gas_penalty)
