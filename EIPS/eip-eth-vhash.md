@@ -1,6 +1,6 @@
 ---
 eip: TBD
-title: eth/vhash - eth/XX - blob-aware mempool
+title: eth/vhash - blob-aware mempool
 description: Make mempool messaging vhash aware
 author: Csaba Kiraly (@cskiraly)
 discussions-to: 
