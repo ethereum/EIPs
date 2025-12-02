@@ -1,4 +1,4 @@
-﻿---
+---
 eip: TBD
 title: Point Evaluation Precompile Gas Cost Increase
 description: Increases cost of point evaluation precompile
