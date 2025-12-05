@@ -5,6 +5,14 @@ from remerkleable.byte_arrays import ByteVector, Bytes32
 from remerkleable.complex import Container
 from remerkleable.progressive import CompatibleUnion, ProgressiveByteList, ProgressiveContainer, ProgressiveList
 
+# Import EIP-7932 registry from EIP-7932
+
+from os import path as os_path
+from sys import path
+current_dir = os_path.dirname(os_path.realpath(__file__))
+path.append(current_dir)
+path.append(current_dir + '/../eip-7932')
+
 from algorithm_registry.helpers import pubkey_to_address, calculate_penalty
 from algorithm_registry.registry import algorithm_registry
 
