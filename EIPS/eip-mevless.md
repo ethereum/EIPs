@@ -1,5 +1,5 @@
 ---
-eip: Draft
+eip: 8099
 title: MEVless Protocol
 description: A protocol that prevents MEV attacks by constraining transaction ordering through blind sequencing and two-phase block execution.
 author: Lawliet Chan (@lawliet-chan)
