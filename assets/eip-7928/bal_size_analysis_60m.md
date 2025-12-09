@@ -65,24 +65,3 @@ Additional:
 | Per Hour (50 blocks) | 4.49 MB | 3.01 MB | 1.48 MB |
 | Per Day | 107.8 MB | 72.3 MB | 35.5 MB |
 | Per Year | 38.4 GB | 25.8 GB | 12.6 GB |
-
-### 4.2 Storage at Scale
-
-| TPS | WITH Reads | WITHOUT Reads | Savings |
-|-----|------------|---------------|---------|
-| 15 TPS | 38.4 GB | 25.8 GB | 12.6 GB |
-| 100 TPS | 256 GB | 172 GB | 84 GB |
-| 1,000 TPS | 2.56 TB | 1.72 TB | 840 GB |
-
-## 5. Reduction Patterns
-
-| Metric | Raw | Compressed |
-|--------|------|------------|
-| Mean | 34.5% | 32.7% |
-| Median | 34.8% | 32.8% |
-| Min | 21.5% | 19.1% |
-| Max | 47.0% | 46.0% |
-
-Notes:
-- Reductions are stable across blocks.
-- Reads compress slightly worse (1.81x vs 1.94x).
