@@ -1,67 +1,87 @@
-# EIP-7928 Block Access List Size Analysis
+# EIP-7928 Component Size - 1000 Blocks
 
-## Storage Reads Impact on BAL Sizes
+## Dataset
+- **Blocks Analyzed**: 1000 blocks (23,991,474 to 23,992,473)
+- **Encoding**: RLP format
+- **Compression**: Snappy algorithm
 
-*Dataset: 50 Ethereum mainnet blocks (23934306–23934355)*
+## Per-Block Component Statistics (KiB)
+
+| Component | Avg Raw | Median Raw | Avg Compressed | Median Compressed | Avg Ratio | Median Ratio |
+|-----------|---------|------------|----------------|-------------------|-----------|--------------
+| Storage Writes | 52.6 | 49.6 | 29.2 | 28.0 | 1.79x | 1.78x |
+| Storage Reads | 31.7 | 29.7 | 18.7 | 17.5 | 1.71x | 1.71x |
+| Balance Changes | 6.8 | 6.6 | 6.7 | 6.5 | 1.02x | 1.00x |
+| Nonce Changes | 1.1 | 1.0 | 1.1 | 1.0 | 0.99x | 1.00x |
+| Code Changes | 2.1 | 0.2 | 1.2 | 0.2 | 1.37x | 1.16x |
+| **Full BAL** | **74.3** | **70.9** | **49.4** | **47.9** | **1.50x** | **1.48x** |
+
+## Component Size Distribution (KiB)
+
+| Component | Min Raw | Max Raw | Std Dev Raw | Min Compressed | Max Compressed | Std Dev Compressed |
+|-----------|---------|---------|-------------|----------------|----------------|-------------------|
+| Storage Writes | 4.5 | 197.0 | 23.7 | 2.8 | 113.8 | 12.8 |
+| Storage Reads | 1.2 | 105.7 | 15.0 | 0.9 | 88.9 | 9.2 |
+| Balance Changes | 0.7 | 22.4 | 2.8 | 0.7 | 22.4 | 2.7 |
+| Nonce Changes | 0.1 | 4.4 | 0.5 | 0.1 | 4.5 | 0.5 |
+| Code Changes | 0.0 | 72.6 | 5.6 | 0.0 | 25.3 | 2.9 |
+| **Full BAL** | **8.4** | **223.5** | **30.7** | **6.8** | **141.8** | **19.5** |
+
+## Compression Ratio Distribution
+
+| Component | Min Ratio | Max Ratio | Std Dev | 25th Percentile | 75th Percentile |
+|-----------|-----------|-----------|---------|-----------------|-----------------
+| Storage Writes | 1.54x | 2.86x | 0.12x | 1.74x | 1.83x |
+| Storage Reads | 1.07x | 2.33x | 0.16x | 1.61x | 1.81x |
+| Balance Changes | 1.00x | 1.50x | 0.04x | 1.00x | 1.03x |
+| Nonce Changes | 0.97x | 1.07x | 0.00x | 0.99x | 1.00x |
+| Code Changes | 0.93x | 8.67x | 0.65x | 0.99x | 1.56x |
+| **Full BAL** | **1.20x** | **2.23x** | **0.10x** | **1.44x** | **1.53x** |
+
+## Block Activity Metrics (per block)
+
+| Metric | Average | Median | Min | Max |
+|--------|---------|--------|-----|-----|
+| Total Accounts | 432 | 428 | 67 | 1124 |
+| Storage Writes Count | 700 | 667 | 65 | 2521 |
+| Storage Reads Count | 982 | 922 | 36 | 3279 |
+| Balance Changes Count | 612 | 598 | 62 | 1812 |
+| Nonce Changes Count | 229 | 224 | 18 | 770 |
+
+## Component Percentage of Full BAL
+
+| Component | % of Raw Size | % of Compressed Size |
+|-----------|---------------|---------------------|
+| Storage Writes | 70.7% | 59.1% |
+| Balance Changes | 9.2% | 13.5% |
+| Nonce Changes | 1.5% | 2.2% |
+| Code Changes | 2.8% | 2.4% |
+| Storage Reads | 28.6% | 25.8% |
+
+## BAL vs Block Size Comparison
+
+Comparison using compressed block average of **71.71 KiB**:
+
+| Metric | BAL Size (KiB) | Block Size (KiB) | Ratio (BAL/Block) | Size Difference |
+|--------|---------------|------------------|-------------------|------------------|
+| **WITHOUT reads** | 49.4 | 71.7 | 0.69x | -22.3 KiB |
+| **WITH reads** | 72.4 | 71.7 | 1.01x | +0.7 KiB |
+
+### Key Insights:
+- BAL **without reads** is 0.69x the size of a compressed block
+- BAL **with reads** is 1.01x the size of a compressed block
+- Storage reads add **23.0 KiB** (46.6%) to BAL size
+- BAL overhead vs blocks: **-31.1%** (without reads), **+1.0%** (with reads)
+
+## Storage Reads Impact Analysis
+
+- **WITH reads**: 72.4 KiB compressed
+- **WITHOUT reads**: 49.4 KiB compressed
+- **Storage reads overhead**: 23.0 KiB (46.6%)
 
 ## Summary
-Storage reads add **30.4 KB (32.7%)** to compressed BAL size per block.
 
-## 1. Size Analysis
-
-### 1.1 BAL Sizes
-
-| Configuration | Raw (KB) | Compressed (KB) | Ratio |
-|---------------|----------|------------------|--------|
-| WITH Reads | 137.7 | 92.0 | 1.50x |
-| WITHOUT Reads | 90.1 | 61.7 | 1.46x |
-| Reduction | 47.6 | 30.4 | — |
-| % Reduction | 34.5% | 32.7% | — |
-
-### 1.2 Distribution
-
-| Metric | With (KB) | Without (KB) | Diff |
-|--------|-----------|--------------|------|
-| Mean | 92.0 | 61.7 | 30.4 |
-| Median | 85.1 | 57.2 | 27.9 |
-| Min | 20.7 | 16.3 | 4.4 |
-| Max | 169.8 | 109.6 | 60.2 |
-| Std Dev | 32.7 | 22.1 | — |
-
-## 2. Impact on Block Size
-
-(Reference block compressed mean: 71.71 KB)
-
-| Config | BAL | BAL % of Block | Block+BAL | Multiplier |
-|--------|-----|----------------|-----------|------------|
-| WITH Reads | 92.0 KB | 128.3% | 163.7 KB | 2.28x |
-| WITHOUT Reads | 61.7 KB | 86.0% | 133.4 KB | 1.86x |
-| Difference | 30.4 KB | 42.3% | 30.3 KB | 0.42x |
-
-Observations:
-- Reads push BALs above block size (128.3%).
-- Without reads, BALs are smaller than blocks (86.0%).
-
-## 3. Component Breakdown
-
-| Component | Count/block | Size (KB) | % of BAL |
-|----------|-------------|-----------|-----------|
-| Storage Writes | 931 | 31.6 | 34.3% |
-| Storage Reads | 1,296 | 30.4 | 32.7% |
-| Total Ops | 2,227 | 62.0 | 67.4% |
-
-Additional:
-- Accounts with reads: 764/block
-- Without reads: 557/block (27.2% fewer)
-- Total reads: 64,822 (50 blocks)
-
-## 4. Network Impact
-
-### 4.1 Bandwidth
-
-| Interval | WITH Reads | WITHOUT Reads | Savings |
-|----------|------------|---------------|---------|
-| Per Block | 92.0 KB | 61.7 KB | 30.4 KB |
-| Per Hour (50 blocks) | 4.49 MB | 3.01 MB | 1.48 MB |
-| Per Day | 107.8 MB | 72.3 MB | 35.5 MB |
-| Per Year | 38.4 GB | 25.8 GB | 12.6 GB |
+1. **Component dominance**: Storage writes are 70.7% of raw BAL size
+2. **Compression efficiency**: Overall 1.50x compression ratio
+3. **Size variability**: BAL sizes vary from 6.8 to 141.8 KiB compressed
+4. **Block size ratio**: BALs are 0.69x compressed block size (without reads)
