@@ -3,5 +3,5 @@ layout: page
 title: Informational
 ---
 
-{% assign eips=site.pages|where:"type","Informational" %}
+{% assign eips=site.pages|where:"type","Informational"|where_exp:"page","page.url contains '/EIPS/'" %}
 {% include eiptable.html eips=eips %}

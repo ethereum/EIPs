@@ -3,4 +3,4 @@ layout: page
 title: All
 ---
 
-{% include eiptable.html eips=site.pages %}
+{% include eiptable.html eips=site.pages|where_exp:"page","page.url contains '/EIPS/'" %}
