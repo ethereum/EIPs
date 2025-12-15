@@ -1,9 +1,7 @@
-from remerkleable.basic import uint8, uint256, uint
+from remerkleable.basic import uint8, uint
 from remerkleable.byte_arrays import ByteVector
 
 from eth_hash.auto import keccak
-from eth_typing import Hash32
-
 
 from .registry import algorithm_registry
 
@@ -13,25 +11,30 @@ class ExecutionAddress(ByteVector[20]):
 
 
 def pubkey_to_address(public_key: bytes, algorithm_id: uint8) -> ExecutionAddress:
-    if algorithm_id == 0xFF:  # Compatibility shim to ensure backwards compatibility
+    if algorithm_id == 0xFF: # Compatibility shim to ensure backwards compatibility
         return ExecutionAddress(keccak(public_key[1:])[12:])
 
-    # || is binary concatenation
-    return ExecutionAddress(keccak(bytes(algorithm_id) + public_key)[12:])
+    return ExecutionAddress(keccak(algorithm_id.to_bytes(1, "big") + public_key)[12:])
 
 
-def calculate_penalty(signature_info: bytes) -> uint:
-    GAS_PER_ADDITIONAL_VERIFICATION_BYTE = 16
-    SECP256K1_SIGNATURE_SIZE = 65
+def calculate_penalty(algorithm: uint8, signing_data: bytes) -> uint:
+    assert algorithm in algorithm_registry
 
-    assert len(signature_info) > 0
-    
-    gas_penalty = (
-        max(len(signature_info) - (SECP256K1_SIGNATURE_SIZE + 1), 0)
-        * GAS_PER_ADDITIONAL_VERIFICATION_BYTE
-    )
-    
-    if uint8(signature_info[0]) in algorithm_registry:
-        gas_penalty += algorithm_registry[uint8(signature_info[0])].GAS_PENALTY
+    algorithm = algorithm_registry[algorithm]
 
-    return uint256(gas_penalty)
+    return algorithm.gas_cost(signing_data)
+
+
+def validate_signature(signature: bytes):
+    assert len(signature) > 0
+    assert signature[0] in algorithm_registry
+
+    algorithm = algorithm_registry[signature[0]]
+
+    return algorithm.validate(signature)
+
+
+def verify_signature(signing_data: bytes, signature: bytes) -> bytes:
+    algorithm = algorithm_registry[signature[0]]
+
+    return algorithm.verify(signature, signing_data)

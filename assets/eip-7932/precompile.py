@@ -1,45 +1,28 @@
 from algorithm_registry import helpers, registry
 
-
+INVALID = b"\x00" * 20
 SIGRECOVER_BASE_GAS = 3000
 
-
-def sigrecover_precompile(input: bytes) -> bytes:
-  assert(len(input) >= 34)
-  signature = input[:-33]
-
-  # This is a magic number to support
-  # potential extensions of hash space
-  # if required by a future EIP.
-  assert(input[-33] == 0x20)
-
-  hash: Hash32 = input[-32:]
-
-  # Get type
-  algorithm_type = signature[0]
-
-  # Ensure the algorithm exists
-  if algorithm_type not in registry.algorithm_registry:
-    return "0x0000000000000000000000000000000000000000"
-
-  alg = registry.algorithm_registry[algorithm_type]
-
-  # Run verify function
+# Modified sigrecover precompile to also return gas
+def sigrecover_precompile(input: bytes) -> tuple[bytes, int]:
+  gas = SIGRECOVER_BASE_GAS
   try:
-    pubkey = alg.verify(signature, hash)
-    return helpers.pubkey_to_address(pubkey, algorithm_type)
-  except Exception as e:
-    print(e)
-    return "0x0000000000000000000000000000000000000000"
+    assert len(input) >= 1
+    assert input[0] in registry.algorithm_registry
 
+    size = registry.algorithm_registry[input[0]].SIZE
+  
+    assert len(input) > size
 
+    signature = input[:size]
+    signing_data = input[size:]
 
-def calculate_sigrecover_gas(input: bytes) -> int:
-    try:
-        assert(len(input) >= 34)
-        signature = input[:-33]
+    gas += helpers.calculate_penalty(input[0], signing_data)
 
-        return SIGRECOVER_BASE_GAS + helpers.calculate_penalty(signature)
-    except AssertionError:
-        return SIGRECOVER_BASE_GAS
+    # Run validate/verify function
+    helpers.validate_signature(signature)
+    pubkey = helpers.verify_signature(signing_data, signature)
 
+    return (helpers.pubkey_to_address(pubkey, input[0]), gas)
+  except AssertionError as _:
+    return (INVALID, gas)
