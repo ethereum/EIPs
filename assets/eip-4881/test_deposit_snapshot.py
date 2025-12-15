@@ -60,12 +60,12 @@ def read_test_cases(filename):
 
 def merkle_root_from_branch(leaf, branch, index) -> Hash32:
     root = leaf
-    for (i, leaf) in enumerate(branch):
+    for (i, sibling) in enumerate(branch):
         ith_bit = (index >> i) & 0x1
         if ith_bit == 1:
-            root = sha256(leaf + root)
+            root = sha256(sibling + root)
         else:
-            root = sha256(root + leaf)
+            root = sha256(root + sibling)
     return root
 
 def check_proof(tree, index):

@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import List, Optional, Tuple
 from dataclasses import dataclass
 from abc import abstractmethod
-from eip_4881 import DEPOSIT_CONTRACT_DEPTH,Hash32,sha256,to_le_bytes,zerohashes
+from eip_4881 import DEPOSIT_CONTRACT_DEPTH,Eth1Data,Hash32,sha256,to_le_bytes,uint64,zerohashes
 
 @dataclass
 class DepositTreeSnapshot:
-    finalized: List[Hash32, DEPOSIT_CONTRACT_DEPTH]
+    finalized: List[Hash32]
     deposit_root: Hash32
     deposit_count: uint64
     execution_block_hash: Hash32
