@@ -63,6 +63,10 @@ The AllCoreDevs call serves as a way for client implementers to do three things.
 
 These calls generally result in a "rough consensus" around what EIPs should be implemented. This "rough consensus" rests on the assumptions that EIPs are not contentious enough to cause a network split and that they are technically sound.
 
+### Network Upgrade Inclusion
+
+EIPs targeting a network upgrade must be proposed for inclusion in that upgrade's Meta EIP. The inclusion stages—from "Proposed for Inclusion" through "Scheduled for Inclusion" to "Included"—are defined in [EIP-7723](./eip-7723.md). The scope for each upgrade is finalized within a few weeks of the previous fork going live on mainnet; after this deadline, only scheduled EIPs and security-critical proposals are considered. Proposals do not carry over between upgrades—authors must re-propose their EIP for each upgrade cycle.
+
 :warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that [the Ethereum Magicians forum](https://ethereum-magicians.org/) thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
 
 *In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea.*
