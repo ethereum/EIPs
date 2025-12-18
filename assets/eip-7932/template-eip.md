@@ -1,6 +1,6 @@
 ---
-title: Example EIP to add secp256k1 curve as an algorithmic type
-description: Example EIP to add secp256k1 curve as an algorithmic type
+title: Example EIP to add generic algorithm as an algorithmic type
+description: Example EIP to add generic algorithm as an algorithmic type
 Author: ExampleAuthor
 discussions-to: fakeurl
 status: Draft
@@ -11,36 +11,37 @@ requires: 7932
 ---
 
 ## Abstract
-This example EIP adds secp256k1 curve as an algorithmic type.
+This example EIP adds generic algorithm as an algorithmic type.
 
 ## Motivation
-secp256k1 is the commonly used curve, therefore it should be added.
+Generic algorithm has a good reason to be in Ethereum, therefore it should be.
 
 ## Specification
 
 This EIP defines a new [EIP-7932](../../EIPS/eip-7932.md) algorithmic type with the following parameters.
 
-| Constant | Value |
-| - | - |
-| `ALG_TYPE` | `Bytes1(0x0)` |
-| `GAS_PENALTY`| `0` |
-| `MAX_SIZE` | `65` |
-
 ```python
-def verify(signature_info: bytes, parent_hash: Hash32) -> ExecutionAddress:
-  assert(len(signature_info) == 65)
-  r, s, v = signature_info[0:32], signature_info[32:64], signature_info[64]
+ALG_TYPE = 0xFA
+SIZE = 128
 
-  # This assumes `ecrecover` is identical to the `ecrecover` function in solidity.
-  signer = ecrecover(parent_hash, v, r, s)
+def gas_cost(signing_data: Bytes) -> Uint64:
+    return Uint64(128 + len(signing_data))
 
-  assert signer != b""
+def validate(signature: Bytes) -> None | Error:
+    # ...
+    # Simple cryptography here
+    # ...
+    return None
 
-  return signer
+def verify(signature: Bytes, signing_data: Bytes) -> Bytes | Error:
+    # ...
+    # Complicated cryptography here
+    # ...
+    return public_key
 ```
 
 ## Rationale
-secp256k1 is the commonly used curve, therefore it should be added.
+Generic algorithm has a good reason to be in Ethereum, therefore it should be.
 
 ## Backwards Compatibility
 No backward compatibility issues found.
