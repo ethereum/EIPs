@@ -1,6 +1,5 @@
 <head>
   <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   {% if page.layout == "eip" %}
     {% if page.category == "ERC" %}
@@ -70,7 +69,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/citation-js/0.6.7/citation.min.js" integrity="sha512-N+LDFMa9owHXGS+CyMrBvuxq2QuGl3fiB/7cys3aUEL7K6P1soHGqsS0sjHXZpwNd9Kz0m3R4IPy1HYRi6ROEQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script type="text/javascript">
     addEventListener('DOMContentLoaded', async () => {
-      const Cite = window.require('citation-js');
+      const Cite = window.Cite;
+      if (!Cite) return;
       const citationElements = document.querySelectorAll('.language-csl-json');
       for (let citationElement of citationElements) {
         try {
