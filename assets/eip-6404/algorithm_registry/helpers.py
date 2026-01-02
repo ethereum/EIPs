@@ -2,7 +2,6 @@ from remerkleable.basic import uint8, uint256, uint
 from remerkleable.byte_arrays import ByteVector
 
 from eth_hash.auto import keccak
-from eth_typing import Hash32
 
 
 from .registry import algorithm_registry
