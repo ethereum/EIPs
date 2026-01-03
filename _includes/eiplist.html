@@ -5,7 +5,6 @@
       <th class="eipnum">Number</th>
       <th class="title">Title</th>
       <th class="author">Author</th>
-      <th class="status">Status</th>
     </tr>
   </thead>
   <tbody>
@@ -15,7 +14,6 @@
           <td class="eipnum"><a href="{{ page.url | relative_url }}">{{ page.eip | xml_escape }}</a></td>
           <td class="title">{{ page.title | xml_escape }}</td>
           <td class="author">{% include authorlist.html authors=page.author %}</td>
-          <td class="status">{{ page.status | xml_escape }}</td>
         </tr>
       {% endif %}
     {% endfor %}

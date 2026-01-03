@@ -100,11 +100,13 @@
 
       function filterByStatus(status) {
         var rows = table.querySelectorAll('tbody tr');
+        var visibleCount = 0;
         rows.forEach(function(row) {
           if (!status || row.getAttribute('data-status') === status) {
-            row.style.display = '';
+            row.classList.remove('hidden');
+            visibleCount++;
           } else {
-            row.style.display = 'none';
+            row.classList.add('hidden');
           }
         });
 
@@ -118,36 +120,89 @@
           }
         });
 
-        // Hide status column when filtering by status
-        if (status) {
-          table.classList.add('status-filtered');
+        // Show "No EIPs" message if filter returns no results
+        var noResultsMsg = document.getElementById('no-results');
+        if (visibleCount === 0) {
+          table.style.display = 'none';
+          if (!noResultsMsg) {
+            noResultsMsg = document.createElement('p');
+            noResultsMsg.id = 'no-results';
+            noResultsMsg.textContent = 'No EIPs';
+            noResultsMsg.className = 'no-results';
+            table.parentNode.insertBefore(noResultsMsg, table.nextSibling);
+          }
+          noResultsMsg.style.display = '';
         } else {
-          table.classList.remove('status-filtered');
+          table.style.display = '';
+          if (noResultsMsg) noResultsMsg.style.display = 'none';
         }
       }
+
+      // Status definitions from EIP-1
+      var statusInfo = {
+        'living': {
+          name: 'Living',
+          description: 'A special status for EIPs that are designed to be continually updated and not reach a state of finality.'
+        },
+        'final': {
+          name: 'Final',
+          description: 'This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.'
+        },
+        'last-call': {
+          name: 'Last Call',
+          description: 'This is the final review window for an EIP before moving to Final. An EIP editor will assign Last Call status and set a review end date, typically 14 days later.'
+        },
+        'review': {
+          name: 'Review',
+          description: 'An EIP Author marks an EIP as ready for and requesting Peer Review.'
+        },
+        'draft': {
+          name: 'Draft',
+          description: 'The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.'
+        },
+        'stagnant': {
+          name: 'Stagnant',
+          description: 'Any EIP in Draft, Review, or Last Call if inactive for a period of 6 months or greater is moved to Stagnant. An EIP may be resurrected from this state by Authors or EIP Editors.'
+        },
+        'withdrawn': {
+          name: 'Withdrawn',
+          description: 'The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number.'
+        }
+      };
 
       // Map hash to status name
       function getStatusFromHash() {
         var hash = window.location.hash.slice(1);
         if (!hash) return '';
-        var statusMap = {
-          'living': 'Living',
-          'final': 'Final',
-          'last-call': 'Last Call',
-          'review': 'Review',
-          'draft': 'Draft',
-          'stagnant': 'Stagnant',
-          'withdrawn': 'Withdrawn'
-        };
-        return statusMap[hash] || '';
+        var info = statusInfo[hash];
+        return info ? info.name : '';
+      }
+
+      // Update status description
+      function updateStatusDescription(hash) {
+        var descEl = document.getElementById('status-description');
+        var textEl = document.getElementById('status-description-text');
+        if (!descEl || !textEl) return;
+
+        var info = statusInfo[hash];
+        if (info) {
+          textEl.textContent = info.description;
+          descEl.style.display = '';
+        } else {
+          descEl.style.display = 'none';
+        }
       }
 
       // Apply filter on load
+      var initialHash = window.location.hash.slice(1);
       filterByStatus(getStatusFromHash());
+      updateStatusDescription(initialHash);
 
       // Apply filter on hash change
       window.addEventListener('hashchange', function() {
+        var hash = window.location.hash.slice(1);
         filterByStatus(getStatusFromHash());
+        updateStatusDescription(hash);
       });
 
       // Handle click on status links
@@ -160,6 +215,7 @@
           } else {
             history.pushState('', document.title, window.location.pathname);
             filterByStatus('');
+            updateStatusDescription('');
           }
         });
       });

@@ -32,12 +32,19 @@
       <span class="status-nav-label">Status:</span>
       <div class="status-nav-links">
         <a class="status-link active" href="#" data-status="">All</a>
-        {%- for status in site.data.statuses -%}
-          {%- assign status_slug = status | slugify -%}
-          <a class="status-link" href="#{{ status_slug }}" data-status="{{ status }}">{{ status }}</a>
-        {%- endfor -%}
+        <a class="status-link" href="#living" data-status="Living">Living</a>
+        <a class="status-link" href="#final" data-status="Final">Final</a>
+        <a class="status-link" href="#last-call" data-status="Last Call">Last Call</a>
+        <a class="status-link" href="#review" data-status="Review">Review</a>
+        <a class="status-link" href="#draft" data-status="Draft">Draft</a>
+        <a class="status-link" href="#stagnant" data-status="Stagnant">Stagnant</a>
+        <a class="status-link" href="#withdrawn" data-status="Withdrawn">Withdrawn</a>
       </div>
     </nav>
+    <div class="status-description" id="status-description" style="display: none;">
+      <p class="status-description-text" id="status-description-text"></p>
+      (<a class="status-description-ref" href="/EIPS/eip-1#eip-process" target="_blank">EIP-1</a>)
+    </div>
   </div>
   {% endif %}
 </header>

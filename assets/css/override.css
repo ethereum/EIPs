@@ -55,6 +55,14 @@
     border-color: rgba(160, 155, 200, 0.8);
   }
 
+  .status-description {
+    color: #aaa;
+  }
+
+  .status-description-ref {
+    color: #777 !important;
+  }
+
   :root {
     color-scheme: dark;
     --bs-body-color: #dee2e6;
