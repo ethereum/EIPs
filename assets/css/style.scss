@@ -14,6 +14,74 @@ $content-width: 1152px;
   }
 }
 
+// Category nav active state
+.site-nav .page-link.active {
+  font-weight: 600;
+  color: #726E97;
+}
+
+// Status filter bar
+.status-nav {
+  width: 100%;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-nav-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
+}
+
+.status-nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.status-link,
+.status-link:visited,
+.status-link:link {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  background: rgba(128, 128, 128, 0.08);
+  color: #666 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.status-link:hover {
+  background-color: rgba(128, 128, 128, 0.15);
+  border-color: rgba(128, 128, 128, 0.4);
+  text-decoration: none;
+  color: #444 !important;
+}
+
+.status-link.active,
+.status-link.active:visited,
+.status-link.active:link {
+  background-color: rgba(114, 110, 151, 0.85);
+  border-color: rgba(114, 110, 151, 0.85);
+  color: #fff !important;
+}
+
+.status-link.active:hover {
+  background-color: rgba(90, 87, 120, 0.9);
+  border-color: rgba(90, 87, 120, 0.9);
+  color: #fff !important;
+}
+
+// Hide status column when filtering
+.eiptable.status-filtered .status {
+  display: none;
+}
+
 .page-content {
   a.anchor-link {
     width: 16px;
@@ -163,4 +231,15 @@ h1 a {
   white-space: nowrap;
   word-break: normal;
   overflow-wrap: normal;
+}
+
+// EIP table styles
+.eiptable {
+  .title {
+    width: 67%;
+  }
+
+  .author {
+    width: 33%;
+  }
 }

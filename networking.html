@@ -1,7 +1,8 @@
 ---
 layout: page
 title: Networking
+category_filter: Networking
 ---
 
 {% assign eips=site.pages|where:"type","Standards Track"|where:"category","Networking" %}
-{% include eiptable.html eips=eips %}
+{% include eiplist.html eips=eips %}

@@ -19,11 +19,25 @@
           {%- for path in page_paths -%}
             {%- assign my_page = site.pages | where: "path", path | first -%}
             {%- if my_page.title -%}
-            <a class="page-link col" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
+            <a class="page-link col{% if page.category_filter == my_page.title %} active{% endif %}" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
             {%- endif -%}
           {%- endfor -%}
         </div>
       </nav>
     {%- endif -%}
   </div>
+  {% if page.category_filter %}
+  <div class="wrapper">
+    <nav class="status-nav" aria-label="Filter by status">
+      <span class="status-nav-label">Status:</span>
+      <div class="status-nav-links">
+        <a class="status-link active" href="#" data-status="">All</a>
+        {%- for status in site.data.statuses -%}
+          {%- assign status_slug = status | slugify -%}
+          <a class="status-link" href="#{{ status_slug }}" data-status="{{ status }}">{{ status }}</a>
+        {%- endfor -%}
+      </div>
+    </nav>
+  </div>
+  {% endif %}
 </header>
