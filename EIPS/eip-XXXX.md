@@ -3,7 +3,7 @@ eip: XXXX
 title: Agent Authorization Interface
 description: A standard interface for secure, time-bound, and usage-limited delegation of on-chain actions to autonomous agents.
 author: WORLD3 Team (@world3-ai) <dev@world3.ai>
-discussions-to: https://ethereum-magicians.org/t/eip-xxxx-agent-authorization-interface
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-agent-authorization-interface (placeholder - topic to be created)
 status: Draft
 type: Standards Track
 category: ERC
