@@ -1,4 +1,5 @@
 ---
+eip: 8116
 title: Replace cumulative receipt fields
 description: Replace cumulativeGasUsed with gasUsed in on-chain receipt
 author: Etan Kissling (@etan-status)
