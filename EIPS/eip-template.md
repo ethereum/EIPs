@@ -1,8 +1,9 @@
 ---
+eip: 8115
 title: Batch priority fees at end of block
 description: Delay all priority fee credits from transactions to end of block
 author: Etan Kissling (@etan-status), Gajinder Singh (@g11tech)
-discussions-to: https://ethereum-magicians.org/t/eip-batch-priority-fees-at-end-of-block/27358
+discussions-to: https://ethereum-magicians.org/t/eip-8115-batch-priority-fees-at-end-of-block/27358
 status: Draft
 type: Standards Track
 category: Core
