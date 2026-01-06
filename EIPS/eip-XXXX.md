@@ -1,0 +1,85 @@
+---
+title: <MLOAD8 and CALLDATALOAD8 Opcodes>
+description: <Adds EVM opcodes for efficient single-byte memory and calldata loads.>
+author: <Helkomine (@Helkomine)>
+discussions-to: <URL>
+status: Draft
+type: <Standards Track>
+category: <Core>
+created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+---
+
+## Abstract
+
+This EIP introduces new EVM opcodes that allow loading a single byte from memory or calldata in a single operation, reducing gas cost and bytecode size compared to existing patterns based on `MLOAD` or `CALLDATALOAD` followed by bit shifting.
+
+## Motivation
+
+Currently, the only way to read a single byte from calldata or memory is to use `CALLDATALOAD (0x35)` or `MLOAD (0x51)` and then shift the loaded 32-byte word.
+For example, reading the byte at offset x from calldata requires:
+`
+PUSH x
+CALLDATALOAD
+PUSH1 248
+SHR
+`
+This pattern increases runtime gas cost and adds three extra bytes to the deployed bytecode for each single-byte access. Contracts that frequently parse byte-oriented calldata or instruction streams incur unnecessary overhead.
+This EIP proposes two new opcodes that allow loading a single byte directly in one operation.
+
+## Specification
+
+### MLOAD8 (TBD)
+- **Stack input**: `offset`
+- **Stack output**: `value`
+Reads one byte from memory at position offset and pushes it onto the stack as a 32-byte word, with the byte placed in the least significant position.
+If offset is greater than or equal to the current memory size, the returned value is 0.
+Memory expansion rules apply in the same way as for `MLOAD`.
+### CALLDATALOAD8 (TBD)
+- **Stack input**: `offset`
+- **Stack output**: `value`
+Reads one byte from calldata at position offset and pushes it onto the stack as a 32-byte word, with the byte placed in the least significant position.
+If offset is greater than or equal to `CALLDATASIZE (0x36)`, the returned value is 0.
+### Gas Cost
+- Base cost: 3 gas
+- `MLOAD8` additionally incurs memory expansion cost as defined by existing memory access rules.
+The base gas cost matches `MLOAD`, `MSTORE8`, and `CALLDATALOAD`, ensuring consistency with existing EVM pricing.
+### Exceptional Conditions
+Execution results in an exceptional halt if:
+- There is insufficient gas to execute the instruction
+- There are insufficient stack items (stack underflow)
+In both cases, execution halts and the current call frame is reverted, consistent with existing EVM behavior.
+
+## Rationale
+
+### Opcode Symmetry
+
+`MLOAD8` serves as a natural counterpart to `MSTORE8 (0x53)`: one stores exactly one byte from the stack to memory, while the other loads exactly one byte from memory to the stack. This symmetry improves conceptual clarity and developer ergonomics.
+### Efficiency for Byte-Oriented Contracts
+
+Instruction-based architectures such as Uniswap’s Universal Router, as well as contracts that use byte-level calldata compression, benefit from reduced gas usage and smaller bytecode size when parsing byte streams.
+
+## Backwards Compatibility
+
+This EIP introduces new opcodes and does not modify the semantics of existing instructions. No backwards compatibility issues are introduced beyond those inherent to any opcode-adding hard fork.
+
+## Test Cases
+ 
+Assume:
+
+- `calldata = 0x0123456789abcdef`
+- `memory = 0xfedcba9876543210`
+
+| Bytecode | Description | Result |
+|----------|-------------|--------|
+| `5f <CALLDATALOAD8>` | `PUSH0; CALLDATALOAD8` | pushes `0x01` |
+| `6002 <MLOAD8>` | `PUSH1 0x02; MLOAD8` | pushes `0xba` |
+| `<CALLDATALOAD8>` | missing stack operand | exceptional halt |
+| `<MLOAD8>` | missing stack operand | exceptional halt |
+
+## Security Considerations
+
+No new security considerations are introduced beyond those already known for memory and calldata access.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
