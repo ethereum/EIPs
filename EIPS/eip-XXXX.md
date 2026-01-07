@@ -59,7 +59,7 @@ In both cases, execution halts and the current call frame is reverted, consisten
 `MLOAD8` serves as a natural counterpart to `MSTORE8 (0x53)`: one stores exactly one byte from the stack to memory, while the other loads exactly one byte from memory to the stack. This symmetry improves conceptual clarity and developer ergonomics.
 ### Efficiency for Byte-Oriented Contracts
 
-Instruction-based architectures such as Uniswap’s Uniswap’s [Universal Router](https://github.com/Uniswap/universal-router), as well as contracts that use byte-level calldata compression, benefit from reduced gas usage and smaller bytecode size when parsing byte streams.
+Instruction-based architectures such as Uniswap’s Uniswap’s [UniversalRouter](https://docs.uniswap.org/contracts/universal-router/technical-reference), as well as contracts that use byte-level calldata compression, benefit from reduced gas usage and smaller bytecode size when parsing byte streams.
 
 ## Backwards Compatibility
 
