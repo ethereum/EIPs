@@ -1,12 +1,13 @@
 ---
-title: <MLOAD8 and CALLDATALOAD8 Opcodes>
-description: <Adds EVM opcodes for efficient single-byte memory and calldata loads.>
-author: <Helkomine (@Helkomine)>
-discussions-to: <>
+eip: XXXX
+title: MLOAD8 and CALLDATALOAD8 Opcodes
+description: Adds EVM opcodes for efficient single-byte memory and calldata loads.
+author: Helkomine (@Helkomine)
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-mload8-and-calldataload8-opcodes/27396
 status: Draft
-type: <Standards Track>
-category: <Core>
-created: <2026-01-07>
+type: Standards Track
+category: Core
+created: 2026-01-07
 ---
 
 ## Abstract
