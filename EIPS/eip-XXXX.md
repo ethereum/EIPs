@@ -17,15 +17,12 @@ This EIP introduces new EVM opcodes that allow loading a single byte from memory
 
 Currently, the only way to read a single byte from calldata or memory is to use `CALLDATALOAD` or `MLOAD` and then shift the loaded 32-byte word.
 For example, reading the byte at offset x from calldata requires:
-`
+```
 PUSH x
-
 CALLDATALOAD
-
 PUSH1 248
-
 SHR
-`
+```
 This pattern increases runtime gas cost and adds three extra bytes to the deployed bytecode for each single-byte access. Contracts that frequently parse byte-oriented calldata or instruction streams incur unnecessary overhead.
 This EIP proposes two new opcodes that allow loading a single byte directly in one operation.
 
