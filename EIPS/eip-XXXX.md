@@ -2,11 +2,11 @@
 title: <MLOAD8 and CALLDATALOAD8 Opcodes>
 description: <Adds EVM opcodes for efficient single-byte memory and calldata loads.>
 author: <Helkomine (@Helkomine)>
-discussions-to: <URL>
+discussions-to: <>
 status: Draft
 type: <Standards Track>
 category: <Core>
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+created: <2026-01-07>
 ---
 
 ## Abstract
@@ -59,7 +59,7 @@ In both cases, execution halts and the current call frame is reverted, consisten
 `MLOAD8` serves as a natural counterpart to `MSTORE8 (0x53)`: one stores exactly one byte from the stack to memory, while the other loads exactly one byte from memory to the stack. This symmetry improves conceptual clarity and developer ergonomics.
 ### Efficiency for Byte-Oriented Contracts
 
-Instruction-based architectures such as Uniswap’s Universal Router, as well as contracts that use byte-level calldata compression, benefit from reduced gas usage and smaller bytecode size when parsing byte streams.
+Instruction-based architectures such as Uniswap’s Uniswap’s [Universal Router](https://github.com/Uniswap/universal-router), as well as contracts that use byte-level calldata compression, benefit from reduced gas usage and smaller bytecode size when parsing byte streams.
 
 ## Backwards Compatibility
 
