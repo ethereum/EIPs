@@ -11,16 +11,19 @@ created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
 
 ## Abstract
 
-This EIP introduces new EVM opcodes that allow loading a single byte from memory or calldata in a single operation, reducing gas cost and bytecode size compared to existing patterns based on `MLOAD` or `CALLDATALOAD` followed by bit shifting.
+This EIP introduces new EVM opcodes that allow loading a single byte from memory or calldata in a single operation, reducing gas cost and bytecode size compared to existing patterns based on `MLOAD (0x51)` or `CALLDATALOAD (0x35)` followed by bit shifting.
 
 ## Motivation
 
-Currently, the only way to read a single byte from calldata or memory is to use `CALLDATALOAD (0x35)` or `MLOAD (0x51)` and then shift the loaded 32-byte word.
+Currently, the only way to read a single byte from calldata or memory is to use `CALLDATALOAD` or `MLOAD` and then shift the loaded 32-byte word.
 For example, reading the byte at offset x from calldata requires:
 `
 PUSH x
+
 CALLDATALOAD
+
 PUSH1 248
+
 SHR
 `
 This pattern increases runtime gas cost and adds three extra bytes to the deployed bytecode for each single-byte access. Contracts that frequently parse byte-oriented calldata or instruction streams incur unnecessary overhead.
