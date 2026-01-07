@@ -50,6 +50,7 @@ The base gas cost matches `MLOAD`, `MSTORE8`, and `CALLDATALOAD`, ensuring consi
 Execution results in an exceptional halt if:
 - There is insufficient gas to execute the instruction
 - There are insufficient stack items (stack underflow)
+
 In both cases, execution halts and the current call frame is reverted, consistent with existing EVM behavior.
 
 ## Rationale
