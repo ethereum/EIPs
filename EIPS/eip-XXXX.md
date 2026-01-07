@@ -31,18 +31,21 @@ This EIP proposes two new opcodes that allow loading a single byte directly in o
 ### MLOAD8 (TBD)
 - **Stack input**: `offset`
 - **Stack output**: `value`
+
 Reads one byte from memory at position offset and pushes it onto the stack as a 32-byte word, with the byte placed in the least significant position.
 If offset is greater than or equal to the current memory size, the returned value is 0.
 Memory expansion rules apply in the same way as for `MLOAD`.
 ### CALLDATALOAD8 (TBD)
 - **Stack input**: `offset`
 - **Stack output**: `value`
+
 Reads one byte from calldata at position offset and pushes it onto the stack as a 32-byte word, with the byte placed in the least significant position.
 If offset is greater than or equal to `CALLDATASIZE (0x36)`, the returned value is 0.
 ### Gas Cost
 - Base cost: 3 gas
 - `MLOAD8` additionally incurs memory expansion cost as defined by existing memory access rules.
 The base gas cost matches `MLOAD`, `MSTORE8`, and `CALLDATALOAD`, ensuring consistency with existing EVM pricing.
+
 ### Exceptional Conditions
 Execution results in an exceptional halt if:
 - There is insufficient gas to execute the instruction
