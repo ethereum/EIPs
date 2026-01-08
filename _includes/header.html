@@ -19,11 +19,32 @@
           {%- for path in page_paths -%}
             {%- assign my_page = site.pages | where: "path", path | first -%}
             {%- if my_page.title -%}
-            <a class="page-link col" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
+            <a class="page-link col{% if page.category_filter == my_page.title %} active{% endif %}" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
             {%- endif -%}
           {%- endfor -%}
         </div>
       </nav>
     {%- endif -%}
   </div>
+  {% if page.category_filter %}
+  <div class="wrapper">
+    <nav class="status-nav" aria-label="Filter by status">
+      <span class="status-nav-label">Status:</span>
+      <div class="status-nav-links">
+        <a class="status-link active" href="#" data-status="">All</a>
+        <a class="status-link" href="#living" id="living" data-status="Living">Living</a>
+        <a class="status-link" href="#final" id="final" data-status="Final">Final</a>
+        <a class="status-link" href="#last-call" id="last-call" data-status="Last Call">Last Call</a>
+        <a class="status-link" href="#review" id="review" data-status="Review">Review</a>
+        <a class="status-link" href="#draft" id="draft" data-status="Draft">Draft</a>
+        <a class="status-link" href="#stagnant" id="stagnant" data-status="Stagnant">Stagnant</a>
+        <a class="status-link" href="#withdrawn" id="withdrawn" data-status="Withdrawn">Withdrawn</a>
+      </div>
+    </nav>
+    <div class="status-description" id="status-description" style="display: none;">
+      <p class="status-description-text" id="status-description-text"></p>
+      (<a class="status-description-ref" href="/EIPS/eip-1#eip-process" target="_blank">EIP-1</a>)
+    </div>
+  </div>
+  {% endif %}
 </header>
