@@ -18,6 +18,16 @@ layout: default
 </svg>
 
 <div class="home">
+  {% if page.category == "ERC" %}
+    {% assign doc_prefix = "ERC" %}
+  {% else %}
+    {% assign doc_prefix = "EIP" %}
+  {% endif %}
+  {% assign is_draft_stage = page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %}
+  {% capture doc_title %}
+    {{ doc_prefix }}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if is_draft_stage %} [DRAFT]{% endif %}
+  {% endcapture %}
+  {% assign doc_title = doc_title | strip %}
   <span class="h5">
     {% if page.status == "Stagnant" %}
       <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
@@ -46,11 +56,7 @@ layout: default
     {% endif %}
   </span>
   <h1 class="page-heading">
-    {% if page.category == "ERC" %}
-      ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    {% elsif page.category != "ERC" %}
-      EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    {% endif %}
+    {{ doc_prefix }}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
     <a href="{{ page.discussions-to | uri_escape }}" class="no-underline">
       <svg role="img" aria-label="Discuss" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
         <use xlink:href="#bi-chat"/>
@@ -119,7 +125,7 @@ layout: default
   IEEE specification for reference formatting:
   https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
   {% endcomment %}
-  <p>{% include authorlist.html authors=page.author %}, "{% if page.category == "ERC" %}ERC{% else %}EIP{% endif %}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
+  <p>{% include authorlist.html authors=page.author %}, "{{ doc_title }}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
 </div>
 {% comment %}
 Article schema specification:
@@ -129,13 +135,8 @@ https://schema.org/TechArticle
   {
     "@context": "http://schema.org",
     "@type": "TechArticle",
-    {% if page.category == "ERC" %}
-    "headline": "ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
-    "name": "ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
-    {% else %}
-    "headline": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
-    "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
-    {% endif %}
+    "headline": "{{ doc_title }}",
+    "name": "{{ doc_title }}",
     "author": "{{ page.author }}",
     "dateCreated": "{{ page.created | date: "%Y-%m-%d" }}",
     "datePublished": "{{ page.created | date: "%Y-%m-%d" }}",
