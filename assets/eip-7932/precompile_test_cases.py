@@ -1,9 +1,7 @@
 import secp256k1
 
-from precompile import sigrecover_precompile
+from precompile import INVALID, sigrecover_precompile
 from eth_hash.auto import keccak
-
-INVALID = b"\x00" * 20
 
 secp256k1_test_key = bytes.fromhex("1f7627096fa44f0b850f5d9a859d271723ee856e526b947d0d4b011168bdcac1")
 address = "0xd3eF791e8a9c9BD26787D262e66e673FE8E7262A".lower()
