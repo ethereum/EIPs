@@ -48,7 +48,7 @@ layout: default
   <h1 class="page-heading">
     {% if page.category == "ERC" %}
       ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    {% elsif page.category != "ERC" %}
+    {% else %}
       EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
     {% endif %}
     <a href="{{ page.discussions-to | uri_escape }}" class="no-underline">
