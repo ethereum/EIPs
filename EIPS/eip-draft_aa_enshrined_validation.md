@@ -46,8 +46,8 @@ This proposal addresses these limitations by:
 | `AA_TX_TYPE`             | TBD               | [EIP-2718](./eip-2718.md) transaction type |
 | `AA_BASE_COST`           | 15000             | Base intrinsic gas cost for AA transaction |
 | `ACCOUNT_CONFIG_PRECOMPILE` | TBD            | Address of the Account Configuration precompile |
-| `MAX_REQUIRED_PRESTATE_ENTRIES` | 3         | Maximum number of required_pre_state conditions per transaction |
-| `PRESTATE_ENTRY_BASE_COST` | 100            | Base gas cost per required_pre_state entry |
+| `TOKEN_PAYMENT_REGISTRY` | TBD               | Address of the Token Payment Registry |
+| `TOKEN_TRANSFER_COST`    | 5000              | Gas cost for token payment transfer |
 
 
 ### Account Configuration
@@ -206,7 +206,7 @@ When validating a transaction signature, the protocol checks:
 1. First, if the signature is valid for the account's EOA key
 2. If not, check if the signature matches any configured key in the account's key list
 
-Note we expect this behaviour to be removed in the future during any EOA deprecation.
+Note we expect this behaviour to be removed in the future during any EOA deprecation. 
 
 
 ### Key Types
@@ -263,18 +263,17 @@ The transaction payload should be interpreted as:
 AA_TX_TYPE || rlp([
   chain_id,
   from,
-  payer,
   nonce_key,          // 2D nonce: channel key (uint192)
   nonce_sequence,     // 2D nonce: sequence within channel (uint64)
   expiry,
   gas_price,
   gas_limit,
   access_list,
-  authorization_list,
+  authorization_list, 
   calldata,
-  required_pre_state,
+  payment_token,      // Optional: [token_address, max_amount] or empty
   sender_signature,
-  payer_signature
+  payer_auth          // K1 signature (65 bytes) OR payer address (20 bytes)
 ])
 ```
 
@@ -283,10 +282,12 @@ AA_TX_TYPE || rlp([
 The total intrinsic gas for an AA transaction is calculated as:
 
 ```
-intrinsic_gas = AA_BASE_COST + sender_key_cost + payer_key_cost + calldata_cost
+intrinsic_gas = AA_BASE_COST + sender_key_cost + calldata_cost + token_transfer_cost
 ```
 
-Where `sender_key_cost` and `payer_key_cost` are determined by the key types used for each signature (see [Key Types](#key-types) table).
+Where:
+- `sender_key_cost` is determined by the key type used for the sender signature (see [Key Types](#key-types) table)
+- `token_transfer_cost` is `TOKEN_TRANSFER_COST` if `payment_token` is non-empty, otherwise 0
 
 #### Transaction Fields
 
@@ -294,13 +295,11 @@ Where `sender_key_cost` and `payer_key_cost` are determined by the key types use
 
 **`from`** (address): The account that is sending the transaction. This account's validation configuration determines which keys can authorize the transaction.
 
-**`payer`** (address): The account that will pay for the transaction's gas costs. This can be the same as `from` (self-paying) or a different account (sponsored transaction). The payer must also provide a valid signature. If empty, defaults to `from`.
-
 **`nonce_key`** (uint192): The 2D nonce channel key. Allows parallel transaction processing across different keys.
 
 **`nonce_sequence`** (uint64): The sequence number within the nonce channel. Must be exactly `current_sequence` for the given `(from, nonce_key)` pair. Incremented by the protocol after successful execution.
 
-The 2D nonce system enables parallel transactions: different `nonce_key` values can be processed independently, while transactions with the same `nonce_key` are ordered by `nonce_sequence`. Note that the `payer` account does not use its own nonce.
+The 2D nonce system enables parallel transactions: different `nonce_key` values can be processed independently, while transactions with the same `nonce_key` are ordered by `nonce_sequence`.
 
 **`expiry`** (uint64): Unix timestamp after which the transaction is no longer valid. This allows transactions to have built-in time limits, preventing stale transactions from being executed.
 
@@ -314,18 +313,25 @@ The 2D nonce system enables parallel transactions: different `nonce_key` values 
 
 **`calldata`** (bytes): The data to be delivered to the `from` account. The interpretation depends on the account's implementation. For smart accounts, this typically encodes the operations to perform.
 
-**`required_pre_state`** (list): Optional list of state conditions that must be satisfied for the transaction to be valid. Each entry specifies a slot and expected value. Limited to `MAX_REQUIRED_PRESTATE_ENTRIES` entries. Used by payers to protect against griefing.
+**`payment_token`** (list): Optional token payment specification. If non-empty, contains `[token_address, max_amount]`:
+- `token_address` (address): The ERC-20 token to pay with. Must be registered in the Token Payment Registry.
+- `max_amount` (uint256): Maximum tokens the sender is willing to pay. Set to 0 for no limit.
+
+When `payment_token` is set, tokens are transferred from `from` to the payer (outside EVM execution) based on the token's configured exchange rate. See [Token Payments](#token-payments).
 
 **`sender_signature`** (bytes): Signature authorizing the transaction from the sender. Encoding is:
 - **For EOA key**: Raw 65-byte ECDSA signature `(r || s || v)` where r and s are 32 bytes each, v is 1 byte
 - **For configured key**: `0xFF || key_index || signature_data` where:
   - `0xFF` is a 1-byte prefix indicating configured key signature
   - `key_index` (uint8): Index into the sender's configured key list  
-  - `signature_data` (bytes): The actual signature data, format depends on the key type at that index
+   - `signature_data` (bytes): The actual signature data, format depends on the key type at that index
 
 The `0xFF` prefix distinguishes configured key signatures from EOA signatures (which never start with `0xFF` since `r` values are always less than the curve order).
 
-**`payer_signature`** (bytes): Signature from the payer authorizing gas payment. Uses the same encoding as `sender_signature`. If the `payer` field is empty (self-paying transaction), this field MUST be empty bytes `0x`.
+**`payer_auth`** (bytes): Payer authorization. Interpretation depends on length:
+- **65 bytes (K1 signature)**: Permissioned mode. Payer address is recovered via `ecrecover`. Payer signs same payload as sender.
+- **20 bytes (address)**: Permissionless mode. Address references a registered payer configuration. See [Payer Configuration](#payer-configuration).
+- **Empty**: Self-paying transaction. `from` pays gas in ETH (no token payment allowed).
 
 #### Signature Payloads
 
@@ -334,7 +340,6 @@ The `0xFF` prefix distinguishes configured key signatures from EOA signatures (w
 keccak256(AA_TX_TYPE || rlp([
   chain_id,
   from,
-  payer, 
   nonce_key,
   nonce_sequence,
   expiry,
@@ -342,47 +347,12 @@ keccak256(AA_TX_TYPE || rlp([
   gas_limit,
   access_list,
   authorization_list,
-  calldata
+  calldata,
+  payment_token
 ]))
 ```
 
-**Payer signature** is computed over the same payload, ensuring both parties agree on all transaction parameters.
-
-#### Required Pre-State
-
-The `required_pre_state` field allows payers to specify conditions that must hold for the transaction to be valid. Each entry is:
-
-```
-{
-  address: address,      // Must be from, payer, or reference from/payer
-  slot: bytes32,         // Storage slot to check
-  expected_value: bytes32 // Required value
-}
-```
-
-**Gas Costs**:
-
-| Component | Gas Cost |
-|-----------|----------|
-| Base cost per entry | 100 |
-| Cold address access | 2600 (per [EIP-2929](./eip-2929.md)) |
-| Warm address access | 100 |
-| Cold slot read | 2100 |
-| Warm slot read | 100 |
-
-Each `required_pre_state` entry adds to the transaction's intrinsic gas. Addresses and slots in the `access_list` are considered warm.
-
-**Restrictions**:
-- Address must be `from`, `payer`, or contain `from`/`payer` address in the slot computation
-- Maximum `MAX_REQUIRED_PRESTATE_ENTRIES` (3) entries per transaction
-- Prevents mass invalidation attacks by limiting what can be checked
-
-**Use Cases**:
-- Verify wallet implementation (code hash)
-- Check ERC-20 balance for payment
-- Ensure account hasn't been modified
-
-Payers can alternatively use `eth_sendRawTransactionConditional` or builder revert protection for more flexibility.
+**Payer signature** (when `payer_auth` is 65 bytes) is computed over the same payload, ensuring both parties agree on all transaction parameters including the token payment terms.
 
 
 ### 2D Nonce System
@@ -426,6 +396,85 @@ All can be included in the same block without waiting for sequential confirmatio
 ```
 
 
+### Token Payments
+
+This proposal enables gas payment in ERC-20 tokens through a slot-based token registry. Tokens must be registered before they can be used for gas payment.
+
+#### Token Payment Registry
+
+The Token Payment Registry stores configuration for each registered token at `TOKEN_PAYMENT_REGISTRY`:
+
+```
+Base slot: keccak256(token_address || TOKEN_PAYMENT_REGISTRY)
+
+Slot layout:
+- base_slot + 0: balance_slot_index (uint256)
+- base_slot + 1: blocklist_slot_index (uint256, 0 if none)
+- base_slot + 2: oracle_address (address)
+- base_slot + 3: oracle_slot (bytes32)
+- base_slot + 4: decimals (uint8)
+- base_slot + 5: active (bool)
+```
+
+**Token Registration**: Tokens opt-in by calling the registry to declare their storage slots. Registration is initially permissioned by the chain; permissionless registration may be added in future upgrades.
+
+#### Price Oracle
+
+The oracle returns the exchange rate as **tokens per ETH** (in token's smallest unit per wei). The protocol reads this value directly from the configured `oracle_address` at `oracle_slot`.
+
+```
+token_cost = ceil(gas_cost_wei * exchange_rate / 10^18)
+```
+
+If the oracle returns 0 or is unavailable, `token_cost` is 0 (effectively a free transaction).
+
+#### Token Transfer Flow
+
+When `payment_token` is set and `payer_auth` specifies a valid payer:
+
+1. **Read exchange rate** from oracle slot
+2. **Compute token cost**: `ceil(gas_cost * exchange_rate / 10^18)`
+3. **Validate max_amount**: If `max_amount > 0`, require `token_cost <= max_amount`
+4. **Check sender balance**: Read from token's `balance_slot_index`
+5. **Check blocklist**: If `blocklist_slot_index > 0`, verify sender is not blocked
+6. **Transfer tokens**: Direct slot update—decrease sender balance, increase payer balance
+7. **Emit Transfer event**: `Transfer(from, payer, token_cost)` for indexer compatibility
+
+Token transfers occur **outside EVM execution**, before calldata delivery.
+
+
+### Payer Configuration
+
+Payers can register configurations to accept token payments without signing each transaction (permissionless mode).
+
+#### Payer Config Storage
+
+Payer configurations are stored in the Account Configuration precompile:
+
+```
+Base slot: keccak256(payer_address || ACCOUNT_CONFIG_PRECOMPILE || "payer")
+
+Slot layout:
+- base_slot + 0: active (bool)
+- base_slot + 1 + token_index: accepted_tokens mapping
+  - Key: keccak256(token_address || base_slot + 1)
+  - Value: bool (true if accepted)
+```
+
+#### Permissionless Payer Flow
+
+When `payer_auth` is 20 bytes (an address):
+
+1. **Load payer config**: Read from precompile storage
+2. **Verify active**: Payer config must be active
+3. **Verify token accepted**: `accepted_tokens[payment_token.token]` must be true
+4. **Verify payer ETH balance**: Payer must have sufficient ETH for gas
+5. **Process token transfer**: As described in [Token Transfer Flow](#token-transfer-flow)
+6. **Deduct ETH gas**: From payer's balance
+
+This enables **permissionless gas sponsorship**: anyone can deploy a payer contract, register accepted tokens, and earn fees by accepting token payments. The payer contract can implement withdrawal logic, periodic swaps to ETH via Uniswap/Aerodrome, or other treasury management.
+
+
 ### New Opcodes for Transaction Context
 
 To allow wallet code to access transaction context, two new opcodes are introduced:
@@ -447,14 +496,29 @@ These opcodes allow wallet implementations to:
 
 ### Gas Abstraction
 
-This proposal enables native gas abstraction through the separation of the transaction sender (`from`) and the gas payer (`payer`). This allows third-party accounts to sponsor transactions outright or in exchange for payment in ERC-20 tokens or other assets.
+This proposal enables native gas abstraction through two payer modes:
 
-Payers can protect themselves from griefing via:
-1. **`required_pre_state`**: Validate wallet implementation and balances in transaction
-2. **`eth_sendRawTransactionConditional`**: Builder-level conditional inclusion
-3. **Builder revert protection**: Rely on builders to not include reverting txs
+#### Permissioned Mode (Signature-based)
 
-**Payer Security Note**: Payers should initially use **EOA keys** (not rotatable auth config keys) to prevent mass invalidation attacks where a payer could change their keys and invalidate many sponsored transactions in the mempool.
+Payer provides a K1 signature (65 bytes) in `payer_auth`. The payer address is recovered via `ecrecover`. This mode is suitable for:
+- Trusted sponsors (e.g., application subsidizing users)
+- Private relay relationships
+- One-off sponsorships
+
+**Security Note**: Permissioned payers should use EOA keys only (not rotatable auth config keys) to prevent mass invalidation attacks.
+
+#### Permissionless Mode (Config-based)
+
+Payer address (20 bytes) in `payer_auth` references a registered payer configuration. This mode enables:
+- **Pseudo-AMM**: Permissionless gas payment acceptors
+- **Token-for-gas swaps**: Users pay tokens, payer provides ETH
+- **Competitive market**: Multiple payers can compete on exchange rates
+
+Payers can protect themselves via:
+1. **Token registration**: Only accept tokens they've explicitly configured
+2. **Balance verification**: Protocol checks sender token balance before transfer
+3. **Blocklist enforcement**: Tokens can maintain blocklists for compliance
+4. **`eth_sendRawTransactionConditional`**: Builder-level conditional inclusion (for additional checks)
 
 
 ### Pure Smart Account Initialization
@@ -545,29 +609,44 @@ The `salt` parameter allows wallet providers to generate unique addresses from t
 
 When a transaction is received by a node:
 
-1. **Signature Validation**: Both sender and payer signatures are validated against onchain account configurations by checking configured keys or EOA keys.
-2. **Nonce Check**: Sender's nonce must be valid.
-3. **Balance Check**: Payer account must have sufficient ETH balance to cover `gas_limit * gas_price`
-4. **Required Pre-State Check**: All `required_pre_state` conditions must be satisfied
-5. **Expiry Check**: Current timestamp must be before transaction `expiry`
-6. **Mempool Threshold Check**: Payer's pending sponsored transaction count must be below the mempool limit
+1. **Sender Signature Validation**: Validate `sender_signature` against `from` account's configured keys or EOA key
+2. **Payer Resolution**:
+   - If `payer_auth` is 65 bytes: recover payer address via `ecrecover`, validate signature
+   - If `payer_auth` is 20 bytes: use as payer address, verify payer config exists and is active
+   - If `payer_auth` is empty: payer = `from` (self-paying)
+3. **Nonce Check**: Sender's nonce must be valid for the given `(from, nonce_key)`
+4. **Balance Check**: Payer must have sufficient ETH for `gas_limit * gas_price`
+5. **Token Payment Validation** (if `payment_token` is set):
+   - Token must be registered in Token Payment Registry
+   - Payer config must accept the token (permissionless mode) or payer signed (permissioned mode)
+   - Sender must have sufficient token balance
+   - Sender must not be on token's blocklist
+   - Token cost must not exceed `max_amount` (if set)
+6. **Expiry Check**: Current timestamp must be before transaction `expiry`
+7. **Mempool Threshold Check**: Payer's pending sponsored transaction count must be below limits
 
 If all checks pass, the transaction is accepted into the mempool and propagated to peers.
 
 #### Block Inclusion
 
-When a block builder selects a transaction for potential inclusion it revalidates all conditions against current state. If all conditions hold it can be included in the block.
+When a block builder selects a transaction for potential inclusion, it revalidates all conditions against current state. All slot reads for validation are performed outside EVM execution.
 
 #### Execution
 
 Once included in a block:
 
-1. **Gas Deduction**: Total gas spent is deducted from the `payer` account (not the `from` account)
-2. **Authorization Processing**: If `authorization_list` is non-empty, process 7702 authorizations
-3. **Account Initialization**: If account init authorization is present, deploy the new account
-4. **Call Context**: `tx.origin` is set to the `from` address
-5. **Calldata Delivery**: The `calldata` is delivered to the `from` address via a call where `msg.sender` = `from` (self-call)
-6. **Standard Execution**: Follows standard EVM execution rules
+1. **Token Transfer** (if `payment_token` is set):
+   - Read exchange rate from oracle slot
+   - Compute `token_cost = ceil(gas_cost * exchange_rate / 10^18)`
+   - Update sender token balance: `balance -= token_cost`
+   - Update payer token balance: `balance += token_cost`
+   - Emit `Transfer(from, payer, token_cost)` event
+2. **Gas Deduction**: Total gas spent is deducted from the payer's ETH balance
+3. **Authorization Processing**: If `authorization_list` is non-empty, process 7702 authorizations
+4. **Account Initialization**: If account init authorization is present, deploy the new account
+5. **Call Context**: `tx.origin` is set to the `from` address
+6. **Calldata Delivery**: The `calldata` is delivered to the `from` address via a call where `msg.sender` = `from` (self-call)
+7. **Standard Execution**: Follows standard EVM execution rules
 
 
 ### Arbitrary Execution
@@ -623,7 +702,7 @@ Works as-is with AA transactions. Accounts can estimate gas for their transactio
 
 #### `eth_sendRawTransaction`
 
-Works as-is using the new transaction type envelope once nodes support.
+Works as-is using the new transaction type envelope once nodes support. 
 
 #### `eth_getTransactionReceipt`
 
@@ -692,15 +771,19 @@ The `calldata` is always delivered to the `from` address rather than allowing ar
 *Test cases will be provided in a reference implementation. Key scenarios to test:*
 
 1. **Basic AA Transaction**: Self-paying transaction with EOA key
-2. **Sponsored Transaction**: Separate payer with valid signature
-3. **Multi-Key Validation**: Transaction signed with configured key (not EOA)
-4. **Key Rotation**: Add/remove keys and verify validation changes
-5. **2D Nonce**: Parallel transactions with different nonce keys
-6. **DELEGATE Key**: Validation delegated to another account
-7. **Account Initialization**: New account creation with initial keys
-8. **Required Pre-State**: Transaction with state conditions
-9. **Expiry**: Transaction rejected after expiry timestamp
-10. **Invalid Signatures**: Various rejection scenarios
+2. **Permissioned Sponsorship**: Payer provides K1 signature in `payer_auth`
+3. **Permissionless Sponsorship**: Payer address references registered config
+4. **Token Payment**: Transaction with `payment_token` set, tokens transferred to payer
+5. **Token Payment with Max Amount**: Verify `max_amount` enforcement
+6. **Multi-Key Validation**: Transaction signed with configured key (not EOA)
+7. **Key Rotation**: Add/remove keys and verify validation changes
+8. **2D Nonce**: Parallel transactions with different nonce keys
+9. **DELEGATE Key**: Validation delegated to another account
+10. **Account Initialization**: New account creation with initial keys
+11. **Blocklist Enforcement**: Sender on token blocklist rejected
+12. **Oracle Edge Cases**: Zero exchange rate, stale oracle
+13. **Expiry**: Transaction rejected after expiry timestamp
+14. **Invalid Signatures**: Various rejection scenarios
 
 
 ## Backwards Compatibility
@@ -750,9 +833,16 @@ The upgrade requires network-wide adoption through a scheduled hard fork to enab
 
 ### Stakeholder Protections
 
-**Payer Security**: Gas sponsors receive protection through `required_pre_state` mechanism. By validating wallet implementations and account state (such as ERC-20 balances), payers can ensure sufficient funds exist for compensation. Payers should only sponsor transactions for trusted wallet implementations.
+**Payer Security**: 
+- **Permissioned mode**: Payers sign each transaction, maintaining full control over what they sponsor
+- **Permissionless mode**: Payer configs explicitly list accepted tokens. Protocol validates sender balance and blocklist status before transfer. Payers should use EOA keys to prevent mass invalidation.
 
-**Block Builder Security**: Builders validate transactions using the warm Account Configuration precompile address, enabling fast validation without EVM execution. The `required_pre_state` conditions allow simple storage reads to verify validity. The constrained validation model prevents DoS attacks where malicious transactions consume builder resources without paying for gas.
+**Token Payment Security**:
+- **Oracle manipulation**: Attackers could manipulate oracle prices to underpay. Mitigations include TWAP oracles, multiple oracle sources, or payer-set exchange rate bounds.
+- **Zero exchange rate**: If oracle returns 0, token cost is 0 (free gas). This is a feature for promotional tokens but payers should be aware.
+- **Blocklist enforcement**: Protocol checks token blocklist before transfer, ensuring sanctioned addresses cannot use token payments.
+
+**Block Builder Security**: Builders validate transactions using slot reads from warm precompile addresses, enabling fast validation without EVM execution. The constrained validation model prevents DoS attacks where malicious transactions consume builder resources without paying for gas.
 
 ### Interaction with Other Proposals
 
@@ -765,7 +855,17 @@ The upgrade requires network-wide adoption through a scheduled hard fork to enab
 
 ## Future Considerations
 
-A dedicated **payer configuration precompile** could be introduced to reduce the calldata overhead of `required_pre_state` checks. By allowing payers to register commonly-used state validation conditions onchain, transactions could reference these configurations by ID rather than including full condition data in each transaction. This would significantly reduce calldata costs and potentially enable permissionless payer models where standardized validation patterns can be shared across the network.
+**Permissionless Token Registration**: Initially, token registration in the Token Payment Registry is permissioned by the chain (allowlisted tokens only). Future upgrades could enable permissionless registration with:
+- Stake requirements for token registrants
+- Verification that declared slots match actual `balanceOf()` behavior
+- Compatibility markers in token storage
+
+**Payer Configuration Enhancements**: Payer configs could be extended to include:
+- Per-token exchange rate bounds (max rate payer will accept)
+- Wallet code restrictions (only sponsor specific implementations)
+- Rate limiting per sender
+
+**Alternative State Validation**: For use cases requiring state checks beyond token payments (e.g., verifying wallet code hash), applications can use `eth_sendRawTransactionConditional` at the builder level. This approach doesn't enshrine any token standard and provides flexibility for custom validation logic.
 
 
 ## Copyright

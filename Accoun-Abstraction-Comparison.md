@@ -66,6 +66,7 @@ This proposes a minimal native AA transaction type:
 | **No ERC-20 Gas Payments** | Users must hold native token; payers can't receive payment atomically |
 | **No Key Rotation** | Compromised key = lost account |
 | **No P256/WebAuthn** | Can't use passkeys or secure enclaves |
+| **No subaccounts / session keys** | No way to have an different account use a key from a different account  |
 
 ### From Tempo
 
@@ -133,7 +134,7 @@ The abstract approach keeps the protocol more generic—AMM is just another paye
 
 **Note on Public vs Private Mempool**:
 - **Private relay/bundler**: `eth_sendRawTransactionConditional` is sufficient—the relay checks conditions before submitting, so no onchain config needed
-- **Public mempool**: Onchain config becomes important because the tx could be submitted without the conditional check. The protocol-level `required_pre_state` ensures conditions are enforced regardless of submission path
+- **Public mempool**: Token Payment Registry provides protocol-level enforcement regardless of submission path. For non-token conditions (e.g., wallet code verification), use `eth_sendRawTransactionConditional` or builder revert protection
 
 #### Token Slot Declaration (Future: Phase 2/3)
 
@@ -281,7 +282,6 @@ Combine the simplicity of the Simple Approach with necessary extensions:
 AA_TX_TYPE || rlp([
   chain_id,
   from,
-  payer,              // Optional: defaults to from
   nonce_key,          // 2D nonce: channel key (uint192)
   nonce_sequence,     // 2D nonce: sequence within channel (uint64)
   expiry,             // Time-bound validity
@@ -290,101 +290,102 @@ AA_TX_TYPE || rlp([
   access_list,
   authorization_list, // 7702 compatibility
   calldata,           // Data delivered to from account
-  required_pre_state, // Config ID + dynamic params
+  payment_token,      // Optional: [token_address, max_amount]
   sender_signature,
-  payer_signature     // Optional: if payer != from
+  payer_auth          // K1 signature (65 bytes) OR payer address (20 bytes)
 ])
 ```
 
 **Calldata Delivery**: The `calldata` is delivered directly to the `from` account. The account interprets it however it wants—this is **unopinionated execution**. No protocol-level intent processing or revert handling. Wallet code decides what to do.
 
-**Required Pre-State**: Payer protection via state conditions. Two modes:
+### Token Payments
 
-1. **Inline conditions**: Up to 3 slot → expected value checks in the tx
-2. **Config reference**: Reference a global config by ID + dynamic params
-
-### Global Config Registry
-
-Instead of each payer defining conditions, use a **shared global registry**:
+When `payment_token` is set, tokens are transferred from sender to payer **outside EVM execution**:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  CONFIG REGISTRY (Global)                               │
-├─────────────────────────────────────────────────────────┤
-│  configId (content hash) → conditions[]                 │
-│  configId → stake amount                                │
-└─────────────────────────────────────────────────────────┘
+Token Payment Flow:
+1. Read exchange rate from token's oracle (tokens per ETH)
+2. Compute: token_cost = ceil(gas_cost_wei * exchange_rate / 10^18)
+3. Validate: token_cost ≤ max_amount (if set)
+4. Check: sender balance ≥ token_cost
+5. Check: sender not on token blocklist
+6. Direct slot update: sender balance ↓, payer balance ↑
+7. Emit Transfer(sender, payer, token_cost) event
 ```
 
-**Anyone can register** reusable validation patterns:
+### Payer Modes
 
-```solidity
-// Register a config (one-time)
-configRegistry.register([
-    Condition(WALLET_CODE, SAFE_WALLET_HASH, EQ),
-    Condition(TOKEN_BALANCE, USDC, GTE, DYNAMIC),  // min amount from tx
-    Condition(NOT_BLOCKLISTED, USDC_BLOCKLIST)
-]);
-// Returns configId = keccak256(conditions) — content-addressed
+| Mode | payer_auth | Description |
+|------|-----------|-------------|
+| **Self-pay** | Empty | `from` pays gas in ETH |
+| **Permissioned** | 65-byte K1 signature | Payer address recovered via ecrecover |
+| **Permissionless** | 20-byte address | References registered payer config |
+
+**Permissionless mode** enables pseudo-AMM: payers register which tokens they accept, users pay tokens, payers receive tokens and pay ETH gas. Payer contracts can swap accumulated tokens via Uniswap/Aerodrome.
+
+### Token Payment Registry
+
+Tokens opt-in to protocol-level transfers by declaring their storage slots:
+
+```
+Token Config (slot-based):
+├── balance_slot_index: uint256
+├── blocklist_slot_index: uint256 (0 if none)
+├── oracle_address: address
+├── oracle_slot: bytes32        // Returns tokens per ETH
+└── decimals: uint8
 ```
 
-**Transaction references config:**
+**Registration**: Initially permissioned by chain (USDC, USDT, DAI, etc.). Future: permissionless with stake + verification.
+
+### Payer Configuration
+
+Payers register configs in the Auth Precompile to accept permissionless token payments:
+
 ```
-required_pre_state: {
-    configId: 0xabc123...,      // Global config ID
-    params: [minUsdcBalance]    // Dynamic values
-}
+Payer Config:
+├── accepted_tokens: mapping(address => bool)
+└── active: bool
 ```
 
-**Condition types** (developer-friendly, not raw slots):
+### Alternative: State Preconditions (eth_sendRawTransactionConditional)
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `WALLET_CODE` | Check account code hash | Must be Safe wallet |
-| `TOKEN_BALANCE` | Check ERC-20 balance ≥ threshold | Has ≥ 10 USDC |
-| `NOT_BLOCKLISTED` | Check not on blocklist | Not sanctioned |
-| `SLOT_VALUE` | Raw slot check (escape hatch) | Custom condition |
-
-Protocol expands these to actual slot reads internally.
-
-### Staking for Mempool Priority
-
-To prevent spam configs and align incentives:
-
-| Stake Level | Mempool Limit |
-|-------------|---------------|
-| No stake | 4 pending txs using this config |
-| 1 ETH staked | 100 pending txs |
-| 10 ETH staked | 1000 pending txs |
-
-**Benefits of global configs + staking:**
-- **Shared patterns**: Common configs (USDC, Safe wallet) registered once, used by all payers
-- **Reduced calldata**: Reference by ID instead of full conditions
-- **Spam prevention**: Stake required for high-volume usage
-- **Economic alignment**: Popular configs worth staking for
-- **Automatic dedup**: Content-addressed IDs mean same conditions = same ID
+For use cases beyond token payments (e.g., wallet code verification), use `eth_sendRawTransactionConditional` at the builder level. This approach:
+- Doesn't enshrine any token standard
+- Provides flexibility for custom validation
+- Works with private relays/bundlers
+- Transfer happens in EVM (calldata includes transfer)
 
 ### Validation vs Execution (Separation of Concerns)
 
 | Component | Responsibility | When |
 |-----------|---------------|------|
 | **Auth Precompile** | **Who can sign** — validates signatures against registered keys | Before EVM execution |
+| **Token Registry** | **Token transfers** — balance/blocklist checks, direct slot updates | Before EVM execution |
 | **Wallet Code** | **What happens** — interprets calldata and executes operations | During EVM execution |
 
 This separation means:
-- You can have auth config **without** custom wallet code (use default or 7702)
-- Validation is decoupled from execution logic
-- Wallet implementations can vary while auth stays standardized
+- Validation and token transfers happen **outside EVM**
+- Wallet implementations can vary while auth/payment stays standardized
+- No ERC-20 `transfer()` calls during validation—direct slot manipulation
 
 ### Validation (Outside EVM)
 
-1. **Signature Check**: Validate against auth precompile config (or EOA key if no config)
-2. **2D Nonce Check**: Validate `(key, sequence)` pair hasn't been used
-3. **Balance Check**: Payer has `gas_limit * gas_price` ETH
-4. **Expiry Check**: `block.timestamp < expiry`
-5. **Required Pre-State**: All conditions in `required_pre_state` must hold
+1. **Sender Signature Check**: Validate against auth precompile config (or EOA key)
+2. **Payer Resolution**:
+   - 65-byte `payer_auth`: recover address via ecrecover, validate signature
+   - 20-byte `payer_auth`: lookup payer config, verify active and accepts token
+   - Empty: self-pay (payer = from)
+3. **2D Nonce Check**: Validate `(key, sequence)` pair
+4. **Balance Check**: Payer has sufficient ETH for gas
+5. **Token Payment Check** (if `payment_token` set):
+   - Token registered in registry
+   - Sender balance ≥ computed cost
+   - Sender not on blocklist
+   - Cost ≤ max_amount (if specified)
+6. **Expiry Check**: `block.timestamp < expiry`
 
-All checks are **pure state reads**—no EVM execution. Nonces updated at protocol level (not within EVM).
+All checks are **pure slot reads**—no EVM execution.
 
 ### 2D Nonce System
 
@@ -484,14 +485,15 @@ Address is derived deterministically: `keccak256(0xff || PRECOMPILE || salt || k
 
 ### Execution Flow
 
-1. Gas deducted from `payer`
-2. Process 7702 authorizations if present
-3. Process account initialization if present
-4. `tx.origin` = `from`
-5. Deliver `calldata` to `from` (self-call where `msg.sender` = `from`)
-6. Account code processes calldata however it wants
+1. **Token transfer** (if `payment_token` set): sender → payer, emit `Transfer` event
+2. **Gas deducted** from payer's ETH balance
+3. **7702 authorizations** processed if present
+4. **Account initialization** if present
+5. `tx.origin` = `from`
+6. **Deliver calldata** to `from` (self-call where `msg.sender` = `from`)
+7. Account code processes calldata however it wants
 
-**No entrypoint contract**—calldata goes directly to the account.
+**No entrypoint contract**—calldata goes directly to the account. Token transfer happens **before** EVM execution.
 
 ### Security: Mass Invalidation
 
@@ -516,7 +518,7 @@ Address is derived deterministically: `keccak256(0xff || PRECOMPILE || salt || k
 | Feature | Simple | Tempo | Proposed |
 |---------|--------|-------|----------|
 | Native Gas Sponsorship | ✅ | ✅ | ✅ |
-| ERC-20 Gas Payment | ❌ | ✅ (TIP-20 only) | ✅ (flexible payer pattern) |
+| ERC-20 Gas Payment | ❌ | ✅ (TIP-20 only) | ✅ (token registry + permissionless payers) |
 | Key Rotation | ❌ | ❌ | ✅ |
 | Multiple Sig Types | ❌ | ✅ | ✅ |
 | Passkeys/WebAuthn | ❌ | ✅ | ✅ |
