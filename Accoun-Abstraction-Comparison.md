@@ -40,8 +40,10 @@ Replace ERC-4337 with native account abstraction where transaction validation oc
 **Rationale**:
 - Enables key rotation without changing account address
 - Enables 4337 smart account migration (any `msg.sender` can register keys)
+- Enables subaccounts/session keys via `DELEGATE` key type / onchain permissions
 - Enables multiple signature types (K1, R1, WebAuthn, BLS)
 - Provides quantum-safe migration path (add post-quantum key types later)
+- Provides Keyspace integration path (delegate to cross-chain key registry)
 - Works on all chains without new opcodes
 
 **Rejected alternatives**:
@@ -51,41 +53,46 @@ Replace ERC-4337 with native account abstraction where transaction validation oc
 | Per-account storage slots | Storage conflicts with contract code; no canonical interface |
 | New account trie field | Requires deeper protocol changes |
 
-### Decision 2: Token Payment Registry + Oracle
+### Decision 2: Token Payment Registry + Flexible Pricing
 
-**Choice**: Tokens register storage slots; oracle provides exchange rate; payers accept tokens permissionlessly.
+**Choice**: Token registry with flexible pricing—supports both oracle-based pricing and optional native AMM per chain operator.
 
 **Rationale**:
 - Does not enshrine a specific token standard (vs TIP-20)
 - Tokens opt-in by declaring balance/blocklist slots
 - Oracle-based pricing allows any price feed (Native Oracle / Chainlink compatible)
-- Permissionless payers system can leverage existing defi/AMM allowing integrations across the space
+- **Native AMM option**: Chain operators can deploy `NATIVE_PAYER` with integrated AMM for always-available gas abstraction
+- Permissionless payers system can leverage existing DeFi/AMM allowing integrations across the space
 - Payers can implement custom logic (sweep tokens via DeFi)
+- Flexibility: chains choose what works best (oracle-only, native AMM, or both)
 
-**Rejected alternatives**:
-| Alternative | Why Rejected |
-|-------------|--------------|
-| Native AMM | Enshrines ERC-20 at protocol level; picks winner; potentially pulls liquidity from DeFi, stifling innovation |
-| TIP-20 only | Rigid; existing tokens can't participate. Note: TIP-403 blocklist concept is adopted via per-token blocklist slots |
-| In-TX state checks only, EVM execution | Higher calldata cost; no protocol enforcement |
+**Design flexibility**:
+| Approach | Use Case |
+|----------|----------|
+| Oracle + Permissionless Payers | Leverage existing DeFi liquidity; payers sweep tokens |
+| Native AMM | Always-available gas payment; protocol-managed liquidity |
+| Hybrid | Native AMM as default, permissionless payers for additional tokens |
 
 **Token registration** is initially permissioned (chain allowlists USDC, USDT, etc.). Permissionless registration with stake + verification can be added later.
 
-### Decision 3: Permissioned + Permissionless Payer Modes
+### Decision 3: Flexible Payer Modes
 
-**Choice**: Support both signature-based (permissioned) and config-based (permissionless) payers.
+**Choice**: Support signature-based (permissioned), config-based (permissionless), and native payer modes.
 
 | Mode | payer_auth | Use Case |
 |------|-----------|----------|
 | Self-pay | Empty | User pays ETH |
 | Permissioned | 65-byte K1 signature | Trusted sponsors, private relays |
-| Permissionless | 20-byte address | Public gas markets, pseudo-AMM |
+| Permissionless | 20-byte address | Public gas markets, custom payers |
+| Native | Empty + payment_token | Default to `NATIVE_PAYER` (if chain supports); always-available gas abstraction |
 
 **Rationale**:
 - Permissioned mode for trusted relationships (app subsidizing users)
 - Permissionless mode enables open gas markets without signatures
+- **Native mode** provides always-available gas payment when chain operator deploys native AMM
 - Payers register accepted tokens; protocol enforces balance/blocklist checks
 - Payers can sweep accumulated tokens via Uniswap/Aerodrome
+- Users can pay with tokens without finding a sponsor (just set `payment_token`)
 
 ---
 
@@ -104,10 +111,10 @@ AA_TX_TYPE || rlp([
 ### Validation (Outside EVM)
 
 1. Validate `sender_signature` against auth precompile config (or EOA key)
-2. Resolve payer from `payer_auth`
+2. Resolve payer from `payer_auth` (defaults to `NATIVE_PAYER` if empty with `payment_token`)
 3. Verify 2D nonce, payer ETH balance, expiry
 4. If token payment: verify registration, balance, blocklist, max_amount
-5. Mempool threshold for sponsored txs
+5. Mempool threshold for sponsored txs (not applicable for native payer)
 
 All checks are **pure slot reads**—no EVM execution.
 
@@ -140,12 +147,12 @@ All checks are **pure slot reads**—no EVM execution.
 |---------|--------|-------|---------------|
 | Native Gas Sponsorship | ✅ | ✅ | ✅ |
 | ERC-20 Gas Payment | ❌ | ✅ (TIP-20) | ✅ (registry) |
+| Native AMM Option | ❌ | ❌ | ✅ (per chain) |
 | Key Rotation | ❌ | ❌ | ✅ |
 | Multiple Sig Types | ❌ | ✅ | ✅ |
 | Passkeys/WebAuthn | ❌ | ✅ | ✅ |
 | 2D Nonces | ❌ | ✅ | ✅ |
 | Legacy 4337 Migration | ❌ | ❌ | ✅ |
-| Quantum-Safe Path | ❌ | ❌ | ✅ |
 | No EVM in Validation | ✅ | ✅ | ✅ |
 
 ---
@@ -205,3 +212,4 @@ Users opt-in when ready. The `DELEGATE` type makes migration seamless.
 - [EIP-4337](https://eips.ethereum.org/EIPS/eip-4337) - Account Abstraction via EntryPoint
 - [EIP-7796](https://eips.ethereum.org/EIPS/eip-7796) - eth_sendRawTransactionConditional
 - [Keyspace Docs](https://docs.key.space) - Cross-chain key management
+ 

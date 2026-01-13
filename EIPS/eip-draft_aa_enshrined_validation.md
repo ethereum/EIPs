@@ -43,6 +43,7 @@ This proposal addresses these by:
 | `ACCOUNT_CONFIG_PRECOMPILE` | TBD | Account Configuration precompile address |
 | `TOKEN_PAYMENT_REGISTRY` | TBD | Token Payment Registry address |
 | `TOKEN_TRANSFER_COST` | 3000 | Gas cost for token payment transfer |
+| `NATIVE_PAYER` | TBD | Native gas payer precompile address |
 
 ### Account Configuration
 
@@ -131,7 +132,7 @@ Where `token_transfer_cost` is `TOKEN_TRANSFER_COST` if `payment_token` is non-e
 | `calldata` | Data delivered to `from` account |
 | `payment_token` | Optional `[token_address, max_amount]` for token gas payment |
 | `sender_signature` | See [Signature Format](#signature-format) |
-| `payer_auth` | **65 bytes**: K1 signature, payer recovered via ecrecover. **20 bytes**: Registered payer address (permissionless mode). **Empty**: Self-paying, `from` pays ETH |
+| `payer_auth` | **65 bytes**: K1 signature, payer recovered via ecrecover. **20 bytes**: Registered payer address (permissionless mode). **Empty**: If `payment_token` is set, uses `NATIVE_PAYER`; otherwise `from` pays ETH |
 
 #### Signature Format
 
@@ -221,7 +222,31 @@ Base slot: keccak256(payer_address || ACCOUNT_CONFIG_PRECOMPILE || "payer")
 - Payer accepts the specified token
 - Payer has sufficient ETH for gas
 
+**Native (empty with payment_token)**: Defaults to `NATIVE_PAYER` when `payment_token` is set. Protocol handles conversion natively.
+
 This enables permissionless gas sponsorship where payers accept token payments without a signature. Payers can then integrate any code they wish ie. to sweep token to ETH by swapping in defi protocols periodically. 
+
+### Native Payer
+
+The `NATIVE_PAYER` precompile provides protocol-level gas abstraction as the default payer when `payment_token` is set without an explicit payer.
+
+#### Behavior
+
+- **Token Support**: Uses the same Token Payment Registry for token configuration and allowlisting
+- **Oracle Integration**: Registered tokens have oracle slots available; the protocol may use these or implement native pricing mechanisms (e.g., integrated AMM)
+- **Chain Permissioned**: Configuration and supported tokens are managed at the protocol level
+- **Automatic Default**: When `payer_auth` is empty and `payment_token` is non-empty, the native payer is used
+
+#### Usage
+
+Users can pay for gas with tokens without finding a sponsor:
+
+```
+payment_token = [usdc_address, max_amount]
+payer_auth = []  // Defaults to NATIVE_PAYER
+```
+
+The protocol handles token-to-ETH conversion natively, providing always-available gas abstraction for supported tokens.
 
 ### Execution
 
@@ -278,10 +303,10 @@ Users can receive funds at counterfactual addresses before deployment.
 #### Mempool Acceptance
 
 1. Validate `sender_signature` against `from` account's keys
-2. Resolve payer from `payer_auth`
+2. Resolve payer from `payer_auth` (defaults to `NATIVE_PAYER` if empty with `payment_token` set)
 3. Verify nonce, payer ETH balance, expiry
 4. If `payment_token` set: verify token registration, payer acceptance, sender balance/blocklist, max_amount
-5. Mempool threshold: payer's pending sponsored transaction count must be below node-configured limits 
+5. Mempool threshold: payer's pending sponsored transaction count must be below node-configured limits (not applicable for `NATIVE_PAYER`) 
 
 #### Block Execution
 
@@ -319,11 +344,11 @@ No breaking changes. Existing EOAs and smart contracts function unchanged. Adopt
 
 **Replay Protection**: Transactions include `chain_id`, 2D nonce, and `expiry`.
 
-**Key Management**: Only `msg.sender` can modify account configuration. EOA key always retains authorization for recovery.
+**Key Management**: Only `msg.sender` can modify account configuration. EOA key always retains authorization for recovery (if created with an EOA via 7702).
 
 **Delegation**: `DELEGATE` key type limited to 1 hop to prevent loops.
 
-**Gas Spending Risk**: Any authorized key can submit transactions with high gas limits, potentially draining the account's ETH or tokens. Mitigation could be done where max wei / fee is configured in the auth config. 
+**Gas Spending Risk**: Any authorized key can submit transactions with high gas limits, potentially draining the account's ETH or tokens. Mitigation could be done where max wei / fee is configured in the auth config or token specific limits. 
 
 **Payer Security**: Permissioned payers sign each transaction. Permissionless payers explicitly configure accepted tokens; protocol validates sender balance/blocklist before transfer.
 
