@@ -12,12 +12,12 @@ requires: 2718, 2930, 7702
 
 ## Abstract
 
-This proposal introduces a standardized validation mechanism for account abstraction, utilizing onchain account configurations to define accepted keys and key types. Unlike EIP-7701/RIP-7560, which permits arbitrary validation code, this approach restricts validation to a predefined set of key types and rules, ensuring protocol simplicity and secure account abstraction without requiring EVM code execution. A new transaction type leverages this new validation mechanism and includes support for native gas abstraction. This design aims to maintain the simplicity of block builder's validation logic to ensure block building can operate without heavy mempool restrictions or DoS risks. It also maintains compatibility with existing account abstraction mechanisms, such as EIP-7702 and ERC-4337 and future integration of quantum-safe cryptographic algorithms.
+This proposal introduces a standardized validation mechanism for account abstraction, utilizing onchain account configurations to define accepted keys and key types. Unlike EIP-7701/RIP-7560, which permits arbitrary validation code, this approach restricts validation to a predefined set of key types and rules, ensuring protocol simplicity and secure account abstraction without requiring EVM code execution. A new transaction type leverages this new validation mechanism and includes support for native gas abstraction. This design aims to maintain the simplicity of block builder's validation logic to ensure block building can operate without heavy mempool restrictions or DoS risks. It maintains compatibility with existing account abstraction mechanisms, such as EIP-7702 / ERC-4337 and gives a path to integration of quantum-safe cryptographic algorithms.
 
 
 ## Motivation
 
-Account abstraction (AA) has been a long-standing goal for Ethereum, aiming to provide users with more flexible and secure account management. This proposal aims to enable all the benefits of account abstraction—including batching, gas sponsorship, custom authentication and programable account logic—while addressing critical implementation challenges that have hindered adoption of existing solutions.
+This proposal aims to enable all the benefits of account abstraction—including batching, gas sponsorship, custom authentication and programable account logic while enabling the node to operate effectively with simple state checks for validation. Since the node operator can determine transaction validity quickly and operate it's mempool effectively with new proposals like FAL, BAL, there is significantly reduced DoS risks and no risk of unpaid work validating transactions in the EVM (like 4337/7701). 
 
 ### Existing Solutions
 
@@ -31,10 +31,10 @@ This proposal addresses these limitations by:
 - **Enhancing Block Building**: Block builders validate transactions with only state lookups
 - **Maintaining AA Benefits**: Preserves all standard account abstraction benefits
 - **Reducing Gas Costs**: Eliminates entrypoint contracts and associated overheads
-- **Minimal EVM Changes**: Only new opcodes for transaction context
+- **No EVM Changes**: No required changes to EVM (can add opcode for some gas improvements)
 - **Ensuring Extensibility**: Supports future quantum-safe algorithms via new key types
 - **Maintaining Compatibility**: Coexists with EIP-7702 and ERC-4337
-- **Improving Compressibility**: Structured validation fields reduce calldata costs for L2 rollups
+- **Potential Compressibility**: Structured validation fields enable potential signature aggregation (BLS)
 
 
 ## Specification
@@ -47,7 +47,7 @@ This proposal addresses these limitations by:
 | `AA_BASE_COST`           | 15000             | Base intrinsic gas cost for AA transaction |
 | `ACCOUNT_CONFIG_PRECOMPILE` | TBD            | Address of the Account Configuration precompile |
 | `TOKEN_PAYMENT_REGISTRY` | TBD               | Address of the Token Payment Registry |
-| `TOKEN_TRANSFER_COST`    | 5000              | Gas cost for token payment transfer |
+| `TOKEN_TRANSFER_COST`    | 3000              | Gas cost for token payment transfer |
 
 
 ### Account Configuration
@@ -68,7 +68,7 @@ Reasons:
 - **Standardization**: Provides a canonical interface that wallets, block builders, and tooling can rely on across all chains
 - **Efficiency**: Dedicated storage optimized for key configurations, separate from contract storage
 
-Note that though tx validation is done outside of execution, modification to the account configuration is done within execution.
+Note that though tx validation is done outside of execution, modification to the account configuration is done within execution, other than on initial deployment. 
 
 #### Account Configuration Precompile
 
@@ -140,9 +140,7 @@ interface IAccountConfig {
     /// @param keyIndex The index of the removed key
     event KeyRemoved(address indexed account, uint8 keyIndex);
     
-    /// @notice Emitted when an account's configuration is cleared
-    /// @param account The account that cleared their configuration
-    event ConfigurationCleared(address indexed account);
+    // ============ Key Management ============
     
     /// @notice Add a new authentication key to the caller's configuration
     /// @dev Only callable by the account itself (msg.sender)
@@ -157,22 +155,17 @@ interface IAccountConfig {
     /// @param keyIndex The index of the key to remove
     function removeKey(uint8 keyIndex) external;
     
+    /// @notice Get the total number of configured keys for an account
+    /// @param account The account to query
+    /// @return count The number of keys in the account's configuration
+    function getKeyCount(address account) external view returns (uint8 count);
+    
     /// @notice Get authentication key information at the specified index
     /// @param account The account to query
     /// @param keyIndex The index of the key to retrieve
     /// @return keyType The cryptographic algorithm type (0 if index out of bounds)
     /// @return publicKey The public key data (empty if index out of bounds)
     function getKey(address account, uint8 keyIndex) external view returns (uint8 keyType, bytes memory publicKey);
-    
-    /// @notice Get the total number of configured keys for an account
-    /// @param account The account to query
-    /// @return count The number of keys in the account's configuration
-    function getKeyCount(address account) external view returns (uint8 count);
-    
-    /// @notice Get all authentication keys for an account
-    /// @param account The account to query
-    /// @return keys Array of all configured authentication keys
-    function getAllKeys(address account) external view returns (AuthKey[] memory keys);
     
     /// @notice Validate if a signature is authorized for an account at a specific key index
     /// @dev Helper function for smart contracts to check signature validity during execution
@@ -187,6 +180,28 @@ interface IAccountConfig {
         bytes32 messageHash, 
         bytes calldata signature
     ) external view returns (bool isValid);
+    
+    // ============ 2D Nonce ============
+    
+    /// @notice Get the current nonce sequence for an account at a specific nonce key
+    /// @param account The account to query
+    /// @param nonceKey The 2D nonce channel key
+    /// @return sequence The current sequence number for this (account, nonceKey) pair
+    function getNonce(address account, uint192 nonceKey) external view returns (uint64 sequence);
+    
+    // ============ Transaction Context ============
+    
+    /// @notice Get the payer address for the current AA transaction
+    /// @dev Returns tx.origin (self-paying) if not an AA transaction
+    /// @return payer The address paying for gas
+    function getCurrentPayer() external view returns (address payer);
+    
+    /// @notice Get the signing key info for the current AA transaction
+    /// @dev Returns (0xFF, empty) if not an AA transaction or EOA key was used
+    /// @return keyIndex The index of the key used (0xFF for EOA)
+    /// @return keyType The type of the signing key
+    /// @return publicKey The public key data
+    function getCurrentSigner() external view returns (uint8 keyIndex, uint8 keyType, bytes memory publicKey);
 }
 ```
 
@@ -217,13 +232,13 @@ The following key types are supported:
 
 | Key Type | ID | Algorithm | Public Key Size | Signature Size | Intrinsic Gas Cost |
 |----------|-----|-----------|-----------------|----------------|-------------------|
-| `K1` | `0x01` | secp256k1 (ECDSA) | 33 bytes (compressed) or 65 bytes (uncompressed) | 65 bytes (r, s, v) | 7000 |
-| `R1` | `0x02` | secp256r1 / P-256 (ECDSA) | 33 bytes (compressed) or 65 bytes (uncompressed) | 64 bytes (r, s) | 8000 |
-| `WEBAUTHN` | `0x03` | WebAuthn / Passkey | 65 bytes (uncompressed P-256) | Variable (includes authenticator data) | 15000 |
-| `BLS` | `0x04` | BLS12-381 | 48 bytes (compressed G1) | 96 bytes (G2 signature) | 9000 | 
-| `DELEGATE` | `0x05` | Delegated validation | 20 bytes (account address) | Variable (depends on delegated account) | 5000 + delegated sig |
+| `K1` | `0x01` | secp256k1 (ECDSA) | 33 bytes (compressed) or 65 bytes (uncompressed) | 65 bytes (r, s, v) | 6000 |
+| `R1` | `0x02` | secp256r1 / P-256 (ECDSA) | 33 bytes (compressed) or 65 bytes (uncompressed) | 64 bytes (r, s) | 7000 |
+| `WEBAUTHN` | `0x03` | WebAuthn / Passkey | 65 bytes (uncompressed P-256) | Variable (includes authenticator data) | 12000 |
+| `BLS` | `0x04` | BLS12-381 | 48 bytes (compressed G1) | 96 bytes (G2 signature) | 8000 | 
+| `DELEGATE` | `0x05` | Delegated validation | 20 bytes (account address) | Variable (depends on delegated account) | 1000 + delegated sig |
 
-- **BLS**: Supports signature aggregation for data availability efficiency. Nodes can reduce intrinsic gas costs for this or cut L1 data fees if relevant.
+- **BLS**: Supports signature aggregation for data availability efficiency. 
 - **Extensibility**: New key types can be added via future EIPs.
 
 #### DELEGATE Key Type
@@ -265,7 +280,7 @@ AA_TX_TYPE || rlp([
   from,
   nonce_key,          // 2D nonce: channel key (uint192)
   nonce_sequence,     // 2D nonce: sequence within channel (uint64)
-  expiry,
+  expiry,             
   gas_price,
   gas_limit,
   access_list,
@@ -380,20 +395,6 @@ For a transaction to be valid:
 #### Benefits
 
 - **Parallel transactions**: Different `nonce_key` values can be processed independently
-- **No blocking**: A pending transaction on key 0 doesn't prevent transactions on key 1
-- **Per-channel ordering**: Within a channel, transactions are still strictly ordered
-- **Backwards compatible**: Using `nonce_key = 0` behaves like traditional sequential nonces
-
-#### Example
-
-```
-User sends 3 transactions simultaneously:
-  - (key: 0, seq: 5) → swap on DEX
-  - (key: 1, seq: 3) → mint NFT  
-  - (key: 2, seq: 0) → transfer tokens
-
-All can be included in the same block without waiting for sequential confirmation.
-```
 
 
 ### Token Payments
@@ -402,41 +403,166 @@ This proposal enables gas payment in ERC-20 tokens through a slot-based token re
 
 #### Token Payment Registry
 
-The Token Payment Registry stores configuration for each registered token at `TOKEN_PAYMENT_REGISTRY`:
+The Token Payment Registry at `TOKEN_PAYMENT_REGISTRY` stores token configuration and blocklist data. It maintains a mapping from token addresses to their payment configuration.
+
+##### Token Configuration Storage
 
 ```
-Base slot: keccak256(token_address || TOKEN_PAYMENT_REGISTRY)
+Base slot: keccak256(token_address || TOKEN_PAYMENT_REGISTRY || "config")
 
 Slot layout:
 - base_slot + 0: balance_slot_index (uint256)
-- base_slot + 1: blocklist_slot_index (uint256, 0 if none)
-- base_slot + 2: oracle_address (address)
-- base_slot + 3: oracle_slot (bytes32)
-- base_slot + 4: decimals (uint8)
+- base_slot + 1: oracle_address (address)
+- base_slot + 2: oracle_slot (bytes32)
+- base_slot + 3: token_decimals (uint8)
+- base_slot + 4: oracle_decimals (uint8)
 - base_slot + 5: active (bool)
 ```
 
-**Token Registration**: Tokens opt-in by calling the registry to declare their storage slots. Registration is initially permissioned by the chain; permissionless registration may be added in future upgrades.
+##### Blocklist Storage
+
+The blocklist is stored in the Token Payment Registry precompile, managed by the token or its authorized managers:
+
+```
+Blocklist slot: keccak256(token_address || account_address || TOKEN_PAYMENT_REGISTRY || "blocklist")
+Value: bool (true if blocked)
+```
+
+##### Blocklist Manager Storage
+
+Tokens can authorize additional addresses to manage their blocklist:
+
+```
+Manager slot: keccak256(token_address || manager_address || TOKEN_PAYMENT_REGISTRY || "manager")
+Value: bool (true if authorized)
+```
+
+##### Access Control
+
+| Function | Who Can Call |
+|----------|--------------|
+| `registerToken` | Chain operator (permissioned) OR token contract (permissionless) |
+| `setTokenActive` | Chain operator (permissioned) OR token contract (permissionless) |
+| `setBlocked` | Token address OR authorized manager |
+| `setBlocklistManager` | Token address only |
+
+##### Token Payment Registry Interface
+
+```solidity
+/// @title ITokenPaymentRegistry
+/// @notice Interface for the Token Payment Registry precompile
+interface ITokenPaymentRegistry {
+    
+    /// @notice Emitted when a token is registered or updated
+    event TokenRegistered(
+        address indexed token,
+        uint256 balanceSlotIndex,
+        address oracle,
+        bytes32 oracleSlot,
+        uint8 tokenDecimals,
+        uint8 oracleDecimals
+    );
+    
+    /// @notice Emitted when a token's active status changes
+    event TokenStatusUpdated(address indexed token, bool active);
+    
+    /// @notice Emitted when an address is added/removed from a token's blocklist
+    event BlocklistUpdated(address indexed token, address indexed account, bool blocked);
+    
+    /// @notice Emitted when a blocklist manager is added/removed
+    event BlocklistManagerUpdated(address indexed token, address indexed manager, bool authorized);
+    
+    // ============ Chain Operator Functions (Permissioned) ============
+    
+    /// @notice Register a token for gas payments
+    /// @dev Only callable by chain operator
+    /// @param token The token address
+    /// @param balanceSlotIndex The storage slot index for balanceOf mapping
+    /// @param oracle The oracle contract address
+    /// @param oracleSlot The storage slot to read exchange rate from
+    /// @param tokenDecimals The token's decimals
+    /// @param oracleDecimals The oracle's decimals (e.g., 8 for Chainlink)
+    function registerToken(
+        address token,
+        uint256 balanceSlotIndex,
+        address oracle,
+        bytes32 oracleSlot,
+        uint8 tokenDecimals,
+        uint8 oracleDecimals
+    ) external;
+    
+    /// @notice Set token active status
+    /// @dev Only callable by chain operator
+    /// @param token The token address
+    /// @param active Whether the token is active for gas payments
+    function setTokenActive(address token, bool active) external;
+    
+    // ============ Token Functions ============
+    
+    /// @notice Add or remove a blocklist manager for the caller's token
+    /// @dev Only callable by the token contract itself (msg.sender == token)
+    /// @param manager The manager address to authorize/revoke
+    /// @param authorized Whether the manager is authorized
+    function setBlocklistManager(address manager, bool authorized) external;
+    
+    /// @notice Add or remove an address from the caller's blocklist
+    /// @dev Callable by token address OR authorized manager
+    /// @param token The token address
+    /// @param account The account to block/unblock
+    /// @param blocked Whether the account should be blocked
+    function setBlocked(address token, address account, bool blocked) external;
+    
+    // ============ View Functions ============
+    
+    /// @notice Check if a token is registered and active
+    /// @param token The token address
+    /// @return active Whether the token is active
+    function isTokenActive(address token) external view returns (bool active);
+    
+    /// @notice Check if an address is blocked for a token
+    /// @param token The token address
+    /// @param account The account to check
+    /// @return blocked Whether the account is blocked
+    function isBlocked(address token, address account) external view returns (bool blocked);
+    
+    /// @notice Check if an address is an authorized blocklist manager
+    /// @param token The token address
+    /// @param manager The manager address to check
+    /// @return authorized Whether the manager is authorized
+    function isBlocklistManager(address token, address manager) external view returns (bool authorized);
+    
+    /// @notice Get the current exchange rate for a token (tokens per ETH)
+    /// @param token The token address
+    /// @return rate The exchange rate normalized to token's smallest units per ETH
+    function getExchangeRate(address token) external view returns (uint256 rate);
+}
+```
+
+**Token Registration**: Registration is initially permissioned by the chain operator. Permissionless registration may be added in future upgrades with appropriate safeguards.
 
 #### Price Oracle
 
-The oracle returns the exchange rate as **tokens per ETH** (in token's smallest unit per wei). The protocol reads this value directly from the configured `oracle_address` at `oracle_slot`.
+The protocol reads the exchange rate directly from the configured `oracle_address` at `oracle_slot`, then normalizes it using the stored decimals:
 
 ```
+oracle_value = SLOAD(oracle_address, oracle_slot)
+exchange_rate = oracle_value * 10^token_decimals / 10^oracle_decimals
 token_cost = ceil(gas_cost_wei * exchange_rate / 10^18)
 ```
 
-If the oracle returns 0 or is unavailable, `token_cost` is 0 (effectively a free transaction).
+This enables direct compatibility with Chainlink price feeds (which use 8 decimals for most USD pairs).
+
+If the oracle returns 0 or is unavailable, `token_cost` is 0 (effectively a free transaction—payer assumes this risk).
 
 #### Token Transfer Flow
 
 When `payment_token` is set and `payer_auth` specifies a valid payer:
 
-1. **Read exchange rate** from oracle slot
-2. **Compute token cost**: `ceil(gas_cost * exchange_rate / 10^18)`
+1. **Read exchange rate** from oracle slot and normalize with decimals
+2. **Compute token cost**: `ceil(gas_cost_wei * exchange_rate / 10^18)`
 3. **Validate max_amount**: If `max_amount > 0`, require `token_cost <= max_amount`
 4. **Check sender balance**: Read from token's `balance_slot_index`
-5. **Check blocklist**: If `blocklist_slot_index > 0`, verify sender is not blocked
+5. **Check blocklist**: Read from `TOKEN_PAYMENT_REGISTRY` blocklist storage, reject if blocked
 6. **Transfer tokens**: Direct slot update—decrease sender balance, increase payer balance
 7. **Emit Transfer event**: `Transfer(from, payer, token_cost)` for indexer compatibility
 
@@ -446,6 +572,46 @@ Token transfers occur **outside EVM execution**, before calldata delivery.
 ### Payer Configuration
 
 Payers can register configurations to accept token payments without signing each transaction (permissionless mode).
+
+#### Payer Configuration Interface
+
+```solidity
+/// @title IPayerConfig
+/// @notice Interface for payer configuration in the Account Configuration precompile
+interface IPayerConfig {
+    
+    /// @notice Emitted when payer configuration is updated
+    /// @param payer The payer address
+    /// @param active Whether the payer is active
+    event PayerUpdated(address indexed payer, bool active);
+    
+    /// @notice Emitted when a payer's accepted token list changes
+    /// @param payer The payer address
+    /// @param token The token address
+    /// @param accepted Whether the token is now accepted
+    event PayerTokenUpdated(address indexed payer, address indexed token, bool accepted);
+    
+    /// @notice Enable or disable the caller as a permissionless payer
+    /// @param active Whether to accept sponsored transactions
+    function setPayerActive(bool active) external;
+    
+    /// @notice Set whether a token is accepted for payment by the caller
+    /// @param token The token address
+    /// @param accepted Whether to accept this token
+    function setPayerTokenAccepted(address token, bool accepted) external;
+    
+    /// @notice Check if a payer is active
+    /// @param payer The payer address to query
+    /// @return active Whether the payer is accepting sponsored transactions
+    function isPayerActive(address payer) external view returns (bool active);
+    
+    /// @notice Check if a payer accepts a specific token
+    /// @param payer The payer address to query
+    /// @param token The token address to check
+    /// @return accepted Whether the payer accepts this token
+    function isPayerTokenAccepted(address payer, address token) external view returns (bool accepted);
+}
+```
 
 #### Payer Config Storage
 
@@ -475,22 +641,45 @@ When `payer_auth` is 20 bytes (an address):
 This enables **permissionless gas sponsorship**: anyone can deploy a payer contract, register accepted tokens, and earn fees by accepting token payments. The payer contract can implement withdrawal logic, periodic swaps to ETH via Uniswap/Aerodrome, or other treasury management.
 
 
-### New Opcodes for Transaction Context
+### Transaction Context Access
 
-To allow wallet code to access transaction context, two new opcodes are introduced:
+AA transactions expose additional context that wallet code may need during execution. This information is available through two mechanisms:
+
+#### Context Fields
+
+| Field | Description |
+|-------|-------------|
+| **Payer** | The address paying for gas. Set per transaction via `payer_auth`. |
+| **Signer Key** | The key used to sign the transaction: key index (uint8) and public key data (bytes). |
+
+**Payer**: The resolved payer address from the transaction's `payer_auth` field. Returns `from` address for self-paying transactions.
+
+**Signer Key**: The key that authorized the transaction. Returns the key index (`0xFF` for EOA key, or the configured key index) along with the public key data used for signature verification.
+
+#### Access Methods
+
+This context can be accessed via:
+
+1. **Precompile queries** (always available): Call `getKey(from, keyIndex)` on the Account Configuration precompile during execution
+2. **Optional opcodes** (gas optimization): If implemented, dedicated opcodes provide cheaper access
+
+#### Optional Opcodes
+
+The following opcodes MAY be added for gas-efficient access to transaction context. If not implemented, the same information is accessible via the Account Configuration precompile.
 
 | Opcode | Value | Gas | Description |
 |--------|-------|-----|-------------|
 | `AAPAYER` | TBD | 2 | Returns the payer address from current AA transaction |
-| `AASIGNER` | TBD | 2 | Returns the key index used by sender (0xFF = EOA key) |
+| `AASIGNER` | TBD | 2 | Returns (key_index, public_key) used by sender |
 
 **`AAPAYER`**: Pushes the `payer` address onto the stack. Returns `from` address if not an AA transaction (self-paying).
 
-**`AASIGNER`**: Pushes the key index used to sign the transaction. Returns `0xFF` if the EOA key was used, or the configured key index otherwise. Returns `0xFF` if not an AA transaction.
+**`AASIGNER`**: Pushes the key index and public key data used to sign the transaction onto the stack. Returns `(0xFF, ecrecover_address)` if the EOA key was used. Returns `(0xFF, 0x)` if not an AA transaction.
 
-These opcodes allow wallet implementations to:
-- Implement payer-specific logic (e.g., transfer tokens to payer)
-- Enforce key-based permissions (e.g., session keys with limited capabilities)
+#### Use Cases
+
+These fields enable wallet implementations to:
+- Enforce key-based permissions (e.g., session keys with limited capabilities, multisig, subaccounts)
 - Log which key authorized an action
 
 
@@ -512,11 +701,10 @@ Payer provides a K1 signature (65 bytes) in `payer_auth`. The payer address is r
 Payer address (20 bytes) in `payer_auth` references a registered payer configuration. This mode enables:
 - **Pseudo-AMM**: Permissionless gas payment acceptors
 - **Token-for-gas swaps**: Users pay tokens, payer provides ETH
-- **Competitive market**: Multiple payers can compete on exchange rates
 
 Payers can protect themselves via:
 1. **Token registration**: Only accept tokens they've explicitly configured
-2. **Balance verification**: Protocol checks sender token balance before transfer
+2. **Balance verification**: Protocol performs transfer, tx invalid if token balance insufficient 
 3. **Blocklist enforcement**: Tokens can maintain blocklists for compliance
 4. **`eth_sendRawTransactionConditional`**: Builder-level conditional inclusion (for additional checks)
 
@@ -672,6 +860,7 @@ The `calldata` field in an AA transaction is **always delivered to the `from` ac
 | Parameter | Value |
 |-----------|-------|
 | `to` | `from` address |
+| `tx.origin` | `from` address |
 | `msg.sender` | `from` address (self-call) |
 | `msg.value` | 0 |
 | `data` | `calldata` field from transaction |
@@ -679,7 +868,7 @@ The `calldata` field in an AA transaction is **always delivered to the `from` ac
 
 **Behavior by account type**:
 
-- **EOA (no code)**: Call succeeds immediately with no effect. Calldata is ignored.
+- **EOA (no code)**: Call succeeds immediately with no effect. Calldata is ignored. Note a chain operator can consider a default account. 
 - **Smart contract account**: Execution begins at the contract's code entry point. The contract interprets `calldata` according to its implementation (typically ABI-encoded function calls).
 
 **Return data and logs** from the call are captured in the transaction receipt as normal.
@@ -704,6 +893,23 @@ Works as-is with AA transactions. Accounts can estimate gas for their transactio
 
 Works as-is using the new transaction type envelope once nodes support. 
 
+#### `eth_getTransactionCount`
+
+Extended with an optional `nonceKey` parameter to support the 2D nonce system:
+
+**Parameters**:
+1. `address` - The account address
+2. `blockNumber` - Block number, or "latest", "pending", "earliest"
+3. `nonceKey` - (optional) The 2D nonce channel key (uint192, hex-encoded)
+
+**Returns**: `uint64` - The nonce/sequence number
+
+**Behavior**:
+- **Without `nonceKey`**: Returns the standard account nonce (used by legacy, EIP-1559, EIP-4844 transactions). Fully backwards compatible.
+- **With `nonceKey`**: Returns the 2D nonce sequence from the Account Configuration precompile for the given `(account, nonceKey)` channel. Used for AA transactions.
+
+**Note**: The standard account nonce and 2D precompile nonces are **independent systems**. An EOA sending legacy transactions uses the account nonce, while the same EOA sending AA transactions uses the 2D nonce in the precompile. They do not affect each other.
+
 #### `eth_getTransactionReceipt`
 
 Works as-is but **SHOULD** include an additional `payer` field in the receipt to indicate which address paid for the transaction gas.
@@ -723,67 +929,6 @@ Using a dedicated precompile rather than per-account storage slots provides:
 Alternative approaches considered:
 - **Per-account storage slots**: Would conflict with contract storage and complicate tooling
 - **New account trie field**: Would require deeper protocol changes and client modifications
-
-### Why Enshrine Specific Key Types?
-
-Enshrining specific key types (K1, R1, WebAuthn, BLS) rather than allowing arbitrary validation code:
-
-1. **Mempool safety**: Validation is deterministic and bounded—no unbounded computation
-2. **Block builder efficiency**: No EVM execution during validation phase
-3. **Security auditability**: Well-known cryptographic algorithms vs arbitrary code
-4. **Extensibility preserved**: New key types can be added via future EIPs without breaking changes
-
-The tradeoff is reduced flexibility in validation logic, but this is acceptable because:
-- Most wallet implementations use standard signature schemes
-- Complex validation logic can still be implemented in the execution phase
-- Session keys and spending limits work via execution-layer enforcement
-
-### Why 2D Nonces?
-
-Traditional sequential nonces create head-of-line blocking where a pending transaction prevents subsequent transactions from being processed. The 2D nonce system allows:
-
-1. **Parallel transaction streams**: Different nonce keys can be processed independently
-2. **No blocking**: A stuck transaction on key 0 doesn't prevent transactions on key 1
-3. **Backwards compatible**: Using `nonce_key = 0` behaves identically to traditional nonces
-4. **Application flexibility**: Apps can use dedicated nonce keys for specific workflows
-
-### Why Separate Sender and Payer?
-
-Separating the transaction sender (`from`) from the gas payer (`payer`) enables:
-
-1. **Native sponsorship**: Third parties can pay gas without intermediary contracts
-2. **Reduced overhead**: No entrypoint contract or bundler infrastructure required
-3. **Clear authorization**: Both parties explicitly sign the same transaction parameters
-4. **Atomic operations**: Sponsorship and execution happen in a single transaction
-
-### Why Deliver Calldata to `from` Only?
-
-The `calldata` is always delivered to the `from` address rather than allowing arbitrary targets because:
-
-1. **Security**: Prevents bypassing wallet-level access controls
-2. **Simplicity**: Clear execution model—wallet receives and interprets calldata
-3. **Compatibility**: Wallets can implement any dispatch logic they need internally
-4. **No privilege escalation**: `tx.origin` checks remain meaningful
-
-
-## Test Cases
-
-*Test cases will be provided in a reference implementation. Key scenarios to test:*
-
-1. **Basic AA Transaction**: Self-paying transaction with EOA key
-2. **Permissioned Sponsorship**: Payer provides K1 signature in `payer_auth`
-3. **Permissionless Sponsorship**: Payer address references registered config
-4. **Token Payment**: Transaction with `payment_token` set, tokens transferred to payer
-5. **Token Payment with Max Amount**: Verify `max_amount` enforcement
-6. **Multi-Key Validation**: Transaction signed with configured key (not EOA)
-7. **Key Rotation**: Add/remove keys and verify validation changes
-8. **2D Nonce**: Parallel transactions with different nonce keys
-9. **DELEGATE Key**: Validation delegated to another account
-10. **Account Initialization**: New account creation with initial keys
-11. **Blocklist Enforcement**: Sender on token blocklist rejected
-12. **Oracle Edge Cases**: Zero exchange rate, stale oracle
-13. **Expiry**: Transaction rejected after expiry timestamp
-14. **Invalid Signatures**: Various rejection scenarios
 
 
 ## Backwards Compatibility
@@ -827,7 +972,7 @@ The upgrade requires network-wide adoption through a scheduled hard fork to enab
 
 **Delegation Risks**: The `DELEGATE` key type delegates validation to another account (limited to 1 hop). Accounts should carefully consider security implications before delegating validation authority.
 
-**Gas Spending Risk**: Compromised keys can authorize transactions with excessively high gas values, putting the account's ETH at risk. Multisigs holding large ETH balances should implement appropriate mitigations in their execution layer.
+**Gas Spending Risk**: Compromised keys can authorize transactions with excessively high gas values, putting the account's ETH / tokens at risk. 
 
 **Quantum-Safe Migration**: The extensible key type system allows adding post-quantum signature schemes (SPHINCS+, Dilithium) as new key types—users can register quantum-safe keys alongside existing ones.
 
@@ -862,8 +1007,6 @@ The upgrade requires network-wide adoption through a scheduled hard fork to enab
 
 **Payer Configuration Enhancements**: Payer configs could be extended to include:
 - Per-token exchange rate bounds (max rate payer will accept)
-- Wallet code restrictions (only sponsor specific implementations)
-- Rate limiting per sender
 
 **Alternative State Validation**: For use cases requiring state checks beyond token payments (e.g., verifying wallet code hash), applications can use `eth_sendRawTransactionConditional` at the builder level. This approach doesn't enshrine any token standard and provides flexibility for custom validation logic.
 

@@ -518,7 +518,7 @@ Address is derived deterministically: `keccak256(0xff || PRECOMPILE || salt || k
 | Feature | Simple | Tempo | Proposed |
 |---------|--------|-------|----------|
 | Native Gas Sponsorship | ✅ | ✅ | ✅ |
-| ERC-20 Gas Payment | ❌ | ✅ (TIP-20 only) | ✅ (token registry + permissionless payers) |
+| ERC-20 Gas Payment | ❌ | ✅ (TIP-20 only) | ✅ (token registry + permissionless/permissioned payers) |
 | Key Rotation | ❌ | ❌ | ✅ |
 | Multiple Sig Types | ❌ | ✅ | ✅ |
 | Passkeys/WebAuthn | ❌ | ✅ | ✅ |
