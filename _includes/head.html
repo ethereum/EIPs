@@ -98,6 +98,9 @@
       var table = document.getElementById('eip-table');
       if (!table) return;
 
+      // Statuses from _data/statuses.yaml
+      var statuses = [{% for status in site.data.statuses %}'{{ status }}'{% unless forloop.last %}, {% endunless %}{% endfor %}];
+
       function filterByStatus(status) {
         var rows = table.querySelectorAll('tbody tr');
         var visibleCount = 0;
@@ -138,71 +141,24 @@
         }
       }
 
-      // Status definitions from EIP-1
-      var statusInfo = {
-        'living': {
-          name: 'Living',
-          description: 'A special status for EIPs that are designed to be continually updated and not reach a state of finality.'
-        },
-        'final': {
-          name: 'Final',
-          description: 'This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.'
-        },
-        'last-call': {
-          name: 'Last Call',
-          description: 'This is the final review window for an EIP before moving to Final. An EIP editor will assign Last Call status and set a review end date, typically 14 days later.'
-        },
-        'review': {
-          name: 'Review',
-          description: 'An EIP Author marks an EIP as ready for and requesting Peer Review.'
-        },
-        'draft': {
-          name: 'Draft',
-          description: 'The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.'
-        },
-        'stagnant': {
-          name: 'Stagnant',
-          description: 'Any EIP in Draft, Review, or Last Call if inactive for a period of 6 months or greater is moved to Stagnant. An EIP may be resurrected from this state by Authors or EIP Editors.'
-        },
-        'withdrawn': {
-          name: 'Withdrawn',
-          description: 'The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number.'
-        }
-      };
-
-      // Map hash to status name
+      // Map hash to status name (e.g., 'last-call' -> 'Last Call')
       function getStatusFromHash() {
         var hash = window.location.hash.slice(1);
         if (!hash) return '';
-        var info = statusInfo[hash];
-        return info ? info.name : '';
-      }
-
-      // Update status description
-      function updateStatusDescription(hash) {
-        var descEl = document.getElementById('status-description');
-        var textEl = document.getElementById('status-description-text');
-        if (!descEl || !textEl) return;
-
-        var info = statusInfo[hash];
-        if (info) {
-          textEl.textContent = info.description;
-          descEl.style.display = '';
-        } else {
-          descEl.style.display = 'none';
+        for (var i = 0; i < statuses.length; i++) {
+          if (statuses[i].toLowerCase().replace(/ /g, '-') === hash) {
+            return statuses[i];
+          }
         }
+        return '';
       }
 
       // Apply filter on load
-      var initialHash = window.location.hash.slice(1);
       filterByStatus(getStatusFromHash());
-      updateStatusDescription(initialHash);
 
       // Apply filter on hash change
       window.addEventListener('hashchange', function() {
-        var hash = window.location.hash.slice(1);
         filterByStatus(getStatusFromHash());
-        updateStatusDescription(hash);
       });
 
       // Handle click on status links
@@ -211,11 +167,10 @@
           e.preventDefault();
           var status = this.getAttribute('data-status');
           if (status) {
-            window.location.hash = status.toLowerCase().replace(' ', '-');
+            window.location.hash = status.toLowerCase().replace(/ /g, '-');
           } else {
             history.pushState('', document.title, window.location.pathname);
             filterByStatus('');
-            updateStatusDescription('');
           }
         });
       });
