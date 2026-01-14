@@ -43,7 +43,7 @@ This proposal addresses these by:
 | `ACCOUNT_CONFIG_PRECOMPILE` | TBD | Account Configuration precompile address |
 | `TOKEN_PAYMENT_REGISTRY` | TBD | Token Payment Registry address |
 | `TOKEN_TRANSFER_COST` | 3000 | Gas cost for token payment transfer |
-| `NATIVE_PAYER` | TBD | Native gas payer precompile address |
+| `NATIVE_PAYER` | TBD | (Optional per chain operator) Native gas AMM payer precompile address  |
 
 ### Account Configuration
 
@@ -132,7 +132,7 @@ Where `token_transfer_cost` is `TOKEN_TRANSFER_COST` if `payment_token` is non-e
 | `calldata` | Data delivered to `from` account |
 | `payment_token` | Optional `[token_address, max_amount]` for token gas payment |
 | `sender_signature` | See [Signature Format](#signature-format) |
-| `payer_auth` | **65 bytes**: K1 signature, payer recovered via ecrecover. **20 bytes**: Registered payer address (permissionless mode). **Empty**: If `payment_token` is set, uses `NATIVE_PAYER`; otherwise `from` pays ETH |
+| `payer_auth` | **65 bytes**: K1 signature, payer recovered via ecrecover. **20 bytes**: Payer address (permissionless or `NATIVE_PAYER`) otherwise `from` pays ETH |
 
 #### Signature Format
 
@@ -156,7 +156,7 @@ keccak256(AA_TX_TYPE || rlp([
 
 ### Token Payments
 
-Tokens must be registered in the Token Payment Registry before use for gas payment.
+Tokens must be registered in the Token Payment Registry before use for gas payment. The registry stores token metadata; pricing is determined per-payer.
 
 #### Token Configuration Storage
 
@@ -164,11 +164,8 @@ Tokens must be registered in the Token Payment Registry before use for gas payme
 Base slot: keccak256(token_address || TOKEN_PAYMENT_REGISTRY || "config")
 
 - base_slot + 0: balance_slot_index (uint256)
-- base_slot + 1: oracle_address (address)
-- base_slot + 2: oracle_slot (bytes32)
-- base_slot + 3: token_decimals (uint8)
-- base_slot + 4: oracle_decimals (uint8)
-- base_slot + 5: active (bool)
+- base_slot + 1: token_decimals (uint8)
+- base_slot + 2: active (bool)
 ```
 
 #### Blocklist Storage
@@ -178,31 +175,36 @@ Blocklist slot: keccak256(token_address || account_address || TOKEN_PAYMENT_REGI
 Value: bool
 ```
 
-#### Price Calculation
-
-```
-oracle_value = SLOAD(oracle_address, oracle_slot)
-exchange_rate = oracle_value * 10^token_decimals / 10^oracle_decimals
-token_cost = ceil(gas_cost_wei * exchange_rate / 10^18)
-```
-
-If oracle returns 0, `token_cost` is 0 (payer assumes this risk).
-
 #### Token Transfer Flow
 
 When `payment_token` is set:
 
-1. Read exchange rate from oracle, compute `token_cost`
-2. Validate `token_cost <= max_amount` (if `max_amount > 0`)
-3. Check sender token balance and blocklist status
-4. Update balances: sender decreases, payer increases
-5. Emit `Transfer(from, payer, token_cost)`
+1. Read exchange rate from payer's oracle config (see [Payer Configuration](#payer-configuration))
+2. Compute `token_cost` using payer's oracle
+3. Validate `token_cost <= max_amount` (if `max_amount > 0`)
+4. Check sender token balance and blocklist status
+5. Update balances: sender decreases, payer increases
+6. Emit `Transfer(from, payer, token_cost)`
 
 Token transfers occur outside EVM execution, before calldata delivery.
 
-### Payer Configuration
+### Payer Modes
 
-Payers can register to accept token payments without signing each transaction (permissionless mode).
+Gas payment supports three modes based on the `payer_auth` field:
+
+| Mode | `payer_auth` | Description |
+|------|--------------|-------------|
+| **Permissioned** | 65-byte K1 signature | Payer signs each transaction. Suitable for trusted sponsors. Any registered token can be used. |
+| **Permissionless** | 20-byte address | References a registered payer config. No signature required per transaction. |
+| **Native** | `NATIVE_PAYER` address or empty | Chain-operated gas abstraction. Address enables unified onchain lookup; empty is an optimization. |
+
+For permissioned mode, any token with a valid Token Configuration can be accepted—the payer's signature authorizes the specific transaction and exchange rate.
+
+When `payer_auth` is empty and `payment_token` is set, the protocol implicitly uses `NATIVE_PAYER`.
+
+### Permissionless Payer Configuration
+
+Permissionless payers register onchain to accept token payments without signing each transaction. Each payer specifies their own oracle per token, enabling a competitive gas market.
 
 #### Storage
 
@@ -210,43 +212,62 @@ Payers can register to accept token payments without signing each transaction (p
 Base slot: keccak256(payer_address || ACCOUNT_CONFIG_PRECOMPILE || "payer")
 
 - base_slot + 0: active (bool)
-- keccak256(token_address || base_slot + 1): accepted (bool)
+
+Per-token config:
+Token slot: keccak256(token_address || payer_address || ACCOUNT_CONFIG_PRECOMPILE || "payer_token")
+
+- token_slot + 0: accepted (bool)
+- token_slot + 1: oracle_address (address)
+- token_slot + 2: oracle_slot (bytes32)
+- token_slot + 3: oracle_decimals (uint8)
 ```
 
-#### Payer Modes
+#### Oracle-Based Pricing
 
-**Permissioned (65-byte signature)**: Payer signs each transaction. Suitable for trusted sponsors.
+Each payer configures an oracle for each token they accept:
 
-**Permissionless (20-byte address)**: References registered payer config. Protocol verifies:
+```
+oracle_value = SLOAD(payer.oracle_address, payer.oracle_slot)
+exchange_rate = oracle_value * 10^token_decimals / 10^oracle_decimals
+token_cost = ceil(gas_cost_wei * exchange_rate / 10^18)
+```
+
+If oracle returns 0, `token_cost` is 0 (payer assumes this risk).
+
+#### Validation
+
+Protocol verifies permissionless payers by checking:
 - Payer config is active
-- Payer accepts the specified token
+- Payer accepts the specified token with valid oracle config
 - Payer has sufficient ETH for gas
 
-**Native (empty with payment_token)**: Defaults to `NATIVE_PAYER` when `payment_token` is set. Protocol handles conversion natively.
+Payers can integrate any offchain logic to manage their position—sweeping accumulated tokens to ETH via DeFi protocols periodically.
 
-This enables permissionless gas sponsorship where payers accept token payments without a signature. Payers can then integrate any code they wish ie. to sweep token to ETH by swapping in defi protocols periodically. 
+#### Rationale
+
+Per-payer oracles rather than global oracles:
+
+1. **Market competition**: Payers compete on pricing. Better oracles and tighter margins attract more transactions.
+2. **No governance**: Avoids protocol-level debates about which oracle is canonical.
+3. **Risk isolation**: A bad oracle only affects users of that payer.
+4. **Flexibility**: Payers can use Chainlink, Uniswap TWAP, custom feeds, or promotional rates.
+5. **Wallet-layer curation**: Discovery of good payers is handled by wallets, not protocol.
+
+The `max_amount` field provides hard protection—transactions fail if cost exceeds the user-specified limit.
 
 ### Native Payer
 
-The `NATIVE_PAYER` precompile provides protocol-level gas abstraction as the default payer when `payment_token` is set without an explicit payer.
+The optional `NATIVE_PAYER` precompile provides chain-operated gas abstraction.
 
 #### Behavior
 
-- **Token Support**: Uses the same Token Payment Registry for token configuration and allowlisting
-- **Oracle Integration**: Registered tokens have oracle slots available; the protocol may use these or implement native pricing mechanisms (e.g., integrated AMM)
-- **Chain Permissioned**: Configuration and supported tokens are managed at the protocol level
-- **Automatic Default**: When `payer_auth` is empty and `payment_token` is non-empty, the native payer is used
+- Uses the Token Payment Registry for token allowlisting and metadata
+- Chain operators define pricing and supported tokens
+- Can be referenced explicitly (20-byte address) or implicitly (empty `payer_auth` with `payment_token`)
 
-#### Usage
+#### Native DEX Integration
 
-Users can pay for gas with tokens without finding a sponsor:
-
-```
-payment_token = [usdc_address, max_amount]
-payer_auth = []  // Defaults to NATIVE_PAYER
-```
-
-The protocol handles token-to-ETH conversion natively, providing always-available gas abstraction for supported tokens.
+`NATIVE_PAYER` serves as the integration point for native DEX features. Chain operators may implement protocol-level AMM, custom pricing curves, or other mechanisms while maintaining a consistent user interface.
 
 ### Execution
 
@@ -303,7 +324,11 @@ Users can receive funds at counterfactual addresses before deployment.
 #### Mempool Acceptance
 
 1. Validate `sender_signature` against `from` account's keys
-2. Resolve payer from `payer_auth` (defaults to `NATIVE_PAYER` if empty with `payment_token` set)
+2. Resolve payer from `payer_auth`:
+   - 65 bytes: recover address via ecrecover
+   - 20 bytes: use directly (permissionless payer or `NATIVE_PAYER`)
+   - Empty with `payment_token`: use `NATIVE_PAYER`
+   - Empty without `payment_token`: `from` pays ETH
 3. Verify nonce, payer ETH balance, expiry
 4. If `payment_token` set: verify token registration, payer acceptance, sender balance/blocklist, max_amount
 5. Mempool threshold: payer's pending sponsored transaction count must be below node-configured limits (not applicable for `NATIVE_PAYER`) 
@@ -348,11 +373,13 @@ No breaking changes. Existing EOAs and smart contracts function unchanged. Adopt
 
 **Delegation**: `DELEGATE` key type limited to 1 hop to prevent loops.
 
-**Gas Spending Risk**: Any authorized key can submit transactions with high gas limits, potentially draining the account's ETH or tokens. Mitigation could be done where max wei / fee is configured in the auth config or token specific limits. 
+**Token Spend Protection**: Token gas payments occur before wallet code executes, bypassing wallet-level spend limits. Mitigations:
+- **Trusted payers list**: Account configures allowed payers (`NATIVE_PAYER`, app sponsors). Attack requires key + payer + oracle compromise.
+- **Key-bound token limits**: Per-key, per-token caps checked at validation time. Or disabling token/unsponsored tx entirely.
 
 **Payer Security**: Permissioned payers sign each transaction. Permissionless payers explicitly configure accepted tokens; protocol validates sender balance/blocklist before transfer.
 
-**Oracle Risks**: Price manipulation could cause underpayment. Mitigations: TWAP oracles, multiple sources, payer-set bounds.
+**Oracle Risks**: Per-payer oracles mean manipulation affects only that payer's users. Mitigations: trusted payer lists, `max_amount` field, TWAP oracles.
 
 **EIP-7702 Compatibility**: Works well together—7702 provides execution logic, this proposal provides authentication.
 
@@ -391,19 +418,19 @@ interface IAccountConfig {
 
 ```solidity
 interface ITokenPaymentRegistry {
-    event TokenRegistered(address indexed token, uint256 balanceSlotIndex, address oracle, bytes32 oracleSlot, uint8 tokenDecimals, uint8 oracleDecimals);
+    event TokenRegistered(address indexed token, uint256 balanceSlotIndex, uint8 tokenDecimals);
     event TokenStatusUpdated(address indexed token, bool active);
     event BlocklistUpdated(address indexed token, address indexed account, bool blocked);
     event BlocklistManagerUpdated(address indexed token, address indexed manager, bool authorized);
     
-    function registerToken(address token, uint256 balanceSlotIndex, address oracle, bytes32 oracleSlot, uint8 tokenDecimals, uint8 oracleDecimals) external;
+    function registerToken(address token, uint256 balanceSlotIndex, uint8 tokenDecimals) external;
     function setTokenActive(address token, bool active) external;
     function setBlocklistManager(address manager, bool authorized) external;
     function setBlocked(address token, address account, bool blocked) external;
     function isTokenActive(address token) external view returns (bool);
     function isBlocked(address token, address account) external view returns (bool);
     function isBlocklistManager(address token, address manager) external view returns (bool);
-    function getExchangeRate(address token) external view returns (uint256);
+    function getTokenDecimals(address token) external view returns (uint8);
 }
 ```
 
@@ -411,13 +438,23 @@ interface ITokenPaymentRegistry {
 
 ```solidity
 interface IPayerConfig {
+    struct TokenConfig {
+        bool accepted;
+        address oracleAddress;
+        bytes32 oracleSlot;
+        uint8 oracleDecimals;
+    }
+    
     event PayerUpdated(address indexed payer, bool active);
-    event PayerTokenUpdated(address indexed payer, address indexed token, bool accepted);
+    event PayerTokenConfigured(address indexed payer, address indexed token, address oracle, bytes32 oracleSlot, uint8 oracleDecimals);
+    event PayerTokenRemoved(address indexed payer, address indexed token);
     
     function setPayerActive(bool active) external;
-    function setPayerTokenAccepted(address token, bool accepted) external;
+    function configureToken(address token, address oracleAddress, bytes32 oracleSlot, uint8 oracleDecimals) external;
+    function removeToken(address token) external;
     function isPayerActive(address payer) external view returns (bool);
-    function isPayerTokenAccepted(address payer, address token) external view returns (bool);
+    function getTokenConfig(address payer, address token) external view returns (TokenConfig memory);
+    function getExchangeRate(address payer, address token) external view returns (uint256);
 }
 ```
 

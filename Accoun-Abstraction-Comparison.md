@@ -53,25 +53,26 @@ Replace ERC-4337 with native account abstraction where transaction validation oc
 | Per-account storage slots | Storage conflicts with contract code; no canonical interface |
 | New account trie field | Requires deeper protocol changes |
 
-### Decision 2: Token Payment Registry + Flexible Pricing
+### Decision 2: Token Registry + Per-Payer Oracles
 
-**Choice**: Token registry with flexible pricing—supports both oracle-based pricing and optional native AMM per chain operator.
+**Choice**: Token registry stores metadata (balance slots, decimals, blocklist); each payer configures their own oracle per token.
 
 **Rationale**:
 - Does not enshrine a specific token standard (vs TIP-20)
 - Tokens opt-in by declaring balance/blocklist slots
-- Oracle-based pricing allows any price feed (Native Oracle / Chainlink compatible)
-- **Native AMM option**: Chain operators can deploy `NATIVE_PAYER` with integrated AMM for always-available gas abstraction
-- Permissionless payers system can leverage existing DeFi/AMM allowing integrations across the space
-- Payers can implement custom logic (sweep tokens via DeFi)
-- Flexibility: chains choose what works best (oracle-only, native AMM, or both)
+- **Per-payer oracles** create a competitive gas market—payers compete on pricing
+- No protocol governance of "which oracle"—each payer chooses
+- Risk isolation: bad oracle only affects users of that payer
+- Payers can use Chainlink, Uniswap TWAP, custom feeds, or promotional rates
+- Wallet-layer curation handles discovery of good payers
+- `max_amount` provides hard protection against overcharging
 
 **Design flexibility**:
 | Approach | Use Case |
 |----------|----------|
-| Oracle + Permissionless Payers | Leverage existing DeFi liquidity; payers sweep tokens |
-| Native AMM | Always-available gas payment; protocol-managed liquidity |
-| Hybrid | Native AMM as default, permissionless payers for additional tokens |
+| Permissionless Payers | Each payer sets own oracle; competes on margin; can sweep tokens via DeFi |
+| Native Payer | Optional integration point for native DEX/AMM features |
+| Hybrid | Native Payer as default, permissionless payers for competition/additional tokens |
 
 **Token registration** is initially permissioned (chain allowlists USDC, USDT, etc.). Permissionless registration with stake + verification can be added later.
 
@@ -84,7 +85,7 @@ Replace ERC-4337 with native account abstraction where transaction validation oc
 | Self-pay | Empty | User pays ETH |
 | Permissioned | 65-byte K1 signature | Trusted sponsors, private relays |
 | Permissionless | 20-byte address | Public gas markets, custom payers |
-| Native | Empty + payment_token | Default to `NATIVE_PAYER` (if chain supports); always-available gas abstraction |
+| Native | `NATIVE_PAYER` address or empty | Chain-operated gas abstraction; address enables unified onchain lookup |
 
 **Rationale**:
 - Permissioned mode for trusted relationships (app subsidizing users)
@@ -121,7 +122,7 @@ All checks are **pure slot reads**—no EVM execution.
 ### Token Payment Flow
 
 ```
-1. Read exchange rate from oracle
+1. Read exchange rate from payer's oracle config
 2. Compute: token_cost = ceil(gas_cost * exchange_rate / 10^18)
 3. Validate: token_cost ≤ max_amount
 4. Check: sender balance and blocklist
@@ -195,11 +196,89 @@ Users opt-in when ready. The `DELEGATE` type makes migration seamless.
 
 ## Open Items
 
-| Item | Status |
-|------|--------|
-| Default account (opt-in wallet code) | Deferred—auth precompile provides most AA benefits |
-| Permissionless token registration | Future—start with chain allowlist |
-| `eth_sendRawTransactionConditional` | Complementary for non-token state checks |
+| Item | Status | Notes |
+|------|--------|-------|
+| Default account | Consideration | Enables native AA without 7702 delegation. All EOAs get AA capabilities by default. |
+| Key-bound token spend limits | Consideration | Per-key, per-token limits in auth config. Required for session keys with spending caps. See below. |
+| Permissionless token registration | Future | Start with chain allowlist, add stake-based registration later |
+
+### Token Spend Protection
+
+**Problem**: Token gas payments occur at protocol level, before wallet code executes. Wallet-level spend limits cannot protect against gas overspending.
+
+```
+1. Signature validated
+2. Token transfer for gas ← protocol level, BEFORE wallet code
+3. Wallet code executes ← spend limits checked here (too late)
+```
+
+#### Option A: Key-Bound Token Limits
+
+Per-key, per-token limits in auth config:
+
+```
+AuthKey {
+    keyType,
+    publicKey,
+    tokenLimits: { token_address -> max_per_tx }
+}
+```
+
+**Rationale:**
+- Session keys need spending caps
+- Different keys have different trust levels (main key: unlimited; session key: 10 USDC max)
+- Gas limit (wei) doesn't map directly to token cost (exchange rates vary)
+
+**Validation**: Protocol checks `token_cost <= key.tokenLimits[token]` before transfer.
+
+#### Option B: Trusted Payers List
+
+Account-level list of trusted payers:
+
+```
+Account Config:
+  trustedPayers: [payer_address, ...]
+```
+
+Only payers on this list can be used for gas payment from this account.
+
+**Security model** - attack requires ALL of:
+1. Key compromise
+2. Compromised payer (must be on trusted list)
+3. Compromised oracle (for overcharge)
+
+**Rationale:**
+- Simpler than per-token limits
+- Leverages trust relationship with known payers
+- User chooses payers they trust (app sponsor, known relayer, `NATIVE_PAYER`)
+
+#### Option C: Combined
+
+Both mechanisms together:
+- Trusted payers list (account-level) - which payers allowed
+- Token limits (key-level) - spending caps per key
+
+Maximum protection for high-value accounts.
+
+#### Comparison
+
+| Approach | Complexity | Attack Surface | Best For |
+|----------|------------|----------------|----------|
+| Token limits | Higher | Caps per-tx and cumulative drain | Session keys, fine-grained control |
+| Trusted payers | Lower | Requires payer+oracle compromise | Simple setup, known sponsors |
+| Combined | Highest | Maximum protection | High-value accounts |
+
+#### Attack Analysis
+
+**Nature of attack**: Primarily griefing, not direct theft. Tokens go to payer for gas, not attacker's wallet.
+
+**MEV vector**: Attacker could profit if they control the payer—overcharge via oracle manipulation, extract value through gas payments.
+
+**Mitigation comparison**:
+- **Trusted payers**: Blocks unknown payers entirely. Natural choices: `NATIVE_PAYER`, app sponsors, onchain standards (e.g., Aerodrome-based payer).
+- **Spend limits**: Caps damage per-tx. Prevents siphoning over many transactions even with compromised key.
+
+**Recommendation**: Trusted payers as baseline (simple, effective). Token limits for session keys requiring fine-grained caps.
 
 ---
 
