@@ -1,0 +1,123 @@
+---
+eip: TODO
+title: Temporary Contract Storage
+description: Adds bounded-lifetime contract storage via TMPLOAD/TMPSTORE opcodes that is automatically cleared on a fixed schedule.
+author: Wei Han Ng (@weiihann)
+discussions-to: TODO
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-01-14
+---
+
+## Abstract
+This EIP introduces *temporary storage*: a new contract-accessible key-value store that persists across transactions and blocks, but is automatically cleared at a protocol-defined schedule (`TEMP_STORAGE_PERIOD`). Two new opcodes are added:
+
+- `TMPSTORE(key, value)` to write temporary storage for the executing contract.
+- `TMPLOAD(key)` to read temporary storage for the executing contract.
+
+Temporary storage is intended for data that does not need indefinite retention, providing a safer alternative to using permanent state for ephemeral data and enabling bounded growth of this class of state.
+
+## Motivation
+![](https://notes.ethereum.org/_uploads/Bk33AfzHWe.png)
+
+*Figure 1: Over 60% of the storage slots are written once and never accessed again onchain (see full analysis [here](https://ethereum-magicians.org/t/not-all-state-is-equal/25508#p-62266-how-actively-used-are-storage-slots-10)).*
+
+Permanent contract storage is costly because it increases long-term node resource requirements (disk, I/O, state maintenance). However, many applications write data that is only valuable for a bounded time window.
+
+This EIP provides:
+- **Bounded lifetime semantics** without requiring explicit deletes.
+- **Predictable clearing** that can be relied upon at the application layer.
+- **A building block** for reducing state growth created by ephemeral use cases.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+
+### Constants and parameters
+
+|Name|Value|Description|
+|-|:-:|-|
+| `FORK_BLOCK` | TBD | Activation timestamp of this EIP |
+| `TEMP_STORAGE_PERIOD` | TBD | The number of blocks that the temporary storage holds for a given period |
+| `TEMP_STORAGE_SYSTEM_ADDRESS` | TBD | Reserved address used to store temporary storage for contract accounts |
+| `TMPLOAD_GAS` | TBD | The gas cost of a warm read at temporary storage slot |
+| `COLD_TMPLOAD_COST` | TBD | The gas cost surchage of a cold access at the temporary storage |
+| `TMPSTORE_SET_GAS` | TBD | The gas cost of setting a slot from zero to non-zero at the temporary storage |
+| `TMPSTORE_RESET_GAS` | TBD | The gas cost of changing a non-zero slot to another value at the temporary storage |
+| `TMPSTORE_CLEARS_SCHEDULE` | TBD | The refund gas amount for clearing storage |
+
+### Temporary storage data model
+Temporary storage is via a **reserved system contract** at `TEMP_STORAGE_SYSTEM_ADDRESS`. The temporary storage keyspace is a mapping of `(contract_address, key) -> value`. This mapping is stored in the system account’s *regular storage trie*, in which the slot is derived by:
+```
+derived_slot_key = keccak256(contract_address || key)
+```
+
+### Periodic rollover (storage reset)
+
+Temporary storage is cleared every `TEMP_STORAGE_PERIOD` after activation.
+
+For blocks with `block.number >= FORK_BLOCK`, define:
+```
+period_index(block_number) = floor((block_number - FORK_BLOCK) / TEMP_STORAGE_PERIOD)
+```
+
+When processing a block `B` (with parent `P`) where both are `>= FORK_BLOCK`, if `period_index(B.number) > period_index(P.number)`, then before executing transactions in `B`, the protocol MUST roll over temporary storage by setting:
+- `TEMP_STORAGE_SYSTEM_ADDRESS.storageRoot = EMPTY_TRIE_ROOT`
+
+No other accounts are modified by the rollover.
+
+### New opcodes
+Add 2 new opcodes as follows:
+
+1. TMPSTORE(key,value) - Stores a key-value pair at the temporary storage of a contract account.
+
+2. 2. TMPLOAD(key) - Retrieves a value at the given key from the temporary storage of a contract account.
+
+The gas rules should follow the conventions in [EIP-2929](https://eips.ethereum.org/EIPS/eip-2929) and [EIP-2200](https://eips.ethereum.org/EIPS/eip-2200) referencing `SSTORE` and `SLOAD`. However, in general the gas costs should be lower than `SSTORE` and `SLOAD`.
+
+### Activation and reserved address
+
+At `FORK_BLOCK`, the chain MUST treat `TEMP_STORAGE_SYSTEM_ADDRESS` as a reserved address:
+
+- If it does not exist in the state trie, it is created with:
+  - `nonce = 1`
+  - `balance = 0`
+  - `codeHash = EMPTY_CODE_HASH`
+  - `storageRoot = EMPTY_TRIE_ROOT`
+
+No contract code is deployed at this address.
+
+## Rationale
+
+### Why not just use transient storage (EIP-1153)?
+
+EIP-1153 (transient storage) is discarded after every transaction, which is ideal for intra-tx operations. This EIP targets a different class of use cases where data must persist across multiple transactions/blocks, but does not need indefinite retention.
+
+### Why a single system account?
+
+Putting all temporary state under a single reserved address allows a constant-time global clear by resetting exactly one storage root at rollover. In contrast, per-account temp roots adds extra overhead to keep track of the 
+
+## Backwards Compatibility
+
+This EIP requires a hard fork to implement.
+
+It does not change behavior of any existing opcodes. Therefore, it is backward compatible with all existing contract accounts.
+
+## Forward Compatibility
+
+**Verkle/binary trie**
+If we remain using a reserved address, then periodic temporary storage clearing involves mass deletion of all temp keys, which is unfeasible in practice. One potential solution is to use a secondary tree solely for temporary storage.
+
+**Future gas repricings** 
+Any repricing of storage access should consider mirroring to temporary storage for consistency.
+
+## Security Considerations
+
+- **DoS surface**: Temporary storage writes still create state that must be processed and witnessed within a period. Gas costs should be calibrated so that worst-case temp writes do not create new per-block disk I/O DoS attack vectors beyond existing storage writes.
+- **Reorg safety**: Clients should retain sufficient history to handle plausible reorg depths.
+- **Application safety**: Contracts MUST treat temp storage as ephemeral and handle the case where entries are unexpectedly missing.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
