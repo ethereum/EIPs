@@ -1,0 +1,170 @@
+---
+eip: 7916
+title: SSZ ProgressiveList
+description: SSZ types for efficiently hashing short lists
+author: Zsolt Felföldi (@zsfelfoldi), Cayman (@wemeetagain), Etan Kissling (@etan-status)
+discussions-to: https://ethereum-magicians.org/t/eip-7916-ssz-progressivebytelist/23254
+status: Review
+type: Standards Track
+category: Core
+created: 2025-03-24
+---
+
+## Abstract
+
+This EIP introduces a new Merkle tree shape for [Simple Serialize (SSZ)](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/simple-serialize.md) types that results in fewer hashes when only a small number of leaves is used. The new tree shape grows progressively with increased leaf count and no longer has a bounded capacity. It also offers forward compatibility: a given chunk index is always assigned the same stable [generalized index (gindex)](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/merkle-proofs.md#generalized-merkle-tree-index) regardless of leaf count.
+
+New types are defined to use the progressive Merkle tree shape: `ProgressiveList[type]` and `ProgressiveBitlist`. These new types represent lists of arbitrary length with stable merkleization, reducing hashing overhead for small lists and avoiding arbitrary capacity limits.
+
+## Motivation
+
+Current SSZ `List[type, N]` types require a predefined capacity `N`, which leads to several issues:
+
+- Inefficient hashing: Lists often contain far fewer elements than their maximum capacity (e.g., [`Transaction`](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/specs/bellatrix/beacon-chain.md#custom-types)), resulting in unnecessary zero-padding and dozens of extra hash computations. This is exacerbated when nesting `List[type, N]`, e.g., in a design where each of up to `X` transactions has up to `Y` access lists, each with up to `Z` storage slots.
+- Arbitrary Limits: The capacity `N` is often chosen arbitrarily (e.g., [`MAX_BYTES_PER_TRANSACTION`](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/specs/bellatrix/beacon-chain.md#execution), [`MAX_TRANSACTIONS_PER_PAYLOAD`](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/specs/bellatrix/beacon-chain.md#execution)) and set to artificially large values to anticipate future design space, which are not always correct.
+- Unstable proofs: Modifying `N` across forks (e.g., [`MAX_ATTESTER_SLASHINGS_ELECTRA`](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/specs/electra/beacon-chain.md#max-operations-per-block), [`MAX_ATTESTATIONS_ELECTRA`](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/specs/electra/beacon-chain.md#max-operations-per-block)) alters gindices, breaking downstream verifiers.
+
+The progressive Merkle tree shape addresses these by:
+
+- Using a recursive tree structure that progressively grows to the actual leaf count with minimal overhead
+- Dropping the notion of a maximum capacity, relying instead on practical limits, e.g., SSZ's 4 GB variable offset cap, network payload limits, gas limits, bounds on the number of signatures.
+- Maintaining stable gindices for each element, ensuring provers remain valid as the leaf count changes.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+### Progressive Merkle tree
+
+The [SSZ Merkleization specification](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/simple-serialize.md#merkleization) is extended with a helper function:
+
+- `merkleize_progressive(chunks, num_leaves=1)`: Given ordered `BYTES_PER_CHUNK`-byte chunks:
+  - The merkleization depends on the number of input chunks and is defined recursively:
+    - If `len(chunks) == 0`: the root is a zero value, `Bytes32()`.
+    - Otherwise: compute the root using `hash(a, b)`
+      - `a`: Merkleize the first up to `num_leaves` chunks as a binary tree using `merkleize(chunks[:num_leaves], num_leaves)`.
+      - `b`: Recursively merkleize chunks beyond `num_leaves` using `merkleize_progressive(chunks[num_leaves:], num_leaves * 4)`.
+
+This results in a 0-terminated sequence of binary subtrees with increasing leaf count. The deepest subtree is padded with zeroed chunks (virtually for memory efficiency).
+
+```
+                   root
+                    /\
+                   /  \
+ 1: chunks[0 ..< 1]   /\
+                     /  \
+   4: chunks[1 ..< 5]   /\
+                       /  \
+   16: chunks[5 ..< 21]   /\
+                         /  \
+    64: chunks[21 ..< 85]    0
+```
+
+| Depth | Added chunks | Total chunks | Total capacity (bytes) |
+| -: | -: | -: | -: |
+| 0 | 0 | 0 | 0 |
+| 1 | 1 | 1 | 32 |
+| 2 | 4 | 5 | 160 |
+| 3 | 16 | 21 | 672 |
+| 4 | 64 | 85 | 2'720 |
+| 5 | 256 | 341 | 10'912 |
+| 6 | 1'024 | 1'365 | 43'680 |
+| 7 | 4'096 | 5'461 | 174'752 |
+| 8 | 16'384 | 21'845 | 699'040 |
+| 9 | 65'536 | 87'381 | 2'796'192 |
+| 10 | 262'144 | 349'525 | 11'184'800 |
+| 11 | 1'048'576 | 1'398'101 | 44'739'232 |
+| 12 | 4'194'304 | 5'592'405 | 178'956'960 |
+| 13 | 16'777'216 | 22'369'621 | 715'827'872 |
+| 14 | 67'108'864 | 89'478'485 | 2'863'311'520 |
+| 15 | 268'435'456 | 357'913'941 | 11'453'246'112 |
+
+### `ProgressiveList[type]` and `ProgressiveBitlist`
+
+Two new [SSZ composite types](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/simple-serialize.md#composite-types) are defined:
+
+- **progressive list**: ordered variable-length homogeneous collection, without limit
+  - notation `ProgressiveList[type]`, e.g. `ProgressiveList[uint64]`
+- **progressive bitlist**: ordered variable-length collection of `boolean` values, without limit
+  - notation `ProgressiveBitlist`
+
+The new types are considered ["variable-size"](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/simple-serialize.md#variable-size-and-fixed-size).
+
+For convenience we [alias](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/simple-serialize.md#aliases):
+
+- `ProgressiveByteList` to `ProgressiveList[byte]`
+
+The [default value](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/simple-serialize.md#default-values) is defined as:
+
+| Type                    | Default Value |
+| ----------------------- | ------------- |
+| `ProgressiveList[type]` | `[]`          |
+| `ProgressiveBitlist`    | `[]`          |
+
+#### Serialization
+
+Serialization, deserialization, and JSON mapping of `ProgressiveBitlist` are identical to [`Bitlist[N]`](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/simple-serialize.md#bitlistn).
+
+Serialization, deserialization, and JSON mapping of `ProgressiveList[type]` are identical to [`List[type, N]`](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/simple-serialize.md#vectors-containers-lists).
+
+#### Merkleization
+
+The [Merkleization](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/simple-serialize.md#merkleization) definitions are extended.
+
+- `mix_in_length(merkleize_progressive(pack(value)), len(value))` if `value` is a progressive list of basic objects.
+- `mix_in_length(merkleize_progressive(pack_bits(value)), len(value))` if `value` is a progressive bitlist.
+- `mix_in_length(merkleize_progressive([hash_tree_root(element) for element in value]), len(value))` if `value` is a progressive list of composite objects.
+
+## Rationale
+
+### Why a recursive structure?
+
+- Efficiency: Small lists use fewer hashes (e.g., a 3-item list in a 16-element subtree wastes fewer hashes than a 1024-element `List[type, N]`).
+- Stability: Fixed subtree sizes ensure stable gindices, avoiding the need for dynamic depth adjustments or multiple queries.
+- Scalability: Recursive subtrees allow arbitrary growth without a hardcoded limit, constrained only by practical limits (e.g., network payload limit, validation rules).
+
+### Why not dynamic depth?
+
+Dynamic-depth Merkleization destabilizes gindices:
+
+- Requires two-step queries (length then gindex), increasing latency and reorg risks.
+- Complicates proofs with semantic lookups.
+
+Mixing in successor subtrees ensures predictable gindices and proof sizes.
+
+### Why not fixed-capacity lists?
+
+`List[type, N]`:
+
+- Imposes arbitrary limits, hindering scalability.
+- Breaks stability when redefined.
+- Wastes hashes with padding (e.g., 1024-element capacity for a 1-item list). (only log(N) wasted hashes)
+
+`ProgressiveList[type]` offers a scalable, efficient alternative.
+
+### Why are initial leaf count and scaling factors not exposed parameters?
+
+- Simplicity: Fixed values (initial leaf count 1, scaling factor 4) provide a sensible default that balances efficiency and usability, aligning with SSZ’s goal of simplicity.
+- Future Extensibility: If specific use cases demand different values, a future EIP could introduce parameterization. For now, fixed values reduce adoption barriers and align with the principle of "good enough" defaults.
+
+## Backwards Compatibility
+
+The new SSZ types coexist with existing types without conflict and share their serialization logic.
+
+## Test Cases
+
+- `ethereum/remerkleable` contains static tests in `test_impl.py` and `test_typing.py`.
+- `ethereum/consensus-specs` releases contain random tests in `tests/general/phase0/ssz_generic`, generated according to a format defined in `tests/format/ssz_generic`.
+
+## Reference Implementation
+
+See `ethereum/remerkleable`.
+
+## Security Considerations
+
+- Resource limits: The `uint32` limit for variable-length offsets essentially introduces a ~4GB cap when including a `ProgressiveList[type]` or `ProgressiveBitlist` within another complex type, but practical limits (e.g., 10MB libp2p messages) apply. Implementations SHOULD enforce context-specific bounds.
+- Variable proof size: Recursive traversal may increase proof sizes for large indices, though logarithmic in list size due to the scaling factor.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).

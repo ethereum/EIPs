@@ -846,9 +846,10 @@ kind = "preamble-length"
 name = "requires"
 min = 1
 
-[lints.markdown-link-first]
-kind = "markdown-link-first"
-pattern = "(?i)(?:eip|erc)-([0-9])+"
+## Disabled because of ERC/EIP split.
+# [lints.markdown-link-first]
+# kind = "markdown-link-first"
+# pattern = "(?i)(?:eip|erc)-([0-9])+"
 
 [lints.markdown-re-erc-dash]
 kind = "markdown-regex"

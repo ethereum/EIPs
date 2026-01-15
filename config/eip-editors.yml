@@ -1,41 +1,36 @@
 governance:
   - lightclient
-  - axic
-  - gcolvin
   - SamWilsn
   - xinbenlv
   - g11tech
+  - jochem-brouwer
 core:
   - lightclient
-  - axic
-  - gcolvin
   - SamWilsn
   - g11tech
+  - jochem-brouwer
 erc:
-  - axic
   - SamWilsn
   - xinbenlv
 networking:
   - lightclient
-  - axic
   - SamWilsn
   - g11tech
+  - jochem-brouwer
 interface:
   - lightclient
-  - axic
   - SamWilsn
   - g11tech
+  - jochem-brouwer
 meta:
   - lightclient
-  - axic
-  - gcolvin
   - SamWilsn
   - xinbenlv
   - g11tech
+  - jochem-brouwer
 informational:
   - lightclient
-  - axic
-  - gcolvin
   - SamWilsn
   - xinbenlv
   - g11tech
+  - jochem-brouwer
