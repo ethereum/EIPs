@@ -80,9 +80,9 @@ Value: current_sequence (uint64)
 | `R1` | `0x02` | secp256r1 / P-256 | 33/65 bytes | 64 bytes | 7000 |
 | `WEBAUTHN` | `0x03` | WebAuthn / Passkey | 65 bytes | Variable | 12000 |
 | `BLS` | `0x04` | BLS12-381 | 48 bytes | 96 bytes | 8000 |
-| `DELEGATE` | `0x05` | Delegated validation | 20 bytes | Variable | 1000 + delegated |
+| `DELEGATE` | `0x05` | Delegated validation | 20 bytes (address) | Nested signature | 1000 + delegated |
 
-**DELEGATE**: Delegates validation to another account's configuration. The delegated account address is stored in `key_data`. Only 1 hop is permitted—if the delegated account also has a `DELEGATE` key at the signing index, validation fails.
+**DELEGATE**: Delegates validation to another account's configuration. The `key_data` stores the delegated account's address (20 bytes). Only 1 hop is permitted—if the delegated account also has a `DELEGATE` key at the signing index, validation fails. See [DELEGATE Signature Format](#delegate-signature-format) for signature structure.
 
 **BLS**: Enables signature aggregation across multiple transactions, reducing data availability costs for rollups and L2s. (impl outside of this scope.)
 
@@ -111,10 +111,15 @@ AA_TX_TYPE || rlp([
 #### Intrinsic Gas
 
 ```
-intrinsic_gas = AA_BASE_COST + sender_key_cost + calldata_cost + token_transfer_cost
+intrinsic_gas = AA_BASE_COST + sender_key_cost + calldata_cost + token_transfer_cost + nonce_key_cost
 ```
 
-Where `token_transfer_cost` is `TOKEN_TRANSFER_COST` if `payment_token` is non-empty, otherwise 0.
+| Component | Value |
+|-----------|-------|
+| `token_transfer_cost` | `TOKEN_TRANSFER_COST` if `payment_token` is non-empty, otherwise 0 |
+| `nonce_key_cost` | `SSTORE_SET_GAS` (20,000) for first use of a `nonce_key`, 0 for existing keys |
+
+The `nonce_key_cost` ensures new 2D nonce channels incur appropriate storage costs. Consider bounding `nonce_key` to a smaller range (e.g., `uint16` for 65,536 channels) to limit per-account state growth.
 
 #### Field Definitions
 
@@ -142,6 +147,23 @@ Where `token_transfer_cost` is `TOKEN_TRANSFER_COST` if `payment_token` is non-e
 
 The `0xFF` prefix distinguishes configured key signatures from EOA signatures.
 
+##### DELEGATE Signature Format
+
+For `DELEGATE` keys, `signature_data` contains a nested signature for the delegated account:
+
+```
+0xFF || key_index || nested_signature
+```
+
+Where `nested_signature` is a valid signature for the delegated account's configuration.
+
+**Example**:
+- Account A has K1 pubkey at `key_index=2`
+- Account B has DELEGATE at `key_index=3` pointing to Account A
+- Valid signature for Account B: `0xFF || 0x03 || 0xFF || 0x02 || ecdsa_sig`
+
+The protocol validates `0xFF || 0x02 || ecdsa_sig` against Account A's config at index 2.
+
 #### Signature Payload
 
 Both sender and payer sign the same payload:
@@ -153,6 +175,10 @@ keccak256(AA_TX_TYPE || rlp([
   calldata, payment_token
 ]))
 ```
+
+**Sender signature**: Authorizes the transaction—calldata execution, gas parameters, and token payment terms.
+
+**Payer signature** (permissioned mode): Authorizes gas payment for this specific transaction. The payer agrees to pay ETH for gas and receive `payment_token` at the implied exchange rate. The payer does NOT control calldata execution.
 
 ### Token Payments
 
@@ -190,17 +216,23 @@ Token transfers occur outside EVM execution, before calldata delivery.
 
 ### Payer Modes
 
-Gas payment supports three modes based on the `payer_auth` field:
+Gas payment supports multiple modes based on the `payer_auth` and `payment_token` fields:
+
+| Case | `payer_auth` | `payment_token` | Gas Payer | Token Recipient |
+|------|--------------|-----------------|-----------|-----------------|
+| Sender pays ETH | Empty | Empty | `from` | N/A |
+| Sponsor pays ETH | 65-byte K1 signature | Empty | Payer (ecrecover) | N/A |
+| Sponsor receives token | 65-byte K1 signature | `[token, max]` | Payer (ecrecover) | Payer |
+| Permissionless sponsor | 20-byte address | `[token, max]` | Payer address | Payer |
+| Native AMM | `NATIVE_PAYER` or empty | `[token, max]` | `NATIVE_PAYER` | `NATIVE_PAYER` |
+
+**Mode details**:
 
 | Mode | `payer_auth` | Description |
 |------|--------------|-------------|
-| **Permissioned** | 65-byte K1 signature | Payer signs each transaction. Suitable for trusted sponsors. Any registered token can be used. |
+| **Permissioned** | 65-byte K1 signature | Payer signs each transaction. Suitable for trusted sponsors. Any registered token can be used—the signature authorizes the specific transaction and exchange rate. |
 | **Permissionless** | 20-byte address | References a registered payer config. No signature required per transaction. |
-| **Native** | `NATIVE_PAYER` address or empty | Chain-operated gas abstraction. Address enables unified onchain lookup; empty is an optimization. |
-
-For permissioned mode, any token with a valid Token Configuration can be accepted—the payer's signature authorizes the specific transaction and exchange rate.
-
-When `payer_auth` is empty and `payment_token` is set, the protocol implicitly uses `NATIVE_PAYER`.
+| **Native** | `NATIVE_PAYER` address or empty | Chain-operated gas abstraction. When empty with `payment_token` set, protocol implicitly uses `NATIVE_PAYER`. Explicit address enables unified onchain lookup. |
 
 ### Permissionless Payer Configuration
 
@@ -254,6 +286,18 @@ Per-payer oracles rather than global oracles:
 5. **Wallet-layer curation**: Discovery of good payers is handled by wallets, not protocol.
 
 The `max_amount` field provides hard protection—transactions fail if cost exceeds the user-specified limit.
+
+#### Oracle Updates
+
+Oracle maintenance is external to this specification. Payers are responsible for maintaining accurate exchange rates. Common approaches:
+
+| Oracle Type | Description |
+|-------------|-------------|
+| **Chainlink feeds** | Decentralized price updates via established infrastructure |
+| **Keeper-updated** | Payer runs offchain updater with top-of-block updates |
+| **DeFi-integrated** | Permissionless contract queries configured DEX pool for current price |
+
+The protocol reads `oracle_slot` at validation time. Stale prices are the payer's risk—they may overpay for gas or have transactions rejected via sender's `max_amount`. A recommended pattern is a non-upgradable oracle contract with a permissionless `update(token)` method that queries configured DEX pools.
 
 ### Native Payer
 
@@ -355,6 +399,19 @@ Users can receive funds at counterfactual addresses before deployment.
 2. **Tooling simplicity**: Single canonical location for key lookups
 3. **No storage conflicts**: Separate from contract storage
 4. **Warmth optimization**: Can be kept warm for efficient validation
+
+### Smart Wallet Migration Path
+
+Existing ERC-4337 smart accounts migrate to native AA without redeployment:
+
+1. **Register keys**: Call `addKey()` on the precompile to add existing signing keys (K1, R1, WebAuthn, etc.) to auth config
+2. **Upgrade wallet logic**: Update contract to use precompile as source of truth:
+   - Call `getKey()` / `validateSignature()` for signature verification
+   - Call `getCurrentSigner()` during execution to identify which key authorized the transaction
+3. **Backwards compatible**: Wallet can still accept ERC-4337 UserOps via EntryPoint alongside native AA transactions
+
+**Key principle**: Wallet contracts should avoid duplicating key storage. The precompile is the single source of truth for authentication. Wallets implement authorization logic (spending limits, timelocks, multisig) in their execution code using `getCurrentSigner()` context.
+
 
 ## Backwards Compatibility
 
