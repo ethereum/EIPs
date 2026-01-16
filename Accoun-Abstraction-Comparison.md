@@ -144,17 +144,169 @@ All checks are **pure slot reads**—no EVM execution.
 
 ## Comparison
 
-| Feature | Simple | Tempo | This Proposal |
-|---------|--------|-------|---------------|
-| Native Gas Sponsorship | ✅ | ✅ | ✅ |
-| ERC-20 Gas Payment | ❌ | ✅ (TIP-20) | ✅ (registry) |
-| Native AMM Option | ❌ | ❌ | ✅ (per chain) |
-| Key Rotation | ❌ | ❌ | ✅ |
-| Multiple Sig Types | ❌ | ✅ | ✅ |
-| Passkeys/WebAuthn | ❌ | ✅ | ✅ |
-| 2D Nonces | ❌ | ✅ | ✅ |
-| Legacy 4337 Migration | ❌ | ❌ | ✅ |
-| No EVM in Validation | ✅ | ✅ | ✅ |
+| Feature | EIP-4337 | EIP-7701 | Simple | Tempo | This Proposal |
+|---------|----------|----------|--------|-------|---------------|
+| Native Gas Sponsorship | ❌ (via Paymaster) | ✅ | ✅ | ✅ | ✅ |
+| ERC-20 Gas Payment | ❌ (app layer) | ❌ | ❌ | ✅ (TIP-20) | ✅ (registry) |
+| Native AMM Option | ❌ | ❌ | ❌ | ❌ | ✅ (per chain) |
+| Key Rotation | ✅ (contract) | ✅ (contract) | ❌ | ❌ | ✅ |
+| Multiple Sig Types | ✅ (contract) | ✅ (contract) | ❌ | ✅ | ✅ |
+| Passkeys/WebAuthn | ✅ (contract) | ✅ (contract) | ❌ | ✅ | ✅ |
+| 2D Nonces | ✅ | ✅ | ❌ | ✅ | ✅ |
+| Legacy 4337 Migration | N/A | ✅  | ❌ | ❌ | ✅ |
+| No EVM in Validation | ❌ | ❌ | ✅ | ✅ | ✅ |
+| Protocol Complexity | Low (app layer) | High (new opcodes) | Low | Medium | Medium |
+| Mempool Rules | Complex (ERC-7562) | Complex | Simple | Simple | Simple |
+
+### EIP-4337 vs EIP-7701 vs This Proposal
+
+| Aspect | EIP-4337 | EIP-7701 | This Proposal |
+|--------|----------|----------|---------------|
+| **Layer** | Application (EntryPoint contract) | Protocol (new tx type + opcodes) | Protocol (new tx type + precompile) |
+| **Validation Logic** | Arbitrary EVM (gas-bounded) | Arbitrary EVM (gas-bounded) | Predefined key types only |
+| **New Opcodes** | None | `CURRENT_ROLE`, `ACCEPT_ROLE`, `TXPARAM*` | None (optional `AAPAYER`, `AASIGNER`) |
+| **Gas Overhead** | High (EntryPoint calls) | Medium | Low |
+| **Block Builder Complexity** | High (ERC-7562 rules) | High (role management) | Low (state lookups only) |
+| **Extensibility** | High (any validation logic) | High (any validation logic) | Medium (new key types) |
+| **Quantum Migration** | Contract upgrade | Contract upgrade | Add key type |
+
+---
+
+## Expert Questions & Open Issues
+
+### DELEGATE Key Type
+
+**Q**: For DELEGATE, if I store `[DELEGATE, 0x12...34]` at `key_index=2`, would my signature look like `0xff | 0x02 | 0xff | 0x01 | signature`, where `0xff | 0x01 | signature` is passed to address `0x12...34`?
+
+**A**: Yes. Example:
+- Account A has pubkey in slot 2
+- Account B has DELEGATE in slot 3 pointing to Account A
+- Account B accepts signatures like: `0xff | 3 | [valid Account A signature]` = `0xff | 3 | [0xff | 2 | sig]`
+
+The nested signature is validated against the delegated account's config. 1-hop limit prevents loops.
+
+**Status**: ✅ Clarified
+
+---
+
+### Multisig Support
+
+**Observation**: No native multisig in auth structure (only BLS threshold schemes).
+
+**Response**: Correct—no native multisig support at the gas payment layer. Accounts can implement multisig features at the execution layer because they are aware of the signing key index via `getCurrentSigner()`.
+
+**Consideration**: May want to add either:
+- Native multisig support in auth config
+- Account-level config to mitigate gas overspending / ERC-20 token spend bypass (e.g., disable unsponsored tx or token tx entirely)
+
+**Status**: Not a blocker. Design intentionally constrains validation, not execution.
+
+---
+
+### 2D Nonce Storage Costs
+
+**Concern**: 2D nonces introduce unbounded storage per account; we'd likely need to charge `SSTORE` equivalent gas for a previously unseen `nonce_key`.
+
+**Response**: Yes, new nonce keys would incur 20k gas (`SSTORE_SET_GAS`). Subsequent increments cost `SSTORE_RESET_GAS` (2,900 gas).
+
+**Additional consideration**: Could bound the keyspace to reduce state bloat:
+- 1024 nonce keys seems sufficient for most use cases
+- Bounded keyspace = bounded storage per account
+
+**Status**: ✅ Confirmed gas cost. Bounded keyspace under consideration.
+
+---
+
+### Smart Wallet Migration
+
+| Question | Answer |
+|----------|--------|
+| **Move auth to account config?** | Yes, 4337 smart wallets migrate by calling the auth precompile to add their keys. This enables the new AA tx type. Migration happens in execution. |
+| **How to prevent non-AA txs if keys are in config?** | Any contract calling the precompile can add keys. An EOA can set this by calling the auth precompile directly. The EOA key always retains authorization for recovery. |
+| **2 signatures if both checks retained?** | No. Smart wallets already accept calls from themselves or the EntryPoint (see [CoinbaseSmartWallet](https://github.com/coinbase/smart-wallet/blob/main/src/CoinbaseSmartWallet.sol#L228-L246)). The same pattern applies. |
+| **2 updates for key rollover?** | No. The smart contract wallet should be upgraded to use the precompile as its source of truth. It can call `getKey()` / `validateSignature()` for 4337 compatibility and native AA. Single source of truth. |
+
+**Recommendation**: Wallet contracts should use `getCurrentSigner()` and `getCurrentPayer()` for all authorization checks, avoiding duplicate key storage.
+
+---
+
+### Token Payment Questions
+
+**Payment Mode Matrix**:
+
+| Case | `payer_auth` | `payment_token` |
+|------|--------------|-----------------|
+| Sender pays ETH | Empty | Empty |
+| Sponsor pays ETH | Payer's EOA signature (65 bytes) | Empty |
+| Sponsor pays ETH, receives token | Payer's EOA signature (65 bytes) | `[token_address, max_amount]` |
+| Permissionless sponsor | Payer address (20 bytes, config required) | `[token_address, max_amount]` |
+| Native AMM pays | `NATIVE_PAYER` address OR empty | `[token_address, max_amount]` |
+
+**Oracle System Options**:
+
+| Oracle Type | Description |
+|-------------|-------------|
+| **Chainlink feed** | Standard price feed integration |
+| **Operator-run oracle** | Top-of-block updates by payer |
+| **DeFi-integrated oracle** | Permissionless updates from DEX pools |
+
+**Recommended design**: Non-upgradable contract with DeFi integrations. Anyone can call `update(tokenAddress)` to query configured pool for current price. May drift between updates, but allows payers to build systems for important tokens and works permissionlessly for all registered tokens.
+
+**Status**: ✅ Clarified
+
+---
+
+### Complexity vs EVM Validation Trade-off
+
+**Observation**: 
+> "There's quite a bit of logic happening in the validation flow; there's set inclusions, signature recoveries, balance checks, oracle price conversion / AMM calculation, etc. What we're really gaining here is a bounded amount of execution... which could also be achieved using EVM validation with a gas limit."
+
+**Response**:
+
+| Aspect | EIP-7701 (EVM validation) | This Proposal (Enshrined validation) |
+|--------|---------------------------|--------------------------------------|
+| **Validation complexity** | Arbitrary (gas-bounded) | Fixed (predefined key types) |
+| **Block builder simulation** | Must execute EVM to validate | Pure state reads, no EVM |
+| **Mempool rules** | Complex (storage access restrictions) | Simple (can validate from state) |
+| **Invalidation risk** | Any state change can invalidate | Only key/nonce/balance changes |
+| **Extensibility** | Infinite (any contract logic) | Bounded (add key types via hardfork) |
+
+**Trade-off**: We accept reduced validation flexibility in exchange for dramatically simpler block building and mempool rules. The "bounded execution" in EVM validation still requires:
+- Simulating contract execution
+- Tracking storage access patterns
+- Complex invalidation rules (ERC-7562)
+
+This proposal eliminates those requirements entirely.
+
+---
+
+### EIP-7701 Simplification Ideas
+
+**Suggestions from experts**:
+1. Reuse same calldata for validation and execution
+2. Use EVM context to determine mode (validation vs execution)  
+3. Single new opcode to "pass validation" instead of full opcode family
+
+**Analysis**:
+
+[RIP-7560](https://github.com/ethereum/RIPs/blob/master/RIPS/rip-7560.md) is a less opcode-heavy design for L2s, but still has complexity.
+
+**Alternative approach**: Enshrine a custom EntryPoint:
+- New tx type where validation revert = invalid tx (cannot land)
+- PVG (Pre-Verification Gas) calculation baked into protocol
+- No new opcodes required
+- Simpler than EIP-7701 while preserving EVM validation flexibility
+
+**Comparison**:
+
+| Approach | Opcodes | Complexity | Flexibility |
+|----------|---------|------------|-------------|
+| EIP-7701 (current) | 5+ new opcodes | High | Maximum |
+| RIP-7560 (L2 variant) | Fewer opcodes | Medium-High | High |
+| Enshrined EntryPoint | 0 new opcodes | Medium | High |
+| This Proposal | 0-2 optional opcodes | Low | Medium |
+
+**Open question**: Is enshrined EntryPoint (EVM validation, no new opcodes) the right middle ground, or does the fully enshrined approach provide enough flexibility while maintaining simplicity?
 
 ---
 
@@ -289,6 +441,9 @@ Maximum protection for high-value accounts.
 - [Simple Approach (gakonst)](https://gist.github.com/gakonst/00117aa2a1cd327f515bc08fb807102e)
 - [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) - EOA code delegation
 - [EIP-4337](https://eips.ethereum.org/EIPS/eip-4337) - Account Abstraction via EntryPoint
+- [EIP-7701](https://eips.ethereum.org/EIPS/eip-7701) - Native Account Abstraction (EVM validation)
+- [RIP-7560](https://github.com/ethereum/RIPs/blob/master/RIPS/rip-7560.md) - Native Account Abstraction (L2 variant)
+- [ERC-7562](https://eips.ethereum.org/EIPS/eip-7562) - Account Abstraction Validation Scope Rules
 - [EIP-7796](https://eips.ethereum.org/EIPS/eip-7796) - eth_sendRawTransactionConditional
 - [Keyspace Docs](https://docs.key.space) - Cross-chain key management
  

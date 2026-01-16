@@ -162,7 +162,7 @@ Where `nested_signature` is a valid signature for the delegated account's config
 - Account B has DELEGATE at `key_index=3` pointing to Account A
 - Valid signature for Account B: `0xFF || 0x03 || 0xFF || 0x02 || ecdsa_sig`
 
-The protocol validates `0xFF || 0x02 || ecdsa_sig` against Account A's config at index 2.
+The protocol validates `0xFF || 0x02 || ecdsa_sig` against Account A's config at index 2. Note this could also be its standard EOA signature (not required to be in precompile).
 
 #### Signature Payload
 
@@ -178,7 +178,7 @@ keccak256(AA_TX_TYPE || rlp([
 
 **Sender signature**: Authorizes the transaction—calldata execution, gas parameters, and token payment terms.
 
-**Payer signature** (permissioned mode): Authorizes gas payment for this specific transaction. The payer agrees to pay ETH for gas and receive `payment_token` at the implied exchange rate. The payer does NOT control calldata execution.
+**Payer signature** (permissioned mode): Authorizes gas payment for this specific transaction. The payer agrees to pay ETH for gas and receive `payment_token` at the implied exchange rate. The payer does NOT control any execution.
 
 ### Token Payments
 
@@ -363,6 +363,23 @@ address = keccak256(0xff || ACCOUNT_CONFIG_PRECOMPILE || salt || keccak256(abi.e
 
 Users can receive funds at counterfactual addresses before deployment.
 
+#### Default Account (Chain Operator Option)
+
+For EOA accounts, chain operators may configure a **default account**—a wallet implementation automatically used for addresses without deployed code. This enables EOAs to submit AA transactions and use AA features (batching, gas sponsorship, token payments) without explicitly deploying code via EIP-7702.
+
+**Behavior**:
+- EOA submits AA transaction with valid signature
+- During execution, if `from` has no code, use the configured default account bytecode
+- The default account interprets `calldata` (e.g., as batched calls)
+- Code injection occurs at transaction time; no permanent deployment required
+
+**Benefits**:
+- Seamless AA onboarding for existing EOAs
+- Users gain smart account capabilities without understanding code delegation
+- Chain can standardize on a secure, audited default implementation
+
+**Configuration**: Chain operators specify the default account bytecode hash. This is an optional feature—chains may require explicit 7702 delegation instead.
+
 ### Validation Flow
 
 #### Mempool Acceptance
@@ -395,6 +412,16 @@ Users can receive funds at counterfactual addresses before deployment.
 
 ### Why a Precompile?
 
+The Account Configuration Precompile serves two roles:
+
+1. **Protocol-level validation**: The chain reads precompile storage directly to validate AA transaction signatures—no EVM execution required during validation. The protocol can keep these storage slots warm for efficient access. 
+2. **Onchain interface**: Smart contracts call the precompile during execution to:
+   - Modify keys (`addKey()`, `removeKey()`)
+   - Query transaction context (`getCurrentSigner()`, `getCurrentPayer()`)
+   - Validate signatures for 4337 compatibility (`validateSignature()`)
+
+Benefits of a precompile over alternative approaches:
+
 1. **Cross-chain consistency**: Same address on all adopting chains
 2. **Tooling simplicity**: Single canonical location for key lookups
 3. **No storage conflicts**: Separate from contract storage
@@ -410,7 +437,7 @@ Existing ERC-4337 smart accounts migrate to native AA without redeployment:
    - Call `getCurrentSigner()` during execution to identify which key authorized the transaction
 3. **Backwards compatible**: Wallet can still accept ERC-4337 UserOps via EntryPoint alongside native AA transactions
 
-**Key principle**: Wallet contracts should avoid duplicating key storage. The precompile is the single source of truth for authentication. Wallets implement authorization logic (spending limits, timelocks, multisig) in their execution code using `getCurrentSigner()` context.
+**Key principle**: Wallet contracts should avoid duplicating key storage. The precompile is ideally the single source of truth for authentication. Wallets implement authorization logic (spending limits, timelocks, multisig) in their execution code using `getCurrentSigner()` context.
 
 
 ## Backwards Compatibility
@@ -418,7 +445,7 @@ Existing ERC-4337 smart accounts migrate to native AA without redeployment:
 No breaking changes. Existing EOAs and smart contracts function unchanged. Adoption is opt-in:
 - EOAs continue sending standard transactions
 - EIP-4337 infrastructure continues operating
-- Accounts gain AA capabilities by configuring keys or using the new transaction type
+- Accounts gain AA capabilities by configuring keys or using the new transaction type, note that code needs to be deployed to do anything useful as calldata is sent to the address and must be interpreted.
 
 ## Security Considerations
 
@@ -437,14 +464,6 @@ No breaking changes. Existing EOAs and smart contracts function unchanged. Adopt
 **Payer Security**: Permissioned payers sign each transaction. Permissionless payers explicitly configure accepted tokens; protocol validates sender balance/blocklist before transfer.
 
 **Oracle Risks**: Per-payer oracles mean manipulation affects only that payer's users. Mitigations: trusted payer lists, `max_amount` field, TWAP oracles.
-
-**EIP-7702 Compatibility**: Works well together—7702 provides execution logic, this proposal provides authentication.
-
-## Future Considerations
-
-- Permissionless token registration with stake requirements
-- Per-token exchange rate bounds in payer configs
-- `eth_sendRawTransactionConditional` for custom validation logic
 
 ## Appendix: Solidity Interfaces
 
