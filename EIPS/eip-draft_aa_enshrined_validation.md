@@ -29,6 +29,7 @@ This proposal addresses these by:
 - **Simplifying Validation**: Predefined key types eliminate EVM execution during validation
 - **Enabling Simple Block Building**: Validators use only state lookups
 - **Reducing Gas Costs**: No entrypoint contracts or associated overhead
+- **Native Multisig**: Protocol-level threshold signatures without execution-time validation
 - **Ensuring Extensibility**: Supports future quantum-safe algorithms via new key types
 - **Maintaining Compatibility**: Coexists with EIP-7702 and ERC-4337
 
@@ -58,11 +59,12 @@ Base slot: keccak256(account_address || ACCOUNT_CONFIG_PRECOMPILE)
 
 Slot layout:
 - base_slot + 0: key_count (uint8)
-- base_slot + 1 + (index * 2): key_type[index] (uint8)
-- base_slot + 1 + (index * 2) + 1: key_data[index] (bytes)
+- base_slot + 1: required_signatures (uint8) - threshold for multisig, default 1
+- base_slot + 2 + (index * 2): key_type[index] (uint8)
+- base_slot + 2 + (index * 2) + 1: key_data[index] (bytes)
 ```
 
-The protocol validates signatures by reading these slots directly—no EVM execution required.
+The protocol validates signatures by reading these slots directly no EVM execution required.
 
 #### 2D Nonce Storage
 
@@ -146,6 +148,29 @@ The `nonce_key_cost` ensures new 2D nonce channels incur appropriate storage cos
 **Configured key**: `0xFF || key_index || signature_data`
 
 The `0xFF` prefix distinguishes configured key signatures from EOA signatures.
+
+##### Multisig Signature Format
+
+For accounts with `required_signatures > 1`, multiple signatures are concatenated:
+
+```
+signature_1 || signature_2 || ... || signature_n
+```
+
+Each signature is either an EOA signature (65 bytes, `v ∈ {27,28}`) or a configured key signature (`0xFF || key_index || sig`). The parser distinguishes them by checking if the first byte is `0xFF`.
+
+**Validation rules**:
+1. Parse signatures sequentially
+2. Track which key indices have signed (no duplicates allowed)
+3. EOA signature counts as one valid signature (if known)
+4. Transaction valid if `unique_valid_signatures >= required_signatures`
+
+**Examples**:
+
+2-of-3 with EOA + configured key at index 2:
+```
+ecdsa_sig (65 bytes) || 0xFF || 0x02 || ecdsa_sig (65 bytes)
+```
 
 ##### DELEGATE Signature Format
 
@@ -338,8 +363,9 @@ This proposal constrains **validation** to enshrined key types but does not cons
 During execution, accounts can query the precompile for:
 - **Payer**: `getCurrentPayer()` returns the gas payer address
 - **Signer**: `getCurrentSigner()` returns `(keyIndex, keyType, publicKey)` used for authorization
+- **Gas Payment**: `getGasPaymentInfo()` returns `(token, amount)` transferred for gas payment
 
-**Optional opcodes** (`AAPAYER`, `AASIGNER`) may be added for gas-efficient access.
+**Optional opcodes** (`AAPAYER`, `AASIGNER`, `AAGASPAYMENT`) may be added for gas-efficient access.
 
 ### Account Initialization
 
@@ -384,15 +410,17 @@ For EOA accounts, chain operators may configure a **default account**—a wallet
 
 #### Mempool Acceptance
 
-1. Validate `sender_signature` against `from` account's keys
+1. Validate `sender_signature` against `from` account's keys (respecting `required_signatures` threshold)
 2. Resolve payer from `payer_auth`:
    - 65 bytes: recover address via ecrecover
    - 20 bytes: use directly (permissionless payer or `NATIVE_PAYER`)
    - Empty with `payment_token`: use `NATIVE_PAYER`
    - Empty without `payment_token`: `from` pays ETH
-3. Verify nonce, payer ETH balance, expiry
-4. If `payment_token` set: verify token registration, payer acceptance, sender balance/blocklist, max_amount
-5. Mempool threshold: payer's pending sponsored transaction count must be below node-configured limits (not applicable for `NATIVE_PAYER`) 
+3. Validate spending protection:
+   - If `requiresSponsor` is set: reject if payer == `from` OR `payment_token` is non-empty (full ETH sponsorship only)
+4. Verify nonce, payer ETH balance, expiry
+5. If `payment_token` set: verify token registration, payer acceptance, sender balance/blocklist, max_amount
+6. Mempool threshold: payer's pending sponsored transaction count must be below node-configured limits (not applicable for `NATIVE_PAYER`) 
 
 #### Block Execution
 
@@ -457,9 +485,11 @@ No breaking changes. Existing EOAs and smart contracts function unchanged. Adopt
 
 **Delegation**: `DELEGATE` key type limited to 1 hop to prevent loops.
 
-**Token Spend Protection**: Token gas payments occur before wallet code executes, bypassing wallet-level spend limits. Mitigations:
-- **Trusted payers list**: Account configures allowed payers (`NATIVE_PAYER`, app sponsors). Attack requires key + payer + oracle compromise.
-- **Key-bound token limits**: Per-key, per-token caps checked at validation time. Or disabling token/unsponsored tx entirely.
+**Multisig**: Native multisig requires `required_signatures` valid signatures from distinct keys. EOA signature counts toward threshold if account has EOA origin (created via 7702). Pure multisig (no EOA) is supported for smart accounts initialized without an EOA key.
+
+**Token Spend Protection**: Token gas payments occur before wallet code executes, bypassing wallet-level spend limits. Protocol-level mitigations:
+- **Require sponsor** (`requiresSponsor`): When enabled, account requires full ETH sponsorship—`payer_auth` must specify a sponsor AND `payment_token` must be empty. No tokens or ETH can be spent by the account for gas, completely eliminating the token spend attack vector.
+- **Future spend limits**: In the future we can consider adding per asset spend limits natively managed.
 
 **Payer Security**: Permissioned payers sign each transaction. Permissionless payers explicitly configure accepted tokens; protocol validates sender balance/blocklist before transfer.
 
@@ -478,15 +508,31 @@ interface IAccountConfig {
     
     event KeyAdded(address indexed account, uint8 keyIndex, uint8 keyType, bytes publicKey);
     event KeyRemoved(address indexed account, uint8 keyIndex);
+    event RequiredSignaturesUpdated(address indexed account, uint8 requiredSignatures);
+    event RequireSponsorUpdated(address indexed account, bool required);
     
+    // Key management
     function addKey(uint8 keyType, bytes calldata publicKey) external returns (uint8 keyIndex);
     function removeKey(uint8 keyIndex) external;
     function getKeyCount(address account) external view returns (uint8);
     function getKey(address account, uint8 keyIndex) external view returns (uint8 keyType, bytes memory publicKey);
     function validateSignature(address account, uint8 keyIndex, bytes32 messageHash, bytes calldata signature) external view returns (bool);
+    
+    // Multisig configuration
+    function setRequiredSignatures(uint8 threshold) external;
+    function getRequiredSignatures(address account) external view returns (uint8);
+    
+    // Spending protection
+    function setRequireSponsor(bool required) external;
+    function getRequireSponsor(address account) external view returns (bool);
+    
+    // Nonce management
     function getNonce(address account, uint192 nonceKey) external view returns (uint64);
+    
+    // Transaction context (only valid during AA transaction execution)
     function getCurrentPayer() external view returns (address);
     function getCurrentSigner() external view returns (uint8 keyIndex, uint8 keyType, bytes memory publicKey);
+    function getGasPaymentInfo() external view returns (address token, uint256 amount);
 }
 ```
 
