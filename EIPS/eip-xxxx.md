@@ -7,7 +7,7 @@ discussions-to: https://ethereum-magicians.org/t/soulbound-nft-as-separate-stand
 status: Draft
 type: Standards Track
 category: ERC
-created: 2026-01-20
+created: 2026-01-19
 requires: [165], [721]
 ---
 
