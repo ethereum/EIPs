@@ -53,10 +53,11 @@ interface IERC_NTT {
     /// @param tokenId The identifier of the burned token
     event Burn(address indexed from, uint256 indexed tokenId);
 
-    /// @notice Mint a new non-transferable token
-    /// @dev The token MUST be bound to msg.sender
+    /// @notice Mint a new non-transferable token to a specified address
+    /// @dev The token MUST be bound to the address specified in the 'to' parameter
+    /// @param to The address to bind the token to
     /// @return tokenId The identifier of the newly minted token
-    function mint() external returns (uint256 tokenId);
+    function mint(address to) external returns (uint256 tokenId);
 
     /// @notice Burn a non-transferable token
     /// @dev MUST revert if msg.sender is not the owner of tokenId
@@ -144,7 +145,7 @@ A dedicated standard removes this baggage entirely.
 
 The core interface contains only what is essential for non-transferable tokens:
 
-- `mint()`: Create and bind token to address
+- `mint(address to)`: Create and bind token to address
 - `burn()`: Destroy token
 - `ownerOf()`: Verify ownership
 
@@ -200,12 +201,12 @@ contract NonTransferableToken is IERC_NTT, IERC721Metadata {
         _baseURI = baseURI_;
     }
 
-    function mint() external override returns (uint256) {
+    function mint(address to) external override returns (uint256) {
         _tokenIdCounter++;
         uint256 tokenId = _tokenIdCounter;
-        _owners[tokenId] = msg.sender;
+        _owners[tokenId] = to;
 
-        emit Mint(msg.sender, tokenId);
+        emit Mint(to, tokenId);
         return tokenId;
     }
 
@@ -270,7 +271,7 @@ External contracts MUST NOT assume transfer capabilities based solely on the pre
 
 ### Reentrancy
 
-The minimal interface reduces reentrancy attack surface, but implementations should still follow checks-effects-interactions pattern, especially if `mint()` or `burn()` trigger external calls.
+The minimal interface reduces reentrancy attack surface, but implementations should still follow checks-effects-interactions pattern, especially if `mint(address to)` or `burn()` trigger external calls.
 
 ## Copyright
 
