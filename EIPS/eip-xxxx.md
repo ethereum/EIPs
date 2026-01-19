@@ -8,7 +8,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2026-01-20
-requires: [165](./eip-165.md), [721](./eip-721.md)
+requires: [165], [721]
 ---
 
 ## Abstract
@@ -107,7 +107,7 @@ All compliant contracts MUST implement both `IERC_NTT` and `IERC721Metadata` int
 
    - Only the token owner MUST be able to burn their token
    - The burning function MUST emit the `Burn` event
-   - After burning, `ownerOf` for that token MUST return address(0)
+   - After burning, `ownerOf` for that token MUST revert 
 
 3. **Non-Transferability**:
 
