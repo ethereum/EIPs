@@ -108,7 +108,7 @@ All compliant contracts MUST implement both `IERC_NTT` and `IERC721Metadata` int
 
    - Only the token owner MUST be able to burn their token
    - The burning function MUST emit the `Burn` event
-   - After burning, `ownerOf` for that token MUST revert 
+   - After burning, `ownerOf(uint256 tokenId)` for that token MUST revert 
 
 3. **Non-Transferability**:
 
@@ -117,8 +117,8 @@ All compliant contracts MUST implement both `IERC_NTT` and `IERC721Metadata` int
    - The only way to move token ownership is through burn and mint operations by authorized parties
 
 4. **Owner Queries**:
-   - `ownerOf` MUST return the address that owns the specified token
-   - `ownerOf` MUST revert for non-existent tokens
+   - `ownerOf(uint256 tokenId)` MUST return the address that owns the specified token
+   - `ownerOf(uint256 tokenId)` MUST revert for non-existent tokens
 
 ### ERC-165 Interface Identification
 
@@ -145,11 +145,11 @@ A dedicated standard removes this baggage entirely.
 
 The core interface contains only what is essential for non-transferable tokens:
 
-- `mint(address to)`: Create and bind token to address
-- `burn()`: Destroy token
-- `ownerOf()`: Verify ownership
+- `mint(address to)`: Create and bind token to specified address
+- `burn(uint256 tokenId)`: Destroy token
+- `ownerOf(uint256 tokenId)`: Verify ownership
 
-Additionally, the standard REQUIRES ERC-721 Metadata interface (`name()`, `symbol()`, `tokenURI()`) for compatibility with existing wallet and indexer infrastructure while maintaining minimalism.
+Additionally, the standard REQUIRES ERC-721 Metadata interface (`name()`, `symbol()`, `tokenURI(uint256 tokenId)`) for compatibility with existing wallet and indexer infrastructure while maintaining minimalism.
 
 ### Why Allow Burning?
 
@@ -271,7 +271,7 @@ External contracts MUST NOT assume transfer capabilities based solely on the pre
 
 ### Reentrancy
 
-The minimal interface reduces reentrancy attack surface, but implementations should still follow checks-effects-interactions pattern, especially if `mint(address to)` or `burn()` trigger external calls.
+The minimal interface reduces reentrancy attack surface, but implementations should still follow checks-effects-interactions pattern, especially if `mint(address to)` or `burn(uint256 tokenId)` trigger external calls.
 
 ## Copyright
 
