@@ -1,11 +1,14 @@
 ---
 eip: 3
 title: Addition of CALLDEPTH opcode
-author: Martin Holst Swende <martin@swende.se>
+description: Add CALLDEPTH opcode to expose call stack depth
+author: Martin Holst Swende (@holiman) <martin@swende.se>
+discussions-to: https://ethereum-magicians.org/t/rip-7614-expose-call-stack-to-contracts/18535
 status: Withdrawn
 type: Standards Track
 category: Core
 created: 2015-11-19
+withdrawal-reason: Withdrawn because it was not adopted by implementations.
 ---
 
 ## Abstract
@@ -32,7 +35,7 @@ It is possible to defend against this in two ways:
 
 [1] a.k.a "shallow stack attack" and "stack attack". However, to be precise, the word ''stack'' has a different meaning within the EVM, and is not to be confused with the ''call stack''.
 
-[2] https://github.com/pipermerriam/ethereum-stack-depth-lib
+[2] `github.com/pipermerriam/ethereum-stack-depth-lib`
 
 ## Specification
 
@@ -42,6 +45,14 @@ The opcode `CALLDEPTH` should return the remaining call stack depth. A value of 
 
 The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap way to protect against call stack attacks.
 
-## Implementation
+## Reference Implementation
 
 Not implemented.
+
+## Security Considerations
+
+If implemented, this opcode could be used to help contracts defend against call stack depth attacks. Exposing call stack depth does not introduce new consensus-layer security risks by itself.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
