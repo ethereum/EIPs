@@ -8,11 +8,11 @@ category: Core
 created: 2015-11-19
 ---
 
-# Abstract
+## Abstract
 
 This is a proposal to add a new opcode, `CALLDEPTH`. The `CALLDEPTH` opcode would return the remaining available call stack depth.
 
-# Motivation
+## Motivation
 
 There is a limit specifying how deep contracts can call other contracts; the call stack. The limit is currently `256`. If a contract invokes another contract (either via `CALL` or `CALLCODE`), the operation will fail if the call stack depth limit has been reached.
 
@@ -34,14 +34,14 @@ It is possible to defend against this in two ways:
 
 [2] https://github.com/pipermerriam/ethereum-stack-depth-lib
 
-# Specification
+## Specification
 
 The opcode `CALLDEPTH` should return the remaining call stack depth. A value of `0` means that the call stack is exhausted, and no further calls can be made.
 
-# Rationale
+## Rationale
 
 The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap way to protect against call stack attacks.
 
-# Implementation
+## Implementation
 
 Not implemented.
