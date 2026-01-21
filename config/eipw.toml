@@ -484,10 +484,6 @@ additional_schemas = [[
       \"edition\": {
         \"type\": [\"string\", \"number\"]
       },
-      \"event\": {
-        \"description\": \"[Deprecated - use 'event-title' instead. Will be removed in 1.1]\",
-        \"type\": \"string\"
-      },
       \"event-title\": {
         \"type\": \"string\"
       },
