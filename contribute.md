@@ -54,10 +54,10 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
    Explain the purpose and scope -  e.g., “Fixing typos in EIP-1559” or “Updating broken link in EIP-4844.”
 * **Make objective, non-semantic edits.** 
    Acceptable edits include:
-   - Typo, grammar, and style corrections 
-   - Markdown and formatting fixes 
-   - Broken or outdated link replacements 
-   - Small clarifications (e.g., referencing a spec or renaming variables for clarity)
+   * Typo, grammar, and style corrections 
+   * Markdown and formatting fixes 
+   * Broken or outdated link replacements 
+   * Small clarifications (e.g., referencing a spec or renaming variables for clarity)
 * **Cite authoritative sources.** 
    When clarifying or aligning text, link to:
    * [Ethereum Yellow Paper](https://ethereum.github.io/yellowpaper/paper.pdf) 
