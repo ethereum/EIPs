@@ -1,19 +1,23 @@
 # EIP Contribution Guidelines
+
 This document outlines how authors, contributors, and editors can collaborate effectively in the [Ethereum Improvement Proposals (EIPs)](https://eips.ethereum.org/) repository. 
 The goal is to keep contributions consistent, transparent, and easy to review -  while respecting the authors’ intent.
 
 ## For EIP Authors
+
 > You are listed as an author in the EIP header.
 
 ### Do’s
+
 #### Text
+
 * Avoid mentioning specific commercial products.
 * Don't use RFC 2119 keywords (all-caps SHOULD/MUST/etc.) outside of the specification section.
 * Prefer "on-chain" and "off-chain" when appearing before the noun they describe, and "on chain" or "off chain" when appearing after. 
 * Do not include punctuation at the end of headings (so no # Example A:).
 * Titles should be in title case.
 * Descriptions should be in sentence case.
-* Prefer SVG diagrams, then PNG, finally everything else.
+* Prefer SVG diagrams, then PNG, and finally everything else.
 * Do not use articles (the/a/an/etc.) in front of EIP identifiers (so no an ERC-20), unless the EIP identifier is used as an adjective/compound noun (so an ERC-20 token is fine.)
 * Initialisms should be written in uppercase (eg. NFT instead of nft.)
 * Only use backticks (`) for code snippets.
@@ -24,23 +28,28 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 * Unless you're writing a fork meta EIP, don't include a fork block number constant.
 
 #### Diagrams
+
 * Prefer SVG, but PNG is acceptable.
-* If possible, use [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries/Using) (specifically prefers-color-scheme) to support dark mode. If not, provide light mode compatible images.
+* If possible, use [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries/Using) (specifically prefers-color-scheme) to support dark mode. If not, provide light-mode compatible images.
 
 #### Other
-- **Monitor feedback regularly**: Respond to comments or PRs that relate to your EIP, especially specification clarifications or typo fixes.
-- **Acknowledge helpful community edits**: You don’t need to merge every PR yourself, but a short confirmation (“LGTM”) helps editors move things forward.
-- **Communicate before major revisions**: If changing motivation, specification, or rationale, explain reasoning in the PR or linked issue (recommended).
-- **Keep contact details up to date**: Editors use your listed email or GitHub for coordination; please keep them valid.
+
+* **Monitor feedback regularly**: Respond to comments or PRs that relate to your EIP, especially specification clarifications or typo fixes.
+* **Acknowledge helpful community edits**: You don’t need to merge every PR yourself, but a short confirmation (“LGTM”) helps editors move things forward.
+* **Communicate before major revisions**: If changing motivation, specification, or rationale, explain reasoning in the PR or linked issue (recommended).
+* **Keep contact details up to date**: Editors use your listed email or GitHub for coordination; please keep them valid.
 
 ### Don’ts
+
 - Don’t merge changes that alter your EIP’s meaning without consensus from co-authors.  
 - Don’t remove or override editor metadata fields.  
 
 ## For Contributors (Non-Authors)
+
 > You are contributing to an existing EIP you did not author - to fix typos, formatting, or clarify technical descriptions.
 
 ### Do’s
+
 - **Add in PR Description**  
    Explain the purpose and scope -  e.g., “Fixing typos in EIP-1559” or “Updating broken link in EIP-4844.”
 - **Make objective, non-semantic edits.** 
@@ -65,15 +74,18 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
    - “Clarify \`gasUsed\` variable in EIP-4844 spec”
 
 ### Don’ts
+
 - Don’t change semantics, logic, or intent.  
 - Don’t move or renumber EIPs.  
 - Don’t alter author metadata or statuses.  
 - Don’t submit speculative or design-changing edits under an existing EIP -  create a new one if the idea differs.  
 
 ## For Editors & Reviewers
+
 > Editors manage review and merging of EIP PRs. Their role is to maintain process integrity and consistency.
 
 ### Do’s
+
 - **Check ownership and status.**  
    - Authors, co-authors & champion can request status changes (Draft - Review - Last Call - Final). 
    - Confirm that non-author edits are non-semantic and author-approved if applicable.
@@ -84,7 +96,7 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
     - For content edits, ensure the author acknowledges or confirms changes before merging.
     - In case the author is non-responsive and the change is trivial or approved by 2 editors, the PR can be merged to update an EIP without author's approval. 
 - **Apply clear labels.**
-To clarify the merge blocker if needed add applicable lables.  
+To clarify the merge blocker if needed, add applicable labels.  
 - **Communicate clearly.**  
    If unclear, request additional context before rejecting or closing a PR.
 - **Maintain clean commit history.**  
@@ -95,15 +107,18 @@ To clarify the merge blocker if needed add applicable lables.
    - This ensures small maintenance fixes don’t remain blocked indefinitely.
 
 ### Don’ts
+
 - Don’t merge substantive changes without author approval.  
 - Don’t alter author list, status, or numbering silently.  
 - Don’t override the author’s technical intent or interpretation.  
 
 ### Thank You
+
 Your contributions help maintain the integrity and accessibility of Ethereum’s open-source governance process.  
 Together, we make the protocol and its documentation stronger, clearer, and more collaborative.
 
 ## References
+
 - [EIP-1: EIP Purpose and Guidelines](https://eips.ethereum.org/EIPS/eip-1) 
 - [EIP-5069: EIP Editor Handbook](https://eips.ethereum.org/EIPS/eip-5069)
  
