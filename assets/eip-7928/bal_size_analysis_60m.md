@@ -14,6 +14,9 @@
 | Balance Changes | 6.8 | 6.6 | 6.7 | 6.5 | 1.02x | 1.00x |
 | Nonce Changes | 1.1 | 1.0 | 1.1 | 1.0 | 0.99x | 1.00x |
 | Code Changes | 2.1 | 0.2 | 1.2 | 0.2 | 1.37x | 1.16x |
+| Account Addresses (w/ Changes) | 8.1 | 8.0 | 7.7 | 7.6 | 1.05x | 1.05x |
+| Touched-Only Addresses | 3.6 | 3.6 | 3.5 | 3.4 | 1.03x | 1.06x |
+| RLP Encoding Overhead | 4.6 | 4.5 | 4.4 | 4.3 | 1.05x | 1.05x |
 | **Full BAL** | **110.8** | **106.0** | **72.4** | **70.5** | **1.52x** | **1.52x** |
 
 ## Component Size Distribution (KiB)
@@ -25,6 +28,9 @@
 | Balance Changes | 0.7 | 22.4 | 2.8 | 0.7 | 22.4 | 2.7 |
 | Nonce Changes | 0.1 | 4.4 | 0.5 | 0.1 | 4.5 | 0.5 |
 | Code Changes | 0.0 | 72.6 | 5.6 | 0.0 | 25.3 | 2.9 |
+| Account Addresses (w/ Changes) | 1.9 | 29.5 | 3.2 | 1.8 | 28.1 | 3.0 |
+| Touched-Only Addresses | 0.8 | 12.6 | 1.4 | 0.8 | 12.2 | 1.3 |
+| RLP Encoding Overhead | 1.2 | 16.8 | 2.1 | 1.1 | 16.2 | 2.0 |
 | **Full BAL** | **10.9** | **301.9** | **45.5** | **8.6** | **191.4** | **28.8** |
 
 ## Compression Ratio Distribution
@@ -36,6 +42,9 @@
 | Balance Changes | 1.00x | 1.50x | 0.04x | 1.00x | 1.03x |
 | Nonce Changes | 0.97x | 1.07x | 0.00x | 0.99x | 1.00x |
 | Code Changes | 0.93x | 8.67x | 0.65x | 0.99x | 1.56x |
+| Account Addresses (w/ Changes) | 1.02x | 1.08x | 0.02x | 1.04x | 1.06x |
+| Touched-Only Addresses | 1.00x | 1.10x | 0.03x | 1.02x | 1.05x |
+| RLP Encoding Overhead | 1.02x | 1.12x | 0.03x | 1.03x | 1.07x |
 | **Full BAL** | **1.19x** | **1.98x** | **0.09x** | **1.47x** | **1.56x** |
 
 ## Block Activity Metrics (per block)
@@ -57,6 +66,9 @@
 | Balance Changes | 6.2% | 9.2% |
 | Nonce Changes | 1.0% | 1.5% |
 | Code Changes | 1.9% | 1.6% |
+| Account Addresses (w/ Changes) | 7.3% | 10.7% |
+| Touched-Only Addresses | 3.3% | 4.8% |
+| RLP Encoding Overhead | 4.1% | 6.1% |
 
 ## BAL vs Block Size Comparison
 
@@ -67,7 +79,6 @@ Comparison using compressed block average of **71.71 KiB**:
 | **Full BAL (with reads)** | 72.4 | 71.7 | 1.01x | +0.7 KiB |
 | **BAL without reads** | 49.4 | 71.7 | 0.69x | -22.3 KiB |
 
-### Key Insights:
 - Full BAL **with reads** is 1.01x the size of a compressed block
 - BAL **without reads** is 0.69x the size of a compressed block
 - Storage reads add **23.0 KiB** (46.6%) to BAL size
@@ -82,6 +93,8 @@ Comparison using compressed block average of **71.71 KiB**:
 ## Summary
 
 1. **Component dominance**: Storage writes are 47.5% of raw BAL size
-2. **Compression efficiency**: Overall 1.52x compression ratio
-3. **Size variability**: BAL sizes vary from 8.6 to 191.4 KiB compressed
-4. **Block size ratio**: Full BALs are 1.01x compressed block size
+2. **Account addressing**: Accounts with changes (10.7%) vs touched-only (4.8%)
+3. **Pure RLP overhead**: Encoding structure accounts for 6.1% of compressed size
+4. **Compression efficiency**: Overall 1.52x compression ratio
+5. **Size variability**: BAL sizes vary from 8.6 to 191.4 KiB compressed
+6. **Block size ratio**: Full BALs are 1.01x compressed block size

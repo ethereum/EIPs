@@ -547,6 +547,7 @@ The current EIP editors are
 - Sam Wilson (@SamWilsn)
 - Zainan Victor Zhou (@xinbenlv)
 - Gajinder Singh (@g11tech)
+- Jochem Brouwer (@jochem-brouwer)
 
 Emeritus EIP editors are
 

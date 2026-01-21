@@ -1,6 +1,6 @@
 from algorithm_registry import helpers, registry
 
-INVALID = b"\x00" * 20
+INVALID = b"\x00" * 32
 SIGRECOVER_BASE_GAS = 3000
 
 # Modified sigrecover precompile to also return gas
@@ -23,6 +23,7 @@ def sigrecover_precompile(input: bytes) -> tuple[bytes, int]:
     helpers.validate_signature(signature)
     pubkey = helpers.verify_signature(signing_data, signature)
 
-    return (helpers.pubkey_to_address(pubkey, input[0]), gas)
+    # Return address left-padded to 32 bytes and gas
+    return ((b"\x00" * 12) + helpers.pubkey_to_address(pubkey, input[0]), gas)
   except AssertionError as _:
     return (INVALID, gas)
