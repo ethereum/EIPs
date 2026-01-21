@@ -16,7 +16,7 @@ This proposal introduces a standardized validation mechanism for account abstrac
 
 ## Motivation
 
-Enable account abstraction benefits—batching, gas sponsorship, custom authentication, programmable logic—while allowing nodes to validate transactions via simple state checks without EVM execution.
+Enable account abstraction benefits—batching, gas sponsorship, custom authentication, programmable logic—while allowing nodes to validate transactions via simple state checks without EVM execution. This enables highly optimizable and performant transaction validation and mempool implementations and removes the need for additional reputation systems to ensure DoS prevention.
 
 ### Existing Solutions
 
@@ -27,7 +27,7 @@ Enable account abstraction benefits—batching, gas sponsorship, custom authenti
 
 This proposal addresses these by:
 - **Simplifying Validation**: Predefined key types eliminate EVM execution during validation
-- **Enabling Simple Block Building**: Validators use only state lookups
+- **Optimizable Mempool and Validation Logic**: Validators use only state lookups, mempools can invalidate transactions quickly via (flash)block access lists.
 - **Reducing Gas Costs**: No entrypoint contracts or associated overhead
 - **Native Multisig**: Protocol-level threshold signatures without execution-time validation
 - **Ensuring Extensibility**: Supports future quantum-safe algorithms via new key types
@@ -64,7 +64,7 @@ Slot layout:
 - base_slot + 2 + (index * 2) + 1: key_data[index] (bytes)
 ```
 
-The protocol validates signatures by reading these slots directly no EVM execution required.
+The protocol validates signatures by reading these slots directly - no EVM execution required.
 
 #### 2D Nonce Storage
 
@@ -86,7 +86,7 @@ Value: current_sequence (uint64)
 
 **DELEGATE**: Delegates validation to another account's configuration. The `key_data` stores the delegated account's address (20 bytes). Only 1 hop is permitted—if the delegated account also has a `DELEGATE` key at the signing index, validation fails. See [DELEGATE Signature Format](#delegate-signature-format) for signature structure.
 
-**BLS**: Enables signature aggregation across multiple transactions, reducing data availability costs for rollups and L2s. (impl outside of this scope.)
+**BLS**: Enables signature aggregation across multiple transactions can be used to reduce data availability costs for rollups and L2s. (implementation outside of this scope.)
 
 ### AA Transaction Type
 
@@ -98,7 +98,7 @@ AA_TX_TYPE || rlp([
   from,
   nonce_key,          // 2D nonce channel (uint192)
   nonce_sequence,     // Sequence within channel (uint64)
-  expiry,             // Unix timestamp
+  expiry,             // Unix timestamp or block number 
   gas_price,
   gas_limit,
   access_list,
@@ -137,9 +137,11 @@ The `nonce_key_cost` ensures new 2D nonce channels incur appropriate storage cos
 | `access_list` | [EIP-2930](./eip-2930.md) access list |
 | `authorization_list` | [EIP-7702](./eip-7702.md) authorization list |
 | `calldata` | Data delivered to `from` account |
-| `payment_token` | Optional `[token_address, max_amount]` for token gas payment |
+| `payment_token` | Optional `[token_address, max_amount]` for token gas payment. See note below. |
 | `sender_signature` | See [Signature Format](#signature-format) |
 | `payer_auth` | **65 bytes**: K1 signature, payer recovered via ecrecover. **20 bytes**: Payer address (permissionless or `NATIVE_PAYER`) otherwise `from` pays ETH |
+
+> **Note on `max_amount`:** For permissioned payers (65-byte signature), `max_amount` is the exact token amount transferred—the payer's signature constitutes agreement to this price. For permissionless and native payers, `max_amount` is a cap protecting the sender from oracle price fluctuations.
 
 #### Signature Format
 
@@ -215,25 +217,36 @@ Tokens must be registered in the Token Payment Registry before use for gas payme
 Base slot: keccak256(token_address || TOKEN_PAYMENT_REGISTRY || "config")
 
 - base_slot + 0: balance_slot_index (uint256)
-- base_slot + 1: token_decimals (uint8)
-- base_slot + 2: active (bool)
+- base_slot + 1: packed config (uint256)
+    - byte 0: token_decimals (uint8)
+    - byte 1: active (bool)
+    - byte 2: highBitBlockList (bool)
+    - bytes 3-31: reserved
 ```
 
 #### Blocklist Storage
+
+When `highBitBlockList` is false, blocklist status is stored separately:
 
 ```
 Blocklist slot: keccak256(token_address || account_address || TOKEN_PAYMENT_REGISTRY || "blocklist")
 Value: bool
 ```
 
+When `highBitBlockList` is true, bit 255 of the token's balance slot indicates blocklist status—no separate storage read required.
+
 #### Token Transfer Flow
 
 When `payment_token` is set:
 
-1. Read exchange rate from payer's oracle config (see [Payer Configuration](#payer-configuration))
-2. Compute `token_cost` using payer's oracle
-3. Validate `token_cost <= max_amount` (if `max_amount > 0`)
-4. Check sender token balance and blocklist status
+1. Read raw balance from token's `balance_slot_index` for sender
+
+2. Verify sender is not blocklisted (via bit or blocklist storage)
+3. Determine `token_cost`:
+   - **Permissioned payer** (65-byte signature): `token_cost = max_amount` (payer signed agreeing to this amount)
+   - **Permissionless payer** (20-byte address): read exchange rate from payer's oracle config, compute `token_cost`, validate `token_cost <= max_amount`
+   - **Native payer**: compute from `NATIVE_PAYER` pricing, validate `token_cost <= max_amount`
+4. Validate `balance >= token_cost`
 5. Update balances: sender decreases, payer increases
 6. Emit `Transfer(from, payer, token_cost)`
 
@@ -416,8 +429,8 @@ For EOA accounts, chain operators may configure a **default account**—a wallet
    - 20 bytes: use directly (permissionless payer or `NATIVE_PAYER`)
    - Empty with `payment_token`: use `NATIVE_PAYER`
    - Empty without `payment_token`: `from` pays ETH
-3. Validate spending protection:
-   - If `requiresSponsor` is set: reject if payer == `from` OR `payment_token` is non-empty (full ETH sponsorship only)
+3. Validate spending protection (optional - if implemented by chain):
+   - If `requiresSponsor` is set or any native token spend limits 
 4. Verify nonce, payer ETH balance, expiry
 5. If `payment_token` set: verify token registration, payer acceptance, sender balance/blocklist, max_amount
 6. Mempool threshold: payer's pending sponsored transaction count must be below node-configured limits (not applicable for `NATIVE_PAYER`) 
@@ -488,7 +501,7 @@ No breaking changes. Existing EOAs and smart contracts function unchanged. Adopt
 **Multisig**: Native multisig requires `required_signatures` valid signatures from distinct keys. EOA signature counts toward threshold if account has EOA origin (created via 7702). Pure multisig (no EOA) is supported for smart accounts initialized without an EOA key.
 
 **Token Spend Protection**: Token gas payments occur before wallet code executes, bypassing wallet-level spend limits. Protocol-level mitigations:
-- **Require sponsor** (`requiresSponsor`): When enabled, account requires full ETH sponsorship—`payer_auth` must specify a sponsor AND `payment_token` must be empty. No tokens or ETH can be spent by the account for gas, completely eliminating the token spend attack vector.
+- **Require sponsor** (`requiresSponsor`): When enabled, account requires full ETH sponsorship—`payer_auth` must specify a sponsor AND `payment_token` must be empty. No tokens or ETH can be spent by the account for gas, completely eliminating the token spend attack vector. 
 - **Future spend limits**: In the future we can consider adding per asset spend limits natively managed.
 
 **Payer Security**: Permissioned payers sign each transaction. Permissionless payers explicitly configure accepted tokens; protocol validates sender balance/blocklist before transfer.
@@ -509,7 +522,7 @@ interface IAccountConfig {
     event KeyAdded(address indexed account, uint8 keyIndex, uint8 keyType, bytes publicKey);
     event KeyRemoved(address indexed account, uint8 keyIndex);
     event RequiredSignaturesUpdated(address indexed account, uint8 requiredSignatures);
-    event RequireSponsorUpdated(address indexed account, bool required);
+    event PolicyUpdated(address indexed account, uint8 version, uint256 flags); // flags such as requiresSponsor 
     
     // Key management
     function addKey(uint8 keyType, bytes calldata publicKey) external returns (uint8 keyIndex);
@@ -522,9 +535,6 @@ interface IAccountConfig {
     function setRequiredSignatures(uint8 threshold) external;
     function getRequiredSignatures(address account) external view returns (uint8);
     
-    // Spending protection
-    function setRequireSponsor(bool required) external;
-    function getRequireSponsor(address account) external view returns (bool);
     
     // Nonce management
     function getNonce(address account, uint192 nonceKey) external view returns (uint64);
@@ -540,12 +550,12 @@ interface IAccountConfig {
 
 ```solidity
 interface ITokenPaymentRegistry {
-    event TokenRegistered(address indexed token, uint256 balanceSlotIndex, uint8 tokenDecimals);
+    event TokenRegistered(address indexed token, uint256 balanceSlotIndex, uint8 tokenDecimals, bool highBitBlocklist);
     event TokenStatusUpdated(address indexed token, bool active);
     event BlocklistUpdated(address indexed token, address indexed account, bool blocked);
     event BlocklistManagerUpdated(address indexed token, address indexed manager, bool authorized);
     
-    function registerToken(address token, uint256 balanceSlotIndex, uint8 tokenDecimals) external;
+    function registerToken(address token, uint256 balanceSlotIndex, uint8 tokenDecimals, bool highBitBlocklist) external;
     function setTokenActive(address token, bool active) external;
     function setBlocklistManager(address manager, bool authorized) external;
     function setBlocked(address token, address account, bool blocked) external;
@@ -553,6 +563,7 @@ interface ITokenPaymentRegistry {
     function isBlocked(address token, address account) external view returns (bool);
     function isBlocklistManager(address token, address manager) external view returns (bool);
     function getTokenDecimals(address token) external view returns (uint8);
+    function hasHighBitBlocklist(address token) external view returns (bool);
 }
 ```
 
