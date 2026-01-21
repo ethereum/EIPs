@@ -41,8 +41,8 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 
 ### Don’ts
 
-- Don’t merge changes that alter your EIP’s meaning without consensus from co-authors.  
-- Don’t remove or override editor metadata fields.  
+* Don’t merge changes that alter your EIP’s meaning without consensus from co-authors.  
+* Don’t remove or override editor metadata fields.  
 
 ## For Contributors (Non-Authors)
 
@@ -50,35 +50,35 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 
 ### Do’s
 
-- **Add in PR Description**  
+* **Add in PR Description**  
    Explain the purpose and scope -  e.g., “Fixing typos in EIP-1559” or “Updating broken link in EIP-4844.”
-- **Make objective, non-semantic edits.** 
+* **Make objective, non-semantic edits.** 
    Acceptable edits include:
    - Typo, grammar, and style corrections 
    - Markdown and formatting fixes 
    - Broken or outdated link replacements 
    - Small clarifications (e.g., referencing a spec or renaming variables for clarity)
-- **Cite authoritative sources.** 
+* **Cite authoritative sources.** 
    When clarifying or aligning text, link to:
-   - [Ethereum Yellow Paper](https://ethereum.github.io/yellowpaper/paper.pdf) 
-   - [Consensus Specs](https://github.com/ethereum/consensus-specs) 
-   - Relevant client implementation notes
-- **Work with the authors.** 
+   * [Ethereum Yellow Paper](https://ethereum.github.io/yellowpaper/paper.pdf) 
+   * [Consensus Specs](https://github.com/ethereum/consensus-specs) 
+   * Relevant client implementation notes
+* **Work with the authors.** 
    Use `@username` for all listed authors, and if possible, connect with the author when making this PR.
-- **Keep PRs focused.** 
+* **Keep PRs focused.** 
    Only one EIP per PR and one topic per change (e.g., typo fix, link fix, or formatting fix - not multiple at once).
-- **Use clear PR titles.**  
+* **Use clear PR titles.**  
    Examples:
-   - “Fix typo in EIP-1559 rationale section.”  
-   - “Update broken link to EIP-1 reference.”  
-   - “Clarify \`gasUsed\` variable in EIP-4844 spec”
+   * “Fix typo in EIP-1559 rationale section.”  
+   * “Update broken link to EIP-1 reference.”  
+   * “Clarify \`gasUsed\` variable in EIP-4844 spec”
 
 ### Don’ts
 
-- Don’t change semantics, logic, or intent.  
-- Don’t move or renumber EIPs.  
-- Don’t alter author metadata or statuses.  
-- Don’t submit speculative or design-changing edits under an existing EIP -  create a new one if the idea differs.  
+* Don’t change semantics, logic, or intent.  
+* Don’t move or renumber EIPs.  
+* Don’t alter author metadata or statuses.  
+* Don’t submit speculative or design-changing edits under an existing EIP -  create a new one if the idea differs.  
 
 ## For Editors & Reviewers
 
@@ -86,31 +86,31 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 
 ### Do’s
 
-- **Check ownership and status.**  
-   - Authors, co-authors & champion can request status changes (Draft - Review - Last Call - Final). 
-   - Confirm that non-author edits are non-semantic and author-approved if applicable.
-- **Enforce structure and format.**  
-   - Confirm all required header fields match [EIP-1](https://eips.ethereum.org/EIPS/eip-1).  
-   - Validate Markdown rendering, metadata, and links.
-- **Require author acknowledgment for community PRs.**  
-    - For content edits, ensure the author acknowledges or confirms changes before merging.
-    - In case the author is non-responsive and the change is trivial or approved by 2 editors, the PR can be merged to update an EIP without author's approval. 
-- **Apply clear labels.**
+* **Check ownership and status.**  
+   * Authors, co-authors & champion can request status changes (Draft - Review - Last Call - Final). 
+   * Confirm that non-author edits are non-semantic and author-approved if applicable.
+* **Enforce structure and format.**  
+   * Confirm all required header fields match [EIP-1](https://eips.ethereum.org/EIPS/eip-1).  
+   * Validate Markdown rendering, metadata, and links.
+* **Require author acknowledgment for community PRs.**  
+    * For content edits, ensure the author acknowledges or confirms changes before merging.
+    * In case the author is non-responsive and the change is trivial or approved by 2 editors, the PR can be merged to update an EIP without author's approval. 
+* **Apply clear labels.**
 To clarify the merge blocker if needed, add applicable labels.  
-- **Communicate clearly.**  
+* **Communicate clearly.**  
    If unclear, request additional context before rejecting or closing a PR.
-- **Maintain clean commit history.**  
+* **Maintain clean commit history.**  
    Squash redundant commits and check that links, formatting, and front matter are valid.
-- **Handle typo-only PRs pragmatically.**  
-   - If a typo or formatting PR is approved by at least one editor and no author response is received within two weeks,  
+* **Handle typo-only PRs pragmatically.**  
+   * If a typo or formatting PR is approved by at least one editor and no author response is received within two weeks,  
      it may be merged at the editor’s discretion.  
-   - This ensures small maintenance fixes don’t remain blocked indefinitely.
+   * This ensures small maintenance fixes don’t remain blocked indefinitely.
 
 ### Don’ts
 
-- Don’t merge substantive changes without author approval.  
-- Don’t alter author list, status, or numbering silently.  
-- Don’t override the author’s technical intent or interpretation.  
+* Don’t merge substantive changes without author approval.  
+* Don’t alter author list, status, or numbering silently.  
+* Don’t override the author’s technical intent or interpretation.  
 
 ### Thank You
 
@@ -119,7 +119,7 @@ Together, we make the protocol and its documentation stronger, clearer, and more
 
 ## References
 
-- [EIP-1: EIP Purpose and Guidelines](https://eips.ethereum.org/EIPS/eip-1) 
-- [EIP-5069: EIP Editor Handbook](https://eips.ethereum.org/EIPS/eip-5069)
+* [EIP-1: EIP Purpose and Guidelines](https://eips.ethereum.org/EIPS/eip-1) 
+* [EIP-5069: EIP Editor Handbook](https://eips.ethereum.org/EIPS/eip-5069)
  
 
