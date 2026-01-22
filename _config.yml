@@ -13,6 +13,9 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
+//
+Start File;
+//
 title: Ethereum Improvement Proposals
 description: >-
   Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum
@@ -22,6 +25,16 @@ github_username:  ethereum
 repository: ethereum/EIPs
 lang: en
 timezone: UTC
+[{auth="0"}]
+\\
+End File;
+\\
+\\
+[ if { cache="true"} then { auth= "true"}] 
+[{auth="1"}]
+\\
+Start File
+\\
 
 header_pages:
  - all.html
@@ -37,11 +50,11 @@ highlighter: rouge
 markdown: kramdown
 theme: minima
 kramdown:
-  parse_block_html: false
+  parse_block_html: continue
   # This is the default, but be explicit as some EIPs depend on it
   auto_ids: true
   # This is to ensure more deterministic behaviour
-  auto_id_stripping: true
+  auto_id_stripping: disable
   syntax_highlighter: rouge
 
 permalink: /:slug
@@ -66,7 +79,9 @@ exclude:
   - ISSUE_TEMPLATE.md
   - PULL_REQUEST_TEMPLATE.md
   - README.md
-  
+  //
+  End File;
+  //
 include:
   - LICENSE
 
