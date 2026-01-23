@@ -3,7 +3,7 @@ eip: TBA
 title: Upgrade Nomenclature
 description: Canonical reference for Ethereum network upgrade naming conventions
 author: Pooja Ranjan (@poojaranjan)
-discussions-to: TBA
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-upgrade-nomenclature/27575
 status: Draft
 type: Informational
 created: 2026-01-23
@@ -35,10 +35,10 @@ Observed upgrades include:
 
 * **Frontier (Genesis)**: Named to convey Ethereum’s initial launch as a raw and experimental “frontier” environment for developers, while Genesis references the creation of the Genesis Block (Block #0), which established the initial network state and Ether distribution.
 * **Frontier Thawing**: Named to reflect the lifting of the initial 5,000 gas block limit that had effectively “frozen” transaction activity after launch. The “thawing” phase enabled miners to establish operations and early users to onboard without time pressure, allowing the network to begin processing live transactions.
-* **Homestead**: Named to signify Ethereum’s transition from the experimental "Frontier" phase into a more stable and production-ready network, marking the first release considered suitable for broader usage rather than beta experimentation.
-* **DAO Fork (DAO Wars - aborted)**:  Named after The DAO incident and the intense community debate that followed the exploit. The terminology reflects the highly contested governance process and the emergency nature of the intervention and resulting chain split.
-* **Tangerine Whistle**: Named to emphasize its urgent, emergency character, analogous to a warning whistle. This was an unplanned fork implementing [EIP-150](https://eips.ethereum.org/EIPS/eip-150) to reprice several opcodes and mitigate active denial-of-service attacks.
-* **Spurious Dragon**: Named to reflect its primary objective of removing millions of “spurious” (empty or fake) accounts created during denial-of-service attacks that bloated Ethereum’s state. The “Dragon” element followed the informal tradition of creative or mythical naming during this period.
+* **[Homestead](https://eips.ethereum.org/EIPS/eip-606)**: Named to signify Ethereum’s transition from the experimental "Frontier" phase into a more stable and production-ready network, marking the first release considered suitable for broader usage rather than beta experimentation.
+* **[DAO Fork (DAO Wars - aborted)](https://eips.ethereum.org/EIPS/eip-779)**:  Named after The DAO incident and the intense community debate that followed the exploit. The terminology reflects the highly contested governance process and the emergency nature of the intervention and resulting chain split.
+* **[Tangerine Whistle](https://eips.ethereum.org/EIPS/eip-608)**: Named to emphasize its urgent, emergency character, analogous to a warning whistle. This was an unplanned fork implementing [EIP-150](https://eips.ethereum.org/EIPS/eip-150) to reprice several opcodes and mitigate active denial-of-service attacks.
+* **[Spurious Dragon](https://eips.ethereum.org/EIPS/eip-607)**: Named to reflect its primary objective of removing millions of “spurious” (empty or fake) accounts created during denial-of-service attacks that bloated Ethereum’s state. The “Dragon” element followed the informal tradition of creative or mythical naming during this period.
 
 These names reflect the exploratory nature of early protocol development.
 
@@ -48,10 +48,10 @@ During the Metropolis development phase, upgrades adopted names based on histori
 
 Observed upgrades include:
 
-* **Byzantium**: The first upgrade in the Metropolis city-themed sequence, named after the ancient Greek city of "Byzantium", marks the “alpha” phase of that roadmap. It introduced major protocol improvements, including zk-SNARK precompiles enabling privacy-oriented cryptography, economic changes such as reduced block rewards and a delayed difficulty bomb, and new opcodes that improved smart contract security and efficiency.
-* **Constantinople**: Named after "Constantinople", the city that succeeded Byzantium as the capital of the Roman/Byzantine Empire, to signal the second phase of the Metropolis city-themed sequence and a maturation step for the protocol. The upgrade focused on maintenance and efficiency improvements while preparing for Proof-of-Stake, including delaying the difficulty bomb and reducing block rewards.
-* **St. Petersburg**: Named after the Russian city of Saint Petersburg to align with the city-themed naming convention of the Metropolis development phase. Saint Petersburg is notable for its dual identity as a grand cultural capital with imperial architecture. The Constantinople and St. Petersburg upgrades were activated at the same block height on mainnet, effectively functioning as a single combined upgrade, with St. Petersburg ensuring the removal of [EIP-1283](https://eips.ethereum.org/EIPS/eip-1283).
-* **Istanbul**: Named after the modern name of the same city, completing the historical progression Byzantium → Constantinople → Istanbul. The name symbolizes the final stage of the Metropolis city-themed sequence and serves as the logical conclusion of the three-part naming convention.
+* **[Byzantium](https://eips.ethereum.org/EIPS/eip-609)**: The first upgrade in the Metropolis city-themed sequence, named after the ancient Greek city of "Byzantium", marks the “alpha” phase of that roadmap. It introduced major protocol improvements, including zk-SNARK precompiles enabling privacy-oriented cryptography, economic changes such as reduced block rewards and a delayed difficulty bomb, and new opcodes that improved smart contract security and efficiency.
+* **[Constantinople](https://eips.ethereum.org/EIPS/eip-1013)**: Named after "Constantinople", the city that succeeded Byzantium as the capital of the Roman/Byzantine Empire, to signal the second phase of the Metropolis city-themed sequence and a maturation step for the protocol. The upgrade focused on maintenance and efficiency improvements while preparing for Proof-of-Stake, including delaying the difficulty bomb and reducing block rewards.
+* **[St. Petersburg](https://eips.ethereum.org/EIPS/eip-1716)**: Named after the Russian city of Saint Petersburg to align with the city-themed naming convention of the Metropolis development phase. Saint Petersburg is notable for its dual identity as a grand cultural capital with imperial architecture. The Constantinople and St. Petersburg upgrades were activated at the same block height on mainnet, effectively functioning as a single combined upgrade, with St. Petersburg ensuring the removal of [EIP-1283](https://eips.ethereum.org/EIPS/eip-1283).
+* **[Istanbul](https://eips.ethereum.org/EIPS/eip-1679)**: Named after the modern name of the same city, completing the historical progression Byzantium → Constantinople → Istanbul. The name symbolizes the final stage of the Metropolis city-themed sequence and serves as the logical conclusion of the three-part naming convention.
 
 This convention standardized naming during frequent upgrade cycles.
 
@@ -61,9 +61,9 @@ Upgrades primarily targeting the Difficulty Bomb adopted glacier-themed naming t
 
 Observed upgrades include:
 
-* **Muir Glacier**: Named after the rapidly retreating Alaskan glacier to symbolize an urgent, temporary response to slow Ethereum’s “Ice Age” (difficulty bomb). This emergency hard fork introduced a single change ([EIP-2387](https://eips.ethereum.org/EIPS/eip-2387)) to delay the difficulty bomb, buying developers time for a longer-term transition toward Proof-of-Stake.
-* **Arrow Glacier**: Named to continue the “Glacier” convention for Ice Age–related upgrades, reflecting a targeted and directional delay of Ethereum’s difficulty bomb. The name conveys a temporary extension that slows the rise in mining difficulty—analogous to a glacier’s gradual movement—buying developers additional time to prepare for the Proof-of-Stake Merge rather than serving as a permanent solution.
-* **Gray Glacier**: Named to reflect a large, slow-moving push to delay the Difficulty Bomb, buying critical time ahead of the transition to Proof-of-Stake. The real "Gray Glacier" merges into another glacier, symbolizing Ethereum’s imminent merge of the Execution Layer with the Beacon Chain. This upgrade represented the final major Difficulty Bomb delay prior to the Merge.
+* **[Muir Glacier](https://eips.ethereum.org/EIPS/eip-2387)**: Named after the rapidly retreating Alaskan glacier to symbolize an urgent, temporary response to slow Ethereum’s “Ice Age” (difficulty bomb). This emergency hard fork introduced a single change with [EIP-2387](https://eips.ethereum.org/EIPS/eip-2387) to delay the difficulty bomb, buying developers time for a longer-term transition toward Proof-of-Stake.
+* **[Arrow Glacier](https://github.com/ethereum/execution-specs/blob/8dbde99b132ff8d8fcc9cfb015a9947ccc8b12d6/network-upgrades/mainnet-upgrades/arrow-glacier.md)**: Named to continue the “Glacier” convention for Ice Age–related upgrades, reflecting a targeted and directional delay of Ethereum’s difficulty bomb with [EIP-4345](https://eips.ethereum.org/EIPS/eip-4345). The name conveys a temporary extension that slows the rise in mining difficulty—analogous to a glacier’s gradual movement—buying developers additional time to prepare for the Proof-of-Stake Merge rather than serving as a permanent solution.
+* **[Gray Glacier](https://github.com/ethereum/execution-specs/blob/8dbde99b132ff8d8fcc9cfb015a9947ccc8b12d6/network-upgrades/mainnet-upgrades/gray-glacier.md)**: Named to reflect a large, slow-moving push to delay the Difficulty Bomb with [EIP-5133](https://eips.ethereum.org/EIPS/eip-5133), buying critical time ahead of the transition to Proof-of-Stake. The real "Gray Glacier" merges into another glacier, symbolizing Ethereum’s imminent merge of the Execution Layer with the Beacon Chain. This upgrade represented the final major Difficulty Bomb delay prior to the Merge.
 
 These names signaled functional scope rather than feature expansion.
 
@@ -75,10 +75,10 @@ One exception applies: the Merge included **Paris** as a reference to EthCC to c
 
 Observed examples include:
 
-- **Berlin** - Devcon 0  
-- **London** - Devcon 1  
-- **Paris** - EthCC  
-- **Shanghai** - Devcon 2  
+- **[Berlin](https://github.com/ethereum/execution-specs/blob/8dbde99b132ff8d8fcc9cfb015a9947ccc8b12d6/network-upgrades/mainnet-upgrades/berlin.md)** - Devcon 0  
+- **[London](https://github.com/ethereum/execution-specs/blob/8dbde99b132ff8d8fcc9cfb015a9947ccc8b12d6/network-upgrades/mainnet-upgrades/london.md)** - Devcon 1  
+- **[Paris](https://github.com/ethereum/execution-specs/blob/8dbde99b132ff8d8fcc9cfb015a9947ccc8b12d6/network-upgrades/mainnet-upgrades/paris.md)** - EthCC  
+- **[Shanghai](https://github.com/ethereum/execution-specs/blob/8dbde99b132ff8d8fcc9cfb015a9947ccc8b12d6/network-upgrades/mainnet-upgrades/shanghai.md)** - Devcon 2  
 - **Cancún** - Devcon 3  
 - **Prague** - Devcon 4  
 - **Osaka** - Devcon 5  
@@ -99,7 +99,7 @@ Consensus Layer (formerly Eth2 / Beacon Chain) upgrades MUST be named after star
 
 Each selected name MUST correspond to an officially recognized star name. This convention was established through open community coordination to provide a consistent, neutral, and globally recognizable naming scheme.
 
-The sequence begins with **Altair**, activated in October 2021 as the first Consensus Layer upgrade, which established the star-based naming convention and serves as the reference point for all subsequent upgrades, followed in alphabetical order by names including but not limited to **Bellatrix**, **Capella**, **Deneb**, **Electra**, **Fulu**, **Gloas**, and **Heze**.
+The sequence begins with **[Altair](https://github.com/ethereum/consensus-specs/tree/master/specs/altair)**, activated in October 2021 as the first Consensus Layer upgrade, which established the star-based naming convention and serves as the reference point for all subsequent upgrades, followed in alphabetical order by names including but not limited to **[Bellatrix](https://github.com/ethereum/consensus-specs/tree/master/specs/bellatrix)**, **[Capella](https://github.com/ethereum/consensus-specs/tree/master/specs/capella)**, **[Deneb](https://github.com/ethereum/consensus-specs/tree/master/specs/deneb)**, **[Electra](https://github.com/ethereum/consensus-specs/tree/master/specs/electra)**, **[Fulu](https://github.com/ethereum/consensus-specs/tree/master/specs/fulu)**, **[Gloas](https://github.com/ethereum/consensus-specs/tree/master/specs/gloas)**, and **Heze**.
 
 This convention provides predictable sequencing of upgrades, clear differentiation between Consensus Layer and Execution Layer upgrades, long-term scalability without name reuse or ambiguity, and a shared vocabulary across protocol developers, client teams, researchers, operators, and ecosystem participants.
 
@@ -129,11 +129,11 @@ The combined name is informational only and MUST NOT replace the canonical layer
 
 Observed examples include:
 * **Shapella**:  derived from Shanghai (Execution Layer) and Capella (Consensus Layer)
-* **Dencun**: derived from Deneb (Consensus Layer) and Cancún (Execution Layer)
-* **Pectra**:  derived from Prague (Execution Layer) and Electra (Consensus Layer)
-* **Fusaka**: derived from Fulu (Consensus Layer) and Osaka (Execution Layer)
-* **Glamsterdam**: derived from Gloas (Consensus Layer) and Amsterdam (Execution Layer)
-* **Hegota**: derived from Heka (Consensus Layer) and Bogotá (Execution Layer)
+* **[Dencun](https://eips.ethereum.org/EIPS/eip-7569)**: derived from Deneb (Consensus Layer) and Cancún (Execution Layer)
+* **[Pectra](https://eips.ethereum.org/EIPS/eip-7600)**:  derived from Prague (Execution Layer) and Electra (Consensus Layer)
+* **[Fusaka](https://eips.ethereum.org/EIPS/eip-7607)**: derived from Fulu (Consensus Layer) and Osaka (Execution Layer)
+* **[Glamsterdam](https://eips.ethereum.org/EIPS/eip-7773)**: derived from Gloas (Consensus Layer) and Amsterdam (Execution Layer)
+* **[Hegotá](https://eips.ethereum.org/EIPS/eip-8081)**: derived from Heka (Consensus Layer) and Bogotá (Execution Layer)
 
 Additional combined names MAY be adopted in future upgrades following the same convention.
 
