@@ -85,9 +85,9 @@ Observed examples include:
 - **Amsterdam** - Devconnect 1  
 - **Bogotá** - Devcon 6  
 
-Future Execution Layer upgrade names SHOULD continue referencing Devcon or Devconnect host cities.
+Future Execution Layer upgrade names MAY continue referencing Devcon or Devconnect host cities.
 
-Additional past and future event host cities include, but are not limited to, *Bangkok and Mumbai*.
+Additional past and future event host cities include, but are not limited to, *Bangkok, Buenos Aires and Mumbai*.
 
 This convention provides geographic neutrality, cultural diversity, and predictable sequencing for roadmap planning and external communication.
 
