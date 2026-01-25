@@ -3,7 +3,7 @@ eip: TBA
 title: BPO1 Upgrade 
 description: Blob parameter changes with BPO1 on Ethereum mainnet.
 author: Pooja Ranjan (@poojaranjan)
-discussions-to: TBA
+discussions-to: https://ethereum-magicians.org/t/hardfork-meta-bpo1/27582
 status: Draft
 type: Meta
 created: 2026-01-24
