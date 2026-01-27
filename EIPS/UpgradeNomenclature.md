@@ -87,7 +87,7 @@ Observed examples include:
 
 Future Execution Layer upgrade names MAY continue referencing Devcon or Devconnect host cities.
 
-Additional past and future event host cities include, but are not limited to, *Bangkok, Buenos Aires and Mumbai*.
+Additional past and announced event host cities include, but are not limited to, *Istanbul, Bangkok, Buenos Aires and Mumbai*.
 
 This convention provides geographic neutrality, cultural diversity, and predictable sequencing for roadmap planning and external communication.
 
@@ -129,11 +129,11 @@ The combined name is informational only and MUST NOT replace the canonical layer
 
 Observed examples include:
 * **Shapella**:  derived from Shanghai (Execution Layer) and Capella (Consensus Layer)
-* **[Dencun](https://eips.ethereum.org/EIPS/eip-7569)**: derived from Deneb (Consensus Layer) and Cancún (Execution Layer)
-* **[Pectra](https://eips.ethereum.org/EIPS/eip-7600)**:  derived from Prague (Execution Layer) and Electra (Consensus Layer)
-* **[Fusaka](https://eips.ethereum.org/EIPS/eip-7607)**: derived from Fulu (Consensus Layer) and Osaka (Execution Layer)
-* **[Glamsterdam](https://eips.ethereum.org/EIPS/eip-7773)**: derived from Gloas (Consensus Layer) and Amsterdam (Execution Layer)
-* **[Hegotá](https://eips.ethereum.org/EIPS/eip-8081)**: derived from Heka (Consensus Layer) and Bogotá (Execution Layer)
+* **[Dencún](https://eips.ethereum.org/EIPS/eip-7569)**: **Den**eb (Consensus Layer) and Can**cún** (Execution Layer)
+* **[Pectra](https://eips.ethereum.org/EIPS/eip-7600)**:  **P**rague (Execution Layer) and El**ectr**a (Consensus Layer)
+* **[Fusaka](https://eips.ethereum.org/EIPS/eip-7607)**: **Fu**lu (Consensus Layer) and O**saka** (Execution Layer)
+* **Glamsterdam**: **Gl**oas (Consensus Layer) and **Amsterdam** (Execution Layer)
+* **Hegotá**: **He**ka (Consensus Layer) and Bo**gotá** (Execution Layer)
 
 Additional combined names MAY be adopted in future upgrades following the same convention.
 
@@ -150,8 +150,12 @@ The naming intentionally avoids descriptive or thematic labels. Sequential numbe
 The BPO is specified in [EIP-7892](https://eips.ethereum.org/EIPS/eip-7892) and applies exclusively to upgrades limited to blob parameter adjustments.
 
 Observed examples include:
-* BPO1
-* BPO2
+* BPO1 <!--
+TODO: Add link to Hardfork Meta
+-->
+* BPO2 <!--
+TODO: Add link to Hardfork Meta
+-->
 * BPO3 (next)
 
 BPO upgrades MAY be deployed independently or alongside larger multi-change upgrades. The numeric identifier remains the canonical reference.
