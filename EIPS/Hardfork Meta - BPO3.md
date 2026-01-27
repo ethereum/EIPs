@@ -3,7 +3,7 @@ eip: TBA
 title: Hardfork Meta - BPO3
 description: Blob parameter changes with BPO3 on Ethereum mainnet.
 author: Pooja Ranjan (@poojaranjan), Barnabas Busa (@barnabasbusa)
-discussions-to: TBA
+discussions-to: https://ethereum-magicians.org/t/hardfork-meta-bpo3/27606
 status: Draft
 type: Meta
 created: 2026-01-27
