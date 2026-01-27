@@ -2,17 +2,17 @@
 eip: TBA
 title: Hardfork Meta - BPO3
 description: Blob parameter changes with BPO3 on Ethereum mainnet.
-author: Pooja Ranjan (@poojaranjan) 
+author: Pooja Ranjan (@poojaranjan), Barnabas Busa (@barnabasbusa)
 discussions-to: https://ethereum-magicians.org/t/hardfork-meta-bpo1/27582
 status: Draft
 type: Meta
-created: 2026-01-24
-requires: 7892, BPO1, BPO2
+created: 2026-01-27
+requires: 8135
 ---
 
 ## Abstract
 
-This Meta EIP documents the activation details, parameter changes, and specification references for the third Blob-Parameter-Only (BPO) network upgrade, **BPO3**. It provides a canonical reference of blob target, blob maximum limits, and associated configuration values, enabling transparent tracking of incremental data availability scaling following [BPO2]().
+This Meta EIP documents the activation details, parameter changes, and specification references for the third Blob-Parameter-Only (BPO) network upgrade, **BPO3**. It provides a canonical reference of blob target, blob maximum limits, and associated configuration values, enabling transparent tracking of incremental data availability scaling following [BPO2](https://eips.ethereum.org/EIPS/eip-8135).
 
 ## Motivation
 
@@ -46,11 +46,10 @@ For reference, prior blob schedules were established in earlier network upgrades
 
 | Upgrade | Blob Target | Blob Max | Base Fee Update Fraction |
 |------------|--------------|-----------|----------------------------|
-| Cancun | 3 | 6 | 3,338,477 |
-| Prague | 6 | 9 | 5,007,716 |
-| BPO1 | 10 | 15 | 8,346,193 |
 | BPO2 | 14 | 21 | 11,684,671 |
-| BPO3 | TBA | TBA | TBA |
+| BPO1 | 10 | 15 | 8,346,193 |
+| Prague | 6 | 9 | 5,007,716 |
+| Cancun | 3 | 6 | 3,338,477 |
 
 BPO3 builds directly on the BPO2 parameter baseline.
 
