@@ -112,7 +112,7 @@ Each EIP should have the following parts:
 
 ## EIP Formats and Templates
 
-EIPs should be written in [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) format. There is a [template](https://github.com/ethereum/EIPs/blob/master/eip-template.md) and [contributor](https://github.com/ethereum/EIPs/blob/master/contributor.md) guidelines to follow.
+EIPs should be written in [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) format. There is a [template](https://github.com/ethereum/EIPs/blob/master/eip-template.md) and [contributor](https://github.com/ethereum/EIPs/blob/master/contribute.md) guidelines to follow.
 
 ## EIP Header Preamble
 
