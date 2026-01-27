@@ -1,7 +1,7 @@
 # EIP Contribution Guidelines
 
 This document outlines how authors, contributors, and editors can collaborate effectively in the [Ethereum Improvement Proposals (EIPs)](https://eips.ethereum.org/) repository. 
-The goal is to keep contributions consistent, transparent, and easy to review -  while respecting the authors’ intent.
+The goal is to keep contributions consistent, transparent, and easy to review - while respecting the authors’ intent.
 
 ## For EIP Authors
 
@@ -12,14 +12,14 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 #### Text
 
 * Avoid mentioning specific commercial products.
-* Don't use RFC 2119 keywords (all-caps SHOULD/MUST/etc.) outside of the specification section.
+* Don't use [RFC 2119](https://www.ietf.org/rfc/rfc2119.html) keywords (all-caps SHOULD/MUST/etc.) outside of the specification section.
 * Prefer "on-chain" and "off-chain" when appearing before the noun they describe, and "on chain" or "off chain" when appearing after. 
 * Do not include punctuation at the end of headings (so no # Example A:).
 * Titles should be in title case.
 * Descriptions should be in sentence case.
 * Prefer SVG diagrams, then PNG, and finally everything else.
-* Do not use articles (the/a/an/etc.) in front of EIP identifiers (so no an ERC-20), unless the EIP identifier is used as an adjective/compound noun (so an ERC-20 token is fine.)
-* Initialisms should be written in uppercase (eg. NFT instead of nft.)
+* Do not use articles (the/a/an/etc.) in front of EIP identifiers (so not "an ERC-20"), unless the EIP identifier is used as an adjective/compound noun (so "an ERC-20 token" is fine.)
+* Initialisms should be written in uppercase (eg. "NFT" instead of "nft".)
 * Only use backticks (`) for code snippets.
 * Avoid single paragraph sentences and sections containing only bulleted lists.
 * Put abbreviations after the expanded form (so liquidity provider (LP) and not LP (liquidity provider).)
@@ -94,7 +94,7 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
    * Validate Markdown rendering, metadata, and links.
 * **Require author acknowledgment for community PRs.**  
     * For content edits, ensure the author acknowledges or confirms changes before merging.
-    * In case the author is non-responsive and the change is trivial or approved by 2 editors, the PR can be merged to update an EIP without author's approval. 
+    * In case the author is non-responsive (for over 2 weeks) and the change is trivial or approved by 2 editors, the PR can be merged to update an EIP without the author's approval. 
 * **Apply clear labels.**
 To clarify the merge blocker if needed, add applicable labels.  
 * **Communicate clearly.**  
