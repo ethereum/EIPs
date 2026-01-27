@@ -1,9 +1,9 @@
 ---
-eip: TBA
+eip: 8133
 title: Upgrade Nomenclature
 description: Canonical reference for Ethereum network upgrade naming conventions
 author: Pooja Ranjan (@poojaranjan)
-discussions-to: https://ethereum-magicians.org/t/eip-xxxx-upgrade-nomenclature/27575
+discussions-to: https://ethereum-magicians.org/t/eip-8133-upgrade-nomenclature/27575
 status: Draft
 type: Informational
 created: 2026-01-23
@@ -69,7 +69,7 @@ These names signaled functional scope rather than feature expansion.
 
 ### Execution Layer Upgrade Naming
 
-Execution Layer upgrades MUST be named after the host city of a Devcon or Devconnect conference. The convention originated with Devcon host cities and later expanded to include Devconnect host cities.
+Execution Layer upgrades MAY be named after the host city of a Devcon or Devconnect conference. The convention originated with Devcon host cities and later expanded to include Devconnect host cities.
 
 One exception applies: the Merge included **Paris** as a reference to EthCC to commemorate the first biggest Ethereum Community Conference.
 
