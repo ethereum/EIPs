@@ -23,9 +23,9 @@ layout: default
   {% else %}
     {% assign doc_prefix = "EIP" %}
   {% endif %}
-  {% assign is_draft_stage = page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %}
+  {% assign is_draft_stage = page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" or page.status == "Final" or page.status == "Living" %}
   {% capture doc_title %}
-    {{ doc_prefix }}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if is_draft_stage %} [DRAFT]{% endif %}
+    {{ doc_prefix }}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if is_draft_stage %}  [{{ page.status | upcase | xml_escape }}] {% endif %}
   {% endcapture %}
   {% assign doc_title = doc_title | strip %}
   <span class="h5">
