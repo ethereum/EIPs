@@ -41,6 +41,12 @@ layout: default
     {% if page.status == "Last Call" %}
       <span class="badge text-light bg-success" data-bs-toggle="tooltip" data-bs-title="This EIP is in the last call for review stage. The authors wish to finalize the EIP and ask you to provide feedback.">📢 Last Call</span>
     {% endif %}
+    {% if page.status == "Final" %}
+      <span class="badge text-light bg-success" data-bs-toggle="tooltip" data-bs-title="This EIP is finalized and is added as an Ethereum Standard. "> 🎉 Final</span>
+    {% endif %}
+    {% if page.status == "Living" %}
+      <span class="badge text-light bg-success" data-bs-toggle="tooltip" data-bs-title="This EIP is Living and accepts infrequent updates. "> 🎉 Living</span>
+    {% endif %}   
     {% if page.category == "ERC" %}
       <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Application-level standards and conventions, including contract standards such as token standards, name registries, URI schemes, library/package formats, and wallet formats." href="../erc">Standards Track: ERC</a>
     {% elsif page.category == "Interface" %}
