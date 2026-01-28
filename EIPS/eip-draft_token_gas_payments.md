@@ -1,7 +1,7 @@
 ---
-eip: 8131
+eip: xxxx
 title: Token Gas Payments for EIP-8130
-description: Enable gas payments using ERC-20 tokens for EIP-8130 AA transactions via the extensions field
+description: Enable gas payments using fungible tokens for EIP-8130 AA transactions via the extensions field
 author: Chris Hunter (@chunter-cb) <chris.hunter@coinbase.com>
 discussions-to: https://ethereum-magicians.org/t/eip-8130-account-abstraction-by-account-configurations/25952
 status: Draft
@@ -13,7 +13,7 @@ requires: 8130
 
 ## Abstract
 
-This proposal extends [EIP-8130](./eip-8130.md) to enable gas payments using ERC-20 tokens. It defines the token payment extension format for EIP-8130's `extensions` field, a Token Payment Registry for allowlisting tokens, permissionless payer configurations with oracle-based pricing, and an optional native payer precompile for chain-operated gas abstraction.
+This proposal extends [EIP-8130](./eip-8130.md) to enable gas payments using ERC-20 tokens. It defines the token payment extension format for EIP-8130's `extensions` field, a Token Payment Registry for allowlisting tokens, permissionless payer configurations with oracle-based pricing, and an optional native payer system contract for chain-operated gas abstraction.
 
 ## Motivation
 
@@ -34,31 +34,35 @@ This proposal uses EIP-8130's `extensions` field to add token payment capability
 | Name | Value | Comment |
 |------|-------|---------|
 | `TOKEN_PAYMENT_EXT_TYPE` | `0x01` | Extension type identifier for token payments |
-| `TOKEN_PAYMENT_REGISTRY` | TBD | Token Payment Registry precompile address |
-| `TOKEN_TRANSFER_COST` | 500/5000 | Same as SSTORE  |
-| `NATIVE_PAYER` | TBD | (Optional) Native gas AMM payer precompile address |
+| `TOKEN_PAYMENT_REGISTRY` | TBD | Token Payment Registry system contract address |
+| `TOKEN_TRANSFER_COST` | 500 (warm) / 5000 (cold) | Per SSTORE costs for balance slot writes |
+| `NATIVE_PAYER` | TBD | (Optional) Native gas AMM payer system contract address |
 
 ### Extension Format
 
-Token payments use the EIP-8130 `extensions` field with the following format:
+Token payments use the EIP-8130 `extensions` field with byte concatenation encoding:
 
 ```
-extensions = [TOKEN_PAYMENT_EXT_TYPE, token_address, max_amount]
+extensions = TOKEN_PAYMENT_EXT_TYPE || token_address || max_amount
+           = 0x01 || address(20 bytes) || uint256(32 bytes)
+           = 53 bytes total
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `TOKEN_PAYMENT_EXT_TYPE` | uint8 | Extension type identifier (`0x01`) |
-| `token_address` | address | ERC-20 token contract address |
-| `max_amount` | uint256 | Maximum token amount sender will pay |
+| Field | Type | Size | Description |
+|-------|------|------|-------------|
+| `TOKEN_PAYMENT_EXT_TYPE` | uint8 | 1 byte | Extension type identifier (`0x01`) |
+| `token_address` | address | 20 bytes | ERC-20 token contract address |
+| `max_amount` | uint256 | 32 bytes | Maximum token amount sender will pay |
 
 When `extensions` contains a valid token payment, the transaction uses token-based gas payment instead of ETH.
 
 ### Token Payment Registry
 
-Tokens must be registered in the Token Payment Registry at `TOKEN_PAYMENT_REGISTRY` before use for gas payment. The registry stores token metadata required for protocol-level balance reads and transfers.
+Tokens must be registered in the Token Payment Registry system contract at `TOKEN_PAYMENT_REGISTRY` before use for gas payment. Similar to EIP-8130's account configuration precompile, this is a protocol-level system contract with persistent storage. The registry stores token metadata required for protocol-level balance reads and transfers.
 
 #### Token Configuration Storage
+
+All storage keys use byte concatenation (`||` denotes concatenation of raw bytes, addresses as 20 bytes, strings as UTF-8):
 
 ```
 Base slot: keccak256(token_address || TOKEN_PAYMENT_REGISTRY || "config")
@@ -73,10 +77,10 @@ Base slot: keccak256(token_address || TOKEN_PAYMENT_REGISTRY || "config")
 
 | Field | Description |
 |-------|-------------|
-| `balance_slot_index` | Storage slot index where token stores `balanceOf` mapping |
+| `balance_slot_index` | Storage slot index for token's `balanceOf` mapping. User balance at: `keccak256(user_address || balance_slot_index)` |
 | `token_decimals` | Token decimal places (e.g., 6 for USDC, 18 for most tokens) |
 | `active` | Whether token is currently accepted for gas payments |
-| `highBitBlocklist` | If true, bit 255 of balance indicates blocklist status |
+| `highBitBlocklist` | If true, bit 255 of balance = 1 indicates account is blocklisted |
 
 #### Blocklist Storage
 
@@ -101,14 +105,6 @@ This extension adds token payment capability to EIP-8130's payer modes:
 | Permissionless sponsor | 20-byte address | `[0x01, token, max]` | Payer address | Payer |
 | Native AMM | `NATIVE_PAYER` or empty | `[0x01, token, max]` | `NATIVE_PAYER` | `NATIVE_PAYER` |
 
-**Mode details**:
-
-| Mode | Description |
-|------|-------------|
-| **Permissioned with token** | Payer signs each transaction. `max_amount` is the exact token amount transferred—the payer's signature constitutes agreement to this price. |
-| **Permissionless** | References a registered payer config. No signature required per transaction. Payer specifies their own oracle for pricing. |
-| **Native** | Chain-operated gas abstraction. When `payer_auth` is empty with token payment extension, protocol uses `NATIVE_PAYER`. |
-
 ### Permissionless Payer Configuration
 
 Permissionless payers register onchain to accept token payments without signing each transaction. Each payer specifies their own oracle per token, enabling a competitive gas market.
@@ -131,13 +127,18 @@ Token slot: keccak256(token_address || payer_address || TOKEN_PAYMENT_REGISTRY |
 
 #### Oracle-Based Pricing
 
-Each payer configures an oracle for each token they accept:
+Each payer configures an oracle for each token they accept. The oracle value represents **tokens per ETH**, scaled by `10^oracle_decimals`:
 
 ```
 oracle_value = SLOAD(payer.oracle_address, payer.oracle_slot)
 exchange_rate = oracle_value * 10^token_decimals / 10^oracle_decimals
 token_cost = ceil(gas_cost_wei * exchange_rate / 10^18)
 ```
+
+**Example**: USDC payment for 0.001 ETH gas cost (1e15 wei), ETH at $2000:
+- `oracle_value` = 2000 × 10^8 (2000 USDC/ETH with 8 decimals, Chainlink standard)
+- `exchange_rate` = 2000e8 × 10^6 / 10^8 = 2000e6
+- `token_cost` = 1e15 × 2000e6 / 1e18 = 2e6 = 2 USDC ✓
 
 If oracle returns 0, `token_cost` is 0 (payer assumes this risk).
 
@@ -150,18 +151,6 @@ Protocol verifies permissionless payers by checking:
 - Payer has sufficient ETH for gas
 
 Payers can integrate any offchain logic to manage their position—sweeping accumulated tokens to ETH via DeFi protocols periodically.
-
-### Per-Payer Oracles Rationale
-
-Per-payer oracles rather than global oracles:
-
-1. **Market competition**: Payers compete on pricing. Better oracles and tighter margins attract more transactions.
-2. **No governance**: Avoids protocol-level debates about which oracle is canonical.
-3. **Risk isolation**: A bad oracle only affects users of that payer.
-4. **Flexibility**: Payers can use Chainlink, custom feeds, or promotional rates.
-5. **Wallet-layer curation**: Discovery of good payers is handled by wallets, not protocol.
-
-The `max_amount` field provides hard protection—transactions fail if cost exceeds the user-specified limit.
 
 ### Oracle Maintenance
 
@@ -177,17 +166,13 @@ The protocol reads `oracle_slot` at validation time. Stale prices are the payer'
 
 ### Native Payer
 
-The optional `NATIVE_PAYER` precompile provides chain-operated gas abstraction.
+The optional `NATIVE_PAYER` system contract provides chain-operated gas abstraction.
 
 #### Behavior
 
 - Uses the Token Payment Registry for token allowlisting and metadata
-- Chain operators define pricing and supported tokens
+- Chain operators define pricing mechanism and supported tokens (intentionally unspecified—enables AMMs, fixed rates, or custom curves)
 - Can be referenced explicitly (20-byte address in `payer_auth`) or implicitly (empty `payer_auth` with token payment extension)
-
-#### Native DEX Integration
-
-`NATIVE_PAYER` serves as the integration point for native DEX features. Chain operators may implement protocol-level AMM, custom pricing curves, or other mechanisms while maintaining a consistent user interface.
 
 ### Token Transfer Flow
 
@@ -196,14 +181,14 @@ When the token payment extension is present:
 1. Read raw balance from token's `balance_slot_index` for sender
 2. Verify sender is not blocklisted (via high bit or blocklist storage)
 3. Determine `token_cost`:
-   - **Permissioned payer** (65-byte signature): `token_cost = max_amount` (payer signed agreeing to this amount)
-   - **Permissionless payer** (20-byte address): read exchange rate from payer's oracle config, compute `token_cost`, validate `token_cost <= max_amount`
-   - **Native payer**: compute from `NATIVE_PAYER` pricing, validate `token_cost <= max_amount`
+   - **Permissioned payer** (65-byte signature): `token_cost = max_amount × (gas_used / gas_limit)` — payer signed agreeing to max price, actual cost scales with gas used
+   - **Permissionless payer** (20-byte address): read exchange rate from payer's oracle config, compute `token_cost` based on actual `gas_used`, validate `token_cost <= max_amount`
+   - **Native payer**: compute from `NATIVE_PAYER` pricing based on actual `gas_used`, validate `token_cost <= max_amount`
 4. Validate `balance >= token_cost`
 5. Update balances: sender decreases, payer increases
-6. Emit `Transfer(from, payer, token_cost)`
+6. Emit `Transfer(from, payer, token_cost)` (implementation-defined)
 
-Token transfers occur outside EVM execution, before calldata delivery. This ensures gas payment happens atomically with transaction inclusion.
+Token transfers occur outside EVM execution. For permissioned payers, the initial transfer uses `max_amount` at transaction start; any refund based on actual gas usage occurs post-execution.
 
 ### Intrinsic Gas
 
@@ -250,6 +235,42 @@ function getGasPaymentInfo() external view returns (address token, uint256 amoun
 
 Returns the token address and amount transferred for gas payment. Returns `(address(0), 0)` for ETH-only payments.
 
+## Rationale
+
+### Why Permissionless Payers?
+
+Permissionless payers create a competitive market for gas payment services:
+
+1. **No gatekeeping**: Anyone can become a payer by registering
+2. **Price competition**: Payers compete on exchange rates
+3. **Decentralization**: No single entity controls gas payment pricing
+4. **Innovation**: Payers can experiment with pricing strategies
+
+### Why Per-Payer Oracles?
+
+Per-payer oracles rather than a global protocol oracle:
+
+1. **Market competition**: Payers compete on pricing—better oracles and tighter margins attract more transactions
+2. **No governance**: Avoids protocol-level debates about which oracle is canonical
+3. **Risk isolation**: A bad oracle only affects users of that payer
+4. **Flexibility**: Payers can use Chainlink, custom feeds, or promotional rates
+5. **Wallet-layer curation**: Discovery of reputable payers is handled by wallets, not protocol
+
+The `max_amount` field provides hard user protection—transactions fail if computed cost exceeds the user-specified limit.
+
+### Why Direct Storage Reads?
+
+Reading token balances directly from storage slots rather than calling ERC-20 methods:
+
+1. **No token upgrades**: Existing tokens with standard `mapping(address => uint256)` balance storage work without modification—just register the balance slot index
+2. **No storage migrations**: Tokens don't need to move data or conform to new interfaces
+3. **Atomic execution**: Balance reads and transfers happen at protocol level, before EVM execution begins
+4. **Extensible**: The same approach can support other asset types that use balance-based storage patterns
+
+## Backwards Compatibility
+
+This proposal extends EIP-8130. Nodes not supporting this EIP will reject transactions with non-empty `extensions` as specified in EIP-8130.
+
 ## Reference Implementation
 
 ### ITokenPaymentRegistry
@@ -261,7 +282,7 @@ interface ITokenPaymentRegistry {
     event BlocklistUpdated(address indexed token, address indexed account, bool blocked);
     event BlocklistManagerUpdated(address indexed token, address indexed manager, bool authorized);
     
-    // Token registration (governance/admin only)
+    // Token registration (token address or configured admin only)
     function registerToken(address token, uint256 balanceSlotIndex, uint8 tokenDecimals, bool highBitBlocklist) external;
     function setTokenActive(address token, bool active) external;
     
@@ -328,38 +349,7 @@ interface IPayerConfig {
 
 **Balance Manipulation**: Protocol reads token balances directly from storage slots. Tokens with non-standard balance storage (rebasing, fee-on-transfer) may behave unexpectedly. Only register well-understood tokens.
 
-## Rationale
-
-### Why an Extension?
-
-Using EIP-8130's `extensions` field rather than a new transaction type:
-
-1. **Single transaction type**: Avoids proliferation of AA transaction types
-2. **Optional adoption**: Chains can support EIP-8130 without token payments
-3. **Future flexibility**: Other extensions (multisig, session keys) can coexist
-4. **Cleaner separation**: Base AA functionality vs. token payment mechanics
-
-### Why Permissionless Payers?
-
-Permissionless payers create a competitive market for gas payment services:
-
-1. **No gatekeeping**: Anyone can become a payer by registering
-2. **Price competition**: Payers compete on exchange rates
-3. **Decentralization**: No single entity controls gas payment pricing
-4. **Innovation**: Payers can experiment with pricing strategies
-
-### Why Direct Storage Reads?
-
-Reading token balances directly from storage slots rather than calling ERC-20 methods:
-
-1. **No token upgrades**: Existing tokens with standard `mapping(address => uint256)` balance storage work without modification—just register the balance slot index
-2. **No storage migrations**: Tokens don't need to move data or conform to new interfaces
-3. **Atomic execution**: Balance reads and transfers happen at protocol level, before EVM execution begins
-4. **Extensible**: The same approach can support other asset types that use balance-based storage patterns
-
-## Backwards Compatibility
-
-This proposal extends EIP-8130. Nodes not supporting EIP-8131 will reject transactions with non-empty `extensions` as specified in EIP-8130.
+**Token Slot Changes**: If a registered token upgrades and changes its balance storage slot, the registry configuration becomes invalid. The token must be deactivated; there is no migration path. This is intentional—tokens used for gas payment should have immutable storage layouts.
 
 ## Copyright
 
