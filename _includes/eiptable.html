@@ -17,6 +17,9 @@
         {% if status == "Last Call" %}
           <tr>
           <th class="eipnum">Number</th><th class="date">Review ends</th><th class="title">Title</th><th class="author">Author</th></tr>
+        {% elsif status == "Withdrawn" %}
+        <tr>
+          <th class="eipnum">Number</th><th class="withdrawn-reason">Withdrawn Reason</th><th class="title">Title</th><th class="author">Author</th></tr>      
         {% else %}
           <tr><th class="eipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
         {% endif %}
