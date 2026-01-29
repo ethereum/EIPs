@@ -2,7 +2,7 @@
 title: Frame Transaction
 description: Add frame abstraction for transaction validation, execution, and gas payment
 author: Vitalik Buterin (@vbuterin), lightclient (@lightclient), Felix Lange (@fjl), Yoav Weiss (@yoavw), Alex Forshtat (@forshtat), Dror Tirosh (@drortirosh), Shahaf Nacson (@shahafn)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/frame-transaction/27617
 status: Draft
 type: Standards Track
 category: Core
