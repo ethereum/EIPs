@@ -1,0 +1,514 @@
+---
+eip: TBD
+title: Block-in-Blobs (BiB)
+description: Ensures execution payload data availability via blobs
+author: Kevaundray Wedderburn (@kevaundray), Ignacio Hagopian (@jsign), Jihoon Song <jihoonsong.dev@gmail.com>, Tau Lepton (@frisitano), Thomas Thiery (@soispoke) <thomas.thiery@ethereum.org>, 
+discussions-to: TBD
+status: Draft
+type: Standards Track
+category: Core
+created: TBD
+requires: 4844, 7594
+---
+
+## Abstract
+
+zkEVMs allow validators to verify the correctness of an execution payload using a proof, without downloading or executing the payload itself. However, removing the requirement to download the execution payload, also removes the implicit DA guarantee; a block producer can publish a valid proof and withhold the execution-payload data since attesters no longer need it for consensus.
+
+This EIP introduces Block-in-Blobs (BiB), a mechanism that requires the execution-payload data to be published in blob data, in the same beacon block that carries the corresponding execution payload's header. This ensures that execution payloads are always available even when validators no longer require them to verify the state transition function(STF).
+
+In short, BiB works by having the block producer encode the execution-payload data into blobs as part of the execution layer's STF, requiring the beacon block’s blob KZG commitments to commit to those payload-blobs.
+
+## Motivation
+
+**Validation via re-execution**
+
+Today, validators verify execution payloads by:
+
+1) Downloading the execution payload
+2) Executing the payload locally
+3) Checking the resulting state root and other fields against the fields in the header
+
+Implicitly this guarantees execution payload availability because the payload cannot be verified unless the node downloads it.
+
+**Validation with zkEVMs**
+
+With zkEVMs, validators instead:
+
+1) Download a proof attesting to the correctness of the execution payload
+2) Download the execution payload header
+3) Verify the proof with respects to the payload header (and other commitments)
+
+In this model, validators no longer require access to the full execution payload data itself in order to verify its correctness.
+
+**The DA problem**
+
+Removing the re-execution requirement in consensus, also removes the implicit requirement that the payload be made available.
+
+A malicious or rational builder could:
+
+- Publish a valid proof for a valid execution payload
+- Withhold the execution-payload data entirely
+
+*Builders*: Since builders will always need to re-execute in order to build blocks, a malicious builder would not publish the execution payload ensuring that they are the only ones that can build on top of the current chain.
+
+*RPC and indexers*: Many nodes such as RPC providers and indexers cannot solely rely on execution proofs and must re-execute the execution payload.
+
+BiB addresses this by making the execution payload available via blobs.
+
+## Specification
+
+### Definitions
+
+### Execution-payload data
+
+**Execution-payload data** refers to the subset of the ExecutionPayload that must be made available via blobs. This includes:
+
+- `transactions`
+- `withdrawals`
+- `requests`
+
+See [What is included in execution-payload data?](#What-is-included-in-execution-payload-data) in the Rationale for why these fields are included and others are not.
+
+### Overview and Invariants
+
+BiB ensures the proven payload is published:
+
+- The beacon block references a list of blob KZG commitments (via 4844/PeerDas)
+- A prefix of those commitments is reserved for the execution-payload data encoded into blobs
+- A zkEVM proof for the block must bind the proven execution payload to those prefixed blob commitments.
+
+**Payload availability invariant:** A valid block implies there exists an ordered list of blobs whose bytes decode to the canonical execution-payload data, and the KZG commitments for these blobs match the first `payload_blob_count` blob commitments referenced by the block. The existing DAS mechanism will ensure that those blobs are available.
+
+### Parameters
+
+#### New Parameters
+
+| Name | Value | Description |
+|------|-------|-------------|
+| `MAX_PAYLOAD_BLOBS_PER_BLOCK` | TBD | Maximum number of blobs that may be used to encode the execution payload |
+
+#### Referenced Parameters
+
+These parameters are defined in EIP-4844 and related specs:
+
+| Name | Value | Source |
+|------|-------|--------|
+| `FIELD_ELEMENTS_PER_BLOB` | `4096` | EIP-4844 |
+| `BYTES_PER_FIELD_ELEMENT` | `32` | EIP-4844 |
+| `GAS_PER_BLOB` | `2**17` | EIP-4844 |
+| `MAX_BLOBS_PER_BLOCK` | Varies by fork | PeerDAS/BPO |
+
+#### Derived Constants
+
+| Name | Value | Description |
+|------|-------|-------------|
+| `USABLE_BYTES_PER_FIELD_ELEMENT` | `BYTES_PER_FIELD_ELEMENT - 1` (31) | Usable bytes per field element (final byte must be zero to stay under BLS modulus) |
+| `USABLE_BYTES_PER_BLOB` | `FIELD_ELEMENTS_PER_BLOB * USABLE_BYTES_PER_FIELD_ELEMENT` | Total usable bytes per blob |
+
+### Referenced Helpers
+
+Throughout this proposal we use methods and classes defined in the corresponding consensus 4844/7594 specs.
+
+Specifically, we use the following methods from [polynomial-commitments.md](https://github.com/ethereum/consensus-specs/blob/46c1199d6b4584ba484dec807f03b8e6211dd725/specs/deneb/polynomial-commitments.md?#introduction):
+
+- [verify_blob_kzg_proof_batch](https://github.com/ethereum/consensus-specs/blob/46c1199d6b4584ba484dec807f03b8e6211dd725/specs/deneb/polynomial-commitments.md#L578)
+- [blob_to_kzg_commitment](https://github.com/ethereum/consensus-specs/blob/86fb82b221474cc89387fa6436806507b3849d88/specs/deneb/polynomial-commitments.md#blob_to_kzg_commitment)
+
+And the following methods from [beacon-chain.md](https://github.com/ethereum/consensus-specs/blob/86fb82b221474cc89387fa6436806507b3849d88/specs/deneb/beacon-chain.md#introduction):
+
+- [kzg_commitment_to_versioned_hash](https://github.com/ethereum/consensus-specs/blob/86fb82b221474cc89387fa6436806507b3849d88/specs/deneb/beacon-chain.md#kzg_commitment_to_versioned_hash)
+
+### Helpers
+
+#### bytes_to_blobs
+
+```python
+def bytes_to_blobs(data: bytes) -> List[Blob]:
+    """
+    Pack arbitrary bytes into one or more blobs.
+    First 4 bytes encode the length of the original data (little endian).
+    Remaining space in final blob is zero-padded.
+
+    Note: The 4-byte length prefix (max ~4GB) is sufficient as we assume execution
+    payloads won't get that big.
+    """
+    length_prefix = len(data).to_bytes(4, 'little')
+    prefixed_data = length_prefix + data
+    
+    # Pad to multiple of USABLE_BYTES_PER_BLOB
+    padding_needed = (USABLE_BYTES_PER_BLOB - (len(prefixed_data) % USABLE_BYTES_PER_BLOB)) % USABLE_BYTES_PER_BLOB
+    prefixed_data = prefixed_data + bytes(padding_needed)
+    
+    blobs = []
+    offset = 0
+    
+    while offset < len(prefixed_data):
+        chunk = prefixed_data[offset : offset + USABLE_BYTES_PER_BLOB]
+        blob = bytes_to_blob(chunk)
+        blobs.append(blob)
+        offset += USABLE_BYTES_PER_BLOB
+    
+    return blobs
+
+
+def bytes_to_blob(data: bytes) -> Blob:
+    """
+    Pack exactly USABLE_BYTES_PER_BLOB bytes into a single blob.
+    Each 31-byte chunk is stored in bytes [0:31] of a field element,
+    with byte [31] (the final byte) set to zero to ensure value < BLS modulus.
+    """
+    assert len(data) == USABLE_BYTES_PER_BLOB
+    
+    blob = bytearray(FIELD_ELEMENTS_PER_BLOB * BYTES_PER_FIELD_ELEMENT)
+    
+    for i in range(FIELD_ELEMENTS_PER_BLOB):
+        chunk_start = i * USABLE_BYTES_PER_FIELD_ELEMENT
+        chunk = data[chunk_start : chunk_start + USABLE_BYTES_PER_FIELD_ELEMENT]
+        
+        # Store 31 data bytes in [0:31], the final byte [31] stays zero
+        blob[i * 32 : i * 32 + 31] = chunk
+    
+    return Blob(blob)
+```
+
+#### blobs_to_bytes
+
+```python
+def blobs_to_bytes(blobs: List[Blob]) -> bytes:
+    """
+    Unpack blobs back to bytes.
+    Reads length prefix (little endian) to determine actual data size.
+    """
+    raw = bytearray()
+    
+    for blob in blobs:
+        raw.extend(blob_to_bytes(blob))
+    
+    length = int.from_bytes(raw[0:4], 'little')
+    return bytes(raw[4 : 4 + length])
+
+
+def blob_to_bytes(blob: Blob) -> bytes:
+    """
+    Extract the 31 usable bytes from each field element.
+    Validates that the final byte is zero for each field element.
+    """
+    result = bytearray()
+    
+    for i in range(FIELD_ELEMENTS_PER_BLOB):
+        # Validate final byte is zero
+        assert blob[i * 32 + 31] == 0x00, "Invalid blob: final byte must be zero"
+        
+        # Extract 31 data bytes
+        result.extend(blob[i * 32 : i * 32 + 31])
+    
+    return bytes(result)
+```
+
+#### ExecutionPayloadData
+
+> TODO: MAX_TRANSACTIONS_PER_PAYLOAD, MAX_WITHDRAWALS_PER_PAYLOAD, MAX_REQUESTS_PER_PAYLOAD are not referenced
+
+```python
+class ExecutionPayloadData(Container):
+    transactions: List[Transaction, MAX_TRANSACTIONS_PER_PAYLOAD]
+    withdrawals: List[Withdrawal, MAX_WITHDRAWALS_PER_PAYLOAD]
+    requests: List[Request, MAX_REQUESTS_PER_PAYLOAD]
+```
+
+#### get_execution_payload_data
+
+```python
+def get_execution_payload_data(payload: ExecutionPayload) -> ExecutionPayloadData:
+    """
+    Extract the data from an ExecutionPayload that must be made available via blobs.
+    """
+    return ExecutionPayloadData(
+        transactions=payload.transactions,
+        withdrawals=payload.withdrawals,
+        requests=payload.requests,
+    )
+```
+
+#### execution_payload_data_to_blobs
+
+```python
+def execution_payload_data_to_blobs(data: ExecutionPayloadData) -> List[Blob]:
+    """
+    Canonically encode the execution-payload data into an ordered list of blobs.
+
+    Encoding steps:
+      1. payload_bytes = SSZ.serialize(data)
+      2. return bytes_to_blobs(payload_bytes)
+
+    Note: This serializes the ExecutionPayloadData container using SSZ.
+    Individual transactions remain as opaque byte arrays (their internal
+    RLP encoding is preserved, not re-encoded).
+    """
+    payload_bytes = SSZ.serialize(data)
+    return bytes_to_blobs(payload_bytes)
+```
+
+#### blobs_to_execution_payload_data
+
+```python
+def blobs_to_execution_payload_data(blobs: List[Blob]) -> ExecutionPayloadData:
+    """
+    Canonically decode an ordered list of blobs into execution-payload data.
+
+    Decoding steps:
+      1. payload_bytes = blobs_to_bytes(blobs)
+      2. return SSZ.deserialize(payload_bytes, ExecutionPayloadData)
+    """
+    payload_bytes = blobs_to_bytes(blobs)
+    return SSZ.deserialize(payload_bytes, ExecutionPayloadData)
+```
+
+
+**Invertibility invariant:** `execution_payload_data_to_blobs` and `blobs_to_execution_payload_data` are mutual inverses on valid execution-payload data.
+
+
+### Execution Layer
+
+**Summary:** The execution layer is modified in two ways:
+
+- The EL header now has a `payload_blob_count` field so that we can accurately compute the total `blob_gas_used`. We include the payload-blobs in this calculation and not just type-3 transactions, so that `blob_gas_used` accurately represents how many blobs the CL used.
+- engine_newPayload takes the ExecutionPayload and before passing it to the EL STF, it computes the payload-blobs, checks that the amount of blobs needed is equal to the `payload_blob_count` value in the ExecutionPayload header and like before checks that the expected version hashes match.
+
+#### Data structures
+
+This EIP adds a new field to the `ExecutionPayloadHeader`:
+
+- payload_blob_count : uint64
+
+Semantics:
+
+- Let `blob_kzg_commitments` be the ordered list of kzg commitments referenced by the beacon block
+- The first `payload_blob_count` entries of `blob_kzg_commitments` are the payload-blob commitments (ie commitments to the blobs that correspond to the payload data)
+- The remaining entries (if any) are for type 3 blob transactions.
+
+#### Validation
+
+On the execution layer, the block validation rules are modified as follows:
+
+```python
+def validate_block(block: Block):
+  blob_gas_used = block.payload_blob_count * GAS_PER_BLOB
+  
+  # ...
+```
+
+In words, instead of starting at `blob_gas_used = 0`, we start it according to how many blobs have been consumed by the payload-blobs. The EL STF in isolation assumes that `payload_blob_count` is correct as it cannot be checked in validate_block. Correctness of `payload_blob_count` is enforced at the Engine API boundary by recomputing the payload blobs and checking consistency with the beacon block's blob commitments.
+
+This change does not affect Consensus Layer blob accounting rules; it only ensures that `blob_gas_used` in the execution payload accurately reflects total blob usage, including payload blobs.
+
+#### Engine API
+
+This section specifies two equivalent formulations of `new_payload`. Implementers choose one based on their execution context:
+
+- **Native execution variant**: Uses `blob_to_kzg_commitment` directly. Suitable for pre mandatory proofs implementations.
+- **zkEVM-optimized variant**: Uses polynomial openings via `verify_blob_kzg_proof_batch`. Avoids the multiscalar multiplication (MSM) which is expensive to prove in a zkEVM circuit.
+
+Both variants enforce identical validity conditions. A block valid under one is valid under the other.
+
+##### Native Execution Variant
+
+```python
+fn new_payload(
+    payload: ExecutionPayload,
+    expected_blob_versioned_hashes: List[VersionedHash],
+    ...
+) -> PayloadStatus:
+
+    # 1. Derive payload blobs
+    payload_data = get_execution_payload_data(payload)
+    payload_blobs = execution_payload_data_to_blobs(payload_data)
+    payload_blob_count = len(payload_blobs)
+    payload_versioned_hashes = [blob_to_versioned_hash(b) for b in payload_blobs]
+
+    # 2. Verify payload_blob_count matches header
+    assert payload_blob_count == payload.payload_blob_count
+
+    assert payload_blob_count <= MAX_PAYLOAD_BLOBS_PER_BLOCK
+
+    # 3. Extract type-3 tx versioned hashes
+    type3_versioned_hashes = []
+    for tx in payload.transactions:
+        if tx.type == BLOB_TX_TYPE:
+            type3_versioned_hashes.extend(tx.blob_versioned_hashes)
+
+    # 4. Verify versioned hashes: payload blobs first, then type-3
+    assert expected_blob_versioned_hashes == payload_versioned_hashes + type3_versioned_hashes
+
+    # 5. Run EL STF (which now checks correct blob_gas_used blob limit using header.payload_blob_count)
+    return execute_payload(payload)
+
+def blob_to_versioned_hash(blob: Blob) -> VersionedHash:
+    commitment = blob_to_kzg_commitment(blob)
+    return kzg_commitment_to_versioned_hash(commitment)
+```
+
+##### zkEVM-Optimized Variant
+
+This variant replaces the MSM in `blob_to_kzg_commitment` with polynomial opening proofs, which are cheaper to verify inside a zkEVM circuit. The payload, commitments and KZG proofs are private inputs to the zkEVM circuit, while the corresponding versioned hashes (and payload header) are public inputs.
+
+```python
+fn new_payload(
+    payload: ExecutionPayload,
+    expected_blob_versioned_hashes: List[VersionedHash], # public input
+
+    # BiB additions: prefix metadata for payload blobs
+    payload_kzg_commitments: List[KZGCommitment],  # private input
+    payload_kzg_proofs: List[KZGProof],            # private input
+    ...
+) -> PayloadStatus:
+
+    # 0. Declared payload blob count from the header
+    n = payload.payload_blob_count
+    assert n <= MAX_PAYLOAD_BLOBS_PER_BLOCK
+    assert len(payload_kzg_commitments) == n
+    assert len(payload_kzg_proofs) == n
+
+    # 1. Construct payload blobs from execution-payload data
+    payload_data = get_execution_payload_data(payload)
+    payload_blobs = execution_payload_data_to_blobs(payload_data)
+    assert len(payload_blobs) == n
+
+    # 2. Check the commitments correspond to the expected versioned hash prefix
+    payload_versioned_hashes = [
+        kzg_commitment_to_versioned_hash(c) for c in payload_kzg_commitments
+    ]
+    assert expected_blob_versioned_hashes[:n] == payload_versioned_hashes
+
+    # 3. Verify blob–commitment consistency using batch KZG proof verification
+    assert verify_blob_kzg_proof_batch(
+        blobs=payload_blobs,
+        commitments=payload_kzg_commitments,
+        proofs=payload_kzg_proofs
+    )
+
+    # 4. Proceed with standard EL payload validation / execution
+    return execute_payload(payload)
+```
+
+### Consensus Layer
+
+#### Validation
+
+The consensus layer does not introduce new blob specific validation rules for payload-blobs beyond what we have for 4844/7594.
+
+The Consensus Layer relies on `payload_blob_count` in the execution payload header to interpret the ordering of blob commitments, but otherwise treats payload blobs identically to other blobs for availability and networking.
+
+### Networking
+
+BiB reuses the existing blob networking mechanism.
+
+We note the following for consideration:
+
+- Once proofs are made mandatory, a mechanism will be needed for execution payload retrieval. Options include:
+    - A separate gossip subtopic with just the execution payload
+    - Allowing one to download the first `payload_blob_count` blobs and reconstruct the execution payload using the decode algorithm.
+- Unlike most type 3 blob transactions, payload-blobs will not have been propagated to the network before a block is built. Depending on the deadlines imposed by ePBS, this may imply higher bandwidth requirements from block builders.
+
+### Fee Accounting
+
+BiB introduces protocol mandated blob usage, rather than user initiated via type-3 transactions. Fee accounting for payload-blobs differ in nature from transaction blob fees as a result.
+
+#### Who pays?
+
+This EIP does not mandate that payload-blobs pay a per-blob fee like transaction blobs.
+
+Instead payload-blobs are treated as builder overhead when constructing the block and would be internalized by the builder. In particular:
+
+- Payload-blobs do not correspond to a user transaction and therefore do not naturally map to a user-paid blob fee.
+- The cost of including payload-blobs, in terms of blob gas usage, is implicitly paid by the builder, and reflected in block profitability.
+
+#### Do payload-blobs compete with transaction blobs for capacity?
+
+Because payload blobs consume blob gas, they directly influence blob congestion and the blob base fee.
+
+#### Open questions and future considerations
+
+- Pre-zk the cost to validate payload blobs is also felt by validators too. So these blobs are in some sense heavier than normal blobs. Should this be priced into blob_gas_used?
+- Networking related: Payload-blobs require higher bandwidth due to the fact that they will not have been in the public mempool
+- Explicit protocol level pricing for payload blobs
+
+## Rationale
+
+### What is included in execution-payload data?
+
+Execution-payload data includes `transactions`, `withdrawals`, and `requests`. This provides a self-contained "bundle": where indexers for example can decode the blobs without requiring CL state access or re-execution.
+
+**Why not the header?** The header cannot be put into blobs because it contains `payload_blob_count`, which depends on the number of blobs; causing a circular dependency.
+
+Note: Withdrawals and requests are technically redundant (withdrawals are CL-derived, requests can be recomputed by executing transactions).
+
+### Builder discretion vs reserving `k` blobs
+
+This EIP specifies that the block builder choose `payload_blob_count`, subject to the constraints imposed by `MAX_BLOBS_PER_BLOCK` and `MAX_PAYLOAD_BLOBS_PER_BLOCK`.
+
+An alternative would have been to always reserve `k` blobs, where `k` corresponds to the worse case execution payload size. While this provides better predictability, it reduces flexibility under blob congestion.
+
+### Why not encode execution-payload data inside the core EL execution logic?
+
+Doing it in the EL STF would require payload-blob commitments or versioned hashes to be made visible inside the core execution logic, rather than being handled at the Engine API boundary.
+
+### When zkEVM proofs become mandatory, why can't those nodes download the execution payload?
+
+The execution payload grows linearly with the gas limit, so as the gas limit increases the bandwidth requirement for these nodes will subsequently increase, if attesters are required to download the payload for DA. 
+
+### Compression algorithm for encoding execution-payload data
+
+Compression can be used on the serialized execution-payload data. This (in theory) should allow the usage of less payload-blobs, depending on the compression ratio. The tradeoffs being:
+
+- That we will use more CPU/proving cycles for decompression
+- A breaking change since we want to decompress on the hot-path. What this means is that the transactions would need to be compressed in the payload, and then decompressed when we attempt to validate it. 
+
+Whether we should use a compression algorithm and which one requires more investigation, in particular we need to investigate:
+
+- The average compression ratios achieved
+- The proving cycle overhead
+- The invasiveness of now requiring consensus aware objects to be compressed when passed for validation.
+
+For now we recommend no compression algorithm.
+
+### Serialization algorithm for encoding execution-payload data
+
+Serialization of the execution-payload data uses SSZ. One could choose a more zk friendly serialization algorithm, however there is currently no evidence showing that SSZ deserialization is a bottleneck and using SSZ introduces no extra dependencies.
+
+As for RLP, since we are serializing the ExecutionPayload outside of the EL STF, SSZ is the natural choice.
+
+### On MAX_PAYLOAD_BLOBS_PER_BLOCK
+
+Given payload-blobs take precedence over type-3 transactions, specifying this value will mean that the builder won't be able to fill the block up with just payload-blobs. 
+
+>TODO: However, lets investigate its removal because there are other variables/EIPs that limit the block size and this needs to be reconciled with the fee accounting)
+
+## Backwards Compatibility
+
+This requires changes to the execution payload header and the EL STF; so requires a fork. Nodes that do not implement BiB will not be able to validate blocks after activation.
+
+## Test Cases
+
+TODO
+
+## Reference Implementation
+
+TODO
+
+## Security Considerations
+
+**Interaction with blob congestion and denial-of-service**
+
+Payload-blobs consume blob gas and therefore are subject to the same congestion control mechanisms and blob limits as transaction blobs.
+
+As a byproduct, this ensure that a malicious block producer cannot make arbitrary large execution payloads without accounting for blob gas limits. However, we note that a block producer could drive up the blob base fee by creating large payloads. `MAX_PAYLOAD_BLOBS_PER_BLOCK` puts a cap on how effective this attack is per block, but this scenario requires more investigation; should protocol mandated behaviour be charged?
+
+**Data withholding**
+
+An attacker cannot withhold execution payload data without also withholding blob data, which would violate existing DAS guarantees and cause the block to be rejected by the consensus layer.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
