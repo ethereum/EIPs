@@ -24,7 +24,7 @@
       {% for page in eips %}
         <tr>
           <td class="eipnum"><a href="{{page.url|relative_url}}">{{page.eip|xml_escape}}</a></td>
-          {% if status == "Last Call" and page.last-call-deadline != undefined %}
+          {% if status == "Last Call" %}
             <td class="date">{{ page.last-call-deadline | xml_escape }}</td>
           {% endif %}
           <td class="title">{{page.title|xml_escape}}</td>
