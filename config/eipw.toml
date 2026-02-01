@@ -156,6 +156,7 @@ exceptions = [
     '^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$',
     '^https://[a-z]*\.spec\.whatwg\.org/commit-snapshots/[0-9a-f]{40}/$',
     '^https://www\.rfc-editor\.org/rfc/.*$',
+    '^https://www\.unicode\.org/reports/tr[0-9]+/tr[0-9]+-[0-9]+\.html$',
 ]
 
 [lints.preamble-req-category]
