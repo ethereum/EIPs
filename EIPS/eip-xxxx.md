@@ -1,7 +1,6 @@
-# eip-XXXX: Multi-Chain Product Identifier Resolution for GS1
 
 ```yaml
-<hr />
+---
 eip: XXXX
 title: Multi-Chain Product Identifier Resolution for GS1
 description: A decentralized approach to resolving GS1 product identifiers using EVM-based infrastructure
@@ -10,7 +9,7 @@ discussions-to: https://ethereum-magicians.org/t/eip-xxxx-multi-chain-product-id
 status: Draft
 type: Informational
 created: 2026-02-01
-<hr />
+---
 ```
 
 ## Abstract
