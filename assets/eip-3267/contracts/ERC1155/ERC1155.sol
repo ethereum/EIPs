@@ -213,7 +213,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
      * https://eips.ethereum.org/EIPS/eip-1155#metadata[defined in the EIP].
      *
      * By this mechanism, any occurrence of the `\{id\}` substring in either the
-     * URI or any of the amounts in the JSON file at said URI will be replaced by
+     * URI or any of the values in the JSON file at said URI will be replaced by
      * clients with the token type ID.
      *
      * For example, the `https://token-cdn-domain/\{id\}.json` URI would be
@@ -238,7 +238,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
      * Requirements:
      *
      * - `account` cannot be the zero address.
-     * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155Received} and return the
+     * - If `account` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155Received} and return the
      * acceptance magic value.
      */
     function _mint(address account, uint256 id, uint256 amount, bytes memory data) internal virtual {
