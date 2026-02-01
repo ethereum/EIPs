@@ -17,7 +17,6 @@ This EIP describes an open, multi-chain approach for resolving product identifie
 The system is described as public digital infrastructure, emphasizing non-discriminatory resolution services without requiring token ownership, fees, or privileged access. This EIP is informational in nature and does not propose changes to the Ethereum protocol or mandate adoption by applications or clients.
 
 
----
 
 ## Motivation
 
@@ -32,7 +31,7 @@ Recent advances in deterministic smart contract deployment and the availability 
 
 Such properties are particularly relevant for use cases including supply chain transparency, food information systems, and digital product passports, where broad public access to product information serves a public-interest function. The architecture described in this EIP is informed by previously published research on decentralized multi-chain GS1 product identifier resolution.
 
----
+
 
 ## Architecture Overview
 
