@@ -1,4 +1,4 @@
-# Ethereum Improvement Proposals (EIPs)
+[![Auto Review Bot Trigger](https://github.com/ethereum/EIPs/actions/workflows/auto-review-trigger.yml/badge.svg)](https://github.com/ethereum/EIPs/actions/workflows/auto-review-trigger.yml)# Ethereum Improvement Proposals (EIPs)
 
 > **_ATTENTION_**: The EIPs repository has recently [undergone](https://github.com/ethereum/EIPs/pull/7206) a separation of ERCs and EIPs. ERCs are now accessible at [https://github.com/ethereum/ercs](https://github.com/ethereum/ercs). All new ERCs and updates to existing ones must be directed at this new repository. The editors apologize for this inconvenience.
 
