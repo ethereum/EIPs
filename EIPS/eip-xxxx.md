@@ -43,7 +43,7 @@ The contracts do not require native tokens, ERC tokens, or payment mechanisms to
 
 The resolver smart contract is permanently deployed and contains no upgrade or administrative mechanisms; all evolution of resolved product information occurs off-chain.
 
----
+
 
 ## Identifier Resolution Model
 
@@ -57,7 +57,7 @@ Resolved data may include:
 
 The architecture is intentionally data-source-agnostic. While Open Food Facts is a commonly referenced example of an open dataset, the resolution mechanism does not privilege or depend on any single data provider.
 
----
+
 
 ## Design Rationale
 
@@ -77,7 +77,7 @@ The absence of token requirements avoids introducing economic barriers to access
 
 This EIP does not define a mandatory interface, contract ABI, or application-level standard. It documents an architectural approach that may inform future implementations, research, or standardization efforts without prescribing a specific solution.
 
----
+
 
 ## Security Considerations
 
@@ -105,7 +105,7 @@ The system does not enforce ownership or authorization over GS1 identifiers. Thi
 
 Practical use of resolved references often depends on off-chain infrastructure such as HTTP gateways, indexers, or content distribution networks. These components may reintroduce centralized points of failure outside the blockchain layer.
 
----
+
 
 ## Related Work
 
@@ -115,7 +115,7 @@ This EIP is informed by prior research on decentralized, multi-chain GS1 product
 
 Additional related efforts include decentralized naming systems and identifier resolution mechanisms deployed on Ethereum and other blockchain platforms, though these systems typically target different identifier namespaces or trust models.
 
----
+
 
 ## Copyright Waiver
 
