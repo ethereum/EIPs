@@ -1,5 +1,3 @@
-
-```yaml
 ---
 eip: XXXX
 title: Multi-Chain Product Identifier Resolution for GS1
@@ -10,7 +8,7 @@ status: Draft
 type: Informational
 created: 2026-02-01
 ---
-```
+
 
 ## Abstract
 
