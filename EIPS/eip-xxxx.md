@@ -17,7 +17,7 @@ This EIP describes an open, multi-chain approach for resolving product identifie
 The system is described as public digital infrastructure, emphasizing non-discriminatory resolution services without requiring token ownership, fees, or privileged access. This EIP is informational in nature and does not propose changes to the Ethereum protocol or mandate adoption by applications or clients.
 
 
----
+<hr />
 
 ## Motivation
 
