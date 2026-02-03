@@ -14,7 +14,7 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 * Avoid mentioning specific commercial products.
 * Don't use [RFC 2119](https://www.ietf.org/rfc/rfc2119.html) keywords (all-caps SHOULD/MUST/etc.) outside of the specification section.
 * Prefer "on-chain" and "off-chain" when appearing before the noun they describe, and "on chain" or "off chain" when appearing after. 
-* Do not include punctuation at the end of headings (so no # Example A:).
+* Do not include punctuation at the end of headings (so no `# Example A:`, but `# Example A`).
 * Titles should be in title case: "In Title Case only Important Words are Capitalized".
 * Descriptions should be in sentence case: "Only the first word and proper nouns like Jupiter are capitalized".
 * Do not use articles (the/a/an/etc.) in front of EIP identifiers (so not "an ERC-20"), unless the EIP identifier is used as an adjective/compound noun (so "an ERC-20 token" is fine.)
