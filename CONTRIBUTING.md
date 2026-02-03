@@ -17,10 +17,9 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 * Do not include punctuation at the end of headings (so no # Example A:).
 * Titles should be in title case.
 * Descriptions should be in sentence case.
-* Prefer SVG diagrams, then PNG, and finally everything else.
 * Do not use articles (the/a/an/etc.) in front of EIP identifiers (so not "an ERC-20"), unless the EIP identifier is used as an adjective/compound noun (so "an ERC-20 token" is fine.)
 * Initialisms should be written in uppercase (eg. "NFT" instead of "nft".)
-* Only use backticks (`) for code snippets.
+* Only use backticks (\`) for code snippets.
 * Avoid single paragraph sentences and sections containing only bulleted lists.
 * Put abbreviations after the expanded form (so liquidity provider (LP) and not LP (liquidity provider).)
 * Use [example domains](https://en.wikipedia.org/wiki/Example.com) in examples, not real services.
@@ -38,11 +37,10 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 * **Acknowledge helpful community edits**: You don’t need to merge every PR yourself, but a short confirmation (“LGTM”) helps editors move things forward.
 * **Communicate before major revisions**: If changing motivation, specification, or rationale, explain reasoning in the PR or linked issue (recommended).
 * **Keep contact details up to date**: Editors use your listed email or GitHub for coordination; please keep them valid.
+* Draft pull requests prevent automatic merges and are effective in gauging agreement among authors.
 
 ### Don’ts
-
-* Don’t merge changes that alter your EIP’s meaning without consensus from co-authors.  
-* Don’t remove or override editor metadata fields.  
+TBA.  
 
 ## For Contributors (Non-Authors)
 
@@ -52,12 +50,15 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 
 * **Add in PR Description**  
    Explain the purpose and scope -  e.g., “Fixing typos in EIP-1559” or “Updating broken link in EIP-4844.”
-* **Make objective, non-semantic edits.** 
+* **Make objective, non-semantic edits.**
    Acceptable edits include:
    * Typo, grammar, and style corrections 
    * Markdown and formatting fixes 
    * Broken or outdated link replacements 
    * Small clarifications (e.g., referencing a spec or renaming variables for clarity)
+> Note: Non-authors may, and are often encouraged to, submit subjective or substantive pull requests; however, such changes require explicit approval from the EIP authors before they can be merged.
+> Once an EIP reaches Final status, pull requests should be limited to objective, non-semantic edits only (for example, corrections to grammar, formatting, or references). The restrictions described above apply exclusively to EIPs in Final status.
+> For EIPs that have not yet reached Final, contributors are welcome to open any relevant pull requests. Contributors should expect active review and potential pushback from the EIP authors, as the proposal may still be evolving.
 * **Cite authoritative sources.** 
    When clarifying or aligning text, link to:
    * [Ethereum Yellow Paper](https://ethereum.github.io/yellowpaper/paper.pdf) 
@@ -77,8 +78,7 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 
 * Don’t change semantics, logic, or intent.  
 * Don’t move or renumber EIPs.  
-* Don’t alter author metadata or statuses.  
-* Don’t submit speculative or design-changing edits under an existing EIP -  create a new one if the idea differs.  
+* Don’t alter author metadata or statuses without the permission of existing authors.  
 
 ## For Editors & Reviewers
 
