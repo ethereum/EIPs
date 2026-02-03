@@ -25,9 +25,9 @@ layout: default
   {% endif %}
   {% assign is_draft_stage = page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" or page.status == "Final" or page.status == "Living" %}
   {% capture doc_title %}
-    {{ doc_prefix }}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if is_draft_stage %}  [{{ page.status | upcase | xml_escape }}] {% endif %}
+    {{ doc_prefix }}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status != "Living" and page.status != "Final" %} [{{ page.status | upcase | xml_escape }}]{% endif %}
   {% endcapture %}
-  {% assign doc_title = doc_title | strip %}
+ {% assign doc_title = doc_title | strip %}
   <span class="h5">
     {% if page.status == "Stagnant" %}
       <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
