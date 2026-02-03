@@ -100,10 +100,10 @@ The change in semantics affects existing contracts in two ways:
 1. Overlaps in allocated memory. By using `CALL`, a contract might have wanted to allocate
    a certain slice of memory, even if that is not written to by the called contract.
    Subsequent uses of `MSIZE` to allocate memory might overlap with this slice that is
-   now smaller than before the change. It is though unlikely that such contracts exist.
+   now smaller than before the change. It is, though, unlikely that such contracts exist.
 
 2. Memory addresses change. Rather general, if memory is allocated using `MSIZE`, the
-   addresses of objects in memory will be different after the change. Contract should
+   addresses of objects in memory will be different after the change. Contracts should
    all be written in a way, though, such that objects in memory are _relocatable_,
    i.e. their absolute position in memory and their relative position to other
    objects does not matter. This is of course not the case for arrays, but they
