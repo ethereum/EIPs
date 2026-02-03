@@ -15,8 +15,8 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 * Don't use [RFC 2119](https://www.ietf.org/rfc/rfc2119.html) keywords (all-caps SHOULD/MUST/etc.) outside of the specification section.
 * Prefer "on-chain" and "off-chain" when appearing before the noun they describe, and "on chain" or "off chain" when appearing after. 
 * Do not include punctuation at the end of headings (so no # Example A:).
-* Titles should be in title case.
-* Descriptions should be in sentence case.
+* Titles should be in title case: "In Title Case only Important Words are Capitalized".
+* Descriptions should be in sentence case: "Only the first word and proper nouns like Jupiter are capitalized".
 * Do not use articles (the/a/an/etc.) in front of EIP identifiers (so not "an ERC-20"), unless the EIP identifier is used as an adjective/compound noun (so "an ERC-20 token" is fine.)
 * Initialisms should be written in uppercase (eg. "NFT" instead of "nft".)
 * Only use backticks (\`) for code snippets.
@@ -24,7 +24,7 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 * Put abbreviations after the expanded form (so liquidity provider (LP) and not LP (liquidity provider).)
 * Use [example domains](https://en.wikipedia.org/wiki/Example.com) in examples, not real services.
 * It's "Ethereum", not "the Ethereum".
-* Unless you're writing a fork meta EIP, don't include a fork block number constant.
+* Unless you're writing a fork meta EIP, don't include fork activation criteria (eg. timestamp/epoch).
 
 #### Diagrams
 
