@@ -60,7 +60,7 @@ Operations were selected as candidates for repricing based on the following crit
 
 The benchmark data covers 237,733 test runs across 5 clients (Besu, Erigon, Geth, Nethermind, and Reth) on the Prague fork. The overall distribution of MGas/s shows significant variation across tests and clients.
 
-![mgas_distribution_by_clientt](../figures/7904_included_operations/mgas_distribution_by_client.png)
+![mgas_distribution_by_client](./figures/mgas_distribution_by_client.png)
 
 The boxplot above shows that different clients have different performance characteristics:
 
@@ -77,11 +77,11 @@ An important consideration for repricing is whether poor performance is isolated
 
 The chart shows the number of tests in which each clietn was the worst performer. We can see that **Besu** is the worst performer in the majority of tests, followed by Erigon.
 
-![worst_client_countt](../figures/7904_included_operations/worst_client_count.png)
+![worst_client_countt](./figures/worst_client_count.png)
 
 The next plot shows the distribution of the performance ratio between the worst client and second-worst client. Each boxplot shows this distribution by the client (i.e., when each client is the worst performer).
 
-![worst_second_worst_gap](../figures/7904_included_operations/worst_second_worst_gap.png)
+![worst_second_worst_gap](./figures/worst_second_worst_gap.png)
 
 For a majority of tests, the gap between worst and second-worst is small (<20%), suggesting that the worst client is not significantly underperforming on relation to the other clients. However, we do see some tests with the gas is much wider. These test are more frequent for when Besu is the worst client.
 
