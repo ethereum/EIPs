@@ -92,7 +92,7 @@ TBA.
 ### Do’s
 
 * **Check ownership and status.**  
-   * Authors, co-authors & champion can request status changes (Draft - Review - Last Call - Final). 
+   * Authors, co-authors & champion can request status changes. 
    * Confirm that non-author edits are non-semantic and author-approved if applicable.
 * **Enforce structure and format.**  
    * Confirm all required header fields match [EIP-1](https://eips.ethereum.org/EIPS/eip-1).  
