@@ -125,7 +125,7 @@ layout: default
   IEEE specification for reference formatting:
   https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
   {% endcomment %}
-  <p>{% include authorlist.html authors=page.author %}, "{{ doc_title }}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
+  <p>{% include authorlist.html authors=page.author %}, "{{ doc_title }}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
 </div>
 {% comment %}
 Article schema specification:
