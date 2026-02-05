@@ -6,7 +6,7 @@ discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: Core
-created: 2025-11-25
+created: 2026-02-05
 requires: 7251, 7685, 7732
 ---
 
