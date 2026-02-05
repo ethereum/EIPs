@@ -527,7 +527,7 @@ Permitted Execution API Specification URLs must anchor to a specific commit, and
 
 ### Unicode Technical Standards (UTS)
 
-Links to Unicode Techincal Standards may be included using normal markdown syntax, such as:
+Links to Unicode Technical Standards may be included using normal markdown syntax, such as:
 
 ```markdown
 [UTS #46](https://www.unicode.org/reports/tr46/tr46-35.html)
