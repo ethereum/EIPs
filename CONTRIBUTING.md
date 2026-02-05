@@ -49,7 +49,7 @@ TBA.
 ### Do’s
 
 * **Add in PR Description**  
-   Explain the purpose and scope -  e.g., “Fixing typos in EIP-1559” or “Updating broken link in EIP-4844.”
+   Explain the purpose and scope - e.g., “Fixing typos in EIP-1559” or “Updating broken link in EIP-4844.”
 * **Make objective, non-semantic edits.**
    Acceptable edits include:
    * Typo, grammar, and style corrections 
