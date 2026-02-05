@@ -40,6 +40,7 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 * Draft pull requests prevent automatic merges and are effective in gauging agreement among authors.
 
 ### Don’ts
+
 TBA.  
 
 ## For Contributors (Non-Authors)
@@ -56,8 +57,11 @@ TBA.
    * Markdown and formatting fixes 
    * Broken or outdated link replacements 
    * Small clarifications (e.g., referencing a spec or renaming variables for clarity)
+
 > Note: Non-authors may, and are often encouraged to, submit subjective or substantive pull requests; however, such changes require explicit approval from the EIP authors before they can be merged.
+>
 > Once an EIP reaches Final status, pull requests should be limited to objective, non-semantic edits only (for example, corrections to grammar, formatting, or references). The restrictions described above apply exclusively to EIPs in Final status.
+>
 > For EIPs that have not yet reached Final, contributors are welcome to open any relevant pull requests. Contributors should expect active review and potential pushback from the EIP authors, as the proposal may still be evolving.
 
 * **Cite authoritative sources.** 
