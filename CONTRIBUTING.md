@@ -59,6 +59,7 @@ TBA.
 > Note: Non-authors may, and are often encouraged to, submit subjective or substantive pull requests; however, such changes require explicit approval from the EIP authors before they can be merged.
 > Once an EIP reaches Final status, pull requests should be limited to objective, non-semantic edits only (for example, corrections to grammar, formatting, or references). The restrictions described above apply exclusively to EIPs in Final status.
 > For EIPs that have not yet reached Final, contributors are welcome to open any relevant pull requests. Contributors should expect active review and potential pushback from the EIP authors, as the proposal may still be evolving.
+
 * **Cite authoritative sources.** 
    When clarifying or aligning text, link to:
    * [Ethereum Yellow Paper](https://ethereum.github.io/yellowpaper/paper.pdf) 
