@@ -66,7 +66,7 @@ sha3(MESSAGE)
 ecies.encrypt(PUBKEY, MESSAGE, AUTHDATA)
     is the asymmetric authenticated encryption function as used by RLPx.
     AUTHDATA is authenticated data which is not part of the resulting ciphertext,
-    but written to HMAC-256 before generating the message tag.
+    but written to the Keccak-256 MAC before generating the message tag.
 ```
 
 ### Motivation
