@@ -525,6 +525,24 @@ Permitted Execution API Specification URLs must anchor to a specific commit, and
 ^(https://github.com/ethereum/execution-apis/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-apis/tree/[0-9a-f]{40}/.*)$
 ```
 
+### Unicode Technical Standards (UTS)
+
+Links to Unicode Technical Standards may be included using normal markdown syntax, such as:
+
+```markdown
+[UTS #46](https://www.unicode.org/reports/tr46/tr46-35.html)
+```
+
+Which renders to:
+
+[UTS #46](https://www.unicode.org/reports/tr46/tr46-35.html)
+
+Permitted UTS URLs must anchor to a specific version, and so must match this regular expression:
+
+```regex
+^https://www\.unicode\.org/reports/tr[0-9]+/tr[0-9]+-[0-9]+\.html$
+```
+
 ## Linking to other EIPs
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP as `./eip-1.md`.
