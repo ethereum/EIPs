@@ -1,7 +1,7 @@
 ---
 title: Private Key Deactivation Aware ecRecover
 description: Modify ecRecover precompile to return zero address for keys deactivated per EIP-7851
-author: Liyi Guo (@colinlyguo)
+author: Liyi Guo (@colinlyguo), Nicolas Consigny (@nconsigny)
 discussions-to: TBD
 status: Draft
 type: Standards Track
