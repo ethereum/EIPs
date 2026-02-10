@@ -24,7 +24,7 @@ jobs:
 
       - name: Auto Review Bot
         id: auto-review-bot
-        uses: ethereum/eip-review-bot@3e9905fcb72cf81ae9ed732df429c28b17e155b1
+        uses: ethereum/eip-review-bot@dist
         continue-on-error: true
         with:
           token: ${{ secrets.TOKEN }}

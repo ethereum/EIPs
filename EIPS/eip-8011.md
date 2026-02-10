@@ -1,0 +1,175 @@
+---
+eip: 8011
+title: Multidimensional Gas Metering
+description: Gas accounting by EVM resource, increasing throughput and improving resource usage controls, with minimal changes to the protocol and UX
+author: Maria Silva (@misilva73), Davide Crapis (@dcrapis), Anders Elowsson (@anderselowsson), Toni Wahrstätter (@nerolation)
+discussions-to: https://ethereum-magicians.org/t/eip-8011-multidimensional-gas-metering/25260
+status: Draft
+type: Standards Track
+category: Core
+created: 2025-08-22
+requires: 1559
+---
+
+## Abstract
+
+This proposal introduces multidimensional gas metering, changing the way we account for gas used at the block level. This enables Ethereum to increase throughput and better control excessive resource usage, with minimal changes to the protocol and the UX. During transaction execution, gas is metered for each resource dimension, such as compute and state. At the transaction level, everything remains unchanged. A transaction still pays fees according to the sum of gas used across all resources and still has a single gas limit imposed on this same sum. However, at the block level, only the gas used in the bottleneck resource is considered when checking if the block is full and when updating the base fee for the next block. This gives a new meaning to the block's gas limit and the block's gas target, which now corresponds to the maximum gas that can be metered in the bottleneck resource.
+
+## Motivation
+
+This proposal separates *transaction pricing* (i.e., the way of measuring consumption of resources by transactions) from *block metering* (i.e., the way of controlling resource limits and ensure that blocks do not overload the network). More concretely, it introduces a multidimensional metering scheme that accounts for the different EVM resources while keeping the pricing model unchanged.
+
+There are four main benefits of the proposal:
+
+1. Throughput gains: By decoupling resource limits, blocks can carry transactions that stress distinct resources simultaneously, improving packing efficiency.
+2. Finer-grained control over excessive resource usage: metering gas costs independently for each resource allows us to tailor each operation's gas cost to the actual resource limits.
+3. Keeps UX identical: users still specify one `gas_limit` and see one `gas_used` value.
+4. Simplicity: This simpler metering change lays the groundwork for eventual multidimensional pricing  (such as [EIP-7999](./eip-7999.md)) without disrupting the current fee market and with minimal protocol changes.
+
+## Specification
+
+### Operation gas costs
+
+Under the multidimensional metering model, EVM operations are assigned a cost vector whose components correspond to their gas cost on each resource dimension. Each cost has 6 dimensions: `gas_cost_vector = (compute_cost, access_cost, size_cost, memory_cost, state_cost, history_cost)`.
+
+#### Pure compute operations
+
+The operations listed in [compute_ops](../assets/eip-8011/compute_ops.md) are assigned a `gas_cost_vector` equal to `(gas_cost, 0, 0, 0, 0, 0)`, where `gas_cost` is the operation's gas cost.
+
+#### Compute and memory operations
+
+The operations listed in [compute_mem_ops](../assets/eip-8011/compute_mem_ops.md) are assigned a `gas_cost_vector` equal to `(compute_cost, 0, 0, memory_cost, 0, 0)`, where `memory_cost` is the operation's memory expansion cost (as defined by the function [`calculate_gas_extend_memory`]) and `compute_cost` is the operation's gas cost minus its memory expansion cost.
+
+[`calculate_gas_extend_memory`]: https://github.com/ethereum/execution-specs/blob/91824145ef62da61803edf9a764fd8f3662794c0/src/ethereum/osaka/vm/gas.py#L167
+
+#### State operations
+
+The assignment of a `gas_cost_vector` to the operations listed in [state_ops](../assets/eip-8011/state_ops.md) is TBD, pending benchmarks.
+<-- TODO -->
+
+#### LOG operations
+
+The assignment of a `gas_cost_vector` to the operations listed in [log_ops](../assets/eip-8011/log_ops.md) is TBD, pending benchmarks.
+<-- TODO -->
+
+### Intrinsic gas costs
+
+Under the multidimensional metering model, each transaction's intrinsic cost (as defined by the function [`calculate_intrinsic_cost`]) is also assigned 6-dimensional `gas_cost_vector`. The breakdown of cost by resource dimension is TBD, pending benchmarks.
+
+[`calculate_intrinsic_cost`]: https://github.com/ethereum/execution-specs/blob/91824145ef62da61803edf9a764fd8f3662794c0/src/ethereum/osaka/transactions.py#L571
+<-- TODO -->
+
+### Gas accounting
+
+Besides replacing the single gas cost with a 6-dimensional cost vector, the gas accounting during block execution also changes. Instead of keeping track of a single total of gas used, the EVM stores a 6-dimensional vector with how much gas units was spent on each resource until that point in the execution.
+
+After executing the ith EVM operation of a transaction, say `OP_i`, with a cost vector `gas_cost_vector_i = (compute_cost_i, access_cost_i, size_cost_i, memory_cost_i, state_cost_i, history_cost_i)`, the following variables are updated:
+
+- Remaining available gas for the transaction:
+  - `gas = gas - sum(compute_cost_i, access_cost_i, size_cost_i, memory_cost_i, state_cost_i, history_cost_i)`
+- Total used gas by the transaction so far:
+  - `gas_used = gas_used + sum(compute_cost_i, access_cost_i, size_cost_i, memory_cost_i, state_cost_i, history_cost_i)`
+- Used gas vector by the transaction so far:
+  - `gas_used_vector = (compute_gas_used + compute_cost_i, access_gas_used + access_cost_i, size_gas_used + size_cost_i, memory_gas_used + memory_cost_i, state_gas_used + state_cost_i, history_gas_used + history_cost_i)`
+
+At the transaction level, everything remains the same. A transaction still has the same one-dimensional `gas_limit`. The transaction's out-of-gas condition is still defined as `gas_used <= gas_limit`. Additionally, the transaction's fee is also computed with `gas_used`.
+
+The key change is the introduction of `gas_used_vector` as a new variable that tracks the gas used by each resource at the transaction level. This variable is returned by the `execute_transaction` function, in addition to `gas_used`:
+
+```python
+def execute_transaction(self, transaction: NormalizedTransaction, effective_gas_price: int) -> tuple[int, list]: pass
+```
+
+### Block header extension
+
+The current header encoding is extended with a new 64-bit unsigned integer field named `max_gas_metered`. This integer corresponds to the total gas units used by the bottleneck resource, i.e., the resource with the largest used gas in the block. This variable is computed as follows:
+
+```python
+def compute_block_max_gas_metered(block: Block) -> int:
+    transactions = self.transactions(block)
+    block_gas_used_vector = array(0, 0, 0, 0, 0, 0)
+    for transaction in transactions:
+        gas_used, gas_used_vector = self.execute_transaction(transaction, effective_gas_price)
+        block_gas_used_vector += gas_used_vector
+    max_gas_metered = max(block_gas_used_vector)
+    return max_gas_metered
+```
+
+The header sequence with the new field is `[..., parent_beacon_block_root, requests_hash, max_gas_metered]`.
+
+### Block validity condition
+
+The block validity conditions are modified to replace `block.gas_used` with `block.max_gas_metered`:
+
+```python
+assert block.max_gas_metered <= block.gas_limit, 'invalid block: too much gas used'
+```
+
+### Base fee update rule
+
+The block validity conditions are modified to replace `parent.gas_used` with `parent.max_gas_metered`:
+
+```python
+gas_used_delta = parent.max_gas_metered - parent.gas_target
+```
+
+This change is compatible with the various transaction variants, such as [EIP-1559](./eip-1559.md), [EIP-4844](./eip-4844.md),  or [EIP-7999](./eip-7999.md).
+
+## Rationale
+
+### Why are we choosing this resource split?
+
+Ethereum’s slot-based structure introduces a strict temporal constraint: all attestations must be processed, aggregated, and propagated within a single slot. This fact makes time a fundamental resource. To maintain network health, validators must execute blocks, validate them, and gossip attestations quickly enough to avoid missed slots and penalties.
+
+Each type of resource contributes differently to this bottleneck:
+
+- Execution time affects how quickly validators can process blocks and produce attestations.
+- Data size influences how long it takes to propagate blocks and blobs across the peer-to-peer network.
+- Memory usage determines how efficiently nodes can handle concurrent workloads without triggering garbage collection or cache eviction. It also affects the minimum hardware requirements that proposers and attesters must meet to fulfill their responsibilities.
+- State growth impacts long-term scalability and database performance, especially for archival and full nodes.
+
+In addition, changes in the slot (e.g., Enshrined Proposer-Builder Separation) and changes in the execution model (e.g., Block-level Access Lists) will change how the different resources interact and how they impact the available slot time. Thus, we want to track as many relevant resources as possible in order to allow for future changes to the protocol that may impact resource contribution.
+
+For these reasons, the proposal splits the resources into the following broad categories:
+
+1. **Block Execution Time**: Captures how long it takes to process a block on a single node. This includes:
+    - Compute: CPU time spent on each operation.
+    - State Access: Time or count of disk I/O operations when accessing the trie (e.g., `SLOAD`/`SSTORE`).
+2. **Block Upload/Download Time**: Captures how data size affects network transmission:
+    - Block size (call data + transaction & block metadata)
+3. **Short-term Memory**: Reflects short-term memory allocation during execution, i.e., RAM usage
+4. **Long-term Storage**: Tracks persistent changes to disk usage. There are two dimensions here:
+    - State Growth: Delta in disk size of the state trie before and after execution.
+    - History Growth: Delta in disk space used for historical receipts, logs, etc.
+
+Note that we are not considering the blob resource (which is part of the Block Upload/Download Time) as it is already priced independently.
+
+Based on previous empirical analysis, state growth represented a significant portion of the gas used in Ethereum blocks, accounting for 30.2% of all gas consumed between blocks 22000000 and 22005000. The second resource with the most gas used was compute (26.8%), followed by state access (21.9%). History growth and data had a less relevant contribution, accounting for 9.9% and 6.9% of all the gas used, respectively. Note that the data component in this analysis did not consider blobs.
+
+## Backwards Compatibility
+
+This change is not backwards-compatible and requires a hard fork.
+
+## Security Considerations
+
+### Worst-case blocks and excessive resource usage
+
+A concern about metering resources independently is the potential of creating worst-case blocks that put too much pressure on EVM resources. Thus, the cost vectors of each EVM operation need to be carefully set up to avoid this scenario. To this end, we will perform comprehensive benchmarks to measure the resource utilization of each operation and set the gas cost vector accordingly.
+
+Additionally, state and history growth are not constrained at the block level, but over longer time frames. Increased aggregate gas usage from this proposal may be associated with increase state-growth, assuming that relative gas consumption across resources is not altered significantly under equilibrium. To keep the long-run consumption in check, the gas cost of operations contributing to state and history growth would thus need to be increased.
+
+### Base fee manipulation
+
+Builders can manipulate the base fee by selectively including or excluding transactions to change the block's `max_gas_metered`. This behavior is already possible with EIP-1559. Yet, multidimensional gas metering compute the base fee on the bottleneck resource instead of the total gas consumed. This allows for blocks that yield the same total fees but with different `max_gas_metered` values. The extent of this concern is limited by the incentives to maximize fee revenue. While the expected gains of base fee manipulation are smaller than execution rewards, we won't observe these attacks.
+
+### Added complexity in block building
+
+Optimal block construction becomes more complex, since builders must now balance resource usage across multiple dimensions rather than a single gas metric. Sophisticated builders may gain an advantage by applying advanced optimization techniques, raising concerns about further builder centralization. However, practical heuristics (e.g., greedily filling blocks until one resource dimension saturates) remain effective for most use cases. These heuristics limit centralization pressure by keeping block construction feasible for local and less sophisticated builders.
+
+### Censorship resistance
+
+This EIP makes it cheaper to fill the block to censor transactions under FOCIL in [EIP-7805](./eip-7805.md) (as also noted in [EIP-7999](./eip-7999.md)). Specifically, it can be cheaper for a builder to create dummy transaction consuming only one resource to fill the block, taking advantage of the lower base fee under equilibrium. However, given that all resources have the same base fee in this proposal, and that the builder must still fill the block up to the gas limit for at least one resource, the degradation in censorship resistance is fairly moderate, and mainly related to the potentially reduced base fee under equilibrium.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).

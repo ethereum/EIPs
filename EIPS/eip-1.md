@@ -24,7 +24,7 @@ There are three types of EIP:
 - A **Standards Track EIP** describes any change that affects most or all Ethereum implementations, such as—a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Standards Track EIPs consist of three parts—a design document, an implementation, and (if warranted) an update to the [formal specification](https://github.com/ethereum/yellowpaper). Furthermore, Standards Track EIPs can be broken down into the following categories:
   - **Core**: improvements requiring a consensus fork (e.g. [EIP-5](./eip-5.md), [EIP-101](./eip-101.md)), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (for example, [EIP-90], and the miner/node strategy changes 2, 3, and 4 of [EIP-86](./eip-86.md)).
   - **Networking**: includes improvements around [devp2p](https://github.com/ethereum/devp2p/blob/readme-spec-links/rlpx.md) ([EIP-8](./eip-8.md)) and [Light Ethereum Subprotocol](https://ethereum.org/en/developers/docs/nodes-and-clients/#light-node), as well as proposed improvements to network protocol specifications of [whisper](https://github.com/ethereum/go-ethereum/issues/16013#issuecomment-364639309) and [swarm](https://github.com/ethereum/go-ethereum/pull/2959).
-  - **Interface**: includes improvements around client [API/RPC](https://github.com/ethereum/execution-apis#README) specifications and standards, and also certain language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html). The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
+  - **Interface**: includes improvements around language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html).
   - **ERC**: application-level standards and conventions, including contract standards such as token standards ([ERC-20](./eip-20.md)), name registries ([ERC-137](./eip-137.md)), URI schemes, library/package formats, and wallet formats.
 
 - A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
@@ -79,7 +79,7 @@ The following is the standardization process for all EIPs in all tracks:
 
 **Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
 
-**Last Call** - This is the final review window for an EIP before moving to `Final`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
+**Last Call** - This is the final review window for an EIP before it is moved to `Final`. An EIP enters `Last Call` when the specification is stable and the author opens a PR with a review end date (`last-call-deadline`), typically 14 days later. 
 
 If this period results in necessary normative changes it will revert the EIP to `Review`.
 
@@ -87,7 +87,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 A PR moving an EIP from Last Call to Final SHOULD contain no changes other than the status update. Any content or editorial proposed change SHOULD be separate from this status-updating PR and committed prior to it.
 
-**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status.
+**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or its earlier status. If not resurrected, a proposal may stay forever in this status.
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
@@ -105,7 +105,7 @@ Each EIP should have the following parts:
 - Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
 - Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
 - Backwards Compatibility *(optional)* - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.
-- Test Cases *(optional)* - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
+- Test Cases *(optional)* - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs) or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
 - Reference Implementation *(optional)* - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all EIPs.
 - Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 - Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](../LICENSE.md).`
@@ -118,7 +118,7 @@ EIPs should be written in [markdown](https://github.com/adam-p/markdown-here/wik
 
 Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
 
-`eip`: *EIP number* (this is determined by the EIP editor)
+`eip`: *EIP number*
 
 `title`: *The EIP title is a few words, not a complete sentence*
 
@@ -172,7 +172,7 @@ At least one author must use a GitHub username, in order to get notified on chan
 
 While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed.
 
-The preferred discussion URL is a topic on [Ethereum Magicians](https://ethereum-magicians.org/). The URL cannot point to Github pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
+The preferred discussion URL is a topic on [Ethereum Magicians](https://ethereum-magicians.org/). The URL cannot point to GitHub pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
 
 ### `type` header
 
@@ -216,6 +216,28 @@ Permitted Execution Client Specifications URLs must anchor to a specific commit,
 ^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
+### Execution Specification Tests
+
+Links to the Ethereum Execution Specification Tests (EEST) may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+
+Permitted Execution Specification Tests URLs must anchor to a specific commit, and so must match one of these regular expressions:
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/(blob|tree)/[a-f0-9]{40}/.+$
+```
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/commit/[a-f0-9]{40}$
+```
+
 ### Consensus Layer Specifications
 
 Links to specific commits of files within the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
@@ -250,6 +272,24 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 
 ```regex
 ^https://github.com/ethereum/devp2p/(blob|commit)/[0-9a-f]{40}/.*$
+```
+
+### Portal Specifications
+
+Links to specific commits of files within the Ethereum Portal Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+```
+
+Which renders as:
+
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+
+Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/portal-network-specs/(blob|commit)/[0-9a-f]{40}/.*$
 ```
 
 ### World Wide Web Consortium (W3C)
@@ -324,6 +364,72 @@ Permitted Bitcoin Improvement Proposal URLs must anchor to a specific commit, an
 
 ```regex
 ^(https://github.com/bitcoin/bips/blob/[0-9a-f]{40}/bip-[0-9]+\.mediawiki)$
+```
+
+### National Vulnerability Database (NVD)
+
+Links to the Common Vulnerabilities and Exposures (CVE) system as published by the National Institute of Standards and Technology (NIST) may be included, provided they are qualified by the date of the most recent change, using the following syntax:
+
+```markdown
+[CVE-2023-29638 (2023-10-17T10:14:15)](https://nvd.nist.gov/vuln/detail/CVE-2023-29638)
+```
+
+Which renders to:
+
+[CVE-2023-29638 (2023-10-17T10:14:15)](https://nvd.nist.gov/vuln/detail/CVE-2023-29638)
+
+### Chain Agnostic Improvement Proposals (CAIPs)
+
+Links to a Chain Agnostic Improvement Proposals (CAIPs) specification may be included using normal markdown syntax, such as:
+
+```markdown
+[CAIP 10](https://github.com/ChainAgnostic/CAIPs/blob/5dd3a2f541d399a82bb32590b52ca4340b09f08b/CAIPs/caip-10.md)
+```
+
+Which renders to:
+
+[CAIP 10](https://github.com/ChainAgnostic/CAIPs/blob/5dd3a2f541d399a82bb32590b52ca4340b09f08b/CAIPs/caip-10.md)
+
+Permitted Chain Agnostic URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ChainAgnostic/CAIPs/blob/[0-9a-f]{40}/CAIPs/caip-[0-9]+\.md)$
+```
+
+### Ethereum Yellow Paper
+
+Links to the Ethereum Yellow Paper may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/9c601d6a58c44928d4f2b837c0350cec9d9259ed/paper.pdf)
+```
+
+Which renders to:
+
+[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/9c601d6a58c44928d4f2b837c0350cec9d9259ed/paper.pdf)
+
+Permitted Yellow Paper URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github\.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/paper\.pdf)$
+```
+
+### Execution Client Specification Tests
+
+Links to the Ethereum Execution Client Specification Tests may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
+
+Permitted Execution Client Specification Tests URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ethereum/execution-spec-tests/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-spec-tests/tree/[0-9a-f]{40}/.*)$
 ```
 
 ### Digital Object Identifier System
@@ -401,6 +507,24 @@ See the [Citation Style Language Schema](https://resource.citationstyles.org/sch
 
 The top-level URL field must resolve to a copy of the referenced document which can be viewed at zero cost. Values under `additional-urls` must also resolve to a copy of the referenced document, but may charge a fee.
 
+### Execution API Specification
+
+Links to the Ethereum Execution API Specification may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution API Specification](https://github.com/ethereum/execution-apis/blob/dd00287101e368752ba264950585dde4b61cdc17/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution API Specification](https://github.com/ethereum/execution-apis/blob/dd00287101e368752ba264950585dde4b61cdc17/README.md)
+
+Permitted Execution API Specification URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ethereum/execution-apis/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-apis/tree/[0-9a-f]{40}/.*)$
+```
+
 ## Linking to other EIPs
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP as `./eip-1.md`.
@@ -419,17 +543,18 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 
 The current EIP editors are
 
-- Alex Beregszaszi (@axic)
-- Gavin John (@Pandapip1)
-- Greg Colvin (@gcolvin)
 - Matt Garnett (@lightclient)
 - Sam Wilson (@SamWilsn)
 - Zainan Victor Zhou (@xinbenlv)
 - Gajinder Singh (@g11tech)
+- Jochem Brouwer (@jochem-brouwer)
 
 Emeritus EIP editors are
 
+- Alex Beregszaszi (@axic)
 - Casey Detrio (@cdetrio)
+- Gavin John (@Pandapip1)
+- Greg Colvin (@gcolvin)
 - Hudson Jameson (@Souptacular)
 - Martin Becze (@wanderer)
 - Micah Zoltu (@MicahZoltu)
@@ -451,7 +576,7 @@ If the EIP isn't ready, the editor will send it back to the author for revision,
 
 Once the EIP is ready for the repository, the EIP editor will:
 
-- Assign an EIP number (generally the PR number, but the decision is with the editors)
+- Assign an EIP number (generally incremental; editors can reassign if number sniping is suspected)
 - Merge the corresponding [pull request](https://github.com/ethereum/EIPs/pulls)
 - Send a message back to the EIP author with the next step.
 

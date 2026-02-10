@@ -1,0 +1,83 @@
+---
+eip: 7607
+title: Hardfork Meta - Fusaka
+description: EIPs included in the Fulu/Osaka Ethereum network upgrade.
+author: Tim Beiko (@timbeiko), Alex Stokes (@ralexstokes), Ansgar Dietrichs (@adietrichs)
+discussions-to: https://ethereum-magicians.org/t/eip-7607-fusaka-meta-eip/18439
+status: Final
+type: Meta
+created: 2024-02-01
+requires: 7594, 7600, 7642, 7823, 7825, 7883, 7892, 7910, 7917, 7918, 7934, 7935, 7939, 7951
+---
+
+## Abstract
+
+This Meta EIP lists the EIPs included in the Fulu/Osaka network upgrade. It follows the Pectra upgrade, documented in [EIP-7600](./eip-7600.md).
+
+## Specification
+
+### Included EIPs
+
+#### Core EIPs
+
+* [EIP-7594](./eip-7594.md): PeerDAS - Peer Data Availability Sampling
+* [EIP-7823](./eip-7823.md): Set upper bounds for MODEXP
+* [EIP-7825](./eip-7825.md): Transaction Gas Limit Cap
+* [EIP-7883](./eip-7883.md): ModExp Gas Cost Increase
+* [EIP-7917](./eip-7917.md): Deterministic proposer lookahead
+* [EIP-7918](./eip-7918.md): Blob base fee bounded by execution cost
+* [EIP-7934](./eip-7934.md): RLP Execution Block Size Limit
+* [EIP-7939](./eip-7939.md): Count leading zeros (CLZ) opcode
+* [EIP-7951](./eip-7951.md): Precompile for secp256r1 Curve Support
+
+#### Other EIPs
+
+* [EIP-7892](./eip-7892.md): Blob Parameter Only Hardforks 
+* [EIP-7642](./eip-7642.md): eth/69 - Drop pre-merge fields
+    * Client teams MUST support this EIP by the activation of the Fusaka network upgrade.
+* [EIP-7910](./eip-7910.md): eth_config JSON-RPC Method
+    * Client teams MUST support this JSON-RPC method by the activation of Fusaka network upgrade. 
+* [EIP-7935](./eip-7935.md): Set default gas limit to 60M
+
+### Activation
+
+| Network Name     | Activation Epoch | Activation Timestamp | Activation Time (UTC)   | Fork ID     |
+|------------------|------------------|----------------------|-------------------------|-------------|
+| Holešky          |   `165120`       |     `1759308480`     | 2025-10-01 08:48:00     | `0x783def52`|
+| Sepolia          |   `272640`       |     `1760427360`     | 2025-10-14 07:36:00     | `0xe2ae4999`|
+| Hoodi            |    `50688`       |     `1761677592`     | 2025-10-28 18:53:12     | `0xe7e0e7ff`|
+| Mainnet          |   `411392`       |      `1764798551`    | 2025-12-03 21:49:11     | `0x5167e2a6`|
+
+### Blob Parameter Only Forks
+
+Blob Parameter Only (BPO) forks, defined in [EIP-7892](./eip-7892.md), are scheduled alongside Fusaka to raise blob capacity without additional protocol changes.
+
+#### BPO 1
+
+| Network Name | Activation Epoch | Activation Timestamp | Activation Time (UTC)   | Fork ID     |
+|--------------|------------------|----------------------|-------------------------|-------------|
+| Holešky      |   `166400`       |     `1759800000`     | 2025-10-07 01:20:00     | `0xa280a45c`|
+| Sepolia      |   `274176`       |     `1761017184`     | 2025-10-21 03:26:24     | `0x56078a1e`|
+| Hoodi        |    `52480`       |     `1762365720`     | 2025-11-05 18:02:00     | `0x3893353e`|
+| Mainnet      |   `412672`       |     `1765290071`     | 2025-12-09 14:21:11     | `0xcba2a1c0`|
+
+#### BPO 2
+
+| Network Name | Activation Epoch | Activation Timestamp | Activation Time (UTC)   | Fork ID     |
+|--------------|------------------|----------------------|-------------------------|-------------|
+| Holešky      |   `167936`       |     `1760389824`     | 2025-10-13 21:10:24     | `0x9bc6cb31`|
+| Sepolia      |   `275712`       |     `1761607008`     | 2025-10-27 23:16:48     | `0x268956b6`|
+| Hoodi        |    `54016`       |     `1762955544`     | 2025-11-12 13:52:24     | `0x23aa1351`|
+| Mainnet      |   `419072`       |     `1767747671`     | 2026-01-07 01:01:11     | `0x07c9462e`|
+
+## Rationale
+
+This Meta EIP provides a global view of all changes included in the Fusaka network upgrade, as well as links to full specification.
+
+## Security Considerations
+
+None.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).

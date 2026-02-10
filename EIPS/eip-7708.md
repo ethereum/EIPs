@@ -1,0 +1,82 @@
+---
+eip: 7708
+title: ETH transfers emit a log
+description: All ETH transfers emit a log
+author: Vitalik Buterin (@vbuterin), Peter Davies (@petertdavies), Etan Kissling (@etan-status), Gajinder Singh (@g11tech), Carson (@carsons-eels), Jared Wasinger (@jwasinger)
+discussions-to: https://ethereum-magicians.org/t/eip-7708-eth-transfers-emit-a-log/20034
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-05-17
+requires: 1559, 4788, 6780
+---
+
+## Abstract
+
+All ETH-transfers, including transactions, `CALL` and `SELFDESTRUCT` emit a log.
+
+## Motivation
+
+Logs are often used to track when balance changes of assets on Ethereum. Logs work for [ERC-20](./eip-20.md) tokens, but they do not work for ETH. ETH transfers from EOAs can be read from the transaction list in the block, but ETH transfers from smart contract wallets are not automatically logged anywhere. This has already led to problems in the past, eg. early exchanges would often not properly support deposits from smart contract wallets, or only support them with a much longer delay. This EIP proposes that we automatically generate a log every time a value-transferring `CALL` or `SELFDESTRUCT` happens. We also add a similar log for transfers in transactions, so that all ETH transfers can be tracked using one mechanism.
+
+## Specification
+
+### ETH transfer logs
+
+A log, identical to a LOG3, is issued for:
+
+- Any nonzero-value-transferring transaction to a different account, before any other logs created by EVM execution
+- Any nonzero-value-transferring `CALL` to a different account, at the time that the value transfer executes
+- Any nonzero-value-transferring `SELFDESTRUCT` to a different account, at the time that the value transfer executes
+
+| Field | Value |
+| - | - |
+| `address` emitting log | `0xfffffffffffffffffffffffffffffffffffffffe` ([`SYSTEM_ADDRESS`](./eip-4788.md)) |
+| `topics[0]` | `0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef` (`keccak256('Transfer(address,address,uint256)')`) |
+| `topics[1]` | `from` address (zero prefixed to fill uint256) |
+| `topics[2]` | `to` address (zero prefixed to fill uint256) |
+| `data` | `amount` in Wei (big endian uint256) |
+
+This matches the [ERC-20](./eip-20.md) Transfer event definition.
+
+### Selfdestruct processing
+
+A log, identical to a LOG2, is issued for:
+
+- Any non-zero balance removal which occurs when a contract created in the same transaction invokes `SELFDESTRUCT` with itself as a target, at the time that the opcode is invoked.
+- Each account which has been marked for deletion and holds a balance at the time of removal during transaction finalization.  Burn logs are emitted after any other logs created by EVM execution and the payment of the [EIP-1559](./eip-1559.md) priority fee to the coinbase, in lexicographical order of account address
+
+| Field | Value |
+| - | - |
+| `address` emitting log | `0xfffffffffffffffffffffffffffffffffffffffe` ([`SYSTEM_ADDRESS`](./eip-4788.md)) |
+| `topics[0]` | `0x4bfaba3443c1a1836cd362418edc679fc96cae8449cbefccb6457cdf2c943083` (`keccak256('Selfdestruct(address,uint256)')`) |
+| `topics[1]` | Closed `contract_address` (zero prefixed to fill uint256) |
+| `data` | `amount` in Wei (big endian uint256)
+
+The Selfdestruct log is emitted when (1) a `SELFDESTRUCT` to self is triggered, or when (2) a smart contract is closed after receiving more ETH after already flagged for `SELFDESTRUCT`.
+
+## Rationale
+
+This is the simplest possible implementation that ensures that all ETH transfers are implemented in some kind of record that can be easily accessed through making RPC calls into a node, or through asking for a Merkle branch that is hashed into the block root. The log type is compatible with the ERC-20 token standard, but does not introduce any overly-specific ERC-20 features (eg. ABI encodings) into the specification.
+
+### Open questions
+
+1. Magic value used for `address`? For address: (a) `0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee` (same as `eth_simulateV1`), (b) `0xfffffffffffffffffffffffffffffffffffffffe` ([`SYSTEM_ADDRESS`](./eip-4788.md)), (c) zero address
+2. Should fee payments trigger a log? It would ensure "completeness", in the sense that you can compute the exact current balance table by watching logs, but it would greatly increase the number of logs, perhaps to an unacceptably high amount.
+3. Should withdrawals also trigger a log? They are not associated with transactions.
+
+## Backwards Compatibility
+
+No backward compatibility issues found.
+
+## Test Cases
+
+TODO
+
+## Security Considerations
+
+ETH transfers already cost a minimum of 6700 gas, which is much more expensive than the LOG3 opcode (1500 gas). Hence, this EIP does not increase the worst-case number of logs that can be put into a block. It will somewhat increase the average number of logs.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
