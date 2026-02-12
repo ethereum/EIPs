@@ -1,0 +1,130 @@
+---
+eip: XXXX
+title: eth/71 - Block Access List Exchange
+description: Adds peer-to-peer exchange of block-level access lists to the eth protocol
+author: Toni Wahrstätter (@nerolation)
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-eth-71-block-access-list-exchange/27725
+status: Draft
+type: Standards Track
+category: Networking
+created: 2026-02-12
+requires: 7928
+---
+
+## Abstract
+
+This EIP modifies the 'eth' p2p protocol to support block-level access list (BAL) exchange. It adds two new messages, `GetBlockAccessLists` (0x12) and `BlockAccessLists` (0x13), enabling peers to request and serve BALs for synchronization and parallel execution.
+
+## Motivation
+
+[EIP-7928](./eip-7928.md) introduces block-level access lists that record all state locations accessed during block execution. These lists enable parallel disk reads, parallel transaction execution, and executionless state updates.
+
+For syncing clients to leverage these capabilities, BALs must be obtainable from peers. The Engine API provides BALs from the consensus layer during normal operation, but historical BALs and peer-based sync require wire protocol support.
+
+## Specification
+
+### Block Header Extension
+
+The block header is extended with a new field after `requests-hash`:
+
+```
+block-header = [
+    ...
+    requests-hash: B_32,
+    block-access-list-hash: B_32,
+]
+```
+
+The `block-access-list-hash` field contains `keccak256(rlp.encode(block_access_list))` as defined in [EIP-7928](./eip-7928.md). This field MUST be present in headers after the Amsterdam fork and absent for earlier blocks.
+
+### Block Access List Encoding
+
+BALs are RLP-encoded as a list of account changes, sorted lexicographically by address:
+
+```
+block-access-list = [account-changes₁, account-changes₂, ...]
+
+account-changes = [
+    address: B_20,
+    storage-changes: [[slot: B_32, [[block-access-index: P, value: B_32], ...]], ...],
+    storage-reads: [slot₁: B_32, slot₂: B_32, ...],
+    balance-changes: [[block-access-index: P, balance: P], ...],
+    nonce-changes: [[block-access-index: P, nonce: P], ...],
+    code-changes: [[block-access-index: P, code: B], ...],
+]
+```
+
+Where `block-access-index` indicates when the change occurred:
+- `0` for pre-execution system contract calls
+- `1...n` for transactions (in block order)
+- `n+1` for post-execution system contract calls and withdrawals
+
+See [EIP-7928](./eip-7928.md) for complete BAL generation rules and inclusion semantics.
+
+### New Protocol Messages
+
+#### GetBlockAccessLists (0x12)
+
+```
+[request-id: P, [blockhash₁: B_32, blockhash₂: B_32, ...]]
+```
+
+Request BALs for the given block hashes. The number of BALs that can be requested in a single message is subject to implementation-defined limits.
+
+BALs are only available for blocks after [EIP-7928](./eip-7928.md) activation and within the weak subjectivity period (~3533 epochs). Requests for unavailable BALs return empty entries.
+
+#### BlockAccessLists (0x13)
+
+```
+[request-id: P, [block-access-list₁, block-access-list₂, ...]]
+```
+
+Response to `GetBlockAccessLists`. Each element corresponds to a block hash from the request, in order. Empty BALs (RLP-encoded empty list `0xc0`) are returned for blocks where the BAL is unavailable.
+
+The recommended soft limit for `BlockAccessLists` responses is 10 MiB.
+
+### Validation
+
+When a BAL is received, clients MUST validate it by computing `keccak256(rlp.encode(bal))` and comparing against the `block-access-list-hash` in the corresponding block header.
+
+## Rationale
+
+### Separate Messages vs. Block Body Extension
+
+BALs are transmitted via dedicated messages rather than extending block bodies because:
+
+1. **Size**: BALs average ~70 KiB, significantly increasing block propagation overhead if bundled.
+2. **Optional retrieval**: Not all sync strategies require BALs. Snap sync can reconstruct state without them.
+3. **Retention policy**: BALs may be pruned after the weak subjectivity period, while block bodies are retained longer.
+
+### Message IDs
+
+Message IDs 0x12 and 0x13 follow sequentially from the existing eth/69 messages (BlockRangeUpdate is 0x11).
+
+### Response Size Limit
+
+The 10 MiB soft limit aligns with existing protocol conventions and accommodates multiple BALs per response while remaining within typical message size constraints.
+
+## Backwards Compatibility
+
+This EIP changes the eth protocol and requires rolling out a new version, eth/71. Supporting multiple protocol versions is standard practice. Rolling out eth/71 does not break older clients, as they can continue using eth/69 or eth/70.
+
+This EIP requires the Amsterdam hard fork for the header field extension. The new messages are only meaningful for post-Amsterdam blocks.
+
+## Security Considerations
+
+### Validation Cost
+
+BAL validation requires computing a keccak256 hash of the RLP-encoded list. For typical BALs (~70 KiB), this is negligible. For worst-case BALs at high gas limits, validation remains bounded by the block gas limit.
+
+### Amplification
+
+A `GetBlockAccessLists` request can trigger responses larger than the request. Implementations SHOULD apply rate limiting and respect the soft response size limit to prevent amplification attacks.
+
+### Unavailable Data
+
+Clients MUST handle empty responses gracefully. A peer returning empty entries for available blocks may be misbehaving but could also have pruned the data legitimately.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
