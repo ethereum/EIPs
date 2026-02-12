@@ -1,5 +1,5 @@
 ---
-eip: XXXX
+eip: 8159
 title: eth/71 - Block Access List Exchange
 description: Adds peer-to-peer exchange of block-level access lists to the eth protocol
 author: Toni Wahrstätter (@nerolation)
