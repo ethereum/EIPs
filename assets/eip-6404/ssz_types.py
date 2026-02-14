@@ -1,12 +1,20 @@
-from typing import Callable, Dict, Optional, Type
-from dataclasses import dataclass
+from typing import Optional
 from enum import IntEnum
-from eth_hash.auto import keccak
-from remerkleable.basic import uint8, uint64, uint256
+from remerkleable.basic import uint8, uint64, uint256, uint
 from remerkleable.byte_arrays import ByteVector, Bytes32
 from remerkleable.complex import Container
 from remerkleable.progressive import CompatibleUnion, ProgressiveByteList, ProgressiveContainer, ProgressiveList
-from secp256k1 import ECDSA, PublicKey
+
+# Import EIP-7932 registry from EIP-7932
+
+from os import path as os_path
+from sys import path
+current_dir = os_path.dirname(os_path.realpath(__file__))
+path.append(current_dir)
+path.append(current_dir + '/../eip-7932')
+
+from algorithm_registry.helpers import pubkey_to_address, calculate_penalty, validate_signature, verify_signature
+
 
 class Hash32(Bytes32):
     pass
@@ -23,29 +31,37 @@ class ExecutionSignature(ProgressiveByteList):
 class ExecutionSignatureAlgorithm(uint8):
     pass
 
-@dataclass
-class ExecutionSignatureAttributes(object):
-    validate: Callable[[ExecutionSignature], None]
-    recover_signer: Callable[[ExecutionSignature, Hash32], ExecutionAddress]
 
-execution_signature_registry: Dict[ExecutionSignatureAlgorithm, ExecutionSignatureAttributes] = {}
+def get_signature_gas_cost(
+    signature: ExecutionSignature,
+    sig_hash: Hash32,
+    expected_algorithm: Optional[ExecutionSignatureAlgorithm]=None
+) -> uint:
+    assert len(signature) > 0
+
+    if expected_algorithm is not None:
+        assert signature[0] == expected_algorithm
+
+    return calculate_penalty(signature[0], sig_hash)
+
 
 def validate_execution_signature(
     signature: ExecutionSignature,
     expected_algorithm: Optional[ExecutionSignatureAlgorithm]=None,
 ):
     assert len(signature) > 0
-    algorithm = signature[0]
+
     if expected_algorithm is not None:
-        assert algorithm == expected_algorithm
-    assert algorithm in execution_signature_registry
-    execution_signature_registry[algorithm].validate(signature)
+        assert signature[0] == expected_algorithm
+
+    validate_signature(signature)
 
 def recover_execution_signer(signature: ExecutionSignature, sig_hash: Hash32) -> ExecutionAddress:
-    algorithm = signature[0]
-    return execution_signature_registry[algorithm].recover_signer(signature, sig_hash)
+    public_key = verify_signature(sig_hash, signature)
 
-SECP256K1_ALGORITHM = ExecutionSignatureAlgorithm(0x01)
+    return pubkey_to_address(public_key, signature[0])
+
+SECP256K1_ALGORITHM = ExecutionSignatureAlgorithm(0xFF)
 SECP256K1_SIGNATURE_SIZE = 1 + 32 + 32 + 1
 
 def secp256k1_pack(r: uint256, s: uint256, y_parity: uint8) -> ExecutionSignature:
@@ -61,25 +77,6 @@ def secp256k1_unpack(signature: ExecutionSignature) -> tuple[uint256, uint256, u
     s = uint256.from_bytes(signature[33:65], 'big')
     y_parity = signature[65]
     return (r, s, y_parity)
-
-def secp256k1_validate(signature: ExecutionSignature):
-    r, s, y_parity = secp256k1_unpack(signature)
-    SECP256K1N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
-    assert 0 < r < SECP256K1N
-    assert 0 < s <= SECP256K1N // 2
-    assert y_parity in (0, 1)
-
-def secp256k1_recover_signer(signature: ExecutionSignature, sig_hash: Hash32) -> ExecutionAddress:
-    ecdsa = ECDSA()
-    recover_sig = ecdsa.ecdsa_recoverable_deserialize(signature[1:65], signature[65])
-    public_key = PublicKey(ecdsa.ecdsa_recover(sig_hash, recover_sig, raw=True))
-    uncompressed = public_key.serialize(compressed=False)
-    return ExecutionAddress(keccak(uncompressed[1:])[12:])
-
-execution_signature_registry[SECP256K1_ALGORITHM] = ExecutionSignatureAttributes(
-    validate=secp256k1_validate,
-    recover_signer=secp256k1_recover_signer,
-)
 
 class FeePerGas(uint256):
     pass
@@ -294,25 +291,50 @@ class RlpTxType(IntEnum):
     SET_CODE = 0x04
     SET_CODE_MAGIC = 0x05
 
+def calculate_transaction_intrinsic_gas(tx: Transaction) -> uint:
+    tx_data = tx.payload.data()
+
+    TX_BASE_COST = 21000 # FIXME
+    gas_cost = TX_BASE_COST
+
+    if hasattr(tx_data, "authorization_list"):
+        for auth in tx_data.authorization_list:
+            gas_cost += get_signature_gas_cost(auth.signature)
+
+    gas_cost += get_signature_gas_cost(tx.signature)
+
+    return uint256(gas_cost)
+
 def validate_transaction(tx: Transaction):
     tx_data = tx.payload.data()
-    match tx_data.type_:
-        case RlpTxType.LEGACY:
-            assert isinstance(tx_data, RlpLegacyTransactionPayload)
-        case RlpTxType.ACCESS_LIST:
-            assert isinstance(tx_data, RlpAccessListTransactionPayload)
-        case RlpTxType.FEE_MARKET:
-            assert isinstance(tx_data, RlpFeeMarketTransactionPayload)
-        case RlpTxType.BLOB:
-            assert isinstance(tx_data, RlpBlobTransactionPayload)
-        case RlpTxType.SET_CODE:
-            assert isinstance(tx_data, RlpSetCodeTransactionPayload)
-            for auth in tx_data.authorization_list:
-                auth_data = auth.payload.data()
+
+    expected_signature_algorithm = None
+
+    if hasattr(tx_data, "type_"):
+        expected_signature_algorithm = SECP256K1_ALGORITHM
+        match tx_data.type_:
+            case RlpTxType.LEGACY:
+                assert isinstance(tx_data, RlpLegacyTransactionPayload)
+            case RlpTxType.ACCESS_LIST:
+                assert isinstance(tx_data, RlpAccessListTransactionPayload)
+            case RlpTxType.FEE_MARKET:
+                assert isinstance(tx_data, RlpFeeMarketTransactionPayload)
+            case RlpTxType.BLOB:
+                assert isinstance(tx_data, RlpBlobTransactionPayload)
+            case RlpTxType.SET_CODE:
+                assert isinstance(tx_data, RlpSetCodeTransactionPayload)
+            case _:
+                assert False
+
+    if hasattr(tx_data, "authorization_list"):
+        for auth in tx_data.authorization_list:
+            auth_data = auth.payload.data()
+
+            if hasattr(auth_data, "magic"):
                 assert auth_data.magic == RlpTxType.SET_CODE_MAGIC
-                if hasattr(auth_data, "chain_id"):
-                    assert auth_data.chain_id != 0
-                validate_execution_signature(auth.signature, expected_algorithm=SECP256K1_ALGORITHM)
-        case _:
-            assert False
-    validate_execution_signature(tx.signature, expected_algorithm=SECP256K1_ALGORITHM)
+            if hasattr(auth_data, "chain_id"):
+                assert auth_data.chain_id != 0
+
+            validate_execution_signature(auth.signature, expected_algorithm=expected_signature_algorithm)
+
+    validate_execution_signature(tx.signature, expected_algorithm=expected_signature_algorithm)
