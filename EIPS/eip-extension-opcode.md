@@ -75,7 +75,11 @@ It is therefore presumed that a `0xAE5B` sequence cannot be a valid extension in
 
 ### Lack of definition of a particular encoding scheme
 
-This EIP chooses to not define any extension encoding scheme, which would have meaningful behavior on the Ethereum L1 EVM. If one is desired in the future, it should be implemented using a prefix other than `0xAE`.
+This EIP chooses to not define any extension encoding scheme, in order to limit its scope as much as possible. Any such extension encoding scheme can be introduced and discussed in a separate proposal.
+
+### Explicit lack of support on Ethereum L1 EVM
+
+We explicitly prohibit any "multi-byte opcode" support using `0xAE` on the Ethereum L1 EVM. If one is desired in the future, it should be implemented using a prefix other than `0xAE`.
 
 ### Porting extension instructions back to Ethereum L1
 
