@@ -11,7 +11,7 @@ created: 2026-2-16
 ---
 ## Abstract
 
-This Informational EIP provides foundational context for understanding static control flow in the EVM and related optimization proposals. It covers the historical development of control flow mechanisms in computing, the technical foundations of control-flow analysis, and the relationship between static control flow and Ethereum's scaling roadmap. This document serves as background material for EIPs including EIP-7979 (Call and Return Opcodes), EIP-8013 (Static Relative Jumps), EIP-3540 (EOF), and discussions around RISC-V migration and ZK verification infrastructure.
+This Informational EIP provides foundational context for understanding static control flow in the EVM and related optimization proposals. It covers the historical development of control flow mechanisms in computing, the technical foundations of control-flow analysis, and the impact of static control flow on Ethereum's scaling roadmap. This document serves as background material for EIPs including EIP-7979 (Call and Return Opcodes), EIP-8013 (Static Relative Jumps), EIP-3540 (EOF), and discussions around RISC-V migration and ZK verification infrastructure.
 
 ## Historical Context
 
@@ -89,7 +89,7 @@ Block 3: JUMPDEST GAS JUMP
 Block N: JUMPDEST GAS JUMP
 ```
 
-At each block's jump instruction, the analyzer cannot know _a priori_ where control will transfer. In the worst case, every block might jump to any other block, creating a fully-connected CFG with O(N²) possible paths. Traversing all paths to verify them requires O(N²) time, and this is not a theoretical worst-case — it's achievable with relatively short pathological programs.
+At each block's jump instruction, the analyzer cannot know _a priori_ where control will transfer. In the worst case, every block might jump to any other block, creating a fully-connected CFG with O(N²) possible paths. Traversing all paths to verify them requires O(N²) time, and this is not a theoretical worst-case, as shown above
 
 For Ethereum, this quadratic behavior is a **denial-of-service vulnerability** for any online static analysis, including:
 - Validating bytecode at contract creation time
