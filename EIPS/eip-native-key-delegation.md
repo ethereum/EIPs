@@ -335,6 +335,28 @@ directly in the account's code field. This is the correct design because:
    `ef0100` pointers. Native key accounts are terminal — no indirection.
 4. **Minimal storage.** 35 bytes per account vs. a full contract deployment.
 
+### Post-Quantum Migration Path
+
+Quantum computers capable of breaking secp256k1 ECDSA will threaten every
+existing EOA. Mitigation requires a migration path that is both credible and
+practical: account holders must be able to rotate to a quantum-resistant scheme
+without abandoning their address, history, or token approvals.
+
+This EIP establishes that path. A single Type `0x05` transaction atomically
+replaces an account's authentication scheme. Because the `0xef01XX` prefix
+space is extensible, a future post-quantum designator (e.g., `0xef0103` for a
+hash-based or lattice-based scheme) slots directly into the same framework. The
+migration is one transaction, one block, one atomic state change — no
+intermediate contract deployments, no multi-step approval chains, and no window
+during which the account is authenticated by both the old and new key.
+
+The crafted-signature path further strengthens this: new accounts can be created
+directly under a post-quantum scheme, bypassing ECDSA entirely. The combination
+of in-place migration for existing accounts and native creation for new accounts
+provides a complete response to the quantum threat without requiring a new
+account model or a hard fork beyond the initial activation of the relevant
+`0xef01XX` designator.
+
 ### Scheme-Specific Prefixes
 
 Using distinct 3-byte prefixes per scheme (`0xef0101` for Ed25519, `0xef0102`
