@@ -309,18 +309,31 @@ account behaves as an EOA for execution purposes.
 
 ## Rationale
 
-### One-Way Conversion
+### Permanent Delegation
 
-Making the ECDSA → native key conversion irreversible eliminates the entire
-class of "dormant key" attacks. Once converted, there is no ECDSA key that
-could be leaked, phished, or quantum-broken to hijack the account. For
-crafted-signature accounts, this is a mathematical guarantee. For
-ephemeral-key accounts, it is a protocol-enforced guarantee independent of
-key destruction procedures.
+Native key delegation is permanent. Once an account's code is set to
+`0xef0101 || pubkey`, the ECDSA key is dead — the protocol will never accept
+it again. This is a deliberate and safe design choice for two reasons.
 
-The irreversibility also simplifies the security model: validators need only
-check the account's code prefix to determine the authentication scheme. There
-is no need to track historical key states or handle mixed-mode authentication.
+First, permanence is safe because the new key is the master key. The holder of
+the installed Ed25519 private key can always rotate to a new key via the
+`NATIVE_KEY_ROTATION` precompile. There is no loss of authority: the account
+owner retains full, exclusive control through the current native key. Reverting
+to ECDSA would only re-introduce a weaker authentication scheme with no
+benefit.
+
+Second, permanence eliminates the entire class of "dormant key" attacks. If
+the conversion were revocable, a leaked or quantum-broken ECDSA key could
+always hijack the account by reverting the delegation. Irreversibility means
+there is no second key to protect, no fallback to worry about, and no ambiguity
+about which key controls the account. For crafted-signature accounts this is a
+mathematical guarantee (the ECDSA key never existed). For ephemeral-key
+accounts it is a protocol-enforced guarantee independent of key destruction
+procedures.
+
+The permanence also simplifies the security model: validators need only check
+the account's code prefix to determine the authentication scheme. There is no
+need to track historical key states or handle mixed-mode authentication.
 
 ### Embedded Keys vs. Contract Delegation
 
