@@ -39,7 +39,7 @@ After the call, the `MSIZE` opcode should return the size the memory was actuall
 
 ### Motivation
 
-In general, it is good practise to reserve a certain memory area for the output of a call,
+In general, it is good practice to reserve a certain memory area for the output of a call,
 because letting a subroutine write to arbitrary areas in memory might be dangerous. On the
 other hand, it is often hard to know the output size of a call prior to performing the call:
 The data could be in the storage of another contract which is generally inaccessible and

@@ -17,7 +17,7 @@ The specification defines the layers and sets forth specific criteria for decidi
 
 # Motivation
 
-Ethereum is a system involving a number of different standards. Some standards are absolute requirements for interoperability while others can be considered optional, giving implementors a choice of whether to support them.
+Ethereum is a system involving a number of different standards. Some standards are absolute requirements for interoperability while others can be considered optional, giving implementers a choice of whether to support them.
 
 In order to have a EIP process which more closely reflects the interoperability requirements, it is necessary to categorize EIPs accordingly. Lower layers present considerably greater challenges in getting standards accepted and deployed.
 
@@ -48,7 +48,7 @@ In a hard fork, structures that were invalid under the old rules become valid un
 
 # 2. Networking Layer
 
-The networking layer specifies the Ethereum wire protocol (eth) and the Light Ethereum Subprotocol (les).  RLPx is excluded and tracked in the [https://github.com/ethereum/devp2p devp2p repository].
+The networking layer specifies the Ethereum wire protocol (eth) and the Light Ethereum Subprotocol (les). RLPx is excluded and tracked in the [devp2p repository](https://github.com/ethereum/devp2p).
 
 Only a subset of subprotocols are required for basic node interoperability. Nodes can support further optional extensions.
 
