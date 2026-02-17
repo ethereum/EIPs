@@ -8,7 +8,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2026-02-17
-requires: 2718, 3541, 7702
+requires: 2718, 2929, 3541, 3607, 7702
 ---
 
 ## Abstract
@@ -22,9 +22,9 @@ code field. Once set, the original ECDSA key is rendered permanently inert. A
 companion transaction type allows these accounts to originate transactions
 authenticated via Ed25519.
 
-Accounts MAY be created without any party ever possessing the ECDSA private
-key, using a crafted-signature technique analogous to
-[Nick's method](https://medium.com/patronum-labs/nicks-method-ethereum-keyless-execution-168a6659479c).
+Accounts may be created without any party ever possessing the ECDSA private
+key, using a crafted-signature technique analogous to Nick's method for keyless
+contract deployment.
 
 ## Motivation
 
@@ -39,7 +39,7 @@ single signature scheme with known limitations:
   modules increasingly ship with native Ed25519 (or Ed448, secp256r1)
   support. Forcing ECDSA introduces bridging complexity and enlarges the
   trusted computing base.
-- **Smart contract wallet overhead.** ERC-4337 and EIP-7702 code delegation
+- **Smart contract wallet overhead.** Smart contract wallets and EIP-7702 code delegation
   can achieve alternative authentication today, but at the cost of EVM
   execution for every transaction validation. Native key delegation moves
   signature verification into the protocol, eliminating per-transaction
@@ -53,7 +53,7 @@ single signature scheme with known limitations:
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in RFC 2119.
+interpreted as described in RFC 2119 and RFC 8174.
 
 ### Constants
 
@@ -74,8 +74,8 @@ extends the `0xef01XX` namespace:
 
 | Prefix | Code length | Semantics |
 |--------|-------------|-----------|
-| `0xef0100` | 23 bytes | Code delegation ([EIP-7702](./eip-7702.md)): `ef0100 \|\| address` |
-| `0xef0101` | 35 bytes | Ed25519 native key (this EIP): `ef0101 \|\| ed25519_pubkey` |
+| `0xef0100` | 23 bytes | Code delegation ([EIP-7702](./eip-7702.md)) |
+| `0xef0101` | 35 bytes | Ed25519 native key (this EIP) |
 | `0xef0102`–`0xef01ff` | varies | Reserved for future signature schemes |
 
 An account whose code is exactly `0xef0101 || pubkey` (35 bytes) is a
@@ -291,20 +291,21 @@ precompile call within an authenticated transaction.
 | `0xef0101` (native key) | `0xef0100` (code delegation) | **No.** ECDSA signatures are permanently rejected. |
 | `0xef0101` (native key) | `0xef0101` (new key) | Yes, via key rotation precompile |
 
-#### Code-reading operations
+#### Code-Reading Operations
 
 | Opcode | Behavior for `0xef0101` accounts |
 |--------|----------------------------------|
-| `EXTCODESIZE` | Returns `35` |
-| `EXTCODECOPY` | Copies from the 35-byte designator |
-| `EXTCODEHASH` | Returns `keccak256(0xef0101 \|\| pubkey)` |
-| `CODESIZE` | Within the account's own context: `35` |
-| `CODECOPY` | Within the account's own context: copies the designator |
+| `EXTCODESIZE` (`0x3b`) | Returns `35` |
+| `EXTCODECOPY` (`0x3c`) | Copies from the 35-byte designator |
+| `EXTCODEHASH` (`0x3f`) | Returns keccak256 of the 35-byte designator |
+| `CODESIZE` (`0x38`) | Within the account's own context: `35` |
+| `CODECOPY` (`0x39`) | Within the account's own context: copies the designator |
 
-#### Code-execution operations
+#### Code-Execution Operations
 
-`CALL`, `CALLCODE`, `DELEGATECALL`, and `STATICCALL` targeting a native-key
-account execute no code. The account behaves as an EOA for execution purposes.
+`CALL` (`0xf1`), `CALLCODE` (`0xf2`), `DELEGATECALL` (`0xf4`), and
+`STATICCALL` (`0xfa`) targeting a native-key account execute no code. The
+account behaves as an EOA for execution purposes.
 
 ## Rationale
 
@@ -365,11 +366,34 @@ method:
 | Side-channel risk during signing | Yes | No |
 | Verifiable by third parties | No | Yes (reproducible `r` derivation) |
 
-The technique is battle-tested: [Nick's method](https://medium.com/patronum-labs/nicks-method-ethereum-keyless-execution-168a6659479c)
-and [ERC-2470](./eip-2470.md) use identical cryptographic reasoning for
-keyless contract deployment.
+The technique is battle-tested: Nick's method and
+[ERC-2470](./eip-2470.md) use identical cryptographic reasoning for keyless
+contract deployment.
+
+## Test Cases
+
+Test cases are required for consensus-affecting changes and will be provided in
+`assets/eip-XXXX/` before this EIP advances beyond Draft status. Key scenarios
+to cover:
+
+- Type `0x05` transaction with a single native key authorization tuple.
+- Type `0x05` transaction with a crafted-signature (keyless) authorization.
+- Type `0x06` transaction from a native-key account (valid Ed25519 signature).
+- Type `0x06` transaction rejected due to invalid Ed25519 signature.
+- ECDSA-signed transaction (Type `0x00`–`0x04`) rejected from a native-key
+  account.
+- EIP-7702 authorization tuple rejected when recovering to a native-key
+  account.
+- Key rotation via the `NATIVE_KEY_ROTATION` precompile.
+- `EXTCODESIZE`, `EXTCODECOPY`, and `EXTCODEHASH` behavior for native-key
+  accounts.
 
 ## Backwards Compatibility
+
+This EIP introduces new behavior gated behind new transaction types and an
+explicit opt-in authorization. No existing accounts or transaction types are
+affected unless the account owner explicitly converts via a native key
+authorization.
 
 1. **New delegation designator** (`0xef0101`). No conflict with `0xef0100`
    or pre-[EIP-3541](./eip-3541.md) contracts, which cannot have
@@ -389,23 +413,23 @@ keyless contract deployment.
 
 When creating an account via the ephemeral key path, the ECDSA private key
 exists in memory for the duration of the authorization signing. Implementors
-SHOULD prefer the crafted-signature path. When using ephemeral keys,
-implementors MUST generate and destroy the key in a secure, memory-safe
-context and MUST NOT persist the key to disk.
+should prefer the crafted-signature path. When using ephemeral keys,
+implementors must generate and destroy the key in a secure, memory-safe
+context and must not persist the key to disk.
 
 ### Ed25519 Implementation Correctness
 
-Signature verification MUST conform strictly to
+Signature verification must conform strictly to
 [RFC 8032](https://www.rfc-editor.org/rfc/rfc8032). In particular:
 
 - Non-canonical signatures (where `s >= L`, with `L` the Ed25519 group order)
-  MUST be rejected.
-- Small-order public keys MUST be rejected.
-- Batch verification, if used, MUST provide the same accept/reject outcomes
+  must be rejected.
+- Small-order public keys must be rejected.
+- Batch verification, if used, must provide the same accept/reject outcomes
   as individual verification.
 
 Consensus-critical divergence between Ed25519 implementations is a chain-split
-risk. Implementations SHOULD use the same audited library or produce
+risk. Implementations should use the same audited library or produce
 test-vector compatibility proofs.
 
 ### Front-Running
@@ -428,14 +452,14 @@ key.
 Native key delegation is irreversible by design. Loss of the Ed25519 private
 key results in permanent loss of access to the account and all associated
 assets. This is the same failure mode as losing a secp256k1 key for a
-standard EOA. Users requiring recovery guarantees SHOULD establish a recovery
+standard EOA. Users requiring recovery guarantees should establish a recovery
 mechanism (e.g., via EIP-7702 code delegation to a social recovery contract)
 before or as part of the native key setup.
 
 ### Deterministic Keyless Addresses
 
 The crafted-signature method produces addresses that depend on `(chain_id, pk,
-r, s, y_parity)`. Users SHOULD use the recommended deterministic `r`
+r, s, y_parity)`. Users should use the recommended deterministic `r`
 construction to ensure addresses are publicly reproducible. Non-deterministic
 `r` values are not unsafe but prevent third-party verification that the
 account is provably rootless.
