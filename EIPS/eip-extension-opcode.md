@@ -2,7 +2,7 @@
 title: Reserve `0xAE EXTENSION` opcode
 description: Reserve an opcode to be used as an extension prefix in non-Ethereum-L1 EVM chains
 author: Bruce Collie (@Baltoli), Piotr Dobaczewski (@pdobacz)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/add-eip-xxxx-reserve-0xae-extension-opcode/27756
 status: Draft
 type: Standards Track
 category: Core
