@@ -1,5 +1,4 @@
 ---
-eip: XXXX
 title: Native Key Delegation for EOAs
 description: Allows EOAs to permanently replace ECDSA with alternative signature schemes via an extended delegation designator.
 author: Gregory Markou (@GregTheGreek) <gregorymarkou@gmail.com>, James Prestwich (@prestwich) <james@prestwi.ch>
@@ -8,7 +7,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2026-02-17
-requires: [2, 2718, 2929, 3541, 3607, 4844, 7702]
+requires: 2, 2718, 2929, 3541, 3607, 4844, 7702
 ---
 
 ## Abstract
