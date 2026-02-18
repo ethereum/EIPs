@@ -519,36 +519,22 @@ authorization.
 The post-quantum threat to Ethereum accounts is not uniform. It depends on
 whether the account's public key has been exposed on-chain:
 
-- **ECDSA-only accounts with nonce > 0** have broadcast at least one signed
-  transaction, exposing their secp256k1 public key on-chain. A quantum
-  attacker can recover the private key from the public key and drain the
-  account. These accounts are vulnerable at rest — no race condition is
-  required.
-- **ECDSA-only accounts with nonce = 0** have never transacted. Their public
-  key is not on-chain (only the address, which is a hash). These accounts are
-  safe until they transact, at which point they become vulnerable.
-- **EIP-7702 delegations at rest** are not post-quantum secure. The
-  `0xef0100` delegation was set by an ECDSA-signed authorization. A quantum
-  attacker who recovers the ECDSA key can submit a new authorization tuple
-  that overwrites the delegation, redirecting the account to attacker-
-  controlled code.
-- **EIP-7702 delegations in flight** (authorization tuples pending inclusion)
-  depend on timely inclusion. A quantum attacker who observes the pending
-  authorization must recover the ECDSA key and submit a competing
-  authorization before the original is included. This assumes that quantum
-  key recovery requires non-trivial expenditure of time and resources — i.e.,
-  that quantum attacks are expensive, not instantaneous.
-- **Native-key accounts** (this EIP) are immune to ECDSA-based quantum
-  attacks. The ECDSA key is permanently rejected by the protocol. However,
-  Ed25519 native-key accounts remain vulnerable to quantum attacks on
-  Ed25519 itself. True post-quantum security requires migration to a
-  quantum-resistant `0xef01XX` designator.
+Any account whose authentication key is exposed on-chain is vulnerable at
+rest to a quantum attacker who can recover the private key. This applies
+uniformly to ECDSA-signed transactions (which expose the secp256k1 public
+key), EIP-7702 delegations (which can be overwritten by recovering the
+authorizing ECDSA key), and Ed25519 native-key delegations (whose public key
+is embedded in the account's code field). Only accounts that have never
+exposed a public key on-chain (nonce-0 EOAs) and native-key accounts
+delegated to a post-quantum `0xef01XX` scheme are safe at rest.
 
-The critical observation is that delegations — both 7702 and any future
-migration mechanism — are only secure in flight if quantum attacks are
-expensive. This EIP does not change that assumption. What it does provide is a
-permanent conversion that eliminates the "at rest" vulnerability: once
-migrated, no quantum attack on the original ECDSA key can affect the account.
+Delegations to a post-quantum scheme are not vulnerable in flight or at rest,
+as neither the authorization signature nor the installed key is
+quantum-recoverable. For all other delegation types, security in flight
+depends on the resource cost of quantum key recovery remaining high relative
+to the time the authorization is pending inclusion. This EIP does not change
+that assumption — it provides the framework through which a post-quantum
+scheme can be deployed when one is ready.
 
 ### ECDSA Key Exposure Window (Ephemeral Key Path)
 
