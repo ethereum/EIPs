@@ -2,13 +2,13 @@
 eip: XXXX
 title: Native Key Delegation for EOAs
 description: Allows EOAs to permanently replace ECDSA with alternative signature schemes via an extended delegation designator.
-author: Gregory Markou (@GregTheGreek) <gregorymarkou@gmail.com>, James Prestwich (@prestwich) <james@prestwi.ch>, Samwise (@init4samwise)
+author: Gregory Markou (@GregTheGreek) <gregorymarkou@gmail.com>, James Prestwich (@prestwich) <james@prestwi.ch>
 discussions-to: TBD
 status: Draft
 type: Standards Track
 category: Core
 created: 2026-02-17
-requires: 2, 2718, 2929, 3541, 3607, 4844, 7702
+requires: [2, 2718, 2929, 3541, 3607, 4844, 7702]
 ---
 
 ## Abstract
@@ -75,8 +75,7 @@ extends the `0xef01XX` namespace:
 |--------|-------------|-----------|
 | `0xef0100` | 23 bytes | Code delegation ([EIP-7702](./eip-7702.md)) |
 | `0xef0101` | 35 bytes | Ed25519 native key (this EIP) |
-| `0xef0102`–`0xef01fe` | varies | Reserved for future signature schemes |
-| `0xef01ff` | n/a | Reserved as invalid for future use |
+| `0xef0102`–`0xef01ff` | varies | Reserved for future signature schemes |
 
 An account whose code is exactly `0xef0101 || pubkey` (35 bytes) is a
 **native-key account**. The 32-byte `pubkey` is an Ed25519 public key used for
