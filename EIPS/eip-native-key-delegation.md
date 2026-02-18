@@ -382,25 +382,49 @@ foundation that such extensions would build on.
 
 ### Post-Quantum Migration Path
 
-Quantum computers capable of breaking secp256k1 ECDSA will threaten every
-existing EOA. Mitigation requires a migration path that is both credible and
-practical: account holders must be able to rotate to a quantum-resistant scheme
-without abandoning their address, history, or token approvals.
+This EIP is not itself a post-quantum resistance mechanism. Ed25519 is
+vulnerable to the same quantum attacks as secp256k1 ECDSA. The purpose of this
+EIP is to establish a credible, tested migration route — not to provide the
+final destination.
 
-This EIP establishes that path. A single Type `0x05` transaction atomically
-replaces an account's authentication scheme. Because the `0xef01XX` prefix
-space is extensible, a future post-quantum designator (e.g., `0xef0103` for a
-hash-based or lattice-based scheme) slots directly into the same framework. The
-migration is one transaction, one block, one atomic state change — no
-intermediate contract deployments, no multi-step approval chains, and no window
-during which the account is authenticated by both the old and new key.
+Adding Ed25519 as the first native key scheme may appear counterintuitive
+given its quantum vulnerability. But Ed25519 is immediately useful (hardware
+support, key hygiene, provable rootlessness), and the migration mechanism it
+exercises is exactly the mechanism a future post-quantum scheme will use. A
+post-quantum emergency that requires migrating billions of dollars of account
+value is not the time to deploy an untested migration path. By deploying the
+framework with Ed25519 first, the ecosystem gains real-world experience with
+the migration flow — wallet UX, tooling, client implementation, edge cases —
+before the stakes become existential. Without a tested route, any real
+post-quantum migration is strictly riskier.
+
+The migration path itself is straightforward. A single Type `0x05` transaction
+atomically replaces an account's authentication scheme. Because the `0xef01XX`
+prefix space is extensible, a future post-quantum designator (e.g., `0xef0103`
+for a hash-based or lattice-based scheme) slots directly into the same
+framework. The migration is one transaction, one block, one atomic state
+change — no intermediate contract deployments, no multi-step approval chains,
+and no window during which the account is authenticated by both the old and new
+key.
 
 The crafted-signature path further strengthens this: new accounts can be created
 directly under a post-quantum scheme, bypassing ECDSA entirely. The combination
 of in-place migration for existing accounts and native creation for new accounts
-provides a credible migration path without requiring a new
-account model or a hard fork beyond the initial activation of the relevant
-`0xef01XX` designator.
+provides a credible migration path without requiring a new account model or a
+hard fork beyond the initial activation of the relevant `0xef01XX` designator.
+
+### Choice of Ed25519
+
+secp256r1 (P-256) ECDSA was considered as the initial scheme. However,
+secp256r1 verification is better served by precompile availability (e.g.,
+RIP-7212), which allows any EIP-7702 delegate or smart contract wallet to
+verify secp256r1 signatures without protocol-level account changes. A
+precompile is the correct abstraction for "make this signature scheme available
+to the EVM." Native key delegation is the correct abstraction for "replace the
+account's authentication primitive." Ed25519 is not available via precompile on
+Ethereum mainnet and provides distinct benefits (simpler implementation,
+deterministic signatures, no malleability, widespread hardware support) that
+justify protocol-level integration.
 
 ### Scheme-Specific Prefixes
 
@@ -474,6 +498,42 @@ authorization.
    account is affected without an explicit on-chain authorization.
 
 ## Security Considerations
+
+### Post-Quantum Threat Model
+
+The post-quantum threat to Ethereum accounts is not uniform. It depends on
+whether the account's public key has been exposed on-chain:
+
+- **ECDSA-only accounts with nonce > 0** have broadcast at least one signed
+  transaction, exposing their secp256k1 public key on-chain. A quantum
+  attacker can recover the private key from the public key and drain the
+  account. These accounts are vulnerable at rest — no race condition is
+  required.
+- **ECDSA-only accounts with nonce = 0** have never transacted. Their public
+  key is not on-chain (only the address, which is a hash). These accounts are
+  safe until they transact, at which point they become vulnerable.
+- **EIP-7702 delegations at rest** are not post-quantum secure. The
+  `0xef0100` delegation was set by an ECDSA-signed authorization. A quantum
+  attacker who recovers the ECDSA key can submit a new authorization tuple
+  that overwrites the delegation, redirecting the account to attacker-
+  controlled code.
+- **EIP-7702 delegations in flight** (authorization tuples pending inclusion)
+  depend on timely inclusion. A quantum attacker who observes the pending
+  authorization must recover the ECDSA key and submit a competing
+  authorization before the original is included. This assumes that quantum
+  key recovery requires non-trivial expenditure of time and resources — i.e.,
+  that quantum attacks are expensive, not instantaneous.
+- **Native-key accounts** (this EIP) are immune to ECDSA-based quantum
+  attacks. The ECDSA key is permanently rejected by the protocol. However,
+  Ed25519 native-key accounts remain vulnerable to quantum attacks on
+  Ed25519 itself. True post-quantum security requires migration to a
+  quantum-resistant `0xef01XX` designator.
+
+The critical observation is that delegations — both 7702 and any future
+migration mechanism — are only secure in flight if quantum attacks are
+expensive. This EIP does not change that assumption. What it does provide is a
+permanent conversion that eliminates the "at rest" vulnerability: once
+migrated, no quantum attack on the original ECDSA key can affect the account.
 
 ### ECDSA Key Exposure Window (Ephemeral Key Path)
 
