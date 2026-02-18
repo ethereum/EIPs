@@ -19,8 +19,8 @@ converting an EOA's authentication from ECDSA over secp256k1 to an alternative
 signature scheme. A new code prefix `0xef0101` designates an account whose
 authentication key is an Ed25519 public key embedded directly in the account's
 code field. Once set, the original ECDSA key is rendered permanently inert. A
-companion transaction type allows these accounts to originate transactions
-authenticated via Ed25519.
+single new transaction type supports both ECDSA-signed key migration and
+Ed25519-authenticated transaction origination.
 
 Accounts may be created without any party ever possessing the ECDSA private
 key, using a crafted-signature technique analogous to Nick's method for keyless
@@ -59,8 +59,7 @@ interpreted as described in RFC 2119 and RFC 8174.
 
 | Name | Value | Description |
 |------|-------|-------------|
-| `SET_NATIVE_KEY_TX_TYPE` | `Bytes1(0x05)` | Transaction type for setting native keys |
-| `NATIVE_KEY_TX_TYPE` | `Bytes1(0x06)` | Transaction type for native-key-authenticated transactions |
+| `NATIVE_KEY_TX_TYPE` | `Bytes1(0x05)` | Transaction type for native key operations |
 | `NATIVE_KEY_MAGIC` | `0x07` | Domain separator for native key authorization signing |
 | `ED25519_DESIGNATION` | `0xef0101` | 3-byte code prefix for Ed25519 native key accounts |
 | `PER_NATIVE_AUTH_BASE_COST` | `12500` | Gas charged per native key authorization tuple |
@@ -82,10 +81,10 @@ An account whose code is exactly `0xef0101 || pubkey` (35 bytes) is a
 **native-key account**. The 32-byte `pubkey` is an Ed25519 public key used for
 all subsequent transaction authentication.
 
-### Set Native Key Transaction (Type `0x05`)
+### Native Key Transaction (Type `0x05`)
 
-A new [EIP-2718](./eip-2718.md) transaction type carries native key
-authorization tuples:
+A new [EIP-2718](./eip-2718.md) transaction type serves both native key
+migration and native-key-authenticated transaction origination:
 
 ```
 0x05 || rlp([
@@ -99,9 +98,8 @@ authorization tuples:
     data,
     access_list,
     native_key_authorization_list,
-    signature_y_parity,
-    signature_r,
-    signature_s
+    sender,
+    signature
 ])
 ```
 
@@ -109,8 +107,33 @@ The fields `chain_id`, `nonce`, `max_priority_fee_per_gas`, `max_fee_per_gas`,
 `gas_limit`, `to`, `value`, `data`, and `access_list` follow the same semantics
 as [EIP-4844](./eip-4844.md). A null `to` is not valid.
 
-The outer transaction is signed with ECDSA by the submitter (any EOA). The
-submitter need not be the authority whose key is being set.
+| Field | Type | Description |
+|-------|------|-------------|
+| `native_key_authorization_list` | `list` | Authorization tuples for setting native keys (may be empty) |
+| `sender` | `bytes` | Empty for ECDSA mode, or 20-byte address for Ed25519 mode |
+| `signature` | `bytes` | 65-byte ECDSA signature or 64-byte Ed25519 signature |
+
+The `sender` field determines the transaction's authentication mode:
+
+- **ECDSA mode** (`sender` is empty): The transaction is signed with ECDSA.
+  `signature` is 65 bytes, encoding `y_parity || r || s`. The transaction
+  sender is recovered via `ecrecover`. Any EOA may submit this transaction;
+  the submitter need not be the authority whose key is being set.
+- **Ed25519 mode** (`sender` is 20 bytes): The transaction is signed with
+  Ed25519 by the native-key account at `sender`. `signature` is 64 bytes.
+
+The signing payload for both modes is:
+
+```
+tx_hash = keccak256(NATIVE_KEY_TX_TYPE || rlp([
+    chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas,
+    gas_limit, to, value, data, access_list,
+    native_key_authorization_list, sender
+]))
+```
+
+In ECDSA mode, `sender` is empty in the payload, so the signing domain is
+distinct from Ed25519 mode where `sender` is 20 bytes.
 
 #### Native Key Authorization Tuple
 
@@ -137,13 +160,52 @@ msg_hash = keccak256(NATIVE_KEY_MAGIC || rlp([chain_id, pubkey, nonce]))
 
 The **authority** is recovered via `ecrecover(msg_hash, y_parity, r, s)`.
 
-#### Processing Rules
+#### Transaction Validation
+
+If `sender` is empty (ECDSA mode):
+
+1. Verify `signature` is exactly 65 bytes. Otherwise the transaction is
+   invalid.
+2. Parse `y_parity = signature[0]`, `r = signature[1..33]`,
+   `s = signature[33..65]`.
+3. Recover the transaction sender via `ecrecover(tx_hash, y_parity, r, s)`.
+   If recovery fails, the transaction is invalid.
+4. Proceed with standard sender validation (nonce, balance, etc.).
+
+If `sender` is 20 bytes (Ed25519 mode):
+
+1. Verify `sender`'s code begins with `ED25519_DESIGNATION` and is exactly
+   35 bytes. Otherwise the transaction is invalid.
+2. Add `sender` to `accessed_addresses` (as defined by [EIP-2929](./eip-2929.md)).
+3. Extract `pubkey = sender.code[3..35]`.
+4. Verify `Ed25519_Verify(pubkey, tx_hash, signature)` using cofactorless
+   verification per [RFC 8032 §5.1.7](https://www.rfc-editor.org/rfc/rfc8032#section-5.1.7),
+   with the following additional constraints:
+   - The encoded point `pubkey` MUST be a canonical encoding of a point on
+     Ed25519. Non-canonical encodings MUST be rejected.
+   - The scalar `s` component of `signature` MUST satisfy `s < L`, where `L`
+     is the Ed25519 group order (`2^252 + 27742317777372353535851937790883648493`).
+     Signatures with `s >= L` MUST be rejected.
+   - Points of small order (order 1, 2, 4, or 8) MUST NOT be accepted as
+     `pubkey`.
+   - Verification MUST NOT use cofactor multiplication. The verification
+     equation is `[8][s]B = [8]R + [8][k]A`, NOT `[s]B = R + [k]A`.
+   If verification fails, the transaction is invalid.
+5. Verify `nonce == sender.nonce`. Otherwise the transaction is invalid.
+6. Proceed with standard transaction execution.
+
+`ED25519_VERIFY_COST` is added to the transaction's intrinsic gas cost in
+Ed25519 mode, replacing the implicit ecrecover cost.
+
+If `sender` is any other length, the transaction is invalid.
+
+#### Authorization List Processing
 
 The `native_key_authorization_list` is processed before transaction execution
-but after the sender's nonce is incremented, mirroring EIP-7702 semantics.
+but after the sender's nonce is incremented, mirroring EIP-7702 semantics. The
+list MAY be empty.
 
-The `native_key_authorization_list` MUST NOT be empty. For each tuple, in
-order:
+For each tuple, in order:
 
 1. Verify `chain_id` is `0` or equals the current chain ID. Otherwise skip.
 2. Verify `pubkey` is exactly 32 bytes. Otherwise skip.
@@ -166,12 +228,13 @@ If multiple tuples target the same authority, the last valid tuple wins.
 
 Once an account's code is set to `0xef0101 || pubkey`:
 
-- ECDSA-signed transactions (Types 0x00–0x04) whose recovered sender is a
-  native-key account MUST be rejected during transaction validation.
+- ECDSA-signed transactions (Types 0x00–0x04, and Type 0x05 in ECDSA mode)
+  whose recovered sender is a native-key account MUST be rejected during
+  transaction validation.
 - EIP-7702 authorization tuples whose recovered authority is a native-key
   account MUST be rejected.
-- Native key authorization tuples (Type 0x05) whose recovered authority is a
-  native-key account MUST be rejected.
+- Native key authorization tuples whose recovered authority is a native-key
+  account MUST be rejected.
 
 The account is permanently governed by its embedded Ed25519 key. The ECDSA
 private key — whether unknown, destroyed, or still held — has no protocol
@@ -195,8 +258,8 @@ private key**:
    This yields a deterministic address for which no party knows the private
    key.
 5. Any party funds `authority` with ETH.
-6. Any party submits a Type `0x05` transaction containing the authorization
-   tuple `[chain_id, pk, 0, y_parity, r, s]`.
+6. Any party submits a Type `0x05` transaction (ECDSA mode) containing the
+   authorization tuple `[chain_id, pk, 0, y_parity, r, s]`.
 
 The account at `authority` is now authenticated exclusively by the Ed25519 key
 `pk`. Because deriving the ECDSA private key from the recovered public key
@@ -212,77 +275,12 @@ chain_id || pk)`, then find the smallest valid secp256k1 x-coordinate ≥
 `r_seed mod p`. Set `s = 1`. This makes the derivation publicly verifiable:
 anyone can reproduce the computation and confirm that no trapdoor was used.
 
-### Native Key Transaction (Type `0x06`)
-
-Transactions originating from native-key accounts use a new
-[EIP-2718](./eip-2718.md) type:
-
-```
-0x06 || rlp([
-    chain_id,
-    nonce,
-    max_priority_fee_per_gas,
-    max_fee_per_gas,
-    gas_limit,
-    to,
-    value,
-    data,
-    access_list,
-    sender,
-    signature
-])
-```
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `sender` | `address` | The 20-byte address of the originating native-key account |
-| `signature` | `bytes64` | Ed25519 signature over the transaction hash |
-
-The signed payload is:
-
-```
-tx_hash = keccak256(NATIVE_KEY_TX_TYPE || rlp([
-    chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas,
-    gas_limit, to, value, data, access_list, sender
-]))
-```
-
-**Note:** Unlike all previous transaction types, `sender` is an explicit field
-rather than being recovered from the signature. Ed25519 does not support public
-key recovery, so the sender must be stated. This is not a limitation — it
-eliminates an elliptic curve operation from transaction parsing.
-
-#### Validation
-
-1. Verify `sender`'s code begins with `ED25519_DESIGNATION` and is exactly
-   35 bytes. Otherwise the transaction is invalid.
-2. Add `sender` to `accessed_addresses` (as defined by [EIP-2929](./eip-2929.md)).
-3. Extract `pubkey = sender.code[3..35]`.
-4. Verify `Ed25519_Verify(pubkey, tx_hash, signature)` using cofactorless
-   verification per [RFC 8032 §5.1.7](https://www.rfc-editor.org/rfc/rfc8032#section-5.1.7),
-   with the following additional constraints:
-   - The encoded point `pubkey` MUST be a canonical encoding of a point on
-     Ed25519. Non-canonical encodings MUST be rejected.
-   - The scalar `s` component of `signature` MUST satisfy `s < L`, where `L`
-     is the Ed25519 group order (`2^252 + 27742317777372353535851937790883648493`).
-     Signatures with `s >= L` MUST be rejected.
-   - Points of small order (order 1, 2, 4, or 8) MUST NOT be accepted as
-     `pubkey`.
-   - Verification MUST NOT use cofactor multiplication. The verification
-     equation is `[8][s]B = [8]R + [8][k]A`, NOT `[s]B = R + [k]A`.
-   If verification fails, the transaction is invalid.
-5. Verify `nonce == sender.nonce`. Otherwise the transaction is invalid.
-6. Proceed with standard transaction execution.
-
-`ED25519_VERIFY_COST` is added to the transaction's intrinsic gas cost,
-replacing the implicit ecrecover cost.
-
 #### Transaction Origination
 
 This EIP extends the [EIP-3607](./eip-3607.md) exception established by
 EIP-7702: accounts whose code begins with `0xef0101` MAY originate
-transactions (via Type `0x06`), in addition to accounts whose code begins with
-`0xef0100`.
+transactions (via Type `0x05` in Ed25519 mode), in addition to accounts whose
+code begins with `0xef0100`.
 
 ### Key Rotation
 
@@ -302,8 +300,8 @@ original ECDSA key.
 
 | From | To | Permitted? |
 |------|----|-----------|
-| Empty / EOA | `0xef0101` (native key) | Yes, via Type `0x05` authorization |
-| `0xef0100` (code delegation) | `0xef0101` (native key) | Yes, via Type `0x05` authorization signed by ECDSA key |
+| Empty / EOA | `0xef0101` (native key) | Yes, via Type `0x05` authorization list |
+| `0xef0100` (code delegation) | `0xef0101` (native key) | Yes, via Type `0x05` authorization list (ECDSA-signed) |
 | `0xef0101` (native key) | `0xef0100` (code delegation) | **No.** ECDSA signatures are permanently rejected. |
 | `0xef0101` (native key) | `0xef0101` (new key) | Yes, via companion key rotation EIP |
 
@@ -331,7 +329,7 @@ Native key delegation is permanent. Once an account's code is set to
 `0xef0101 || pubkey`, the ECDSA key is dead — the protocol will never accept
 it again. This is a deliberate and safe design choice for two reasons.
 
-First, permanence is safe because the new key is the master key. The holder of
+First, permanence is safe because the new key is the root key. The holder of
 the installed Ed25519 private key can always rotate to a new key (via a
 companion key rotation EIP). There is no loss of authority: the account
 owner retains full, exclusive control through the current native key. Reverting
@@ -399,7 +397,7 @@ before the stakes become existential. Without a tested route, any real
 post-quantum migration is strictly riskier.
 
 The migration path itself is straightforward. A single Type `0x05` transaction
-atomically replaces an account's authentication scheme. Because the `0xef01XX`
+(in ECDSA mode) atomically replaces an account's authentication scheme. Because the `0xef01XX`
 prefix space is extensible, a future post-quantum designator (e.g., `0xef0103`
 for a hash-based or lattice-based scheme) slots directly into the same
 framework. The migration is one transaction, one block, one atomic state
@@ -438,12 +436,27 @@ for a future scheme, etc.) rather than a generic prefix with a scheme byte:
 3. **No version negotiation.** The prefix fully determines the verification
    algorithm.
 
-### Explicit Sender in Type `0x06`
+### Single Transaction Type with Dual Authentication Mode
 
-Ed25519 does not support public key recovery from signatures. The sender
-address must be stated explicitly. This is a departure from Ethereum's
-"recover sender from signature" convention, but provides a tangible benefit:
-transaction deserialization no longer requires an elliptic curve operation.
+This EIP uses a single transaction type (`0x05`) for both setting native keys
+(ECDSA mode) and originating transactions from native-key accounts (Ed25519
+mode). The `sender` field acts as the discriminant: empty for ECDSA, 20 bytes
+for Ed25519. This avoids consuming two [EIP-2718](./eip-2718.md) type numbers
+and enables a capability that two separate types could not: a native-key
+account can submit migration authorizations for other accounts in the same
+transaction it uses to send value or call contracts.
+
+The `native_key_authorization_list` MAY be empty in either mode. In ECDSA
+mode, a transaction with an empty list is invalid (there is no reason to use
+Type `0x05` without authorizations or Ed25519 signing). In Ed25519 mode, an
+empty list is the common case — a native-key account simply sending a
+transaction.
+
+Ed25519 does not support public key recovery from signatures. The `sender`
+address must be stated explicitly in Ed25519 mode. This is a departure from
+Ethereum's "recover sender from signature" convention, but provides a tangible
+benefit: transaction deserialization no longer requires an elliptic curve
+operation.
 
 ### Crafted-Signature Creation
 
@@ -467,10 +480,12 @@ Test cases are required for consensus-affecting changes and will be provided in
 `assets/eip-XXXX/` before this EIP advances beyond Draft status. Key scenarios
 to cover:
 
-- Type `0x05` transaction with a single native key authorization tuple.
-- Type `0x05` transaction with a crafted-signature (keyless) authorization.
-- Type `0x06` transaction from a native-key account (valid Ed25519 signature).
-- Type `0x06` transaction rejected due to invalid Ed25519 signature.
+- Type `0x05` in ECDSA mode with a single native key authorization tuple.
+- Type `0x05` in ECDSA mode with a crafted-signature (keyless) authorization.
+- Type `0x05` in Ed25519 mode from a native-key account (valid signature).
+- Type `0x05` in Ed25519 mode rejected due to invalid Ed25519 signature.
+- Type `0x05` in Ed25519 mode with non-empty authorization list (dual use).
+- Type `0x05` in ECDSA mode with empty authorization list (must be rejected).
 - ECDSA-signed transaction (Type `0x00`–`0x04`) rejected from a native-key
   account.
 - EIP-7702 authorization tuple rejected when recovering to a native-key
@@ -480,7 +495,7 @@ to cover:
 
 ## Backwards Compatibility
 
-This EIP introduces new behavior gated behind new transaction types and an
+This EIP introduces new behavior gated behind a new transaction type and an
 explicit opt-in authorization. No existing accounts or transaction types are
 affected unless the account owner explicitly converts via a native key
 authorization.
@@ -488,7 +503,7 @@ authorization.
 1. **New delegation designator** (`0xef0101`). No conflict with `0xef0100`
    or pre-[EIP-3541](./eip-3541.md) contracts, which cannot have
    `0xef`-prefixed code.
-2. **New transaction types** (`0x05`, `0x06`). Standard
+2. **New transaction type** (`0x05`). Standard
    [EIP-2718](./eip-2718.md) typed transaction rollout. Unrecognized types
    are ignored by older clients.
 3. **Extended [EIP-3607](./eip-3607.md) exception.** Transaction origination
@@ -545,8 +560,8 @@ context and must not persist the key to disk.
 
 ### Ed25519 Implementation Correctness
 
-The Ed25519 verification algorithm is specified precisely in the Type `0x06`
-validation rules to avoid the ambiguities in RFC 8032 that have caused
+The Ed25519 verification algorithm is specified precisely in the Type `0x05`
+Ed25519 mode validation rules to avoid the ambiguities in RFC 8032 that have caused
 consensus failures in other protocols (notably Zcash and Solana). The
 specification requires cofactorless verification with explicit rejection of
 non-canonical encodings, `s >= L` signatures, and small-order public keys.
@@ -570,7 +585,7 @@ key.
 
 ### Replay Protection
 
-- **Cross-chain.** `chain_id` in both authorization tuples and Type `0x06`
+- **Cross-chain.** `chain_id` in both authorization tuples and Type `0x05`
   transactions. Setting `chain_id = 0` in an authorization permits
   intentional multi-chain use.
 - **Same-chain.** Nonce in both authorization tuples and transactions.
@@ -608,7 +623,7 @@ chain once the authorization tuple is public.
 Native-key accounts share the same transaction pool challenges as EIP-7702
 delegated accounts: a key rotation (once specified in a companion EIP) could
 invalidate pending transactions. Clients should accept at most one pending
-Type `0x06` transaction per native-key account to minimize the number of
+Type `0x05` transaction per native-key account to minimize the number of
 transactions that can be invalidated by a single state change.
 
 ### Deterministic Keyless Addresses
