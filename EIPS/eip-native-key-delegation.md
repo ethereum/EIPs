@@ -8,7 +8,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2026-02-17
-requires: 2718, 2929, 3541, 3607, 7702
+requires: 2, 2718, 2929, 3541, 3607, 4844, 7702
 ---
 
 ## Abstract
@@ -61,7 +61,7 @@ interpreted as described in RFC 2119 and RFC 8174.
 |------|-------|-------------|
 | `SET_NATIVE_KEY_TX_TYPE` | `Bytes1(0x05)` | Transaction type for setting native keys |
 | `NATIVE_KEY_TX_TYPE` | `Bytes1(0x06)` | Transaction type for native-key-authenticated transactions |
-| `NATIVE_KEY_MAGIC` | `0x06` | Domain separator for native key authorization signing |
+| `NATIVE_KEY_MAGIC` | `0x07` | Domain separator for native key authorization signing |
 | `ED25519_DESIGNATION` | `0xef0101` | 3-byte code prefix for Ed25519 native key accounts |
 | `PER_NATIVE_AUTH_BASE_COST` | `12500` | Gas charged per native key authorization tuple |
 | `PER_EMPTY_ACCOUNT_COST` | `25000` | Additional gas if the authority account was previously empty |
@@ -94,7 +94,7 @@ authorization tuples:
     max_priority_fee_per_gas,
     max_fee_per_gas,
     gas_limit,
-    destination,
+    to,
     value,
     data,
     access_list,
@@ -104,6 +104,10 @@ authorization tuples:
     signature_s
 ])
 ```
+
+The fields `chain_id`, `nonce`, `max_priority_fee_per_gas`, `max_fee_per_gas`,
+`gas_limit`, `to`, `value`, `data`, and `access_list` follow the same semantics
+as [EIP-4844](./eip-4844.md). A null `to` is not valid.
 
 The outer transaction is signed with ECDSA by the submitter (any EOA). The
 submitter need not be the authority whose key is being set.
@@ -135,21 +139,25 @@ The **authority** is recovered via `ecrecover(msg_hash, y_parity, r, s)`.
 
 #### Processing Rules
 
+The `native_key_authorization_list` is processed before transaction execution
+but after the sender's nonce is incremented, mirroring EIP-7702 semantics.
+
 The `native_key_authorization_list` MUST NOT be empty. For each tuple, in
 order:
 
 1. Verify `chain_id` is `0` or equals the current chain ID. Otherwise skip.
 2. Verify `pubkey` is exactly 32 bytes. Otherwise skip.
 3. Verify `nonce < 2^64 - 1`. Otherwise skip.
-4. Set `msg_hash = keccak256(NATIVE_KEY_MAGIC || rlp([chain_id, pubkey, nonce]))`.
-5. Set `authority = ecrecover(msg_hash, y_parity, r, s)`. If recovery fails, skip.
-6. Verify `authority`'s code is empty, begins with `0xef0100`, or begins
+4. Verify `s <= secp256k1n / 2`, as per [EIP-2](./eip-2.md). Otherwise skip.
+5. Set `msg_hash = keccak256(NATIVE_KEY_MAGIC || rlp([chain_id, pubkey, nonce]))`.
+6. Set `authority = ecrecover(msg_hash, y_parity, r, s)`. If recovery fails, skip.
+7. Verify `authority`'s code is empty, begins with `0xef0100`, or begins
    with `0xef0101`. Otherwise skip.
-7. Verify `authority`'s nonce equals `nonce`. Otherwise skip.
-8. Add `authority` to `accessed_addresses` (as defined by [EIP-2929](./eip-2929.md)).
-9. Increment `authority`'s nonce by one.
-10. Set `authority`'s code to `0xef0101 || pubkey`.
-11. Charge `PER_NATIVE_AUTH_BASE_COST` gas, plus `PER_EMPTY_ACCOUNT_COST` if
+8. Verify `authority`'s nonce equals `nonce`. Otherwise skip.
+9. Add `authority` to `accessed_addresses` (as defined by [EIP-2929](./eip-2929.md)).
+10. Increment `authority`'s nonce by one.
+11. Set `authority`'s code to `0xef0101 || pubkey`.
+12. Charge `PER_NATIVE_AUTH_BASE_COST` gas, plus `PER_EMPTY_ACCOUNT_COST` if
     the account was previously empty.
 
 If multiple tuples target the same authority, the last valid tuple wins.
@@ -158,13 +166,16 @@ If multiple tuples target the same authority, the last valid tuple wins.
 
 Once an account's code is set to `0xef0101 || pubkey`:
 
-- ECDSA-signed transactions (Types 0x00–0x04) with that account as sender
-  MUST be rejected during transaction validation.
-- EIP-7702 authorization tuples recovering to that account MUST be rejected.
-- Native key authorization tuples (Type 0x05) signed by that account's
-  ECDSA key MUST be rejected.
+- ECDSA-signed transactions (Types 0x00–0x04) whose recovered sender is a
+  native-key account MUST be rejected during transaction validation.
+- EIP-7702 authorization tuples whose recovered authority is a native-key
+  account MUST be rejected.
+- Native key authorization tuples (Type 0x05) whose recovered authority is a
+  native-key account MUST be rejected.
 
-The account is permanently governed by its embedded Ed25519 key.
+The account is permanently governed by its embedded Ed25519 key. The ECDSA
+private key — whether unknown, destroyed, or still held — has no protocol
+significance.
 
 ### Keyless Account Creation (Crafted-Signature Method)
 
@@ -245,12 +256,23 @@ eliminates an elliptic curve operation from transaction parsing.
 
 1. Verify `sender`'s code begins with `ED25519_DESIGNATION` and is exactly
    35 bytes. Otherwise the transaction is invalid.
-2. Extract `pubkey = sender.code[3..35]`.
-3. Verify `Ed25519_Verify(pubkey, tx_hash, signature)` per
-   [RFC 8032 §5.1.7](https://www.rfc-editor.org/rfc/rfc8032#section-5.1.7).
+2. Add `sender` to `accessed_addresses` (as defined by [EIP-2929](./eip-2929.md)).
+3. Extract `pubkey = sender.code[3..35]`.
+4. Verify `Ed25519_Verify(pubkey, tx_hash, signature)` using cofactorless
+   verification per [RFC 8032 §5.1.7](https://www.rfc-editor.org/rfc/rfc8032#section-5.1.7),
+   with the following additional constraints:
+   - The encoded point `pubkey` MUST be a canonical encoding of a point on
+     Ed25519. Non-canonical encodings MUST be rejected.
+   - The scalar `s` component of `signature` MUST satisfy `s < L`, where `L`
+     is the Ed25519 group order (`2^252 + 27742317777372353535851937790883648493`).
+     Signatures with `s >= L` MUST be rejected.
+   - Points of small order (order 1, 2, 4, or 8) MUST NOT be accepted as
+     `pubkey`.
+   - Verification MUST NOT use cofactor multiplication. The verification
+     equation is `[8][s]B = [8]R + [8][k]A`, NOT `[s]B = R + [k]A`.
    If verification fails, the transaction is invalid.
-4. Verify `nonce == sender.nonce`. Otherwise the transaction is invalid.
-5. Proceed with standard transaction execution.
+5. Verify `nonce == sender.nonce`. Otherwise the transaction is invalid.
+6. Proceed with standard transaction execution.
 
 `ED25519_VERIFY_COST` is added to the transaction's intrinsic gas cost,
 replacing the implicit ecrecover cost.
@@ -264,23 +286,17 @@ transactions (via Type `0x06`), in addition to accounts whose code begins with
 
 ### Key Rotation
 
-A native-key account MAY rotate its Ed25519 public key by including a
-**rotation authorization** in a Type `0x06` transaction. The transaction calls
-the `NATIVE_KEY_ROTATION` precompile at address `0xNKR` with calldata:
+Key rotation for native-key accounts — replacing the embedded Ed25519 public
+key with a new one — requires a mechanism for mutating the account's code field
+from within an authenticated transaction. This involves novel EVM semantics (a
+precompile or system contract that writes to the caller's code) and is
+specified in a companion EIP.
 
-```
-new_pubkey (32 bytes)
-```
-
-The precompile:
-
-1. Verifies `msg.sender` has `0xef0101` code.
-2. Sets `msg.sender`'s code to `0xef0101 || new_pubkey`.
-3. Returns success.
-
-Because the Type `0x06` transaction is already authenticated by the current
-Ed25519 key, no additional signature is required. Key rotation is simply a
-precompile call within an authenticated transaction.
+This EIP guarantees that key rotation is possible: the `0xef0101` prefix is
+recognized by the processing rules (step 7), so a native-key account MAY be
+the target of a new native key authorization tuple. A companion EIP will
+define a practical rotation mechanism that does not require re-exposing the
+original ECDSA key.
 
 ### Interaction with EIP-7702
 
@@ -289,7 +305,7 @@ precompile call within an authenticated transaction.
 | Empty / EOA | `0xef0101` (native key) | Yes, via Type `0x05` authorization |
 | `0xef0100` (code delegation) | `0xef0101` (native key) | Yes, via Type `0x05` authorization signed by ECDSA key |
 | `0xef0101` (native key) | `0xef0100` (code delegation) | **No.** ECDSA signatures are permanently rejected. |
-| `0xef0101` (native key) | `0xef0101` (new key) | Yes, via key rotation precompile |
+| `0xef0101` (native key) | `0xef0101` (new key) | Yes, via companion key rotation EIP |
 
 #### Code-Reading Operations
 
@@ -316,8 +332,8 @@ Native key delegation is permanent. Once an account's code is set to
 it again. This is a deliberate and safe design choice for two reasons.
 
 First, permanence is safe because the new key is the master key. The holder of
-the installed Ed25519 private key can always rotate to a new key via the
-`NATIVE_KEY_ROTATION` precompile. There is no loss of authority: the account
+the installed Ed25519 private key can always rotate to a new key (via a
+companion key rotation EIP). There is no loss of authority: the account
 owner retains full, exclusive control through the current native key. Reverting
 to ECDSA would only re-introduce a weaker authentication scheme with no
 benefit.
@@ -348,6 +364,22 @@ directly in the account's code field. This is the correct design because:
    `ef0100` pointers. Native key accounts are terminal — no indirection.
 4. **Minimal storage.** 35 bytes per account vs. a full contract deployment.
 
+### Native-Key Accounts as Pure EOAs
+
+Native-key accounts intentionally have no code execution capability. They
+cannot use EIP-7702 code delegation for batching, sponsorship, or privilege
+de-escalation. This is a deliberate scope constraint, not an oversight.
+
+The purpose of this EIP is to replace the authentication primitive, not to
+replicate the full EIP-7702 feature set. Combining native key authentication
+with code delegation is a valid goal but introduces significant complexity:
+the account's code field would need to encode both a delegation target and an
+authentication key, and the interaction between the two must be carefully
+specified. A future EIP MAY define a combined designator (e.g., one that
+embeds both a pubkey and a delegation address) or allow `0xef0101` accounts
+to also carry `0xef0100` delegation. This EIP provides the authentication
+foundation that such extensions would build on.
+
 ### Post-Quantum Migration Path
 
 Quantum computers capable of breaking secp256k1 ECDSA will threaten every
@@ -366,7 +398,7 @@ during which the account is authenticated by both the old and new key.
 The crafted-signature path further strengthens this: new accounts can be created
 directly under a post-quantum scheme, bypassing ECDSA entirely. The combination
 of in-place migration for existing accounts and native creation for new accounts
-provides a complete response to the quantum threat without requiring a new
+provides a credible migration path without requiring a new
 account model or a hard fork beyond the initial activation of the relevant
 `0xef01XX` designator.
 
@@ -419,7 +451,6 @@ to cover:
   account.
 - EIP-7702 authorization tuple rejected when recovering to a native-key
   account.
-- Key rotation via the `NATIVE_KEY_ROTATION` precompile.
 - `EXTCODESIZE`, `EXTCODECOPY`, and `EXTCODEHASH` behavior for native-key
   accounts.
 
@@ -454,18 +485,20 @@ context and must not persist the key to disk.
 
 ### Ed25519 Implementation Correctness
 
-Signature verification must conform strictly to
-[RFC 8032](https://www.rfc-editor.org/rfc/rfc8032). In particular:
-
-- Non-canonical signatures (where `s >= L`, with `L` the Ed25519 group order)
-  must be rejected.
-- Small-order public keys must be rejected.
-- Batch verification, if used, must provide the same accept/reject outcomes
-  as individual verification.
+The Ed25519 verification algorithm is specified precisely in the Type `0x06`
+validation rules to avoid the ambiguities in RFC 8032 that have caused
+consensus failures in other protocols (notably Zcash and Solana). The
+specification requires cofactorless verification with explicit rejection of
+non-canonical encodings, `s >= L` signatures, and small-order public keys.
+This corresponds to the "strict" verification mode, not the permissive
+ZIP-215 interpretation.
 
 Consensus-critical divergence between Ed25519 implementations is a chain-split
-risk. Implementations should use the same audited library or produce
-test-vector compatibility proofs.
+risk. All implementations must produce identical accept/reject decisions for
+every possible (pubkey, message, signature) triple. Implementors should
+validate against a shared test vector suite (to be provided in
+`assets/eip-XXXX/`) and should not rely on library defaults, as different
+libraries implement different verification strictness levels.
 
 ### Front-Running
 
@@ -486,10 +519,37 @@ key.
 
 Native key delegation is irreversible by design. Loss of the Ed25519 private
 key results in permanent loss of access to the account and all associated
-assets. This is the same failure mode as losing a secp256k1 key for a
-standard EOA. Users requiring recovery guarantees should establish a recovery
-mechanism (e.g., via EIP-7702 code delegation to a social recovery contract)
-before or as part of the native key setup.
+assets. This is the same failure mode as losing a secp256k1 key for a standard
+EOA.
+
+Native-key accounts as specified in this EIP have no on-chain recovery path.
+Because they cannot execute code (no EIP-7702 delegation), smart-contract-based
+social recovery is not available. Users who require recovery guarantees should
+evaluate whether native key delegation is appropriate for their use case, or
+wait for a companion EIP that combines native key authentication with code
+delegation.
+
+### Cross-Chain Authorization Replay
+
+Authorization tuples with `chain_id = 0` are valid on all EVM chains. For the
+crafted-signature creation path, this means an attacker who observes the
+authorization tuple can replay it on any chain, establishing the same account
+(same address, same Ed25519 key) on chains the creator did not intend. The
+account state on those chains (pre-existing balance, nonce, or code) may
+differ from the creator's expectations.
+
+Creators who do not intend multi-chain deployment should set `chain_id` to the
+target chain. Creators who intentionally use `chain_id = 0` for multi-chain
+deployment should be aware that any party can trigger the migration on any
+chain once the authorization tuple is public.
+
+### Transaction Pool Considerations
+
+Native-key accounts share the same transaction pool challenges as EIP-7702
+delegated accounts: a key rotation (once specified in a companion EIP) could
+invalidate pending transactions. Clients should accept at most one pending
+Type `0x06` transaction per native-key account to minimize the number of
+transactions that can be invalidated by a single state change.
 
 ### Deterministic Keyless Addresses
 
