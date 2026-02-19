@@ -19,6 +19,6 @@ runs:
         cd $GITHUB_WORKSPACE/EIPS
         find . -name "erc-*.md" -type f -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
         cd $GITHUB_WORKSPACE/assets
-        find . -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
+        find . -depth -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
         cd $GITHUB_WORKSPACE
         rm -rf ERCs
