@@ -3,7 +3,7 @@ eip: 8164
 title: Native Key Delegation for EOAs
 description: Allows EOAs to permanently replace ECDSA with alternative signature schemes via an extended delegation designator.
 author: Gregory Markou (@GregTheGreek) <gregorymarkou@gmail.com>, James Prestwich (@prestwich) <james@prestwi.ch>
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/eip-8164-native-key-delegation/27770
 status: Draft
 type: Standards Track
 category: Core
