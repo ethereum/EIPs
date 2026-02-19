@@ -106,15 +106,15 @@ Even offline, dynamic jumps (and the lack of calls and returns) can cause static
 
 > "Analyzing contract binaries is vital ... comprising function entry identification and detecting its boundaries... Unfortunately, it is challenging to identify functions ... due to the lack of internal function call statements."[^7]
 
-There is an entire academic literature of complex, incomplete solutions to problems like these that proper control-flow structure render trivial.
+There is an entire academic literature of complex, incomplete solutions to problems like these that static control-flow renders trivial.
 
 ### Static Control Flow
 
 **Static control flow** means that the destination of every jump or call is determinable at static analysis time (before execution). This is typically achieved by:
 
-1. Requiring jump destinations to be immediate values (not stack values)
-2. Providing explicit call/return opcodes rather than using dynamic jumps for calls
-3. Validating that all jump destinations point to valid instruction boundaries
+- Requiring jump destinations to be immediate values (not stack values)
+- Providing explicit call/return opcodes rather than using dynamic jumps for calls
+- Validating that all jump destinations point to valid instruction boundaries
 
 With static control flow:
 - The CFG can be constructed in time linear in code size
@@ -139,8 +139,8 @@ To understand why static control flow matters for scaling, we need to briefly un
 **Proofs:** A ZK proof is a cryptographic proof that the witness satisfies the circuit's constraints, without revealing the witness itself.
 
 The size of the witness (and thus the proof) depends on:
-1. The length of the execution trace (how many steps the computation takes)
-2. The complexity of the circuit (how many constraints must be checked)
+- The length of the execution trace (how many steps the computation takes)
+- The complexity of the circuit (how many constraints must be checked)
 
 **Dynamic jumps increase both of these.** They force the prover to consider all possible execution paths, making traces longer and circuits more complex.
 
