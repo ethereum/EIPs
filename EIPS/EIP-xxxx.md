@@ -13,6 +13,8 @@ created: 2026-2-16
 
 This Informational EIP provides foundational context for understanding static control flow in the EVM and related optimization proposals. It covers the historical development of control flow mechanisms in computing, the technical foundations of control-flow analysis, and the impact of static control flow on Ethereum's scaling roadmap. This document serves as background material for EIPs including EIP-7979 (Call and Return Opcodes), EIP-8013 (Static Relative Jumps), EIP-3540 (EOF), and discussions around RISC-V migration and ZK verification infrastructure.
 
+_(Note: I leaned heavily on Copilot to create this draft.  It needs more review by relevant experts.)_
+
 ## Historical Context
 
 ### Babbage, 1833: Jumps and Conditional Jumps
@@ -92,9 +94,8 @@ Block N: JUMPDEST GAS JUMP
 At each block's jump instruction, the analyzer cannot know _a priori_ where control will transfer. In the worst case, every block might jump to any other block, creating a fully-connected CFG with O(N²) possible paths. Traversing all paths to verify them requires O(N²) time, and this is not a theoretical worst-case, as shown above
 
 For Ethereum, this quadratic behavior is a **denial-of-service vulnerability** for any online static analysis, including:
-- Validating bytecode at contract creation time
-- Translating bytecode to other representations
-- AOT or JIT compilation at runtime
+- Validating bytecode and AOT compilation at contract creation time
+- JIT compilation at runtime
 
 Even offline, dynamic jumps (and the lack of calls and returns) can cause static analyses of many contracts to become impractical, intractable or even impossible. The following are quotes from the abstracts for just a few recent papers on the problem:
 
@@ -110,9 +111,9 @@ There is an entire academic literature of complex, incomplete solutions to probl
 
 ### Static Control Flow
 
-**Static control flow** means that the destination of every jump or call is determinable at static analysis time (before execution). This is typically achieved by:
+**Static control flow** means that the destination of every jump or call is determinable at contract creation time (before execution). This is typically achieved by:
 
-- Requiring jump destinations to be immediate values (not stack values)
+- Requiring jump destinations to be constant values
 - Providing explicit call/return opcodes rather than using dynamic jumps for calls
 - Validating that all jump destinations point to valid instruction boundaries
 
@@ -180,8 +181,7 @@ As already discussed, static control flow enables contracts to be compiled to ma
 
 There is ongoing discussion within Ethereum research about potentially replacing the EVM with RISC-V or a RISC-V-based execution environment. RISC-V is a standard instruction set architecture which is seeing increasing use in the ZK community.
 
-One currrent strategy for creating a ZK-EVM is to compile an EVM interpreter like evmone or reth to RISC-V for use in a ZK-VM.
-Supporting RISC-V directly eliminates the overhead of the EVM interpreter.
+One currrent strategy for creating a ZK-EVM is to compile an EVM interpreter like evmone or reth to RISC-V for use in a ZK-VM.  Supporting RISC-V directly eliminates the overhead of the EVM interpreter.
 
 An EVM with static control flow opens up another strategy -- compile the EVM code to RISC-V code.  That does require that the EVM compiler be correct, but we already have solutions for that -- formal specifications like KEVM allow for "correct by construction" compilers.
 
