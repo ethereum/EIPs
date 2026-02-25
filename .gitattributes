@@ -5,3 +5,5 @@
 # Force Linux line endings on all files
 # Necessary for running eipw locally
 * text=auto eol=lf
+
+.github/workflows/*.lock.yml linguist-generated=true merge=ours
