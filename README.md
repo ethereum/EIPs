@@ -85,3 +85,52 @@ eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
 2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
 
 More information on Jekyll and GitHub Pages [here](https://docs.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
+
+> **Note**: If you encounter issues with Ruby version compatibility, consider using a Ruby version manager like `rbenv` or `rvm` to manage multiple Ruby versions.
+
+### Ruby Version Managers
+
+Here are some options for managing Ruby versions:
+
+**rbenv:**
+```sh
+# Install rbenv
+brew install rbenv
+
+# Install Ruby 3.1.4
+rbenv install 3.1.4
+
+# Set as local version
+rbenv local 3.1.4
+```
+
+**rvm:**
+```sh
+# Install rvm
+curl -sSL https://get.rvm.io | bash
+
+# Install Ruby 3.1.4
+rvm install 3.1.4
+
+# Use Ruby 3.1.4
+rvm use 3.1.4
+```
+
+### Common Build Issues
+
+If you encounter issues while building the site:
+
+- **Port already in use**: Change the port with `bundle exec jekyll serve --port 4001`
+- **Dependency conflicts**: Run `bundle clean --force` and then `bundle install`
+- **Permission errors**: Ensure you have write permissions in the project directory
+
+### Alternative Build Methods
+
+You can also build the site without running a server:
+
+```sh
+# Build static site
+bundle exec jekyll build
+
+# Output will be in the _site directory
+```
