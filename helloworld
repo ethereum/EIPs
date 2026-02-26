@@ -1,0 +1,2633 @@
+<!DOCTYPE html>
+
+
+    <html class="html__responsive html__unpinned-leftnav" lang="en">
+
+    <head>
+
+        <title>Newest Questions - Bitcoin Stack Exchange</title>
+        <link rel="shortcut icon" href="https://cdn.sstatic.net/Sites/bitcoin/Img/favicon.ico?v=1f9970d23d34">
+        <link rel="apple-touch-icon" href="https://cdn.sstatic.net/Sites/bitcoin/Img/apple-touch-icon.png?v=03725253491d">
+        <link rel="image_src" href="https://cdn.sstatic.net/Sites/bitcoin/Img/apple-touch-icon.png?v=03725253491d"> 
+        <link rel="search" type="application/opensearchdescription+xml" title="Bitcoin Stack Exchange" href="/opensearch.xml">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+        <meta property="og:type" content= "website" />
+        <meta property="og:url" content="https://bitcoin.stackexchange.com/questions"/>
+        <meta property="og:site_name" content="Bitcoin Stack Exchange" />
+        <meta property="og:image" itemprop="image primaryImageOfPage" content="https://cdn.sstatic.net/Sites/bitcoin/Img/apple-touch-icon@2.png?v=b4864ba760f1" />
+        <meta name="twitter:card" content="summary"/>
+        <meta name="twitter:domain" content="bitcoin.stackexchange.com"/>
+        <meta name="twitter:title" property="og:title" itemprop="name" content="Newest Questions" />
+        <meta name="twitter:description" property="og:description" itemprop="description" content="Q&amp;A for Bitcoin crypto-currency enthusiasts" />
+    <script id="webpack-public-path" type="text/uri-list">https://cdn.sstatic.net/</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script defer src="https://cdn.sstatic.net/Js/third-party/npm/@stackoverflow/stacks/dist/js/stacks.min.js?v=b95611219aa3"></script>
+    <script src="https://cdn.sstatic.net/Js/stub.en.js?v=68a37805e06d"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.sstatic.net/Shared/stacks.css?v=83d4b324173a">
+    <link rel="stylesheet" type="text/css" href="https://cdn.sstatic.net/Sites/bitcoin/primary.css?v=5aef8b034213">
+
+
+    
+    
+    <script defer src="https://cdn.sstatic.net/Js/webpack-chunks/1631.en.js?v=76eab8a51bd7"></script><script defer src="https://cdn.sstatic.net/Js/questions/list.en.js?v=b44eca611a6b"></script>
+    <script>StackExchange.ready(function () {StackExchange.realtime.subscribeToUQL('308', 'newest', [], {}, []);});</script>
+
+        
+        
+        
+        <link rel="stylesheet" type="text/css" href="https://cdn.sstatic.net/Shared/Channels/channels.css?v=a5fae8812988">
+
+        
+        
+
+
+    <script>
+        StackExchange.ready(function () {
+            StackExchange.realtime.init('wss://qa.sockets.stackexchange.com');
+                StackExchange.realtime.subscribeToReputationNotifications('308');
+        StackExchange.realtime.subscribeToTopBarNotifications('308');
+        });
+    </script>
+    <script type="application/json" data-role="module-args" data-module-name="Shared/options.mod">{"options":{"locale":"en","serverTime":1680911700,"routeName":"Questions/List","stackAuthUrl":"https://stackauth.com","networkMetaHostname":"meta.stackexchange.com","site":{"name":"Bitcoin Stack Exchange","description":"Q\u0026A for Bitcoin crypto-currency enthusiasts","isNoticesTabEnabled":true,"enableNewTagCreationWarning":false,"insertSpaceAfterNameTabCompletion":false,"id":308,"cookieDomain":".stackexchange.com","childUrl":"https://bitcoin.meta.stackexchange.com","negativeVoteScoreFloor":null,"enableSocialMediaInSharePopup":true,"protocol":"https"},"user":{"fkey":"5016d0e073b167976b2f1d336a014114808d1e066cf6816b0c8a61a9b3c4dfec","tid":"ab95f1ae-c55d-c0e5-d7bc-d818aedad340","rep":1,"isRegistered":true,"keyboardShortcuts":true,"userType":3,"userId":137631,"accountId":22021373,"gravatar":"\u003cdiv class=\u0022gravatar-wrapper-32\u0022\u003e\u003cimg src=\u0022https://lh3.googleusercontent.com/a/AATXAJw398FfLwecakkuT7z77z2It0zbSkQW7XeMQGwU=k-s32\u0022 alt=\u0022Tod Stephens\u0026#39;s user avatar\u0022 width=\u002232\u0022 height=\u002232\u0022 class=\u0022bar-sm\u0022\u003e\u003c/div\u003e","profileUrl":"https://bitcoin.stackexchange.com/users/137631/tod-stephens","canSeeDeletedPosts":false},"realtime":{"newest":true,"active":true,"tagged":true,"staleDisconnectIntervalInHours":0},"events":{"postType":{"question":1},"postEditionSection":{"title":1,"body":2,"tags":3}}}}</script>
+<script type="application/json" data-role="module-args" data-module-name="Shared/settings.mod">{"settings":{"userMessaging":{},"tags":{},"subscriptions":{"defaultBasicMaxTrueUpSeats":250,"defaultFreemiumMaxTrueUpSeats":50,"defaultMaxTrueUpSeats":1000},"snippets":{"renderDomain":"stacksnippets.net"},"site":{"allowImageUploads":true,"enableImgurHttps":true,"enableUserHovercards":true,"forceHttpsImages":true,"stacksEditorPreviewEnabled":true,"styleCode":true},"search":{},"questions":{"enableQuestionTitleLengthLiveWarning":true,"enableSavesFeature":true,"maxTitleSize":150,"questionTitleLengthStartLiveWarningChars":50},"intercom":{"appId":"inf0secd","hostBaseUrl":"https://stacksnippets.net"},"paths":{"jQueryUICSSPath":"https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css","jQueryUIJSPath":"https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"},"mentions":{"maxNumUsersInDropdown":50},"markdown":{"enableTables":true},"legal":{"oneTrustConfigId":"cb0f3c87-b769-4e66-bbaa-377f9194216d"},"flags":{"allowRetractingCommentFlags":true,"allowRetractingFlags":true},"elections":{"opaVoteResultsBaseUrl":"https://www.opavote.com/results/"},"comments":{},"accounts":{"currentPasswordRequiredForChangingStackIdPassword":true}}}</script>
+<script>StackExchange.init();</script>
+
+    <script>
+        StackExchange.using.setCacheBreakers({"Js/adops.en.js":"6da43f5e0a84","Js/ask.en.js":"","Js/begin-edit-event.en.js":"20edbaccceae","Js/copy-transpiled.en.js":"2beafae5021b","Js/events.en.js":"","Js/explore-qlist.en.js":"2b1f34938b8b","Js/full-anon.en.js":"841ab61b2781","Js/full.en.js":"571167a1a5d3","Js/highlightjs-loader.en.js":"036aae3dd40c","Js/inline-tag-editing.en.js":"8a038866f9a6","Js/keyboard-shortcuts.en.js":"107c2ac31497","Js/markdown-it-loader.en.js":"5818ef89ff9d","Js/mentions-transpiled.en.js":"78637d7eac99","Js/moderator.en.js":"ee37b3b258e2","Js/postCollections-transpiled.en.js":"588ac26c1ad0","Js/post-validation.en.js":"5b55f6dc25d3","Js/question-editor.en.js":"","Js/review-v2-transpiled.en.js":"3b102c86129f","Js/revisions.en.js":"e6acc03fd5b5","Js/stacks-editor.en.js":"4a547551816b","Js/tageditor.en.js":"e5db6df2411b","Js/tageditornew.en.js":"cebacb19d403","Js/tagsuggestions.en.js":"bd6ec908f2a7","Js/unlimited-transpiled.en.js":"7ed67670b600","Js/wmd.en.js":"09d93d5de0f4"});
+        StackExchange.using("gps", function() {
+             StackExchange.gps.init(true);
+        });
+    </script>
+    <noscript id="noscript-css"><style>body,.s-topbar{margin-top:1.9em}</style></noscript>
+    </head>
+    <body class="questions-page unified-theme">
+    <div id="notify-container"></div>
+    <div id="custom-header"></div>
+        
+<header class="s-topbar ps-fixed t0 l0 js-top-bar">
+	<div class="s-topbar--container">
+			<a href="#" class="s-topbar--menu-btn js-left-sidebar-toggle" role="menuitem" aria-haspopup="true" aria-controls="left-sidebar" aria-expanded="false"><span></span></a>
+			<div class="topbar-dialog leftnav-dialog js-leftnav-dialog dno">
+				<div class="left-sidebar js-unpinned-left-sidebar" data-can-be="left-sidebar" data-is-here-when="sm md lg"></div>
+			</div>
+			<a href="#" class="s-topbar--logo network-logo js-gps-track js-network-logo"
+		   data-gps-track="stack_exchange_popup.show" role="menuitem" aria-haspopup="true" aria-controls="topbar-network-logo-dialog" aria-expanded="false">
+				<svg aria-hidden="true" class="native mtn1 svg-icon iconLogoSEAlternativeSm" width="107" height="15" viewBox="0 0 107 15"><path d="m48.41 11.93-1.96-3.2-1.04 1.16v2.04h-1.42V2.18h1.42v6.01L48.14 5h1.72l-2.44 2.7 2.74 4.22h-1.75Zm-7.06.08c-1.59 0-3.14-.96-3.14-3.56s1.55-3.54 3.14-3.54c.97 0 1.65.27 2.31.97l-.97.93c-.44-.48-.79-.66-1.34-.66s-1 .22-1.3.62c-.31.38-.42.87-.42 1.68 0 .81.1 1.32.41 1.7.3.4.76.62 1.3.62.56 0 .9-.18 1.35-.66l.97.92c-.66.7-1.34.98-2.31.98Zm-5.66-3.15h-1.65c-.83 0-1.26.37-1.26 1s.4.99 1.3.99c.53 0 .93-.04 1.3-.4.22-.2.31-.53.31-1.03v-.56Zm.03 3.07v-.63c-.51.5-1 .71-1.87.71-.87 0-1.46-.2-1.89-.63a2.1 2.1 0 0 1-.55-1.49c0-1.16.82-2 2.42-2h1.86v-.5c0-.87-.44-1.3-1.54-1.3-.77 0-1.15.18-1.54.68l-.92-.86c.66-.77 1.35-1 2.52-1 1.93 0 2.9.8 2.9 2.38v4.64h-1.39Zm-5.9 0c-1.32 0-1.93-.93-1.93-1.93V6.18h-.8V5.1h.8V3h1.41v2.1h1.36v1.07H29.3v3.75c0 .5.25.81.78.81h.58v1.2h-.85Zm-6.33.08c-1.48 0-2.55-.34-3.49-1.28l1-.98c.72.72 1.51.94 2.52.94 1.3 0 2.04-.55 2.04-1.5 0-.42-.13-.78-.39-1.01-.25-.23-.5-.33-1.08-.41l-1.16-.17a3.4 3.4 0 0 1-1.88-.78 2.41 2.41 0 0 1-.72-1.86c0-1.7 1.25-2.86 3.3-2.86 1.3 0 2.22.33 3.07 1.1l-.96.94a2.92 2.92 0 0 0-2.15-.75c-1.16 0-1.8.65-1.8 1.52 0 .35.1.67.37.9.25.22.65.38 1.11.45l1.13.17c.91.13 1.42.35 1.84.72.54.47.8 1.17.8 2 0 1.8-1.48 2.86-3.55 2.86Z" fill="#FEFEFE"/><path d="M104.16 7.09c-.2-.42-.6-.74-1.2-.74s-.99.32-1.18.74c-.1.25-.15.44-.16.75h2.7a2 2 0 0 0-.16-.75Zm-2.54 1.96c0 .9.56 1.57 1.55 1.57.78 0 1.16-.21 1.61-.66l1.08 1.04a3.4 3.4 0 0 1-2.7 1.11c-1.68 0-3.29-.76-3.29-3.62 0-2.3 1.26-3.6 3.1-3.6 1.97 0 3.1 1.44 3.1 3.37v.79h-4.45Zm-5.48-2.57C95.1 6.48 95 7.37 95 8.3c0 .94.1 1.85 1.15 1.85 1.05 0 1.18-.91 1.18-1.85 0-.93-.13-1.82-1.18-1.82Zm-.17 8.22c-1.1 0-1.84-.21-2.58-.92l1.1-1.11c.4.38.8.54 1.4.54 1.06 0 1.43-.74 1.43-1.46v-.72c-.47.51-1 .7-1.7.7-.69 0-1.29-.23-1.68-.62-.67-.66-.73-1.57-.73-2.8 0-1.24.06-2.13.73-2.8.4-.39 1-.62 1.7-.62.75 0 1.24.2 1.73.75v-.67h1.72v6.8c0 1.7-1.21 2.93-3.12 2.93Zm-5.76-2.67V7.76c0-.96-.61-1.28-1.17-1.28-.56 0-1.18.32-1.18 1.28v4.27h-1.78V4.97h1.73v.65a2.44 2.44 0 0 1 1.78-.73c.7 0 1.28.23 1.67.62.58.57.73 1.24.73 2v4.52H90.2Zm-7.1-2.98h-1.4c-.64 0-1 .3-1 .8 0 .49.33.81 1.02.81.5 0 .8-.04 1.12-.34.2-.17.26-.46.26-.89v-.38Zm.04 2.98v-.6c-.48.47-.93.67-1.74.67-.8 0-1.4-.2-1.82-.62-.38-.4-.58-.97-.58-1.59 0-1.12.77-2.05 2.42-2.05h1.68V7.5c0-.77-.38-1.11-1.32-1.11-.68 0-1 .16-1.37.58l-1.13-1.1c.7-.75 1.38-.97 2.57-.97 1.99 0 3.02.84 3.02 2.5v4.64h-1.73Zm-6.93 0v-4.3c0-.94-.6-1.25-1.15-1.25-.56 0-1.15.32-1.15 1.24v4.31h-1.77V2.38h1.77v3.24a2.35 2.35 0 0 1 1.7-.73c1.56 0 2.38 1.08 2.38 2.57v4.57h-1.78Zm-6.96.08c-1.42 0-3.18-.76-3.18-3.62 0-2.85 1.76-3.6 3.18-3.6.98 0 1.72.3 2.34.95l-1.2 1.2c-.36-.4-.68-.56-1.14-.56-.42 0-.75.14-1.01.46-.27.33-.4.8-.4 1.55s.13 1.24.4 1.58c.26.3.59.46 1 .46.47 0 .79-.16 1.15-.56l1.2 1.18c-.62.65-1.36.96-2.34.96Zm-5.53-.08-1.3-2.11-1.3 2.11H59l2.45-3.6-2.35-3.46h2.12L62.42 7l1.21-2.02h2.13L63.4 8.43l2.46 3.6h-2.13Zm-11.75 0V2.06h6.6V3.8h-4.65v2.33h3.96v1.74h-3.96v2.42h4.65v1.74h-6.6Z" fill="#2F96E8"/><path d="M0 3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2H0Z" fill="#8FD8F7"/><path d="M12 10H0c0 1.1.9 2 2 2h5v3l3-3a2 2 0 0 0 2-2Z" fill="#155397"/><path fill="#46A2D9" d="M0 4h12v2H0z"/><path fill="#2D6DB5" d="M0 7h12v2H0z"/></svg>
+			</a>
+			<div class="topbar-dialog network-logo-dialog js-network-logo-dialog dno" id="topbar-network-logo-dialog" role="dialog" aria-labelledby="topbar-network-logo-dialog-title" aria-describedby="topbar-network-logo-dialog-body">
+				<div class="dialog-content">
+					<h4 class="bold" id="topbar-network-logo-dialog-title">Stack Exchange Network</h4>
+					<p id="topbar-network-logo-dialog-body">
+						Stack Exchange network consists of 181 Q&amp;A communities including <a href="https://stackoverflow.com">Stack Overflow</a>, the largest, most trusted online community for developers to learn, share their knowledge, and build their careers.
+					</p>
+					<a class="s-btn s-btn__filled" href="https://stackexchange.com"
+				   data-gps-track="stack_exchange_popup.click">Visit Stack Exchange</a>
+					<button class="icon-close js-close-button s-btn s-btn__unset" aria-label="Close"><svg aria-hidden="true" class="svg-icon iconClear" width="18" height="18"  viewBox="0 0 18 18"><path  d="M15 4.41 13.59 3 9 7.59 4.41 3 3 4.41 7.59 9 3 13.59 4.41 15 9 10.41 13.59 15 15 13.59 10.41 9 15 4.41Z"/></svg></button>
+				</div>
+			</div>
+
+
+
+
+
+		        <form id="search" role="search" action=/search class="s-topbar--searchbar js-searchbar " autocomplete="off">
+                        <div class="s-topbar--searchbar--input-group">
+                            <input name="q"
+                                   type="text"
+                                   role="combobox"
+                                   placeholder="Search on Bitcoin&#x2026;"
+                                   value=""
+                                   autocomplete="off"
+                                   maxlength="240"
+                                   class="s-input s-input__search js-search-field "
+                                   aria-label="Search"
+                                   aria-controls="top-search" 
+                                   data-controller="s-popover"
+                                   data-action="focus->s-popover#show"
+                                   data-s-popover-placement="bottom-start" />
+                            <svg aria-hidden="true" class="s-input-icon s-input-icon__search svg-icon iconSearch" width="18" height="18"  viewBox="0 0 18 18"><path  d="m18 16.5-5.14-5.18h-.35a7 7 0 1 0-1.19 1.19v.35L16.5 18l1.5-1.5ZM12 7A5 5 0 1 1 2 7a5 5 0 0 1 10 0Z"/></svg>
+                            <div class="s-popover p0 wmx100 wmn4 sm:wmn-initial js-top-search-popover" id="top-search" role="menu">
+    <div class="s-popover--arrow"></div>
+    <div class="js-spinner p24 d-flex ai-center jc-center d-none">
+        <div class="s-spinner s-spinner__sm fc-orange-400">
+            <div class="v-visible-sr">Loading&#x2026;</div>
+        </div>
+    </div>
+
+    <span class="v-visible-sr js-screen-reader-info"></span>
+    <div class="js-ac-results overflow-y-auto hmx3 d-none"></div>
+
+    <div class="js-search-hints" aria-describedby="Tips for searching"></div>
+</div>
+                        </div>
+                </form>
+		
+<nav class="h100 ml-auto overflow-x-auto pr12">
+    <ol class="s-topbar--content" role="menubar">
+            <li role="none"><button class="s-topbar--item s-btn s-btn__icon s-btn__muted d-none sm:d-inline-flex js-searchbar-trigger" role="menuitem" aria-label="Search" aria-haspopup="true" aria-controls="search" title="Click to show search"><svg aria-hidden="true" class="svg-icon iconSearch" width="18" height="18"  viewBox="0 0 18 18"><path  d="m18 16.5-5.14-5.18h-.35a7 7 0 1 0-1.19 1.19v.35L16.5 18l1.5-1.5ZM12 7A5 5 0 1 1 2 7a5 5 0 0 1 10 0Z"/></svg></button></li>
+    
+                <li role="none">
+                    <a href="/users/137631/tod-stephens" class="s-topbar--item s-user-card s-user-card__small m0 px12 js-gps-track" role="menuitem" data-gps-track="profile_summary.click()">
+<div class="s-avatar s-avatar__24 s-user-card--avatar sm:m0" title="Tod Stephens"><img src="https://lh3.googleusercontent.com/a/AATXAJw398FfLwecakkuT7z77z2It0zbSkQW7XeMQGwU=k-s48" alt="Tod Stephens&#39;s user avatar" width="24" height="24" class="bar-sm s-avatar--image js-avatar-me"></div>                            <span class="v-visible-sr">Tod Stephens</span>
+    
+        <div class="s-user-card--info sm:d-none">
+            <ul class="s-user-card--awards">
+                <li class="s-user-card--rep js-header-rep" title="your reputation: 1" aria-hidden="true">
+                    1
+                    <span class="v-visible-sr">, 1 reputation</span>
+                </li>
+                    <li class="-badges mr0">
+<span title="1 bronze badge" aria-hidden="true"><span class="badge3">&#9679;</span><span class="badgecount">1</span></span><span class="v-visible-sr">1 bronze badge</span>                    </li>
+            </ul>
+        </div>
+                    </a>
+                </li>
+        <li role="none">
+            <a href="https://stackexchange.com/users/22021373?tab=inbox" class="s-topbar--item js-inbox-button" aria-label="Inbox"
+                role="menuitem" title="Recent inbox messages" aria-haspopup="true" aria-expanded="false" data-unread-count="0">
+                <svg aria-hidden="true" class="svg-icon iconInbox" width="20" height="18"  viewBox="0 0 20 18"><path  d="M4.63 1h10.56a2 2 0 0 1 1.94 1.35L20 10.79V15a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-4.21l2.78-8.44c.25-.8 1-1.36 1.85-1.35Zm8.28 12 2-2h2.95l-2.44-7.32a1 1 0 0 0-.95-.68H5.35a1 1 0 0 0-.95.68L1.96 11h2.95l2 2h6Z"/></svg>
+                <span class="s-activity-indicator s-activity-indicator__danger js-unread-count d-none">0</span>
+            </a>
+        </li>
+        <li role="none">
+            <a href="https://stackexchange.com/users/22021373?tab=reputation" class="s-topbar--item js-achievements-button" data-unread-class="fc-success"
+           aria-label="Achievements" role="menuitem" title="Recent achievements: reputation, badges, and privileges earned" aria-haspopup="true" aria-expanded="false" data-unread-count="0" data-lit-up="false">
+                <svg aria-hidden="true" class="svg-icon iconAchievements" width="18" height="18"  viewBox="0 0 18 18"><path  d="M15 2V1H3v1H0v4c0 1.6 1.4 3 3 3v1c.4 1.5 3 2.6 5 3v2H5s-1 1.5-1 2h10c0-.4-1-2-1-2h-3v-2c2-.4 4.6-1.5 5-3V9c1.6-.2 3-1.4 3-3V2h-3ZM3 7c-.5 0-1-.5-1-1V4h1v3Zm8.4 2.5L9 8 6.6 9.4l1-2.7L5 5h3l1-2.7L10 5h2.8l-2.3 1.8 1 2.7h-.1ZM16 6c0 .5-.5 1-1 1V4h1v2Z"/></svg>
+                <span class="s-activity-indicator s-activity-indicator__success js-unread-count d-none">+0</span>
+            </a>
+        </li>
+        <li role="none">
+            <a href="/help" class="s-topbar--item js-help-button" role="menuitem" title="Help Center and other resources" aria-haspopup="true" aria-controls="topbar-help-dialog"
+           data-ga="[&quot;top navigation&quot;,&quot;help menu click&quot;,null,null,null]"><svg aria-hidden="true" class="svg-icon iconHelp" width="18" height="18"  viewBox="0 0 18 18"><path  d="M9 1C4.64 1 1 4.64 1 9c0 4.36 3.64 8 8 8 4.36 0 8-3.64 8-8 0-4.36-3.64-8-8-8Zm.81 12.13c-.02.71-.55 1.15-1.24 1.13-.66-.02-1.17-.49-1.15-1.2.02-.72.56-1.18 1.22-1.16.7.03 1.2.51 1.17 1.23ZM11.77 8c-.59.66-1.78 1.09-2.05 1.97a4 4 0 0 0-.09.75c0 .05-.03.16-.18.16H7.88c-.16 0-.18-.1-.18-.15.06-1.35.66-2.2 1.83-2.88.39-.29.7-.75.7-1.24.01-1.24-1.64-1.82-2.35-.72-.21.33-.18.73-.18 1.1H5.75c0-1.97 1.03-3.26 3.03-3.26 1.75 0 3.47.87 3.47 2.83 0 .57-.2 1.05-.48 1.44Z"/></svg></a>
+        </li>
+        <div class="topbar-dialog help-dialog js-help-dialog dno" id="topbar-help-dialog" role="menu">
+            <div class="modal-content">
+                <ul>
+                        <li>
+                            <a href="/tour" class="js-gps-track" data-gps-track="help_popup.click({ item_type:1 })"
+                       data-ga="[&quot;top navigation&quot;,&quot;tour submenu click&quot;,null,null,null]">
+                                Tour
+                                <span class="item-summary">
+                                    Start here for a quick overview of the site
+                                </span>
+                            </a>
+                        </li>
+                    <li>
+                        <a href="/help" class="js-gps-track"
+                       data-gps-track="help_popup.click({ item_type:4 })"
+                       data-ga="[&quot;top navigation&quot;,&quot;help center&quot;,null,null,null]">
+                            Help Center
+                            <span class="item-summary">
+                                Detailed answers to any questions you might have
+                            </span>
+                        </a>
+                    </li>
+                                <li>
+                                    <a href="https://bitcoin.meta.stackexchange.com" class="js-gps-track" data-gps-track="help_popup.click({ item_type:2 })"
+                       data-ga="[&quot;top navigation&quot;,&quot;meta submenu click&quot;,null,null,null]">
+                                        Meta
+                                        <span class="item-summary">
+                                            Discuss the workings and policies of this site
+                                        </span>
+                                    </a>
+                                </li>
+                            <li>
+                                <a href="https://stackoverflow.co/" class="js-gps-track" data-gps-track="help_popup.click({ item_type:6 })"
+                       data-ga="[&quot;top navigation&quot;,&quot;about us submenu click&quot;,null,null,null]">
+                                    About Us
+                                    <span class="item-summary">
+                                        Learn more about Stack Overflow the company, and our products.
+                                    </span>
+                                </a>
+                            </li>
+                </ul>
+            </div>
+        </div>
+        <li role="none">
+            <a href="https://stackexchange.com" class="s-topbar--item js-site-switcher-button js-gps-track" data-gps-track="site_switcher.show"
+           aria-label="Site switcher"
+           role="menuitem"
+           title="A list of all 181 Stack Exchange sites"
+           aria-haspopup="true" aria-expanded="false"
+           data-ga="[&quot;top navigation&quot;,&quot;stack exchange click&quot;,null,null,null]">
+                <svg aria-hidden="true" class="svg-icon iconStackExchange" width="18" height="18"  viewBox="0 0 18 18"><path  d="M15 1H3a2 2 0 0 0-2 2v2h16V3a2 2 0 0 0-2-2ZM1 13c0 1.1.9 2 2 2h8v3l3-3h1a2 2 0 0 0 2-2v-2H1v2Zm16-7H1v4h16V6Z"/></svg>
+            </a>
+        </li>
+    
+    
+        <li class="js-topbar-dialog-corral" role="presentation">
+                
+
+    <div class="topbar-dialog siteSwitcher-dialog dno" role="menu">
+        <div class="header fw-wrap">
+            <h3 class="flex--item">
+                <a href="https://bitcoin.stackexchange.com">current community</a>
+            </h3>
+            <div class="flex--item fl1">
+                <div class="ai-center d-flex jc-end">
+                    <button
+                        class="js-close-button s-btn s-btn__muted p0 ml8 d-none sm:d-block"
+                        type="button"
+                        aria-label="Close"
+                    >
+                        <svg aria-hidden="true" class="svg-icon iconClear" width="18" height="18"  viewBox="0 0 18 18"><path  d="M15 4.41 13.59 3 9 7.59 4.41 3 3 4.41 7.59 9 3 13.59 4.41 15 9 10.41 13.59 15 15 13.59 10.41 9 15 4.41Z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-content bg-powder-050 current-site-container">
+                <div class="d-none sm:d-block">
+                    <div class="d-flex ai-end">
+                        <div class="s-user-card flex--item fl1">
+                            <a href="/users/137631/tod-stephens" class="s-avatar s-avatar__32 s-user-card--avatar">
+                                <div class="gravatar-wrapper-32"><img src="https://lh3.googleusercontent.com/a/AATXAJw398FfLwecakkuT7z77z2It0zbSkQW7XeMQGwU=k-s32" alt="Tod Stephens&#39;s user avatar" width="32" height="32" class="bar-sm avatar s-avatar--image"></div>
+                            </a>
+                            <div class="s-user-card--info">
+                                <a href="/users/137631/tod-stephens" class="s-user-card--link">Tod Stephens</a>
+                                <div class="s-user-card--awards lh-unset fc-black-700 fw-bold">
+                                    <span class="reputation-score" title="reputation score " dir="ltr">1</span><span title="1 bronze badge" aria-hidden="true"><span class="badge3"></span><span class="badgecount">1</span></span><span class="v-visible-sr">1 bronze badge</span>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="related-links flex--item p8">
+                                <a href="https://bitcoin.stackexchange.com/users/logout" data-gps-track="site_switcher.click({ item_type:8 })">log out</a>
+                            </div>
+                    </div>
+                </div>
+            <ul class="current-site ">
+                    <li class="d-flex">
+                            <div class="fl1">
+                <a href="https://bitcoin.stackexchange.com"
+       class="current-site-link site-link js-gps-track d-flex gs8 gsx"
+       data-id="308"
+       data-gps-track="site_switcher.click({ item_type:3 })">
+        <div class="favicon favicon-bitcoin site-icon flex--item" title="Bitcoin"></div>
+        <span class="flex--item fl1">
+            Bitcoin
+        </span>
+    </a>
+
+    </div>
+    <div class="related-links">
+            <a href="https://bitcoin.stackexchange.com/help" class="js-gps-track" data-gps-track="site_switcher.click({ item_type:14 })">help</a>
+            <a href="https://chat.stackexchange.com?tab=site&amp;host=bitcoin.stackexchange.com" class="js-gps-track" data-gps-track="site_switcher.click({ item_type:6 })">chat</a>
+            <a href="https://bitcoin.stackexchange.com/users/logout" class="js-gps-track" data-gps-track="site_switcher.click({ item_type:8 })">log out</a>
+    </div>
+
+                    </li>
+                    <li class="related-site d-flex">
+                            <div class="L-shaped-icon-container">
+        <span class="L-shaped-icon"></span>
+    </div>
+
+                            <a href="https://bitcoin.meta.stackexchange.com"
+       class=" site-link js-gps-track d-flex gs8 gsx"
+       data-id="310"
+       data-gps-track="site.switch({ target_site:310, item_type:3 }),site_switcher.click({ item_type:4 })">
+        <div class="favicon favicon-bitcoinmeta site-icon flex--item" title="Bitcoin Meta"></div>
+        <span class="flex--item fl1">
+            Bitcoin Meta
+        </span>
+    </a>
+
+                    </li>
+            </ul>
+        </div>
+
+        <div class="header" id="your-communities-header">
+            <h3>
+                    <a href="https://stackexchange.com/users/22021373/?tab=accounts">your communities</a>
+            </h3>
+
+                <a href="#" id="edit-pinned-sites">edit</a>
+                <a href="#" id="cancel-pinned-sites" style="display: none;">cancel</a>
+        </div>
+        <div class="modal-content" id="your-communities-section">
+
+                <ul class="my-sites">
+                        <li>
+                                <a href="https://askubuntu.com"
+       class=" site-link js-gps-track d-flex gs8 gsx"
+       data-id="89"
+       data-gps-track="site.switch({ target_site:89, item_type:3 }),site_switcher.click({ item_type:1 })">
+        <div class="favicon favicon-askubuntu site-icon flex--item" title="Ask Ubuntu"></div>
+        <span class="flex--item fl1">
+            Ask Ubuntu
+        </span>
+            <span class="rep-score flex--item">1</span>
+    </a>
+
+                        </li>
+                        <li>
+                                <a href="https://bitcoin.stackexchange.com"
+       class=" site-link js-gps-track d-flex gs8 gsx"
+       data-id="308"
+       data-gps-track="site.switch({ target_site:308, item_type:3 }),site_switcher.click({ item_type:1 })">
+        <div class="favicon favicon-bitcoin site-icon flex--item" title="Bitcoin"></div>
+        <span class="flex--item fl1">
+            Bitcoin
+        </span>
+            <span class="rep-score flex--item">1</span>
+    </a>
+
+                        </li>
+                        <li>
+                                <a href="https://ethereum.stackexchange.com"
+       class=" site-link js-gps-track d-flex gs8 gsx"
+       data-id="642"
+       data-gps-track="site.switch({ target_site:642, item_type:3 }),site_switcher.click({ item_type:1 })">
+        <div class="favicon favicon-ethereum site-icon flex--item" title="Ethereum"></div>
+        <span class="flex--item fl1">
+            Ethereum
+        </span>
+            <span class="rep-score flex--item">1</span>
+    </a>
+
+                        </li>
+                        <li>
+                                <a href="https://scifi.stackexchange.com"
+       class=" site-link js-gps-track d-flex gs8 gsx"
+       data-id="186"
+       data-gps-track="site.switch({ target_site:186, item_type:3 }),site_switcher.click({ item_type:1 })">
+        <div class="favicon favicon-scifi site-icon flex--item" title="Science Fiction &amp; Fantasy"></div>
+        <span class="flex--item fl1">
+            Science Fiction &amp; Fantasy
+        </span>
+            <span class="rep-score flex--item">1</span>
+    </a>
+
+                        </li>
+                        <li>
+                                <a href="https://stackoverflow.com"
+       class=" site-link js-gps-track d-flex gs8 gsx"
+       data-id="1"
+       data-gps-track="site.switch({ target_site:1, item_type:3 }),site_switcher.click({ item_type:1 })">
+        <div class="favicon favicon-stackoverflow site-icon flex--item" title="Stack Overflow"></div>
+        <span class="flex--item fl1">
+            Stack Overflow
+        </span>
+            <span class="rep-score flex--item">1</span>
+    </a>
+
+                        </li>
+                </ul>
+                    <div class="pinned-site-editor-container" style="display: none;">
+                        <input type="hidden" name="fkey" value="5016d0e073b167976b2f1d336a014114808d1e066cf6816b0c8a61a9b3c4dfec">
+                        <div class="d-flex p12">
+                            <div class="flex--item fl1 ps-relative">
+                                <input id="js-site-search-txt"
+                                        type="text"
+                                        class="s-input s-input__sm w100 h100 site-filter-input"
+                                        value=""
+                                        placeholder="Add a Stack Exchange community"/>
+                                <ul class="js-found-sites found-sites hmx1 l0 r0 ps-absolute overflow-y-auto"></ul>
+                            </div>
+                            <button class="ml8 s-btn s-btn__sm" type="submit" id="pin-site-btn" disabled="disabled">Add</button>
+                        </div>
+                        <ul class="pinned-site-list sortable" data-custom-list="False">
+                        </ul>
+                        <div class="d-flex p12 jc-end">
+                            <a class="flex--item s-btn s-btn__sm js-reset-pinned-sites" href="#">Reset</a>
+                            <button class="ml8 flex--item s-btn s-btn__primary s-btn__sm" type="submit" id="save-pinned-sites-btn" disabled="disabled">Save</button>
+                        </div>
+                    </div>
+        </div>
+
+        <div class="header">
+            <h3><a href="https://stackexchange.com/sites">more stack exchange communities</a>
+            </h3>
+            <a href="https://stackoverflow.blog" class="float-right">company blog</a>
+        </div>
+        <div class="modal-content">
+                <div class="child-content"></div>
+        </div>        
+    </div>
+
+        </li>
+    
+    </ol>
+</nav>
+
+
+	</div>
+</header>
+
+	<script>
+		StackExchange.ready(function () { StackExchange.topbar.init(); });
+		StackExchange.scrollPadding.setPaddingTop(50, 10); 
+	</script>
+
+
+
+
+        <header class="site-header">
+            <div class="site-header--container">
+            <a class="site-header--link d-flex ai-center fs-headline1 fw-bold" href="https://bitcoin.stackexchange.com">
+                <img class="h-auto wmx100" src="https://cdn.sstatic.net/Sites/bitcoin/Img/logo.svg?v=65edcd6e45f3" alt="Bitcoin">
+            </a>
+
+            </div>
+        </header>
+
+    <div class="container">
+                
+
+<div id="left-sidebar" data-is-here-when="" class="left-sidebar js-pinned-left-sidebar ps-relative">
+    <div class="left-sidebar--sticky-container js-sticky-leftnav">
+        <nav role="navigation">
+
+            <ol class="nav-links">
+                
+
+<li class="ps-relative"  aria-current="false">
+
+
+    <a
+       href="/"
+       class="pl8 js-gps-track nav-links--link"
+       
+       data-gps-track="top_nav.click({is_current: false, location:3, destination:8})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never">
+            <div class="d-flex ai-center">
+                <div class="flex--item truncate">
+                    Home
+                </div>
+            </div>
+    </a>
+</li>
+
+                
+                <li>
+                    <ol class="nav-links">
+
+                        <li class="fs-fine tt-uppercase ml8 mt16 mb4 fc-light">Public</li>
+
+                            
+
+<li class="ps-relative  youarehere"  aria-current="true">
+
+
+    <a id="nav-questions"
+       href="/questions"
+       class="pl8 js-gps-track nav-links--link -link__with-icon"
+       
+       data-gps-track="top_nav.click({is_current: true, location:3, destination:1})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="page"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never">
+<svg aria-hidden="true" class="svg-icon iconGlobe" width="18" height="18"  viewBox="0 0 18 18"><path  d="M9 1C4.64 1 1 4.64 1 9c0 4.36 3.64 8 8 8 4.36 0 8-3.64 8-8 0-4.36-3.64-8-8-8ZM8 15.32a6.46 6.46 0 0 1-4.3-2.74 6.46 6.46 0 0 1-.93-5.01L7 11.68v.8c0 .88.12 1.32 1 1.32v1.52Zm5.72-2c-.2-.66-1-1.32-1.72-1.32h-1v-2c0-.44-.56-1-1-1H6V7h1c.44 0 1-.56 1-1V5h2c.88 0 1.4-.72 1.4-1.6v-.33a6.45 6.45 0 0 1 3.83 4.51 6.45 6.45 0 0 1-1.51 5.73v.01Z"/></svg>            <span class="-link--channel-name">Questions</span>
+    </a>
+</li>
+
+                        
+
+                        
+
+<li class="ps-relative"  aria-current="false">
+
+
+    <a id="nav-tags"
+       href="/tags"
+       class=" js-gps-track nav-links--link"
+       
+       data-gps-track="top_nav.click({is_current: false, location:3, destination:2})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never">
+            <div class="d-flex ai-center">
+                <div class="flex--item truncate">
+                    Tags
+                </div>
+            </div>
+    </a>
+</li>
+
+
+                        
+
+<li class="ps-relative"  aria-current="false">
+
+
+    <a id="nav-users"
+       href="/users"
+       class=" js-gps-track nav-links--link"
+       
+       data-gps-track="top_nav.click({is_current: false, location:3, destination:3})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never">
+            <div class="d-flex ai-center">
+                <div class="flex--item truncate">
+                    Users
+                </div>
+            </div>
+    </a>
+</li>
+
+
+                            
+
+<li class="ps-relative"  aria-current="false">
+
+
+    <a id="nav-companies"
+       href="https://stackoverflow.com/jobs/companies?so_medium=bitcoin&amp;so_source=SiteNav"
+       class=" js-gps-track nav-links--link"
+       
+       data-gps-track="top_nav.click({is_current: false, location:3, destination:12})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never">
+            <div class="d-flex ai-center">
+                <div class="flex--item truncate">
+                    Companies
+                </div>
+            </div>
+    </a>
+</li>
+
+
+                            
+
+<li class="ps-relative"  aria-current="false">
+
+
+    <a id="nav-unanswered"
+       href="/unanswered"
+       class=" js-gps-track nav-links--link"
+       
+       data-gps-track="top_nav.click({is_current: false, location:3, destination:5})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never">
+            <div class="d-flex ai-center">
+                <div class="flex--item truncate">
+                    Unanswered
+                </div>
+            </div>
+    </a>
+</li>
+
+
+                        
+                    </ol>
+                </li>
+                
+                
+
+        
+
+<li class="js-freemium-cta ps-relative">
+        <a href="#" title="Dismiss" class="js-freemium-cta-dismiss ps-absolute tn8 r0 s-btn s-btn__muted s-btn__xs">
+            <svg aria-hidden="true" class="svg-icon iconClearSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="M12 3.41 10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7 12 3.41Z"/></svg>
+        </a>
+
+    <div class="fs-fine tt-uppercase ml8 mt16 mb8 fc-light">Teams</div>
+
+    <div class="px32 pt16 pb0 fc-black-600 blr-sm overflow-hidden">
+        <strong class="fc-black-750 mb6">Stack Overflow for Teams</strong>
+        – Start collaborating and sharing organizational knowledge.
+        
+        <img class="wmx100 mx-auto my8 h-auto d-block" width="139" height="114" src="https://cdn.sstatic.net/Img/teams/teams-illo-free-sidebar-promo.svg?v=47faa659a05e" alt="">
+
+        <a href="https://try.stackoverflow.co/why-teams/?utm_source=so-owned&amp;utm_medium=side-bar&amp;utm_campaign=campaign-38&amp;utm_content=cta" 
+           class="w100 s-btn s-btn__primary s-btn__xs bg-orange-400 js-gps-track"
+           data-gps-track="teams.create.left-sidenav.click({ Action: 6 })"
+           data-ga="[&quot;teams left navigation&quot;,&quot;left nav free cta&quot;,&quot;stackoverflow.com/teams/create/free&quot;,null,null]">Create a free Team</a>
+        <a href="https://stackoverflow.co/teams" 
+           class="w100 s-btn s-btn__muted s-btn__xs js-gps-track"
+           data-gps-track="teams.create.left-sidenav.click({ Action: 5 })"
+           data-ga="[&quot;teams left navigation&quot;,&quot;left nav free cta&quot;,&quot;stackoverflow.com/teams&quot;,null,null]">Why Teams?</a>
+
+    </div>
+</li>
+
+    <script>
+        $('.js-freemium-cta-dismiss').click(function (e) {
+            e.preventDefault();
+            StackExchange.helpers.toggleAccountPreferenceFlags(32, true);
+            $('.js-freemium-cta').addClass('d-none');
+            $('.js-create-team-cta').removeClass('d-none');
+            return false;
+        });
+    </script>
+
+    <li class="d-flex ai-center jc-space-between ml8 mt24 mb4 js-create-team-cta d-none">
+        <div class="flex--item tt-uppercase fs-fine fc-light">Teams</div>
+        <div class="flex--item">
+            <a href="javascript:void(0)" class="s-link p12 fc-black-500 h:fc-black-800 js-gps-track"
+            role="button"
+            aria-controls="popover-teams-create-cta"
+            data-controller="s-popover"
+            data-action="s-popover#toggle"
+            data-s-popover-placement="bottom-start"
+            data-s-popover-toggle-class="is-selected"
+            data-gps-track="teams.create.left-sidenav.click({ Action: ShowInfo })"
+            data-ga="[&quot;teams left navigation&quot;,&quot;left nav show teams info&quot;,null,null,null]">
+                <svg aria-hidden="true" class="svg-icon iconInfoSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="M7 1a6 6 0 1 1 0 12A6 6 0 0 1 7 1Zm1 10V6H6v5h2Zm0-6V3H6v2h2Z"/></svg>
+            </a>
+
+        </div>
+    </li>
+    <li class="ps-relative js-create-team-cta d-none">
+        <a href="https://stackoverflowteams.com/teams/create/free?utm_source=so-owned&amp;utm_medium=side-bar&amp;utm_campaign=campaign-38&amp;utm_content=cta"
+        class="pl8 js-gps-track nav-links--link"
+        title="Stack Overflow for Teams is a private, secure spot for your organization's questions and answers."
+        data-gps-track="teams.create.left-sidenav.click({ Action: FreemiumTeamsCreateClick })"
+        data-ga="[&quot;teams left navigation&quot;,&quot;left nav team click&quot;,&quot;stackoverflow.com/teams/create/free&quot;,null,null]">
+            <div class="d-flex ai-center">
+                <div class="flex--item s-avatar va-middle bg-orange-400">
+                    <div class="s-avatar--letter mtn1">
+                        <svg aria-hidden="true" class="svg-icon iconBriefcaseSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="M4 3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1h.5c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5h-7A1.5 1.5 0 0 1 2 10.5v-5C2 4.67 2.67 4 3.5 4H4V3Zm5 1V3H5v1h4Z"/></svg>
+                    </div>
+                    <svg aria-hidden="true" class="native s-avatar--badge svg-icon iconShieldXSm" width="9" height="10"  viewBox="0 0 9 10"><path fill="var(--white)" d="M0 1.84 4.5 0 9 1.84v3.17C9 7.53 6.3 10 4.5 10 2.7 10 0 7.53 0 5.01V1.84Z"/><path fill="var(--black-500)" d="M1 2.5 4.5 1 8 2.5v2.51C8 7.34 5.34 9 4.5 9 3.65 9 1 7.34 1 5.01V2.5Zm2.98 3.02L3.2 7h2.6l-.78-1.48a.4.4 0 0 1 .15-.38c.34-.24.73-.7.73-1.14 0-.71-.5-1.23-1.41-1.23-.92 0-1.39.52-1.39 1.23 0 .44.4.9.73 1.14.12.08.18.23.15.38Z"/></svg>
+                </div>
+                <div class="flex--item pl6">
+                    Create free Team
+                </div>
+            </div>
+        </a>
+    </li>
+    <li class="pl1 pr8">
+        <button class="s-btn s-btn__link w100 fc-blue-700 h:fc-blue-900 p8 fs-caption mr8 mt8 d-block bar-md bg-blue-050 lh-md js-gps-track"
+                aria-controls="teams-were-moved-popover"
+                aria-expanded="false"
+                data-controller="s-popover"
+                data-action="s-popover#toggle"
+                data-s-popover-placement="bottom-start"
+                data-gps-track="teams.sot_migration_notification_teams_moved.click()">
+            Looking for your Teams?
+        </button>
+    </li>
+
+
+            </ol>
+        </nav>
+    </div>
+
+        <div class="s-popover mt4 ws3"
+            id="teams-were-moved-popover"
+            role="menu">
+            <div class="s-popover--arrow"></div>
+            <p>Stack Overflow for Teams has its own domain!</p>
+            <p>You can now access your Teams at <a href="https://stackoverflowteams.com" class="s-link fs-italic">stackoverflowteams.com</a>. Teams no longer appear in the left sidebar on <span class="fs-italic">stackoverflow.com</span>. Check your email to learn more about these changes.</p>
+        </div>
+
+
+        <div class="s-popover ws2"
+        id="popover-teams-create-cta"
+        role="menu"
+        aria-hidden="true">
+            <div class="s-popover--arrow"></div>
+
+            <div class="ps-relative overflow-hidden">
+                <p class="mb2"><strong>Teams</strong></p>
+                <p class="mb12 fs-caption fc-black-400">Q&amp;A for work</p>
+                <p class="mb12 fs-caption fc-medium">Connect and share knowledge within a single location that is structured and easy to search.</p>
+                <a href="https://stackoverflow.co/teams"
+            class="js-gps-track s-btn s-btn__primary s-btn__xs"
+            data-gps-track="teams.create.left-sidenav.click({ Action: CtaClick })"
+            data-ga="[&quot;teams left navigation&quot;,&quot;left nav cta&quot;,&quot;stackoverflow.com/teams&quot;,null,null]">
+                    Learn more about Teams
+                </a>
+            </div>
+
+            <div class="ps-absolute t8 r8">
+                <svg aria-hidden="true" class="fc-orange-500 svg-spot spotPeople" width="48" height="48"  viewBox="0 0 48 48"><path  d="M13.5 28a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM7 30a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v5h11v-5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H33v5a1 1 0 0 1-1 1H20a1 1 0 0 1-1-1v-5H8a1 1 0 0 1-1-1V30Zm25-6.5a4.5 4.5 0 1 0 9 0 4.5 4.5 0 0 0-9 0ZM24.5 34a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z" opacity=".2"/><path  d="M16.4 26.08A6 6 0 1 0 7.53 26C5.64 26.06 4 27.52 4 29.45V40a1 1 0 0 0 1 1h9a1 1 0 1 0 0-2h-4v-7a1 1 0 1 0-2 0v7H6v-9.55c0-.73.67-1.45 1.64-1.45H16a1 1 0 0 0 .4-1.92ZM12 18a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm16.47 14a6 6 0 1 0-8.94 0A3.6 3.6 0 0 0 16 35.5V46a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V35.5c0-1.94-1.64-3.42-3.53-3.5ZM20 28a4 4 0 1 1 8 0 4 4 0 0 1-8 0Zm-.3 6h8.6c1 0 1.7.75 1.7 1.5V45h-2v-7a1 1 0 1 0-2 0v7h-4v-7a1 1 0 1 0-2 0v7h-2v-9.5c0-.75.7-1.5 1.7-1.5ZM42 22c0 1.54-.58 2.94-1.53 4A3.5 3.5 0 0 1 44 29.45V40a1 1 0 0 1-1 1h-9a1 1 0 1 1 0-2h4v-7a1 1 0 1 1 2 0v7h2v-9.55A1.5 1.5 0 0 0 40.48 28H32a1 1 0 0 1-.4-1.92A6 6 0 1 1 42 22Zm-2 0a4 4 0 1 0-8 0 4 4 0 0 0 8 0Z"/><g  opacity=".35"><path d="M17 10a1 1 0 011-1h12a1 1 0 110 2H18a1 1 0 01-1-1Zm1-5a1 1 0 100 2h12a1 1 0 100-2H18ZM14 1a1 1 0 00-1 1v12a1 1 0 001 1h5.09l4.2 4.2a1 1 0 001.46-.04l3.7-4.16H34a1 1 0 001-1V2a1 1 0 00-1-1H14Zm1 12V3h18v10h-5a1 1 0 00-.75.34l-3.3 3.7-3.74-3.75a1 1 0 00-.71-.29H15Z"/></g></svg>
+            </div>
+        </div>
+
+
+</div>
+
+
+
+        <div id="content" class="">
+
+            
+
+<div id="mainbar" role="main" aria-labelledby="h-all-questions">
+        
+
+
+
+            <div class="d-flex fw-wrap mb12">
+                    <h1 class="flex--item fl1 fs-headline1 mr12 mb12">All Questions</h1>
+                <div class="aside-cta flex--item mb12 print:d-none">
+                        <a href="/questions/ask" class="ws-nowrap s-btn s-btn__primary">
+        Ask Question
+    </a>
+
+                </div>
+            </div>
+
+
+        
+<script type="application/json" data-role="module-args" data-module-name="entry-points/questions/userQuestionList.mod">{"regularTagsString":"","moderatorTagsString":""}</script>
+<script defer src="https://cdn.sstatic.net/Js/questions/userQuestionList.en.js?v=bbf645847596"></script>
+
+<div data-controller="se-uql" data-se-uql-id="" data-se-uql-sanitize-tag-query="false">
+    <div class="d-flex ai-center jc-space-between mb12 sm:fd-column sm:ai-stretch">
+        <div class="fs-body3 flex--item fl1 mr12 sm:mr0 sm:mb12">
+            29,705
+            questions
+        </div>
+
+        <div class="uql-nav flex--item"
+             data-action="se-uql-list:edit-current-requested@document->se-uql#toggleEditor">
+            <div class="d-flex ai-center jc-space-between">
+                <div class="js-uql-navigation s-btn-group flex--item mr16 ff-row-nowrap">
+                        <a class="s-btn s-btn__muted s-btn__outlined s-btn__sm d-flex is-selected" data-nav-value="Newest" href="/questions?tab=Newest" data-shortcut="N" aria-current="page">
+                            <div class="flex--item">Newest</div>
+                        </a>
+                        <a class="s-btn s-btn__muted s-btn__outlined s-btn__sm d-flex" data-nav-value="Active" href="/questions?tab=Active" data-shortcut="A">
+                            <div class="flex--item">Active</div>
+                        </a>
+                        <a class="s-btn s-btn__muted s-btn__outlined s-btn__sm d-flex uql-nav--expanded-item" data-nav-value="Bounties" href="/questions?tab=Bounties" data-shortcut="E">
+                            <div class="flex--item">Bountied</div>
+                        </a>
+                        <a class="s-btn s-btn__muted s-btn__outlined s-btn__sm d-flex uql-nav--expanded-item" data-nav-value="Unanswered" href="/questions?tab=Unanswered" data-shortcut="U">
+                            <div class="flex--item">Unanswered</div>
+                        </a>
+                    <button class="s-btn s-btn__muted s-btn__outlined s-btn__sm s-btn__dropdown"
+                            role="button"
+                            data-controller="s-popover"
+                            data-action="s-popover#toggle"
+                            data-se-uql-target="toggleMoreButton"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            aria-controls="uql-more-popover">
+                        More
+                    </button>
+                </div>
+
+                <div class="s-popover z-dropdown ws2 px0 py4"
+                     id="uql-more-popover"
+                     data-se-uql-target="morePopover">
+                    <div class="s-popover--arrow"></div>
+                    <ul class="s-menu js-uql-navigation" role="menu">
+                            <li class=" uql-nav--collapsed-item" role="menuitem">
+                                    <a href="/questions?tab=Bounties" class="s-block-link s-block-link__left" data-shortcut="">
+                                        Bountied
+                                            <span class="s-badge s-badge__bounty s-badge__bounty s-badge__sm lh-xs px4">0</span>
+                                    </a>
+                            </li>
+                            <li class=" uql-nav--collapsed-item" role="menuitem">
+                                    <a href="/questions?tab=Unanswered" class="s-block-link s-block-link__left" data-shortcut="">
+                                        Unanswered
+                                    </a>
+                            </li>
+                            <li role="menuitem">
+                                    <a href="/questions?tab=Frequent" class="s-block-link s-block-link__left" data-shortcut="F">
+                                        Frequent
+                                    </a>
+                            </li>
+                            <li role="menuitem">
+                                    <a href="/questions?tab=Votes" class="s-block-link s-block-link__left" data-shortcut="V">
+                                        Score
+                                    </a>
+                            </li>
+                                <li class="s-menu--divider" role="separator"></li>
+                            <li role="menuitem">
+                                    <span class="s-block-link c-default fc-black-350">Unanswered (my tags)</span>
+                            </li>
+                            <li class="s-menu--divider" role="separator"></li>
+                            <li class="s-menu--title" role="separator">Custom filters</li>
+                            <li role="menuitem">
+                                <div class="py16 px24 ta-center fs-fine fc-black-500">
+                                    Save custom sorting &amp; filtering for easy access.
+                                </div>
+                            </li>
+                    </ul>
+                </div>
+
+                <div class="flex--item">
+                    <button class="s-btn s-btn__filled s-btn__sm s-btn__icon ws-nowrap"
+                            role="button"
+                            data-controller="s-expandable-control"
+                            data-s-expandable-control-toggle-class="is-selected"
+                            data-se-uql-target="toggleFormButton"
+                            aria-expanded="false"
+                            aria-controls="uql-form">
+                        <svg aria-hidden="true" class="svg-icon iconFilter" width="18" height="18"  viewBox="0 0 18 18"><path  d="M2 4h14v2H2V4Zm2 4h10v2H4V8Zm8 4H6v2h6v-2Z"/></svg> Filter
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <form class="s-expandable ps-relative z-active"
+          id="uql-form"
+          data-se-uql-target="form"
+          data-action="se-uql#navigate">
+        <input name="uqlId" type="hidden"/>
+        <div class="s-expandable--content">
+            <div class="bg-black-050 ba bc-black-100 bar-sm mb16">
+                <div class="px12 py16">
+                    <div class="d-flex gs32 fw-wrap">
+                        <div class="flex--item">
+                            <fieldset class="d-flex gs8 gsy fd-column">
+                                <legend class="flex--item s-label px0">Filter by</legend>
+        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-checkbox d-block"
+                           type="checkbox"
+                           name="filterId"
+                           value="NoAnswers"
+                           id="62af42ee-f80f-4404-a52c-b8846be63490" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="62af42ee-f80f-4404-a52c-b8846be63490" id="c16c9983-621e-49b4-b729-54622693a33b">No answers</label>
+            </div>
+        </div>
+        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-checkbox d-block"
+                           type="checkbox"
+                           name="filterId"
+                           value="NoAcceptedAnswer"
+                           id="5d035224-a70b-4d3d-9dee-7c3b66b929ae" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="5d035224-a70b-4d3d-9dee-7c3b66b929ae" id="3382ee06-c250-49a0-abec-ea87d6a691b5">No accepted answer</label>
+            </div>
+        </div>
+        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-checkbox d-block"
+                           type="checkbox"
+                           name="filterId"
+                           value="Bounty"
+                           id="be0e76af-62bf-4b70-853a-87a9113402c9" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="be0e76af-62bf-4b70-853a-87a9113402c9" id="2e28e43f-3748-4c55-99b6-7615920d7afb">Has bounty</label>
+            </div>
+        </div>
+                            </fieldset>
+                        </div>
+                        <div class="flex--item">
+                            <fieldset class="d-flex gs8 gsy fd-column">
+                                <legend class="flex--item s-label px0">Sorted by</legend>
+        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-radio d-block"
+                           type="radio"
+                           name="sortId"
+                           value="Newest"
+                           checked="checked"
+                           id="c8e1ff25-d319-4e80-96cc-c1c27a16f3a9" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="c8e1ff25-d319-4e80-96cc-c1c27a16f3a9" id="10d0a8ae-183a-4f52-ac07-f900d55450b2">Newest</label>
+            </div>
+        </div>
+        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-radio d-block"
+                           type="radio"
+                           name="sortId"
+                           value="RecentActivity"
+                           id="99bbdb1e-27f5-4929-9d9d-7dd226f610db" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="99bbdb1e-27f5-4929-9d9d-7dd226f610db" id="27db4ee8-5362-4c00-bd41-4197724c08d6">Recent activity</label>
+            </div>
+        </div>
+        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-radio d-block"
+                           type="radio"
+                           name="sortId"
+                           value="MostVotes"
+                           id="38481d1e-df70-479d-804d-a25fb541e314" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="38481d1e-df70-479d-804d-a25fb541e314" id="80346422-5710-4d14-a02d-95c3c376a352">Highest score</label>
+            </div>
+        </div>
+        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-radio d-block"
+                           type="radio"
+                           name="sortId"
+                           value="MostFrequent"
+                           id="d7f5e96f-a6d9-486a-a958-e728583568b9" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="d7f5e96f-a6d9-486a-a958-e728583568b9" id="22165226-d647-47f5-963d-02b240b186e3">Most frequent</label>
+            </div>
+        </div>
+        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-radio d-block"
+                           type="radio"
+                           name="sortId"
+                           value="BountyEndingSoon"
+                           id="07806373-49bf-4e44-90ec-6ac2fb5d109c" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="07806373-49bf-4e44-90ec-6ac2fb5d109c" id="5144a0c9-4f49-4996-aac0-5c7cb1deef26">Bounty ending soon</label>
+            </div>
+        </div>
+                            </fieldset>
+                        </div>
+                        <div class="flex--item">
+                            <fieldset class="d-flex gs8 gsy fd-column">
+                                <legend class="flex--item s-label px0">Tagged with</legend>
+                                        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-radio d-block"
+                           type="radio"
+                           name="tagModeId"
+                           value="Watched"
+                           id="c95746a6-499e-4bb6-ad05-5a65acef8750" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="c95746a6-499e-4bb6-ad05-5a65acef8750" id="293dd102-1862-4d51-807b-981dea030bdc">My watched tags</label>
+            </div>
+        </div>
+
+                                        <div class="flex--item">
+            <div class="d-flex gs4 gsx ai-center">
+                <div class="flex--item">
+                    <input class="s-radio d-block"
+                           type="radio"
+                           name="tagModeId"
+                           value="Specified"
+                           checked="checked"
+                           id="bc90acf8-22d2-4fcd-b532-e2f48bafb614" />
+                </div>
+                <label class="flex--item s-label fw-normal ws-nowrap" for="bc90acf8-22d2-4fcd-b532-e2f48bafb614" id="3dda4cde-514b-4dfd-b84f-9b31c5879fe1">The following tags:</label>
+            </div>
+        </div>
+
+                            </fieldset>
+                            <div class="ps-relative ml24 mt8 ws2">
+                                <input id="uql-modal-tag-input" class="w100 s-input" name="tagQuery" data-se-uql-target="tagQuery" type="text" size="60" tabindex="0" aria-labelledby="3dda4cde-514b-4dfd-b84f-9b31c5879fe1" placeholder="e.g. bitcoin-core or transactions">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p12 bt bc-black-100">
+                    <div class="d-flex">
+                        <div class="d-flex gs4 gsx fl1">
+                            <button class="s-btn s-btn__sm s-btn__primary flex--item" type="submit" data-se-uql-target="applyButton">Apply filter</button>
+                                <button class="s-btn s-btn__filled s-btn__sm flex--item"
+                                        role="button"
+                                        data-action="se-uql#showSaveModal">
+Save custom filter                                </button>
+                        </div>
+                        <div class="flex--item">
+                            <button class="s-btn s-btn__sm" data-action="se-uql#cancelEditor" type="button">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+        <script type="text/html" data-se-uql-target="saveTemplate">
+            <aside class="s-modal"
+                   tabindex="0"
+                   role="dialog"
+                   aria-labelledby="uql-modal-title"
+                   aria-describedby="uql-modal-description"
+                   aria-hidden="true"
+                   data-controller="se-uql-save">
+                <div class="s-modal--dialog" role="document" data-controller="se-draggable">
+                    <h1 class="s-modal--header fw-bold mb12 mr48 js-first-tabbable" id="uql-modal-title" data-se-draggable-target="handle" tabindex="0">Create a custom filter</h1>
+                    <form id="uql-modal-description" data-action="se-uql-save#createNew">
+                        <div class="d-flex gs4 gsy fd-column js-stacks-validation">
+                            <div class="flex--item">
+                                <div class="d-flex gs2 gsy fd-column">
+                                    <label class="flex--item s-label" for="uql-name-field">Filter title</label>
+                                </div>
+                            </div>
+                            <div class="d-flex ps-relative">
+                                <input class="s-input js-modal-initial-focus"
+                                       name="name"
+                                       id="uql-name-field"
+                                       type="text"
+                                       autocomplete="off"
+                                       placeholder="Give your custom filter a title"
+                                       data-se-uql-save-target="name"
+                                       data-action="input->se-uql-save#liveValidate" />
+                            </div>
+                            <div class="s-input-message mt4 js-stacks-validation-message d-none" aria-live="assertive"></div>
+                        </div>
+                        <div class="mt12">
+                                <button class="s-btn s-btn__primary" type="submit" data-se-uql-target="saveButton">
+                                    Save filter
+                                </button>
+                                <button class="s-btn js-modal-close" type="button" data-action="se-uql#dismissModal">Cancel</button>
+                        </div>
+                    </form>
+                    <button class="s-modal--close s-btn s-btn__muted js-modal-close js-last-tabbable" href="#" aria-label="Close">
+                        <svg aria-hidden="true" class="svg-icon iconClearSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="M12 3.41 10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7 12 3.41Z"/></svg>
+                    </button>
+                </div>
+            </aside>
+        </script>
+</div>
+
+
+
+        <div id="questions" class=" flush-left">
+
+                        
+
+
+<div id="question-summary-117857" class="s-post-summary    js-post-summary" data-post-id="117857" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 0">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item  " title="0 answers">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="8 views">
+            <span class="s-post-summary--stats-item-number">8</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117857/after-updating-my-mac-doesnt-recognize-my-bitcoin-core" class="s-link">After updating my Mac doesn&#39;t recognize my bitcoin core</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                After an update my Mac doesn't recognize my bitcoin core.  The bitcoin avatar shows up in launchpad with a &quot;?&quot; in it.  How can I fix it?  I have been running a node 24/7 for a couple months ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-bitcoin-core">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/bitcoin-core" class="post-tag flex--item mt0 js-tagname-bitcoin-core" title="show questions tagged &#39;bitcoin-core&#39;" aria-label="show questions tagged &#39;bitcoin-core&#39;" rel="tag" aria-labelledby="tag-bitcoin-core-tooltip-container">bitcoin-core</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141368/danny-cooper" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141368">        <div class="gravatar-wrapper-16">
+            <img src="https://lh3.googleusercontent.com/a/AGNmyxbMsdZ2eMzr-BYChOHEFHwqoMf4G1UFa_VMPQhs=k-s32" alt="Danny Cooper&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141368/danny-cooper" class="flex--item">Danny Cooper</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">1</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-07 20:47:03Z' class='relativetime'>3 hours ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117854" class="s-post-summary    js-post-summary" data-post-id="117854" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 2">
+            <span class="s-post-summary--stats-item-number">2</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item  " title="0 answers">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="23 views">
+            <span class="s-post-summary--stats-item-number">23</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117854/how-to-generate-a-legacy-compatible-address-using-ledger-live" class="s-link">How to generate a legacy-compatible address using Ledger Live?</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                I'm trying to withdraw funds from Bittrex to my Ledger device, but it seems they do not accept native Segwit addresses.
+Is it possible to generate a legacy-compatible address (for instance a P2SH-...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-segregated-witness t-address-generation t-ledger-hardware-wallet">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/segregated-witness" class="post-tag flex--item mt0 js-tagname-segregated-witness" title="show questions tagged &#39;segregated-witness&#39;" aria-label="show questions tagged &#39;segregated-witness&#39;" rel="tag" aria-labelledby="tag-segregated-witness-tooltip-container">segregated-witness</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/address-generation" class="post-tag flex--item mt0 js-tagname-address-generation" title="show questions tagged &#39;address-generation&#39;" aria-label="show questions tagged &#39;address-generation&#39;" rel="tag" aria-labelledby="tag-address-generation-tooltip-container">address-generation</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/ledger-hardware-wallet" class="post-tag flex--item mt0 js-tagname-ledger-hardware-wallet" title="show questions tagged &#39;ledger-hardware-wallet&#39;" aria-label="show questions tagged &#39;ledger-hardware-wallet&#39;" rel="tag" aria-labelledby="tag-ledger-hardware-wallet-tooltip-container">ledger-hardware-wallet</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141358/noelle" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141358">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/9f48ec789cb7cd3de21d51e5446706a6?s=32&amp;d=identicon&amp;r=PG&amp;f=y&amp;so-version=2" alt="noelle&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141358/noelle" class="flex--item">noelle</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">21</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-07 10:42:40Z' class='relativetime'>13 hours ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117853" class="s-post-summary    js-post-summary" data-post-id="117853" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 0">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item  " title="0 answers">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="14 views">
+            <span class="s-post-summary--stats-item-number">14</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117853/i-want-to-generate-raw-transaction-data-in-nodejs" class="s-link">I want to generate raw transaction data in Nodejs</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                The information I have Source address Destination Address Source private key Amount That's it.
+I have no information other than that.  please tell me how to get
+How do I build raw transaction data ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-bitcoin-core t-transactions">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/bitcoin-core" class="post-tag flex--item mt0 js-tagname-bitcoin-core" title="show questions tagged &#39;bitcoin-core&#39;" aria-label="show questions tagged &#39;bitcoin-core&#39;" rel="tag" aria-labelledby="tag-bitcoin-core-tooltip-container">bitcoin-core</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/transactions" class="post-tag flex--item mt0 js-tagname-transactions" title="show questions tagged &#39;transactions&#39;" aria-label="show questions tagged &#39;transactions&#39;" rel="tag" aria-labelledby="tag-transactions-tooltip-container">transactions</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141333/scooby" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141333">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/13b2506f180da66387b750b49989e944?s=32&amp;d=identicon&amp;r=PG&amp;f=y&amp;so-version=2" alt="scooby&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141333/scooby" class="flex--item">scooby</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">1</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-07 08:36:03Z' class='relativetime'>15 hours ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117851" class="s-post-summary    js-post-summary" data-post-id="117851" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 0">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item has-answers " title="1 answer">
+            <span class="s-post-summary--stats-item-number">1</span>
+            <span class="s-post-summary--stats-item-unit">answer</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="19 views">
+            <span class="s-post-summary--stats-item-number">19</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117851/are-corporate-wallets-visible-to-public" class="s-link">Are corporate wallets visible to public</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                If a company has created a corporate wallet for me to receive funds back to my crypto account is that publicly visible
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-transactions">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/transactions" class="post-tag flex--item mt0 js-tagname-transactions" title="show questions tagged &#39;transactions&#39;" aria-label="show questions tagged &#39;transactions&#39;" rel="tag" aria-labelledby="tag-transactions-tooltip-container">transactions</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141349/richard-thompson" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141349">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/66987be35f5fbc9adf28eecfa1e95054?s=32&amp;d=identicon&amp;r=PG&amp;f=y&amp;so-version=2" alt="Richard Thompson&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141349/richard-thompson" class="flex--item">Richard Thompson</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">1</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-07 07:18:52Z' class='relativetime'>16 hours ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117847" class="s-post-summary    js-post-summary" data-post-id="117847" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 0">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item  " title="0 answers">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="20 views">
+            <span class="s-post-summary--stats-item-number">20</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117847/how-do-i-verify-bitcoin-core-s-integrity" class="s-link">How do I verify Bitcoin Core’s integrity?</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                I'm trying to verify release signatures, but I have no idea how. It says to open a terminal window, and every time I do, I have no idea what to type. I’m using Windows. I downloaded the Bitcoin Core ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-bitcoin-core t-windows t-verification t-pgp">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/bitcoin-core" class="post-tag flex--item mt0 js-tagname-bitcoin-core" title="show questions tagged &#39;bitcoin-core&#39;" aria-label="show questions tagged &#39;bitcoin-core&#39;" rel="tag" aria-labelledby="tag-bitcoin-core-tooltip-container">bitcoin-core</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/windows" class="post-tag flex--item mt0 js-tagname-windows" title="show questions tagged &#39;windows&#39;" aria-label="show questions tagged &#39;windows&#39;" rel="tag" aria-labelledby="tag-windows-tooltip-container">windows</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/verification" class="post-tag flex--item mt0 js-tagname-verification" title="show questions tagged &#39;verification&#39;" aria-label="show questions tagged &#39;verification&#39;" rel="tag" aria-labelledby="tag-verification-tooltip-container">verification</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/pgp" class="post-tag flex--item mt0 js-tagname-pgp" title="show questions tagged &#39;pgp&#39;" aria-label="show questions tagged &#39;pgp&#39;" rel="tag" aria-labelledby="tag-pgp-tooltip-container">pgp</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141341/mrcass" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141341">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/635e7560f76855c120abea2f8e7f7df9?s=32&amp;d=identicon&amp;r=PG&amp;f=y&amp;so-version=2" alt="MrCass&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141341/mrcass" class="flex--item">MrCass</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">1</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-06 18:28:47Z' class='relativetime'>yesterday</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117845" class="s-post-summary    js-post-summary" data-post-id="117845" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 0">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item  " title="0 answers">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="20 views">
+            <span class="s-post-summary--stats-item-number">20</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117845/iam-trying-to-clone-peercoin-but-i-get-the-following-error-when-trying-to-premi" class="s-link">Iam trying to clone Peercoin, but I get the following error when trying to premine the coins using generate to address [closed]</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                I am trying to clone the peercoin code. I have created genesis block correctly. But when I try to pre-mine the coins using generatetoaddress which uses POW, I get the following error
+RROR: ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-altcoin-development t-peercoin">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/altcoin-development" class="post-tag flex--item mt0 js-tagname-altcoin-development" title="show questions tagged &#39;altcoin-development&#39;" aria-label="show questions tagged &#39;altcoin-development&#39;" rel="tag" aria-labelledby="tag-altcoin-development-tooltip-container">altcoin-development</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/peercoin" class="post-tag flex--item mt0 js-tagname-peercoin" title="show questions tagged &#39;peercoin&#39;" aria-label="show questions tagged &#39;peercoin&#39;" rel="tag" aria-labelledby="tag-peercoin-tooltip-container">peercoin</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141332/mina" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141332">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/e38454854e76e978677f0832d1442008?s=32&amp;d=identicon&amp;r=PG&amp;f=y&amp;so-version=2" alt="Mina&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141332/mina" class="flex--item">Mina</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">1</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-06 06:09:57Z' class='relativetime'>yesterday</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117837" class="s-post-summary    js-post-summary" data-post-id="117837" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 8">
+            <span class="s-post-summary--stats-item-number">8</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item has-answers " title="3 answers">
+            <span class="s-post-summary--stats-item-number">3</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="781 views">
+            <span class="s-post-summary--stats-item-number">781</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117837/how-many-sigops-are-in-the-invalid-block-783426" class="s-link">How many sigops are in the invalid block 783426?</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                On April 1st 2023 F2Pool mined block 00000000000000000002ec935e245f8ae70fc68cc828f05bf4cfa002668599e4 (full block) which my node failed with bad-blk-sigops.
+Bitcoin Core stops counting as soon as it ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-bitcoin-core t-block-validity t-signature-operations">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/bitcoin-core" class="post-tag flex--item mt0 js-tagname-bitcoin-core" title="show questions tagged &#39;bitcoin-core&#39;" aria-label="show questions tagged &#39;bitcoin-core&#39;" rel="tag" aria-labelledby="tag-bitcoin-core-tooltip-container">bitcoin-core</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/block-validity" class="post-tag flex--item mt0 js-tagname-block-validity" title="show questions tagged &#39;block-validity&#39;" aria-label="show questions tagged &#39;block-validity&#39;" rel="tag" aria-labelledby="tag-block-validity-tooltip-container">block-validity</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/signature-operations" class="post-tag flex--item mt0 js-tagname-signature-operations" title="show questions tagged &#39;signature-operations&#39;" aria-label="show questions tagged &#39;signature-operations&#39;" rel="tag" aria-labelledby="tag-signature-operations-tooltip-container">signature-operations</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/4948/sjors-provoost" class="s-avatar s-avatar__16 s-user-card--avatar js-user-hover-target" data-user-id="4948">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/8ef80e96c505c1a49294d22793362e30?s=32&amp;d=identicon&amp;r=PG" alt="Sjors Provoost&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/4948/sjors-provoost" class="flex--item">Sjors Provoost</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">848</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-05 18:06:38Z' class='relativetime'>2 days ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117836" class="s-post-summary    js-post-summary" data-post-id="117836" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 3">
+            <span class="s-post-summary--stats-item-number">3</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item has-answers has-accepted-answer" title="one of the answers was accepted as the correct answer">
+<svg aria-hidden="true" class="svg-icon iconCheckmarkSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="M13 3.41 11.59 2 5 8.59 2.41 6 1 7.41l4 4 8-8Z"/></svg>            <span class="s-post-summary--stats-item-number">1</span>
+            <span class="s-post-summary--stats-item-unit">answer</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="50 views">
+            <span class="s-post-summary--stats-item-number">50</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117836/how-do-i-perform-a-rbf-transaction-through-bitcoin-core" class="s-link">How do I perform a RBF transaction through Bitcoin Core?</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                I have no knowledge about Bitcoin Core and attempted my first transaction, which failed due to low fee due to a basic math error. (Did not notice it was per kilobyte rather than per byte.)
+It is ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-bitcoin-core t-change t-replace-by-fee">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/bitcoin-core" class="post-tag flex--item mt0 js-tagname-bitcoin-core" title="show questions tagged &#39;bitcoin-core&#39;" aria-label="show questions tagged &#39;bitcoin-core&#39;" rel="tag" aria-labelledby="tag-bitcoin-core-tooltip-container">bitcoin-core</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/change" class="post-tag flex--item mt0 js-tagname-change" title="show questions tagged &#39;change&#39;" aria-label="show questions tagged &#39;change&#39;" rel="tag" aria-labelledby="tag-change-tooltip-container">change</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/replace-by-fee" class="post-tag flex--item mt0 js-tagname-replace-by-fee" title="show questions tagged &#39;replace-by-fee&#39;" aria-label="show questions tagged &#39;replace-by-fee&#39;" rel="tag" aria-labelledby="tag-replace-by-fee-tooltip-container">replace-by-fee</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141318/user141318" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141318">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/c9606331e2939715c3b693cb2605296e?s=32&amp;d=identicon&amp;r=PG&amp;f=y&amp;so-version=2" alt="user141318&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141318/user141318" class="flex--item">user141318</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">33</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-05 17:21:09Z' class='relativetime'>2 days ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117835" class="s-post-summary    js-post-summary" data-post-id="117835" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 1">
+            <span class="s-post-summary--stats-item-number">1</span>
+            <span class="s-post-summary--stats-item-unit">vote</span>
+        </div>
+        <div class="s-post-summary--stats-item  " title="0 answers">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="11 views">
+            <span class="s-post-summary--stats-item-number">11</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117835/what-are-business-cases-with-hardened-child-derivation-bitcoin-what-wallets-s" class="s-link">What are business cases with hardened child derivation (bitcoin)? What wallets support it?</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                Looks like many widely used wallets do not support hardened child key derivation. E.g. Sparrow, Electrum, etc.
+If so, why has it made into the standard, what would be good case examples?
+Speaking ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-bip32-hd-wallets t-wallet-security t-business t-hardened-derivation">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/bip32-hd-wallets" class="post-tag flex--item mt0 js-tagname-bip32-hd-wallets" title="show questions tagged &#39;bip32-hd-wallets&#39;" aria-label="show questions tagged &#39;bip32-hd-wallets&#39;" rel="tag" aria-labelledby="tag-bip32-hd-wallets-tooltip-container">bip32-hd-wallets</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/wallet-security" class="post-tag flex--item mt0 js-tagname-wallet-security" title="show questions tagged &#39;wallet-security&#39;" aria-label="show questions tagged &#39;wallet-security&#39;" rel="tag" aria-labelledby="tag-wallet-security-tooltip-container">wallet-security</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/business" class="post-tag flex--item mt0 js-tagname-business" title="show questions tagged &#39;business&#39;" aria-label="show questions tagged &#39;business&#39;" rel="tag" aria-labelledby="tag-business-tooltip-container">business</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/hardened-derivation" class="post-tag flex--item mt0 js-tagname-hardened-derivation" title="show questions tagged &#39;hardened-derivation&#39;" aria-label="show questions tagged &#39;hardened-derivation&#39;" rel="tag" aria-labelledby="tag-hardened-derivation-tooltip-container">hardened-derivation</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/107366/meglio" class="s-avatar s-avatar__16 s-user-card--avatar js-user-hover-target" data-user-id="107366">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/c9a1577cedad5cf1af59379a5bd6721b?s=32&amp;d=identicon&amp;r=PG" alt="Meglio&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/107366/meglio" class="flex--item">Meglio</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">277</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-05 13:18:07Z' class='relativetime'>2 days ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117834" class="s-post-summary    js-post-summary" data-post-id="117834" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 1">
+            <span class="s-post-summary--stats-item-number">1</span>
+            <span class="s-post-summary--stats-item-unit">vote</span>
+        </div>
+        <div class="s-post-summary--stats-item  " title="0 answers">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="24 views">
+            <span class="s-post-summary--stats-item-number">24</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117834/i-am-trying-to-convert-the-12-words-into-btc-addresses-but-they-do-not-match" class="s-link">I am trying to convert the 12 words into BTC addresses, but they do not match</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                I am trying to convert the 12 words into BTC addresses, but they do not match the ones shown to me by Safepal, Coinomi, and Trust Wallet. I have tried using several libraries and doing it manually.
+I ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-python t-address-generation t-mnemonic-seed t-python-bitcoinlib">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/python" class="post-tag flex--item mt0 js-tagname-python" title="show questions tagged &#39;python&#39;" aria-label="show questions tagged &#39;python&#39;" rel="tag" aria-labelledby="tag-python-tooltip-container">python</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/address-generation" class="post-tag flex--item mt0 js-tagname-address-generation" title="show questions tagged &#39;address-generation&#39;" aria-label="show questions tagged &#39;address-generation&#39;" rel="tag" aria-labelledby="tag-address-generation-tooltip-container">address-generation</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/mnemonic-seed" class="post-tag flex--item mt0 js-tagname-mnemonic-seed" title="show questions tagged &#39;mnemonic-seed&#39;" aria-label="show questions tagged &#39;mnemonic-seed&#39;" rel="tag" aria-labelledby="tag-mnemonic-seed-tooltip-container">mnemonic-seed</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/python-bitcoinlib" class="post-tag flex--item mt0 js-tagname-python-bitcoinlib" title="show questions tagged &#39;python-bitcoinlib&#39;" aria-label="show questions tagged &#39;python-bitcoinlib&#39;" rel="tag" aria-labelledby="tag-python-bitcoinlib-tooltip-container">python-bitcoinlib</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141301/nigan" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141301">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/19332edf238ae4f3490b321b65fee969?s=32&amp;d=identicon&amp;r=PG&amp;f=1" alt="Nigan&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141301/nigan" class="flex--item">Nigan</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">11</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-05 11:48:59Z' class='relativetime'>2 days ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117831" class="s-post-summary    js-post-summary" data-post-id="117831" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 0">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item has-answers " title="1 answer">
+            <span class="s-post-summary--stats-item-number">1</span>
+            <span class="s-post-summary--stats-item-unit">answer</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="40 views">
+            <span class="s-post-summary--stats-item-number">40</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117831/i-have-bitcoin-core-v-23-0-i-have-my-12-word-seed-how-do-i-recover-my-wallet" class="s-link">I have Bitcoin core v 23.0 I have my 12 word seed how do I recover my wallet?</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                I have Bitcoin core version 23.0 I have my
+12 word seed how do I recover my wallet?
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-bitcoin-core t-wallet-recovery t-mnemonic-seed">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/bitcoin-core" class="post-tag flex--item mt0 js-tagname-bitcoin-core" title="show questions tagged &#39;bitcoin-core&#39;" aria-label="show questions tagged &#39;bitcoin-core&#39;" rel="tag" aria-labelledby="tag-bitcoin-core-tooltip-container">bitcoin-core</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/wallet-recovery" class="post-tag flex--item mt0 js-tagname-wallet-recovery" title="show questions tagged &#39;wallet-recovery&#39;" aria-label="show questions tagged &#39;wallet-recovery&#39;" rel="tag" aria-labelledby="tag-wallet-recovery-tooltip-container">wallet-recovery</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/mnemonic-seed" class="post-tag flex--item mt0 js-tagname-mnemonic-seed" title="show questions tagged &#39;mnemonic-seed&#39;" aria-label="show questions tagged &#39;mnemonic-seed&#39;" rel="tag" aria-labelledby="tag-mnemonic-seed-tooltip-container">mnemonic-seed</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141304/bitnick54" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141304">        <div class="gravatar-wrapper-16">
+            <img src="https://www.gravatar.com/avatar/ce5d6f13466e9538c0506d7b98c0e0b9?s=32&amp;d=identicon&amp;r=PG&amp;f=y&amp;so-version=2" alt="Bitnick54&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141304/bitnick54" class="flex--item">Bitnick54</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">1</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-05 05:38:15Z' class='relativetime'>2 days ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117830" class="s-post-summary    js-post-summary" data-post-id="117830" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 1">
+            <span class="s-post-summary--stats-item-number">1</span>
+            <span class="s-post-summary--stats-item-unit">vote</span>
+        </div>
+        <div class="s-post-summary--stats-item has-answers " title="1 answer">
+            <span class="s-post-summary--stats-item-number">1</span>
+            <span class="s-post-summary--stats-item-unit">answer</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="19 views">
+            <span class="s-post-summary--stats-item-number">19</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117830/recreate-java-code-in-python" class="s-link">Recreate Java code in python</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                I have a java code that I need to pass to python but I don't know which libraries to use and how to start and if you can help me I would really appreciate it
+MNEMONIC = &quot;twenty four mnemonic ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-python t-javascript t-block-hash t-python-bitcoinlib">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/python" class="post-tag flex--item mt0 js-tagname-python" title="show questions tagged &#39;python&#39;" aria-label="show questions tagged &#39;python&#39;" rel="tag" aria-labelledby="tag-python-tooltip-container">python</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/javascript" class="post-tag flex--item mt0 js-tagname-javascript" title="show questions tagged &#39;javascript&#39;" aria-label="show questions tagged &#39;javascript&#39;" rel="tag" aria-labelledby="tag-javascript-tooltip-container">javascript</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/block-hash" class="post-tag flex--item mt0 js-tagname-block-hash" title="show questions tagged &#39;block-hash&#39;" aria-label="show questions tagged &#39;block-hash&#39;" rel="tag" aria-labelledby="tag-block-hash-tooltip-container">block-hash</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/python-bitcoinlib" class="post-tag flex--item mt0 js-tagname-python-bitcoinlib" title="show questions tagged &#39;python-bitcoinlib&#39;" aria-label="show questions tagged &#39;python-bitcoinlib&#39;" rel="tag" aria-labelledby="tag-python-bitcoinlib-tooltip-container">python-bitcoinlib</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141280/you1977" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141280">        <div class="gravatar-wrapper-16">
+            <img src="https://lh3.googleusercontent.com/a/AGNmyxblBsZiwnHPQyLFyTz80RqDqwRV-LdOTBfWkycthQ=k-s32" alt="you1977&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141280/you1977" class="flex--item">you1977</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">21</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-05 01:57:33Z' class='relativetime'>2 days ago</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117829" class="s-post-summary    js-post-summary" data-post-id="117829" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of -1">
+            <span class="s-post-summary--stats-item-number">-1</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item  " title="0 answers">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="35 views">
+            <span class="s-post-summary--stats-item-number">35</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117829/bitcoin-mining-bonus" class="s-link">Bitcoin mining bonus [duplicate]</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                Ok so I know that I've bought into Bitcoin about 5 years ago while playing around with it trying too learn. I have no clue what platform I used. I keep gettinf emails from Bitcoin mining bonus or ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-mining-reward">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/mining-reward" class="post-tag flex--item mt0 js-tagname-mining-reward" title="show questions tagged &#39;mining-reward&#39;" aria-label="show questions tagged &#39;mining-reward&#39;" rel="tag" aria-labelledby="tag-mining-reward-tooltip-container">mining-reward</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/141295/ashley" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="141295">        <div class="gravatar-wrapper-16">
+            <img src="https://i.stack.imgur.com/DMG5Y.jpg?s=32&amp;g=1" alt="Ashley&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/141295/ashley" class="flex--item">Ashley</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">1</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-04 22:17:32Z' class='relativetime'>Apr 4 at 22:17</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117827" class="s-post-summary    js-post-summary" data-post-id="117827" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 0">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item has-answers has-accepted-answer" title="one of the answers was accepted as the correct answer">
+<svg aria-hidden="true" class="svg-icon iconCheckmarkSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="M13 3.41 11.59 2 5 8.59 2.41 6 1 7.41l4 4 8-8Z"/></svg>            <span class="s-post-summary--stats-item-number">3</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="52 views">
+            <span class="s-post-summary--stats-item-number">52</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117827/if-bitcoin-replaces-current-monetary-system-wouldnt-deflation-be-a-problem" class="s-link">If bitcoin replaces current monetary system wouldn&#39;t deflation be a problem?</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                Basically that's the whole question.
+From what I understand in current monetary system inflation is intentional(not high, but moderate).
+It is done to motivate people to actually spend money instead ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-economic-theory t-deflation">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/economic-theory" class="post-tag flex--item mt0 js-tagname-economic-theory" title="show questions tagged &#39;economic-theory&#39;" aria-label="show questions tagged &#39;economic-theory&#39;" rel="tag" aria-labelledby="tag-economic-theory-tooltip-container">economic-theory</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/deflation" class="post-tag flex--item mt0 js-tagname-deflation" title="show questions tagged &#39;deflation&#39;" aria-label="show questions tagged &#39;deflation&#39;" rel="tag" aria-labelledby="tag-deflation-tooltip-container">deflation</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/49494/piliponful" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="49494">        <div class="gravatar-wrapper-16">
+            <img src="https://lh4.googleusercontent.com/-yDKO8yQ23iM/AAAAAAAAAAI/AAAAAAAAAK8/-ZpBBiaXVs8/photo.jpg?sz=32" alt="Piliponful&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/49494/piliponful" class="flex--item">Piliponful</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">103</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-04 18:04:04Z' class='relativetime'>Apr 4 at 18:04</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                        
+
+
+<div id="question-summary-117826" class="s-post-summary    js-post-summary" data-post-id="117826" data-post-type-id="1">
+    <div class="s-post-summary--stats js-post-summary-stats">
+        <div class="s-post-summary--stats-item s-post-summary--stats-item__emphasized" title="Score of 0">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">votes</span>
+        </div>
+        <div class="s-post-summary--stats-item  " title="0 answers">
+            <span class="s-post-summary--stats-item-number">0</span>
+            <span class="s-post-summary--stats-item-unit">answers</span>
+        </div>
+        <div class="s-post-summary--stats-item " title="24 views">
+            <span class="s-post-summary--stats-item-number">24</span>
+            <span class="s-post-summary--stats-item-unit">views</span>
+        </div>
+
+
+    </div>
+    <div class="s-post-summary--content">
+        <h3 class="s-post-summary--content-title">
+            <a href="/questions/117826/nonce-search-algorithm" class="s-link">nonce search algorithm</a>
+        </h3>
+            <div class="s-post-summary--content-excerpt">
+                I have a question about the nonce search algorithm.
+Let's say I have a s9 miner and my competitor has a more powerful s19. We both check nonces from 0 sequentially, so I will check nonces that my ...
+            </div>
+        <div class="s-post-summary--meta">
+            <div class="s-post-summary--meta-tags tags js-tags t-mining-theory t-nonce">
+
+<ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/mining-theory" class="post-tag flex--item mt0 js-tagname-mining-theory" title="show questions tagged &#39;mining-theory&#39;" aria-label="show questions tagged &#39;mining-theory&#39;" rel="tag" aria-labelledby="tag-mining-theory-tooltip-container">mining-theory</a></li><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/nonce" class="post-tag flex--item mt0 js-tagname-nonce" title="show questions tagged &#39;nonce&#39;" aria-label="show questions tagged &#39;nonce&#39;" rel="tag" aria-labelledby="tag-nonce-tooltip-container">nonce</a></li></ul>
+            </div>
+            
+
+
+<div class="s-user-card s-user-card__minimal">
+
+        <div aria-live="polite">
+                    <a href="/users/123227/oleh-baidiuk" class="s-avatar s-avatar__16 s-user-card--avatar" data-user-id="123227">        <div class="gravatar-wrapper-16">
+            <img src="https://lh5.googleusercontent.com/-_UkoFl2E8lw/AAAAAAAAAAI/AAAAAAAAfoU/KcUGTwdnIfg/photo.jpg?sz=32" alt="Oleh Baidiuk&#39;s user avatar" width="16" , height="16" class="s-avatar--image" />
+        </div>
+</a>
+        </div>
+
+    <div class="s-user-card--info">
+            <div class="s-user-card--link d-flex gs4" >
+                <a href="/users/123227/oleh-baidiuk" class="flex--item">Oleh Baidiuk</a>
+            </div>
+        
+                <ul class="s-user-card--awards">
+            <li class="s-user-card--rep"><span class="todo-no-class-here" title="reputation score " dir="ltr">1</span></li>
+
+        </ul>
+
+        
+    </div>
+
+        <time class="s-user-card--time">asked <span title='2023-04-04 16:17:20Z' class='relativetime'>Apr 4 at 16:17</span></time>
+</div>
+
+        </div>
+       
+    </div>
+</div>
+
+                <br class="clear-both" />
+            
+        </div>
+
+        <br class="clear-both" />
+<div class="s-pagination site308 themed page-sizer float-right">
+  <a href="/questions?tab=newest&amp;pagesize=15" title="Show 15 items per page" class="s-pagination--item is-selected" aria-current="true">15</a>
+  <a href="/questions?tab=newest&amp;pagesize=30" title="Show 30 items per page" class="s-pagination--item">30</a>
+  <a href="/questions?tab=newest&amp;pagesize=50" title="Show 50 items per page" class="s-pagination--item">50</a>
+  <span class="s-pagination--item s-pagination--item__clear">per page</span>
+</div>
+<div class="s-pagination site308 themed pager float-left">
+<div class="s-pagination--item is-selected" aria-current=&quot;page&quot;>1</div>
+<a class="s-pagination--item js-pagination-item" href="/questions?tab=newest&page=2" rel="" title="Go to page 2">2</a>
+<a class="s-pagination--item js-pagination-item" href="/questions?tab=newest&page=3" rel="" title="Go to page 3">3</a>
+<a class="s-pagination--item js-pagination-item" href="/questions?tab=newest&page=4" rel="" title="Go to page 4">4</a>
+<a class="s-pagination--item js-pagination-item" href="/questions?tab=newest&page=5" rel="" title="Go to page 5">5</a>
+<div class="s-pagination--item s-pagination--item__clear" >…</div>
+<a class="s-pagination--item js-pagination-item" href="/questions?tab=newest&page=1981" rel="" title="Go to page 1981">1981</a>
+<a class="s-pagination--item js-pagination-item" href="/questions?tab=newest&page=2" rel="next" title="Go to page 2"> Next</a></div>
+
+</div>
+    <div id="sidebar" role="complementary" aria-label="sidebar">
+        
+    <div class="s-sidebarwidget s-sidebarwidget__yellow s-anchors s-anchors__grayscale mb16" data-tracker="cb=1">
+        <ul class="d-block p0 m0">
+                        <li class="s-sidebarwidget--header s-sidebarwidget__small-bold-text d-flex fc-black-600 d:fc-black-900 bb bbw1">
+                            The Overflow Blog
+                        </li>
+        <li class="s-sidebarwidget--item d-flex px16">
+            <div class="flex--item1 fl-shrink0">
+<svg aria-hidden="true" class="va-text-top svg-icon iconPencilSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="m11.1 1.71 1.13 1.12c.2.2.2.51 0 .71L11.1 4.7 9.21 2.86l1.17-1.15c.2-.2.51-.2.71 0ZM2 10.12l6.37-6.43 1.88 1.88L3.88 12H2v-1.88Z"/></svg>            </div>
+            <div class="flex--item wmn0 ow-break-word">
+                <a href="https://stackoverflow.blog/2023/04/05/from-cryptography-to-consensus-qa-with-cto-david-schwartz-on-building-blockchain-apps/" class="js-gps-track" title="From cryptography to consensus: Q&amp;A with CTO David Schwartz on building real-world blockchain apps" data-ga="[&quot;community bulletin board&quot;,&quot;The Overflow Blog&quot;,&quot;https://stackoverflow.blog/2023/04/05/from-cryptography-to-consensus-qa-with-cto-david-schwartz-on-building-blockchain-apps/&quot;,null,null]" data-gps-track="communitybulletin.click({ priority: 1, position: 0 })">From cryptography to consensus: Q&amp;A with CTO David Schwartz on building...</a>
+                    <div class="fc-light fs-italic">sponsored post</div>
+            </div>
+        </li>
+        <li class="s-sidebarwidget--item d-flex px16">
+            <div class="flex--item1 fl-shrink0">
+<svg aria-hidden="true" class="va-text-top svg-icon iconPencilSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="m11.1 1.71 1.13 1.12c.2.2.2.51 0 .71L11.1 4.7 9.21 2.86l1.17-1.15c.2-.2.51-.2.71 0ZM2 10.12l6.37-6.43 1.88 1.88L3.88 12H2v-1.88Z"/></svg>            </div>
+            <div class="flex--item wmn0 ow-break-word">
+                <a href="https://stackoverflow.blog/2023/04/07/building-an-api-is-half-the-battle-ep-552/" class="js-gps-track" data-ga="[&quot;community bulletin board&quot;,&quot;The Overflow Blog&quot;,&quot;https://stackoverflow.blog/2023/04/07/building-an-api-is-half-the-battle-ep-552/&quot;,null,null]" data-gps-track="communitybulletin.click({ priority: 1, position: 1 })">Building an API is half the battle (Ep. 552)</a>
+            </div>
+        </li>
+                        <li class="s-sidebarwidget--header s-sidebarwidget__small-bold-text d-flex fc-black-600 d:fc-black-900 bb bbw1">
+                            Featured on Meta
+                        </li>
+        <li class="s-sidebarwidget--item d-flex px16">
+            <div class="flex--item1 fl-shrink0">
+<div class="favicon favicon-stackexchangemeta" title="Meta Stack Exchange"></div>            </div>
+            <div class="flex--item wmn0 ow-break-word">
+                <a href="https://meta.stackexchange.com/questions/388030/improving-the-copy-in-the-close-modal-and-post-notices-2023-edition" class="js-gps-track" data-ga="[&quot;community bulletin board&quot;,&quot;Featured on Meta&quot;,&quot;https://meta.stackexchange.com/questions/388030/improving-the-copy-in-the-close-modal-and-post-notices-2023-edition&quot;,null,null]" data-gps-track="communitybulletin.click({ priority: 3, position: 2 })">Improving the copy in the close modal and post notices - 2023 edition</a>
+            </div>
+        </li>
+        </ul>
+    </div>
+
+
+
+            <div class="s-sidebarwidget mb16 module" data-controller="se-uql-list">
+    <h2 class="s-sidebarwidget--header mb0 fs-body2">Custom Filters</h2>
+    <ul class="s-sidebarwidget--content s-sidebarwidget__items">
+        <li class="s-sidebarwidget--item fc-black-300">
+            <a class="s-btn s-btn__link" data-action="se-uql-list#editCurrent" href="/questions?edited=true">Create a custom filter</a>
+        </li>
+    </ul>
+</div>
+
+<div class="js-tag-preferences-container">
+    <div class="s-sidebarwidget mb16">
+        <div class="s-sidebarwidget--header d-flex">
+            <h2 class="flex--item fl1 overflow-hidden ow-break-word mb0 fs-body2" id="js-add-watched-label">
+Watched Tags            </h2>
+                <a class="js-edit-watched-tags flex--item ml12 d-none" href="/users/tag-notifications/137631#watching-308" aria-label="edit your watched tags">edit</a>
+        </div>
+        <div class="s-sidebarwidget--content fd-column">
+                <div class="js-watched-tag-list d-flex gs4 py4 fw-wrap d-none">
+                    <script type="text/html" class="js-tag-template"><div class="js-tag flex--item "><a href="/questions/tagged/template" class="post-tag" title="show questions tagged &#39;template&#39;" aria-label="show questions tagged &#39;template&#39;" rel="tag" aria-labelledby="tag-template-tooltip-container">template</a></div></script>
+                </div>
+
+            <div class="js-add-watched-container"></div>
+
+            <div class="js-show-add-watched-container d-flex fd-column ta-center ai-center gsy gs16 mx-auto">
+                <div class="flex--item">
+                    <svg aria-hidden="true" class="fc-blue-400 d:fc-blue-700 svg-spot spotSearch" width="48" height="48"  viewBox="0 0 48 48"><path  d="M29.22 38.1a3.4 3.4 0 0 1 4.81-4.82l8.81 8.81a3.4 3.4 0 0 1-4.81 4.81l-8.81-8.8Z" opacity=".2"/><path  d="M18.5 5a1 1 0 1 0 0 2c.63 0 1.24.05 1.84.15a1 1 0 0 0 .32-1.98A13.6 13.6 0 0 0 18.5 5Zm7.02 1.97a1 1 0 1 0-1.04 1.7 11.5 11.5 0 0 1 5.44 8.45 1 1 0 0 0 1.98-.24 13.5 13.5 0 0 0-6.38-9.91ZM18.5 0a18.5 18.5 0 1 0 10.76 33.55c.16.57.46 1.12.9 1.57L40 44.94A3.5 3.5 0 1 0 44.94 40l-9.82-9.82c-.45-.45-1-.75-1.57-.9A18.5 18.5 0 0 0 18.5 0ZM2 18.5a16.5 16.5 0 1 1 33 0 16.5 16.5 0 0 1-33 0Zm29.58 15.2a1.5 1.5 0 1 1 2.12-2.12l9.83 9.83a1.5 1.5 0 1 1-2.12 2.12l-9.83-9.83Z"/></svg>
+                </div>
+                <p class="flex--item wmx2 fc-black-500">
+Watch tags to curate your list of questions.                </p>
+                <a class="js-show-add-watched flex--item s-btn s-btn__filled s-btn__sm s-btn__icon"><svg aria-hidden="true" class="svg-icon iconEye" width="18" height="18"  viewBox="0 0 18 18"><path  d="M9.06 3C4 3 1 9 1 9s3 6 8.06 6C14 15 17 9 17 9s-3-6-7.94-6ZM9 13a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2a2 2 0 0 0 2-2 2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 0 2 2Z"/></svg> Watch a tag</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="-ignored s-sidebarwidget mb16">
+        <div class="s-sidebarwidget--header d-flex">
+            <h2 class="flex--item fl1 mb0 fs-body2" id="js-add-ignored-label">Ignored Tags</h2>
+            <a class="js-edit-ignored-tags flex--item ml12 d-none" href="/users/tag-notifications/137631#ignored-308" aria-label="edit your ignored tags">edit</a>
+        </div>
+        <div class="s-sidebarwidget--content fd-column">
+            <div class="js-ignored-tag-list d-flex gs4 py4 fw-wrap ai-baseline d-none">
+                <script type="text/html" class="js-tag-template"><div class="js-tag flex--item "><a href="/questions/tagged/template" class="post-tag" title="show questions tagged &#39;template&#39;" aria-label="show questions tagged &#39;template&#39;" rel="tag" aria-labelledby="tag-template-tooltip-container">template</a></div></script>
+            </div>
+
+            <div class="js-add-ignored-container"></div>
+
+            <button class="js-show-add-ignored none mx-auto d-inline-block s-btn s-btn__filled s-btn__sm">Add an ignored tag</button>
+
+            <div class="js-ignored-edit-visible mt8 d-none">
+                <div class="d-flex ai-center">
+                    <div class="flex--item mr8"><input type="radio" name="hideIgnored" class="js-hide-ignored s-radio" id="7f07c50c-255c-4a55-8528-4659c6d1a36d-on" /></div>
+                    <label for="7f07c50c-255c-4a55-8528-4659c6d1a36d-on" class="flex--item s-label fs-body1 fw-normal">Hide questions in your ignored tags</label>
+                </div>
+                <div class="d-flex ai-center">
+                    <div class="flex--item mr8"><input type="radio" name="hideIgnored" class="js-dim-ignored s-radio" id="7f07c50c-255c-4a55-8528-4659c6d1a36d-off" checked="checked" /></div>
+                    <label for="7f07c50c-255c-4a55-8528-4659c6d1a36d-off" class="flex--item s-label fs-body1 fw-normal">Gray out questions in your ignored tags</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    StackExchange.ready(function() {
+        StackExchange.tagPreferences.applyPrefs(true, [], undefined);
+    });
+</script>
+            <div class="js-sidebar-zone">
+                    <style>
+    </style>
+<div class="js-zone-container zone-container-sidebar">
+    <div id="dfp-tsb" class="everyonelovesstackoverflow everyoneloves__top-sidebar"></div>
+		<div class="js-report-ad-button-container " style="width: 300px"></div>
+</div>
+
+                
+                
+            </div>
+
+            <div class="module js-gps-related-tags" id="related-tags">
+                    <h2 id="h-related-tags" class="fc-black-700">Related Tags</h2>
+        <div data-name="bitcoin-core">
+            <a href="/questions/tagged/bitcoin-core" class="post-tag no-tag-menu" title="show questions tagged &#39;bitcoin-core&#39;" aria-label="show questions tagged &#39;bitcoin-core&#39;" rel="tag">bitcoin-core</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">4030</span> </span>
+        </div>
+        <div data-name="transactions">
+            <a href="/questions/tagged/transactions" class="post-tag no-tag-menu" title="show questions tagged &#39;transactions&#39;" aria-label="show questions tagged &#39;transactions&#39;" rel="tag">transactions</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">3308</span> </span>
+        </div>
+        <div data-name="blockchain">
+            <a href="/questions/tagged/blockchain" class="post-tag no-tag-menu" title="show questions tagged &#39;blockchain&#39;" aria-label="show questions tagged &#39;blockchain&#39;" rel="tag">blockchain</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">2822</span> </span>
+        </div>
+        <div data-name="wallet">
+            <a href="/questions/tagged/wallet" class="post-tag no-tag-menu" title="show questions tagged &#39;wallet&#39;" aria-label="show questions tagged &#39;wallet&#39;" rel="tag">wallet</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">2361</span> </span>
+        </div>
+        <div data-name="bitcoind">
+            <a href="/questions/tagged/bitcoind" class="post-tag no-tag-menu" title="show questions tagged &#39;bitcoind&#39;" aria-label="show questions tagged &#39;bitcoind&#39;" rel="tag">bitcoind</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">2279</span> </span>
+        </div>
+        <div data-name="address">
+            <a href="/questions/tagged/address" class="post-tag no-tag-menu" title="show questions tagged &#39;address&#39;" aria-label="show questions tagged &#39;address&#39;" rel="tag">address</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">1046</span> </span>
+        </div>
+        <div data-name="transaction-fees">
+            <a href="/questions/tagged/transaction-fees" class="post-tag no-tag-menu" title="show questions tagged &#39;transaction-fees&#39;" aria-label="show questions tagged &#39;transaction-fees&#39;" rel="tag">transaction-fees</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">938</span> </span>
+        </div>
+        <div data-name="lightning-network">
+            <a href="/questions/tagged/lightning-network" class="post-tag no-tag-menu" title="show questions tagged &#39;lightning-network&#39;" aria-label="show questions tagged &#39;lightning-network&#39;" rel="tag">lightning-network</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">934</span> </span>
+        </div>
+        <div data-name="security">
+            <a href="/questions/tagged/security" class="post-tag no-tag-menu" title="show questions tagged &#39;security&#39;" aria-label="show questions tagged &#39;security&#39;" rel="tag">security</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">904</span> </span>
+        </div>
+        <div data-name="private-key">
+            <a href="/questions/tagged/private-key" class="post-tag no-tag-menu" title="show questions tagged &#39;private-key&#39;" aria-label="show questions tagged &#39;private-key&#39;" rel="tag">private-key</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">855</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="json-rpc">
+            <a href="/questions/tagged/json-rpc" class="post-tag no-tag-menu" title="show questions tagged &#39;json-rpc&#39;" aria-label="show questions tagged &#39;json-rpc&#39;" rel="tag">json-rpc</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">814</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="mining-pools">
+            <a href="/questions/tagged/mining-pools" class="post-tag no-tag-menu" title="show questions tagged &#39;mining-pools&#39;" aria-label="show questions tagged &#39;mining-pools&#39;" rel="tag">mining-pools</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">798</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="mining-theory">
+            <a href="/questions/tagged/mining-theory" class="post-tag no-tag-menu" title="show questions tagged &#39;mining-theory&#39;" aria-label="show questions tagged &#39;mining-theory&#39;" rel="tag">mining-theory</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">786</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="exchanges">
+            <a href="/questions/tagged/exchanges" class="post-tag no-tag-menu" title="show questions tagged &#39;exchanges&#39;" aria-label="show questions tagged &#39;exchanges&#39;" rel="tag">exchanges</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">772</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="blockchain.info">
+            <a href="/questions/tagged/blockchain.info" class="post-tag no-tag-menu" title="show questions tagged &#39;blockchain.info&#39;" aria-label="show questions tagged &#39;blockchain.info&#39;" rel="tag">blockchain.info</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">713</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="client">
+            <a href="/questions/tagged/client" class="post-tag no-tag-menu" title="show questions tagged &#39;client&#39;" aria-label="show questions tagged &#39;client&#39;" rel="tag">client</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">708</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="api">
+            <a href="/questions/tagged/api" class="post-tag no-tag-menu" title="show questions tagged &#39;api&#39;" aria-label="show questions tagged &#39;api&#39;" rel="tag">api</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">660</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="electrum">
+            <a href="/questions/tagged/electrum" class="post-tag no-tag-menu" title="show questions tagged &#39;electrum&#39;" aria-label="show questions tagged &#39;electrum&#39;" rel="tag">electrum</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">646</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="block">
+            <a href="/questions/tagged/block" class="post-tag no-tag-menu" title="show questions tagged &#39;block&#39;" aria-label="show questions tagged &#39;block&#39;" rel="tag">block</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">626</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="script">
+            <a href="/questions/tagged/script" class="post-tag no-tag-menu" title="show questions tagged &#39;script&#39;" aria-label="show questions tagged &#39;script&#39;" rel="tag">script</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">592</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="bitcoin-core-development">
+            <a href="/questions/tagged/bitcoin-core-development" class="post-tag no-tag-menu" title="show questions tagged &#39;bitcoin-core-development&#39;" aria-label="show questions tagged &#39;bitcoin-core-development&#39;" rel="tag">bitcoin-core-development</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">564</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="unconfirmed-transactions">
+            <a href="/questions/tagged/unconfirmed-transactions" class="post-tag no-tag-menu" title="show questions tagged &#39;unconfirmed-transactions&#39;" aria-label="show questions tagged &#39;unconfirmed-transactions&#39;" rel="tag">unconfirmed-transactions</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">559</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="segregated-witness">
+            <a href="/questions/tagged/segregated-witness" class="post-tag no-tag-menu" title="show questions tagged &#39;segregated-witness&#39;" aria-label="show questions tagged &#39;segregated-witness&#39;" rel="tag">segregated-witness</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">558</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="multi-signature">
+            <a href="/questions/tagged/multi-signature" class="post-tag no-tag-menu" title="show questions tagged &#39;multi-signature&#39;" aria-label="show questions tagged &#39;multi-signature&#39;" rel="tag">multi-signature</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">532</span> </span>
+        </div>
+        <div class="dno js-hidden" data-name="hash">
+            <a href="/questions/tagged/hash" class="post-tag no-tag-menu" title="show questions tagged &#39;hash&#39;" aria-label="show questions tagged &#39;hash&#39;" rel="tag">hash</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">&times;</span>&nbsp;<span class="item-multiplier-count">501</span> </span>
+        </div>
+        <a href="#"
+           class="show-more js-show-more js-gps-track"
+           data-gps-track="related_tags.click({ item_type:2 })">
+            more related tags
+        </a>
+        <script>
+            StackExchange.ready(function () {
+                var $div = $('#h-related-tags').parent();
+                $div.find('.js-show-more').click(function () {
+                    $div.find('.js-hidden').show();
+                    $(this).remove();
+                    return false;
+                });
+            });
+        </script>
+
+            </div>
+
+        <div id="hot-network-questions" class="module tex2jax_ignore">
+    <h4>
+        <a href="https://stackexchange.com/questions?tab=hot"
+           class="js-gps-track s-link s-link__inherit" 
+           data-gps-track="posts_hot_network.click({ item_type:1, location:9 })">
+            Hot Network Questions
+        </a>
+    </h4>
+    <ul>
+            <li >
+                <div class="favicon favicon-puzzling" title="Puzzling Stack Exchange"></div><a href="https://puzzling.stackexchange.com/questions/120398/smallest-rectangle-to-put-the-24-abcd-words-combination" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:559 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Smallest rectangle to put the 24 ABCD words combination
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-diy" title="Home Improvement Stack Exchange"></div><a href="https://diy.stackexchange.com/questions/270342/how-to-wire-two-different-3-way-circuits-from-same-box" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:73 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    How to wire two different 3-way circuits from same box
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-tex" title="TeX - LaTeX Stack Exchange"></div><a href="https://tex.stackexchange.com/questions/682096/change-page-numbering-in-preamble-latex-counter-modification-hexadecimal-con" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:85 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Change page numbering in preamble - latex counter modification - hexadecimal conversion
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-space" title="Space Exploration Stack Exchange"></div><a href="https://space.stackexchange.com/questions/63286/calculating-and-drawing-the-orbit-of-a-body-in-a-2d-gravity-simulation-in-python" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:508 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Calculating and Drawing the orbit of a body in a 2D gravity simulation in python
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-dba" title="Database Administrators Stack Exchange"></div><a href="https://dba.stackexchange.com/questions/325757/choosing-relational-db-for-a-small-virtual-server-with-1gb-ram" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:182 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Choosing relational DB for a small virtual server with 1Gb RAM
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-ell" title="English Language Learners Stack Exchange"></div><a href="https://ell.stackexchange.com/questions/335061/pensioner-vs-retired-person-arent-they-overlapping-really-who-is-who" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:481 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    &quot;pensioner&quot; vs &quot;retired person&quot; Aren&#x27;t they overlapping? Really, who is who?
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-gis" title="Geographic Information Systems Stack Exchange"></div><a href="https://gis.stackexchange.com/questions/457162/improving-st-intersects-performance-in-postgis" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:79 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Improving ST_Intersects performance in PostGIS
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-serverfault" title="Server Fault"></div><a href="https://serverfault.com/questions/1128104/san-certificate-with-uri-fragment" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:2 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    SAN certificate with URI fragment
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-astronomy" title="Astronomy Stack Exchange"></div><a href="https://astronomy.stackexchange.com/questions/53326/earths-rotation-longitude" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:514 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Earth&#x27;s Rotation &amp; Longitude
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-tex" title="TeX - LaTeX Stack Exchange"></div><a href="https://tex.stackexchange.com/questions/682078/l3colors-colors-unusable-with-tikz" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:85 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    l3color&#x27;s colors: unusable with tikz?
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-matheducators" title="Mathematics Educators Stack Exchange"></div><a href="https://matheducators.stackexchange.com/questions/26321/seeking-advice-on-allowing-students-to-skip-a-quiz-in-linear-algebra-course" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:548 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Seeking Advice on Allowing Students to Skip a Quiz in Linear Algebra Course
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-diy" title="Home Improvement Stack Exchange"></div><a href="https://diy.stackexchange.com/questions/270304/drilling-through-tiles-fastened-to-concrete" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:73 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Drilling through tiles fastened to concrete
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-politics" title="Politics Stack Exchange"></div><a href="https://politics.stackexchange.com/questions/79067/why-is-china-worried-about-population-decline" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:475 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Why is China worried about population decline?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-bitcoin" title="Bitcoin Stack Exchange"></div><a href="https://bitcoin.stackexchange.com/questions/117837/how-many-sigops-are-in-the-invalid-block-783426" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:308 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    How many sigops are in the invalid block 783426?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-outdoors" title="The Great Outdoors Stack Exchange"></div><a href="https://outdoors.stackexchange.com/questions/28907/how-to-assess-cold-water-boating-canoeing-safety" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:395 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    How to assess cold water boating/canoeing safety
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-worldbuilding" title="Worldbuilding Stack Exchange"></div><a href="https://worldbuilding.stackexchange.com/questions/244906/how-can-a-person-kill-a-giant-ape-without-using-a-weapon" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:579 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    How can a person kill a giant ape without using a weapon?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-rpg" title="Role-playing Games Stack Exchange"></div><a href="https://rpg.stackexchange.com/questions/205603/can-a-frightened-pc-shape-change-if-doing-so-reduces-their-distance-to-the-sourc" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:122 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Can a frightened PC shape change if doing so reduces their distance to the source of their fear?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-physics" title="Physics Stack Exchange"></div><a href="https://physics.stackexchange.com/questions/758556/cat-righting-reflex-is-the-cats-angular-speed-zero-or-non-zero-or-is-it-more" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:151 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Cat righting reflex: Is the cat&#x27;s angular speed zero or non-zero? (Or is it more complicated?)
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-biology" title="Biology Stack Exchange"></div><a href="https://biology.stackexchange.com/questions/111881/tiny-insect-identification-in-potted-plants" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:375 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Tiny insect identification in potted plants
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-blender" title="Blender Stack Exchange"></div><a href="https://blender.stackexchange.com/questions/290199/how-make-a-light-wall-glow" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:502 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    How make a Light Wall Glow
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-physics" title="Physics Stack Exchange"></div><a href="https://physics.stackexchange.com/questions/758565/how-do-telescopes-see-many-billion-light-years-distant-object-in-our-universe" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:151 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    How do telescopes see many billion light years distant object in our universe?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-electronics" title="Electrical Engineering Stack Exchange"></div><a href="https://electronics.stackexchange.com/questions/661933/problem-with-resistor-for-seven-segment-display" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:135 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Problem with resistor for seven segment display
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-philosophy" title="Philosophy Stack Exchange"></div><a href="https://philosophy.stackexchange.com/questions/98521/why-are-the-existence-of-obstacles-to-our-will-considered-a-counterargument-to-s" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:265 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Why are the existence of obstacles to our will considered a counterargument to solipsism?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-aviation" title="Aviation Stack Exchange"></div><a href="https://aviation.stackexchange.com/questions/98534/why-are-trailing-edge-flaps-used-for-landing" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:9, target_site:528 }); posts_hot_network.click({ item_type:2, location:9 })">
+                    Why are trailing edge flaps used for landing?
+                </a>
+
+            </li>
+    </ul>
+
+        <a href="#" 
+           class="show-more js-show-more js-gps-track" 
+           data-gps-track="posts_hot_network.click({ item_type:3, location:9 })">
+            more hot questions
+        </a>
+</div>
+    </div>
+
+        </div>
+    </div>
+
+        
+    <script type="text/javascript">
+    var cam = cam || { opt: {} };
+    var clcGamLoaderOptions = cam || { opt: {} };
+    var opt = clcGamLoaderOptions.opt;
+
+
+    opt.sf = !1;
+    opt.hb = !1;
+    opt.ll = !0;
+    opt.tlb_position = 0;
+    opt.personalization_consent = !0;
+    opt.targeting_consent = !0;
+    opt.performance_consent = !0;
+
+    opt.targeting = {Registered:['false']};
+    opt.adReportEnabled = !0;
+    opt.adReportUrl = '/ads/report-ad';
+    opt.adReportText = 'Report this ad';
+	opt.adReportFileTypeErrorMessage = 'Please select a PNG or JPG file.';
+    opt.adReportFileSizeErrorMessage = 'The file must be under 2 MiB.';
+	opt.adReportErrorText = 'Error uploading ad report.';
+	opt.adReportThanksText = 'Thanks for your feedback. We’ll review this against our code of conduct and take action if necessary.';
+    opt.adReportLoginExpiredMessage = 'Your login session has expired, please login and try again.';
+    opt.adReportLoginErrorMessage = 'An error occurred when loading the report form - please try again';
+	opt.adReportModalClass = 'js-ad-report';
+
+    opt.requestGuid = '95de91f4-1cea-4769-b190-8ba3f268b389';
+
+
+    opt.targeting.TargetingConsent = ['True'];
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('dfptestads')) {
+        const dfptestads = urlParams.get('dfptestads');
+        opt.targeting.DfpTestAds = dfptestads;
+    }
+</script>
+<script>;(()=>{"use strict";var __webpack_modules__={23:(e,t,o)=>{o.d(t,{Z7:()=>l,eq:()=>r,kG:()=>n});const a=/^\/tags\//.test(location.pathname)||/^\/questions\/tagged\//.test(location.pathname)?"tag-pages":/^\/$/.test(location.pathname)||/^\/home/.test(location.pathname)?"home-page":"question-pages";let s=location.hostname;const i={slots:{lb:[[728,90]],mlb:[[728,90]],smlb:[[728,90]],bmlb:[[728,90]],sb:e=>"dfp-tsb"===e?[[300,250],[300,600]]:[[300,250]],"tag-sponsorship":[[730,135]],"mobile-below-question":[[320,50],[300,250]],msb:[[300,250],[300,600]],"talent-conversion-tracking":[[1,1]],"site-sponsorship":[[230,60]]},ids:{"dfp-tlb":"lb","dfp-mlb":"mlb","dfp-smlb":"smlb","dfp-bmlb":"bmlb","dfp-tsb":"sb","dfp-isb":"sb","dfp-tag":"tag-sponsorship","dfp-msb":"msb","dfp-sspon":"site-sponsorship","dfp-m-aq":"mobile-below-question"},idsToExcludeFromAdReports:["dfp-sspon"]};function n(){return Object.keys(i.ids)}function r(e){return i.idsToExcludeFromAdReports.indexOf(e)<0}function l(e){var t=e.split("_")[0];const o=i.ids[t];let n=i.slots[o];return"function"==typeof n&&(n=n(t)),{path:`/248424177/${s}/${o}/${a}`,sizes:n,zone:o}}},865:(e,t,o)=>{function a(e){return"string"==typeof e?document.getElementById(e):e}function s(e){return!!(e=a(e))&&"none"===getComputedStyle(e).display}function i(e){return!s(e)}function n(e){return!!e}function r(e){return/^\s*$/.test(a(e).innerHTML)}function l(e){const{style:t}=e;t.height=t.maxHeight=t.minHeight="auto",t.display="none"}function d(e){const{style:t}=e;t.height=t.maxHeight=t.minHeight="auto",t.display="none",[].forEach.call(e.children,d)}function c(e){const{style:t}=e;t.height=t.maxHeight=t.minHeight="auto",t.removeProperty("display")}function p(e){const t=document.createElement("script");t.src=e,document.body.appendChild(t)}function g(e){return o=e,(t=[]).push=function(e){return o(),delete this.push,this.push(e)},t;var t,o}function h(e){let t="function"==typeof HTMLTemplateElement;var o=document.createElement(t?"template":"div");return e=e.trim(),o.innerHTML=e,t?o.content.firstChild:o.firstChild}o.d(t,{$Z:()=>c,Bv:()=>h,Gx:()=>p,Nj:()=>a,QZ:()=>g,cf:()=>l,pn:()=>i,wo:()=>d,xb:()=>r,xj:()=>s,yb:()=>n})},763:(__unused_webpack_module,__webpack_exports__,__webpack_require__)=>{__webpack_require__.d(__webpack_exports__,{t:()=>AdReports});var _common_helper__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__(865),_console__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(276),_ad_units__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(23);class AdReports{constructor(e,t){if(this.googletag=e,this.cam=t,this.allowedFileTypes=["image/png","image/jpg","image/jpeg"],this.ignoreValidation=!1,_console__WEBPACK_IMPORTED_MODULE_1__.cM("Ad reporting init"),this.cam=t,this.callOnButtonClick=e=>this.onButtonClick(e),this.googletag.pubads().addEventListener("slotRenderEnded",e=>this.handleSlotRendered(e)),Array.isArray(t.slotsRenderedEvents)){_console__WEBPACK_IMPORTED_MODULE_1__.cM("Adding report button to "+t.slotsRenderedEvents.length+" events that have transpired");for(var o=0;o<t.slotsRenderedEvents.length;o++)this.handleSlotRendered(t.slotsRenderedEvents[o])}}handleSlotRendered(e){if(e&&e.slot&&!e.isEmpty&&(e.creativeId||e.lineItemId||!e.isEmpty)){var t=e.slot.getSlotElementId();if(t){var o=document.getElementById(t);if(o)if((0,_ad_units__WEBPACK_IMPORTED_MODULE_0__.eq)(t)){var a=o?.closest(".js-zone-container")?.querySelector(".js-report-ad-button-container");a.append(this.createButton(e)),a.style.height="24px",_console__WEBPACK_IMPORTED_MODULE_1__.cM("Added report button to the bottom of "+t)}else _console__WEBPACK_IMPORTED_MODULE_1__.cM("Not adding report button to the bottom of "+t+": shouldHaveReportButton = false");else _console__WEBPACK_IMPORTED_MODULE_1__.cM("Not adding report button to the bottom of "+t+": resolved invalid adUnit element")}else _console__WEBPACK_IMPORTED_MODULE_1__.cM("Not adding report button to the bottom of element: invalid adUnitElementId")}else _console__WEBPACK_IMPORTED_MODULE_1__.cM("Not adding report button to the bottom of element: invalid SlotRenderEndedEvent")}async onButtonClick(e){e.preventDefault();let t=e.target;const o=t.dataset.modalUrl,a=t.dataset.googleEventData;return await this.loadModal(o,t,a),!1}createButton(e){let t=document.createElement("button");var o=JSON.stringify(e);return t.dataset.googleEventData=o,t.dataset.modalUrl=this.cam.opt.adReportUrl,t.dataset.adUnit=e.slot.getSlotElementId(),t.classList.add("js-report-ad","s-btn","s-btn__link","fs-fine","mt2","float-right"),t.append(document.createTextNode(this.cam.opt.adReportText)),t.removeEventListener("click",this.callOnButtonClick),t.addEventListener("click",this.callOnButtonClick),t}async loadModal(url,$link,googleEventData){try{await window.StackExchange.helpers.loadModal(url,{returnElements:window.$($link)}),this.initForm(googleEventData)}catch(e){var message="",response=e.responseText?eval(`(${e.responseText})`):null;message=response&&response.isLoggedOut?this.cam.opt.adReportLoginExpiredMessage:this.cam.opt.adReportLoginErrorMessage,window.StackExchange.helpers.showToast(message,{type:"danger"})}}removeModal(){window.StackExchange.helpers.closePopups(document.querySelectorAll("."+this.cam.opt.adReportModalClass),"dismiss")}initForm(e,t=!1){this.ignoreValidation=t,this.$form=document.querySelector(".js-ad-report-form"),this.$googleEventData=this.$form.querySelector(".js-json-data"),this.$adReportReasons=this.$form.querySelectorAll(".js-ad-report-reason"),this.$adReportReasonOther=this.$form.querySelector(".js-ad-report-reason-other"),this.$fileUploaderInput=this.$form.querySelector(".js-file-uploader-input"),this.$imageUploader=this.$form.querySelector(".js-image-uploader"),this.$clearImageUpload=this.$form.querySelector(".js-clear-image-upload"),this.$imageUploaderText=this.$form.querySelector(".js-image-uploader-text"),this.$imageUploaderPreview=this.$form.querySelector(".js-image-uploader-preview"),this.$fileErrorMessage=this.$form.querySelector(".js-file-error");const o=this.$form.querySelector(".js-drag-drop-enabled"),a=this.$form.querySelector(".js-drag-drop-disabled");this.$googleEventData.value=e,this.$adReportReasons.forEach((e,t)=>e.addEventListener("change",e=>{this.$adReportReasonOther.classList.toggle("d-none","3"!==e.target.value)})),this.$fileUploaderInput.addEventListener("change",()=>{this.validateFileInput()&&this.updateImagePreview(this.$fileUploaderInput.files)}),this.$clearImageUpload.addEventListener("click",e=>{e.preventDefault(),this.clearImageUpload()});try{this.$fileUploaderInput[0].value="",this.$imageUploader.addEventListener("dragenter dragover dragleave drop",this.preventDefaults),this.$imageUploader.addEventListener("dragenter dragover",this.handleDragStart),this.$imageUploader.addEventListener("dragleave drop",this.handleDragEnd),this.$imageUploader.addEventListener("drop",this.handleDrop)}catch(e){o.classList.add("d-none"),a.classList.remove("d-none")}this.$form.removeEventListener("",this.handleDragEnd),this.$form.addEventListener("submit",async e=>(e.preventDefault(),this.submitForm(),!1))}clearImageUpload(){this.$fileUploaderInput.value="",this.$imageUploaderPreview.setAttribute("src",""),this.$imageUploaderPreview.classList.add("d-none"),this.$clearImageUpload.classList.add("d-none"),this.$imageUploaderText.classList.remove("d-none"),this.$imageUploader.classList.add("p16","ba","bas-dashed","bc-black-100")}preventDefaults(e){e.preventDefault(),e.stopPropagation()}handleDragStart(e){this.$imageUploader.classList.remove("bas-dashed"),this.$imageUploader.classList.add("bas-solid","bc-black-100")}handleDragEnd(e){this.$imageUploader.classList.remove("bas-solid","bc-black-100"),this.$imageUploader.classList.add("bas-dashed")}handleDrop(e){var t=e.originalEvent.dataTransfer.files;FileReader&&t&&1===t.length&&(this.$fileUploaderInput.files=t,this.validateFileInput()&&this.updateImagePreview(t))}setError(e){this.$fileErrorMessage.parentElement.classList.toggle("has-error",e)}updateImagePreview(e){this.$imageUploader.classList.remove("p16","ba","bas-dashed","bc-black-100"),this.$clearImageUpload.classList.remove("d-none"),this.$imageUploaderText.classList.add("d-none");var t=new FileReader;t.onload=e=>{null!=e.target&&(this.$imageUploaderPreview.setAttribute("src",e.target.result),this.$imageUploaderPreview.classList.remove("d-none"))},t.readAsDataURL(e[0])}validateFileInput(){if(this.ignoreValidation)return!0;const e=this.cam.opt.adReportFileTypeErrorMessage,t=this.cam.opt.adReportFileSizeErrorMessage;if(null==this.$fileUploaderInput.files)return!1;var o=this.$fileUploaderInput.files[0];return null==o?(this.setError(!0),!1):this.allowedFileTypes.indexOf(o.type)<0?(this.$fileErrorMessage.textContent=e,this.$fileErrorMessage.classList.remove("d-none"),this.setError(!0),!1):o.size>2097152?(this.$fileErrorMessage.textContent=t,this.$fileErrorMessage.classList.remove("d-none"),this.setError(!0),!1):(this.$fileErrorMessage.classList.add("d-none"),this.setError(!1),!0)}async submitForm(){if(!this.validateFileInput())return!1;this.$form.querySelector("[type=submit]").setAttribute("disabled","true");var e=JSON.parse(this.$googleEventData.value||"{}");e.Reason=parseInt(this.$form.querySelector(".js-ad-report-reason:checked").value,10),e.Description=this.$adReportReasonOther.value,this.$googleEventData.value=JSON.stringify(e);var t=new FormData(this.$form);try{const e=await window.fetch(this.$form.getAttribute("action"),{method:this.$form.getAttribute("method"),body:t,cache:"no-cache"}),a=e.headers.get("content-type")||"",s=await e.text();if(!e.ok)throw new Error("response not valid");if(0===a.indexOf("text/html")){var o=(0,_common_helper__WEBPACK_IMPORTED_MODULE_2__.Bv)(s);const e=o?o.querySelector(".js-modal-content"):null;if(_console__WEBPACK_IMPORTED_MODULE_1__.cM("$popupContent"),_console__WEBPACK_IMPORTED_MODULE_1__.cM(e),!e)throw new Error(`Could not find .js-modal-content in response from ${this.$form.getAttribute("action")}`);document.querySelector(".js-modal-content").replaceWith(e)}else window.StackExchange.helpers.showToast(this.cam.opt.adReportThanksText,{type:"success"}),this.removeModal()}catch(e){window.StackExchange.helpers.showToast(this.cam.opt.adReportErrorText,{type:"danger"})}finally{let e=this.$form.querySelector("[type=submit]");e&&e.removeAttribute("disabled")}}}},276:(e,t,o)=>{function a(...e){}o.d(t,{cM:()=>a})}},__webpack_module_cache__={};function __webpack_require__(e){var t=__webpack_module_cache__[e];if(void 0!==t)return t.exports;var o=__webpack_module_cache__[e]={exports:{}};return __webpack_modules__[e](o,o.exports,__webpack_require__),o.exports}__webpack_require__.d=(e,t)=>{for(var o in t)__webpack_require__.o(t,o)&&!__webpack_require__.o(e,o)&&Object.defineProperty(e,o,{enumerable:!0,get:t[o]})},__webpack_require__.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t);var __webpack_exports__={};(()=>{var e=__webpack_require__(276),t=(e=>(e[e.Above=0]="Above",e[e.Below=1]="Below",e))(t||{});const o=Object.assign({},{"lib":"https://cdn.sstatic.net/clc/js/bundles/gam_loader_script/gam_loader_script.bundle.741.08bfea5f8f4d3e6902a1.min.js","style":null,"u":null,"wa":true,"kt":2000,"tto":true,"h":"clc.stackoverflow.com","allowed":"^(((talent\\.)?stackoverflow)|(blog\\.codinghorror)|(.*\\.googlesyndication)|(serverfault|askubuntu)|([^\\.]+\\.stackexchange))\\.com$","wv":true,"al":false,"abd":true,"cpa_liid":[5882654614],"cpa_cid":[138377597667],"dp":false});var a=__webpack_require__(23),s=__webpack_require__(865),i=__webpack_require__(763);window.cam=new class{constructor(){this.gptImported=!1,this.collapsed={},e.cM("constructor"),this.clc_options=o,window.clcGamLoaderOptions?Object.assign(this,window.clcGamLoaderOptions):void 0===this.opt&&(this.opt=window.opt)}init(){if(e.cM("init"),void 0===this.opt)throw new Error("opt not set, required by GAM Loader");e.cM("setup message handler"),window.addEventListener("message",e=>{this.onmessage(e)}),this.opt.targeting&&this.opt.targeting.ProductVariant&&"SystemDefault"===this.opt.targeting.ProductVariant[0]&&(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?this.opt.targeting.ProductVariant="Dark":this.opt.targeting.ProductVariant="Light")}handleSlotRenderedNoAdReport(){if(googletag.pubads().addEventListener("slotRenderEnded",e=>this.applyExtraMarginBottom(e)),Array.isArray(this.slotsRenderedEvents))for(var e=0;e<this.slotsRenderedEvents.length;e++)this.applyExtraMarginBottom(this.slotsRenderedEvents[e])}onmessage(t){let o="omni";if(t.data&&("string"==typeof t.data||t.data instanceof String)){if(0===t.data.indexOf("get-omni-")){e.cM("Recevied get-omni message, sending back omni");var a=t.source,i=this.opt.omni,n="string"==typeof i?i:"";a.postMessage([o,n,this.opt.requestGuid].join("|"),"*")}else if(0===t.data.indexOf("collapse-")){e.cM("Recevied collapse message, collapse ad iframe"),e.cM(t);for(var r=t.source.window,l=document.getElementsByTagName("IFRAME"),d=0;d<l.length;d++){var c=l[d];if(c.contentWindow==r)return void(0,s.wo)(c.parentElement.parentElement.parentElement)}}else if(0===t.data.indexOf("resize|")){e.cM("Recevied resize message, resize ad iframe"),e.cM(t);let o=this._getFrameByEvent(t),a=t.data.indexOf("|")+1,s=t.data.slice(a),i=parseFloat(s)+.5;e.cM("New iframe height "+i),o.height=i.toString(),o.parentElement.style.height=i.toString()+"px"}else if(0===t.data.indexOf("getmarkup|")){let o=t.data.indexOf("|")+1,a=t.data.slice(o);e.cM("Recevied get markup message: "+a);let s=this._getFrameByEvent(t).closest(".everyonelovesstackoverflow");const i=document.createElement("script");i.dataset.adZoneId=s.id,i.src=a,document.body.appendChild(i)}}else e.cM("Received unhandled message")}placeInIframe(t,o){e.cM("Received markup result in main frame");let a=document.getElementById(t.dataset.adZoneId),s=a.querySelector("iframe");if("string"==typeof o.prefixToIframeHtml){let e=document.createElement("div");e.innerHTML=o.prefixToIframeHtml,a.prepend(e.querySelector("img"))}s.contentWindow.postMessage(["markup",JSON.stringify(o)].join("|"),"*")}_getFrameByEvent(e){return Array.from(document.getElementsByTagName("iframe")).filter(t=>t.contentWindow===e.source)[0]}classifyZoneIds(e){const t=e.map(s.Nj).filter(s.yb);return{eligible:t.filter(s.xb).filter(s.pn),ineligible:t.filter(s.xj)}}applyExtraMarginBottom(t){if(t&&t.slot&&!t.isEmpty&&(t.creativeId||t.lineItemId||!t.isEmpty)){var o=t.slot.getSlotElementId();if(o){var s=document.getElementById(o);if(s)if((0,a.eq)(o)){var i=s?.closest(".js-zone-container");i.style.marginBottom="24px",e.cM("Applied extra margin to the bottom of "+o)}else e.cM("Not applying extra margin to the bottom of "+o+": shouldHaveReportButton = false");else e.cM("Not applying extra margin to the bottom of "+o+": resolved invalid adUnit element")}else e.cM("Not applying extra margin to the bottom of element: invalid adUnitElementId")}else e.cM("Not applying extra margin to the bottom of element: invalid SlotRenderEndedEvent")}load(o=(0,a.kG)()){const n=this.opt.tlb_position===t.Above?["dfp-mlb","dfp-smlb"]:["dfp-mlb","dfp-smlb","dfp-tlb"];if(!this.isGptReady())return e.cM("Initializing..."),this.initGpt(),void googletag.cmd.push(()=>this.load(o));this.opt.adReportEnabled?(e.cM("Ad reporting enabled"),this.adReports=new i.t(googletag,this)):(e.cM("Ad reporting not enabled"),this.handleSlotRenderedNoAdReport()),e.cM("Attempting to load ads into ids: ",o);const{eligible:r,ineligible:l}=this.classifyZoneIds(o);if(this.initDebugPanel(googletag,r.concat(l)),r.forEach(e=>(0,s.cf)(e)),l.forEach(s.wo),0===r.length)return void e.cM("Found no ad ids on page");e.cM("Eligible ids:",r),this.opt.abd&&this.appendAdblockDetector();var d=googletag.pubads().getSlots().filter(e=>o.indexOf(e.getSlotElementId())>=0);googletag.destroySlots(d),this.opt.sf&&(googletag.pubads().setForceSafeFrame(!0),googletag.pubads().setSafeFrameConfig({allowOverlayExpansion:!0,allowPushExpansion:!0,sandbox:!0})),e.cM("Targeting consent: Checking...");let c=!1,p=!1;void 0!==this.opt.targeting_consent&&(p=!0,e.cM("Targeting consent: Parameter set"),e.cM("Targeting consent: Consent given? ",this.opt.targeting_consent),c=this.opt.targeting_consent),void 0!==this.opt.personalization_consent&&(e.cM("Personalization consent: Parameter set"),e.cM("Personalization consent: Consent given? ",this.opt.personalization_consent),c=c&&this.opt.personalization_consent),c=c&&p,googletag.pubads().setRequestNonPersonalizedAds(c?0:1),c||googletag.pubads().setPrivacySettings({limitedAds:!0}),this.opt.ll||googletag.pubads().enableSingleRequest(),cam.sreEvent||(googletag.pubads().addEventListener("slotRenderEnded",e=>this.onSlotRendered(e)),cam.sreEvent=!0),this.setTargeting(googletag);var g=r.filter(e=>!this.opt.ll||n.indexOf(e.id)<0),h=r.filter(e=>!!this.opt.ll&&n.indexOf(e.id)>=0);e.cM("Up front ids:",g),e.cM("Lazy loaded ids:",h),g.forEach(t=>{e.cM(`Defining ad for element ${t.id}`),this.defineSlot(t.id,googletag),t.setAttribute("data-dfp-zone","true")}),googletag.enableServices(),g.forEach(t=>{e.cM(`Displaying ad for element ${t.id}`),googletag.cmd.push(()=>googletag.display(t.id))}),this.opt.ll&&(e.cM("Enabling lazy loading for GAM"),googletag.pubads().enableLazyLoad({fetchMarginPercent:0,renderMarginPercent:0}),e.cM("Setting up lazy loaded ad units"),h.forEach(t=>{e.cM(`Lazy loading - Defining Slot ${t.id}`),this.defineSlot(t.id,googletag)}),h.forEach(t=>{e.cM(`Lazy loading - Displaying ad for element ${t.id}`),googletag.cmd.push(()=>googletag.display(t.id))}))}setTargeting(t){let o=this.opt.targeting;if(!o)throw new Error("Targeting not defined");Object.keys(o).forEach(a=>{e.cM(`-> targeting - ${a}: ${o[a]}`),t.pubads().setTargeting(a,o[a])})}appendAdblockDetector(){const e=document.createElement("div");e.className="adsbox",e.id="clc-abd",e.style.position="absolute",e.style.pointerEvents="none",e.innerHTML="&nbsp;",document.body.appendChild(e)}onSlotRendered(o){try{const n=o.slot.getSlotElementId();let r=[];n||r.push("id=0");const l=document.getElementById(n);if(n&&!l&&r.push("el=0"),0!==r.length)return void this.stalled(r.join("&"));const{path:d,sizes:c,zone:p}=(0,a.Z7)(n);if(this.collapsed[p]&&o.isEmpty)return e.cM(`No line item for the element #${l.id}... collapsing.`),void(0,s.wo)(l);if(this.slotsRenderedEvents.push(o),o.lineItemId||o.creativeId||!o.isEmpty){e.cM(`Rendered ad for element #${l.id} [line item #${o.lineItemId}]`),e.cM(o);var i=l.parentElement;if(i.classList.contains("js-zone-container")){switch((0,s.cf)(i),n){case"dfp-tlb":this.opt.tlb_position===t.Above?i.classList.add("mb8"):i.classList.add("mt16");break;case"dfp-tag":i.classList.add("mb8");break;case"dfp-msb":i.classList.add("mt16");break;case"dfp-mlb":case"dfp-smlb":case"dfp-bmlb":i.classList.add("my8");break;case"dfp-isb":i.classList.add("mt24");break;case"dfp-m-aq":i.classList.add("my12"),i.classList.add("mx-auto")}(0,s.$Z)(i),(0,s.$Z)(l)}else e.cM(`No ad for element #${l.id}, collapsing`),e.cM(o),(0,s.wo)(l)}}catch(e){this.stalled("e=1")}}stalled(e){(new Image).src=`https://${this.clc_options.h}/stalled.gif?${e}`}defineSlot(t,o){"dfp-isb"===t&&(e.cM("-> targeting - Sidebar: Inline"),o.pubads().setTargeting("Sidebar",["Inline"])),"dfp-tsb"===t&&(e.cM("-> targeting - Sidebar: Right"),o.pubads().setTargeting("Sidebar",["Right"]));const{path:s,sizes:i,zone:n}=(0,a.Z7)(t);e.cM(`Defining slot for ${t}: ${s}, sizes: ${JSON.stringify(i)}`),o.defineSlot(s,i,t).addService(o.pubads())}importGptLibrary(){this.gptImported||(this.gptImported=!0,void 0===this.opt.targeting_consent||this.opt.targeting_consent?(0,s.Gx)("https://securepubads.g.doubleclick.net/tag/js/gpt.js"):(0,s.Gx)("https://pagead2.googlesyndication.com/tag/js/gpt.js"))}isGptReady(){return"undefined"!=typeof googletag&&!!googletag.apiReady}initGpt(){"undefined"==typeof googletag&&(window.googletag={cmd:(0,s.QZ)(()=>this.importGptLibrary())})}initDebugPanel(t,o){e.cM("initDebugPanel"),e.cM("Not showing debug panel")}},window.clcGamLoaderOptions&&(cam.init(),cam.load())})()})();</script>
+        
+    <footer id="footer" class="site-footer js-footer" role="contentinfo">
+        <div class="site-footer--container">
+            <nav class="site-footer--nav">
+                    <div class="site-footer--col">
+                        <h5 class="-title"><a href="/">Bitcoin</a></h5>
+                        <ul class="-list js-primary-footer-links">
+                                    <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 2 })" href="/tour">Tour</a></li>
+                                <li><a href="/help" class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 3 })">Help</a></li>
+                                    <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 5 })" href="https://chat.stackexchange.com?tab=site&host=bitcoin.stackexchange.com">Chat</a></li>
+                            <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 13 })" href="/contact">Contact</a></li>
+                                <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 14 })" href="https://bitcoin.meta.stackexchange.com">Feedback</a></li>
+                        </ul>
+                    </div>
+                <div class="site-footer--col">
+                    <h5 class="-title"><a class="js-gps-track" data-gps-track="footer.click({ location: 3, link: 1 })" href="https://stackoverflow.co/">Company</a></h5>
+                    <ul class="-list">
+                            <li><a href="https://stackoverflow.com" class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 15})">Stack Overflow</a></li>
+                            <li><a href="https://stackoverflow.co/teams" class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 29 })">Teams</a></li>
+                            <li><a href="https://stackoverflow.co/advertising" class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 21 })">Advertising</a></li>
+                            <li><a href="https://stackoverflow.co/collectives" class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 40 })">Collectives</a></li>
+                            <li><a href="https://stackoverflow.co/talent" class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 20 })">Talent</a></li>
+                                <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 1 })" href="https://stackoverflow.co/">About</a></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 27 })" href="https://stackoverflow.co/company/press">Press</a></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 7 })" href="https://stackoverflow.com/legal">Legal</a></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 8 })" href="https://stackoverflow.com/legal/privacy-policy">Privacy Policy</a></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 37 })" href="https://stackoverflow.com/legal/terms-of-service">Terms of Service</a></li>
+                            <li class="" id="consent-footer-link"><a class="js-gps-track -link js-cookie-settings" data-gps-track="footer.click({ location: 3, link: 38 })" href="#" data-consent-popup-loader="footer">Cookie Settings</a></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link: 39 })" href="https://stackoverflow.com/legal/cookie-policy">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="site-footer--col site-footer--categories-nav">
+                    <div>
+                        <h5 class="-title"><a href="https://stackexchange.com" data-gps-track="footer.click({ location: 3, link: 30 })">Stack Exchange Network</a></h5>
+                        <ul class="-list">
+                            <li>
+                                <a href="https://stackexchange.com/sites#technology" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 24 })">
+                                    Technology
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#culturerecreation" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 24 })">
+                                    Culture &amp; recreation
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#lifearts" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 24 })">
+                                    Life &amp; arts
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#science" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 24 })">
+                                    Science
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#professional" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 24 })">
+                                    Professional
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#business" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 24 })">
+                                    Business
+                                </a>
+                            </li>
+
+                            <li class="mt16 md:mt0">
+                                <a href="https://api.stackexchange.com/" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 24 })">
+                                    API
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="https://data.stackexchange.com/" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 24 })">
+                                    Data
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <div class="site-footer--copyright fs-fine md:mt24">
+                <ul class="-list -social md:mb8">
+                    <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 3, link:4 })" href="https://stackoverflow.blog?blb=1">Blog</a></li>
+                    <li><a href="https://www.facebook.com/officialstackoverflow/" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 31 })">Facebook</a></li>
+                    <li><a href="https://twitter.com/stackoverflow" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 32 })">Twitter</a></li>
+                    <li><a href="https://linkedin.com/company/stack-overflow" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 33 })">LinkedIn</a></li>
+                    <li><a href="https://www.instagram.com/thestackoverflow" class="-link js-gps-track" data-gps-track="footer.click({ location: 3, link: 36 })">Instagram</a></li>
+                </ul>
+
+                <p class="md:mb0">
+Site design / logo &#169; 2023 Stack Exchange Inc; user contributions licensed under <span class='td-underline'><a href="https://stackoverflow.com/help/licensing">CC BY-SA</a></span>.                    <span id="svnrev">rev&nbsp;2023.4.6.43381</span>
+                </p>
+            </div>
+        </div>
+
+    </footer>
+
+
+                <!-- Google tag (gtag.js) -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=G-S812YQPLT2"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+            </script>
+            <script>
+                (function(i, s, o, g, r, a, m) {
+                    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function() { (i[r].q = i[r].q || []).push(arguments) }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m);
+                })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+            </script>
+        <script>
+            StackExchange.ready(function() {
+
+                var ga3Settings = {
+                    autoLink: ["stackoverflow.blog","info.stackoverflowsolutions.com","stackoverflowsolutions.com"],
+                    sendTitles: true,
+                    tracker: window.ga,
+                    trackingCodes: [
+                        'UA-108242619-5'
+                    ],
+                    checkDimension: 'dimension42'
+                                                    };
+
+                var customGA4Dimensions = {};
+
+                        customGA4Dimensions["routename"] = "Questions/List";
+
+                var ga4Settings = {
+                    tracker: gtag,
+                    trackingCodes: [
+                        'G-S812YQPLT2'
+                    ],
+                    consentsToPerformanceCookies: "granted",
+                    consentsToTargetingCookies: "granted",
+                    eventParameters: customGA4Dimensions,
+                    checkForAdBlock: true
+                };
+
+                StackExchange.ga.init({ GA3: ga3Settings, GA4: ga4Settings });
+
+                StackExchange.ga.setDimension('dimension1', '22021373');
+
+
+
+                StackExchange.ga.setDimension('dimension3', 'Questions/List');
+
+
+                StackExchange.ga.setDimension('dimension7', "1680911700.1990314640");
+
+                StackExchange.ga.trackPageView();
+            });
+        </script>
+
+        
+    <div id="onetrust-consent-sdk" class="d-none"></div>
+    <div id="onetrust-banner-sdk" data-controller="s-modal"></div>
+    <div id="ot-pc-content" class="d-none"></div>
+    <div id="onetrust-style" class="d-none">&nbsp;</div>
+    <div class="d-none js-consent-banner-version" data-consent-banner-version="1"></div>
+
+
+    
+    </body>
+    </html>
