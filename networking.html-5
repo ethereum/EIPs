@@ -1,0 +1,11 @@
+<html> | </html>
+≤script>
+---
+layout: page
+title: Networking
+---
+</script>
+<html><body></html>
+<body><script>
+{% assign eips=site.pages|where:"type","Standards Track"|where:"category","Networking" %}
+{% include eiptable.html eips=eips %}</script></body></html>
