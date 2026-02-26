@@ -1,0 +1,16 @@
+def get_derivative(func, x):
+    h = 0.0001                          
+    return (func(x + h) - func(x)) / math.radians(h)
+
+
+
+def f(x): 
+    return math.sin(math.radians(x))
+
+
+
+x =  30                               
+computed = get_derivative(f, x)
+actual = math.cos(math.radians( x + math.radians(0.0001 )))
+
+computed, actual   
