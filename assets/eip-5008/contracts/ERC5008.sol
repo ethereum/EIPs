@@ -27,6 +27,7 @@ contract ERC5008 is ERC721, IERC5008 {
     ) internal virtual override{
         super._beforeTokenTransfer(from, to, tokenId);
         _tokenNonce[tokenId]++;
+        emit NonceChanged(tokenId, _tokenNonce[tokenId]);
     }
 
     /// @dev See {IERC165-supportsInterface}.

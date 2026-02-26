@@ -159,7 +159,7 @@ abstract contract BaseLock is
         _collateralContractAddress.safeTransferFrom(_from, address(this), _collateralTokenId, _amount, _data); // last against reentrancy attack
     }
 
-    /// Gather a DeFi profit of a token previous donated to this contact.
+    /// Gather a DeFi profit of a token previous donated to this contract.
     /// @param _collateralContractAddress The collateral ERC-1155 contract address.
     /// @param _collateralTokenId The collateral ERC-1155 token ID.
     /// @param _oracleId The oracle ID to whose ecosystem to donate to.

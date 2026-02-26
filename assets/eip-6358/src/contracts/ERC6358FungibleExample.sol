@@ -251,7 +251,7 @@ contract ERC6358FungibleExample is ERC20, Ownable, IERC6358Fungible {
 
         emit OmniverseTokenTransfer(_from, _to, _amount);
 
-        address toAddr = _pkToAddress(_to);
+        address toAddr = OmniverseProtocolHelper.pkToAddress(_to);
         accountsMap[toAddr] = _to;
     }
     
@@ -259,7 +259,7 @@ contract ERC6358FungibleExample is ERC20, Ownable, IERC6358Fungible {
      * @notice Check if the public key is the owner
      */
     function _checkOwner(bytes memory _pk) internal view {
-        address fromAddr = _pkToAddress(_pk);
+        address fromAddr = OmniverseProtocolHelper.pkToAddress(_pk);
         require(fromAddr == owner(), "Not owner");
     }
 
@@ -270,7 +270,7 @@ contract ERC6358FungibleExample is ERC20, Ownable, IERC6358Fungible {
         omniverseBalances[_to] += _amount;
         emit OmniverseTokenTransfer("", _to, _amount);
 
-        address toAddr = _pkToAddress(_to);
+        address toAddr = OmniverseProtocolHelper.pkToAddress(_to);
         accountsMap[toAddr] = _to;
     }
 
@@ -288,14 +288,6 @@ contract ERC6358FungibleExample is ERC20, Ownable, IERC6358Fungible {
     function _omniverseBurn(bytes memory _from, uint256 _amount) internal {
         omniverseBalances[_from] -= _amount;
         emit OmniverseTokenTransfer(_from, "", _amount);
-    }
-
-    /**
-     * @notice Convert the public key to evm address
-     */
-    function _pkToAddress(bytes memory _pk) internal pure returns (address) {
-        bytes32 hash = keccak256(_pk);
-        return address(uint160(uint256(hash)));
     }
 
     /**
@@ -350,7 +342,7 @@ contract ERC6358FungibleExample is ERC20, Ownable, IERC6358Fungible {
     /**
      * @notice Set the cooling down time of an omniverse transaction
      */
-    function setCooingDownTime(uint256 _time) external {
+    function setCoolingDownTime(uint256 _time) external {
         cdTime = _time;
     }
 

@@ -30,12 +30,7 @@ contract VestingNFT is ERC5725 {
      * @param releaseTimestamp When the full amount of tokens get released
      * @param token The ERC20 token to vest over time
      */
-    function create(
-        address to,
-        uint256 amount,
-        uint128 releaseTimestamp,
-        IERC20 token
-    ) public virtual {
+    function create(address to, uint256 amount, uint128 releaseTimestamp, IERC20 token) public virtual {
         require(to != address(0), "to cannot be address 0");
         require(releaseTimestamp > block.timestamp, "release must be in future");
 
@@ -56,13 +51,10 @@ contract VestingNFT is ERC5725 {
     /**
      * @dev See {IERC5725}.
      */
-    function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)
-        public
-        view
-        override(ERC5725)
-        validToken(tokenId)
-        returns (uint256 payout)
-    {
+    function vestedPayoutAtTime(
+        uint256 tokenId,
+        uint256 timestamp
+    ) public view override(ERC5725) validToken(tokenId) returns (uint256 payout) {
         if (timestamp >= _endTime(tokenId)) {
             return _payout(tokenId);
         }

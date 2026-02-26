@@ -1,0 +1,27 @@
+{
+  "name": "erc6982-example",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "npx hardhat test",
+    "compile": "npx hardhat compile"
+  },
+  "author": {
+    "name": "Francesco Sullo",
+    "email": "francesco@sullo.co"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.5",
+    "@openzeppelin/hardhat-upgrades": "^1.25.3",
+    "chai": "^4.3.7",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.14.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.3",
+    "@openzeppelin/contracts-upgradeable": "^4.8.3"
+  }
+}

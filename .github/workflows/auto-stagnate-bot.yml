@@ -2,6 +2,7 @@ on:
   schedule:
     # A job that runs every sunday at 00:00
     - cron:  '0 0 * * 0'
+  workflow_dispatch:
 
 name: Auto Stagnant Bot
 jobs:
@@ -11,9 +12,9 @@ jobs:
     name: Auto Stagnant Bot
     steps:
       - name: Checkout
-        uses: actions/checkout@e2f20e631ae6d7dd3b768f56a5d2af784dd54791
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
       - name: Setup Node.js Environment
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516
+        uses: actions/setup-node@d98fa1113850e562f83c7fc3a89c0ecd7a87fbed
         with:
           node-version: '14'
       - name: auto-stagnant-bot

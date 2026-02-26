@@ -4,5 +4,14 @@
     "config:base",
     ":disableDependencyDashboard"
   ],
-  "ignorePaths": ["**/assets/**"]
+  "prConcurrentLimit": 100,
+  "ignorePaths": [
+    "**/assets/**"
+  ],
+  "ignoreDeps": [
+    "Pandapip1/jekyll-label-action",
+    "ethereum/eipw-action",
+    "ethereum/eip-review-bot",
+    "ethereum/EIP-Bot"
+  ]
 }

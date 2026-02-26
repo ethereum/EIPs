@@ -1,5 +1,8 @@
 {
     "name": "EIP-5008",
+    "scripts": {
+        "test": "npx hardhat test"
+    },
     "dependencies": {
         "@openzeppelin/contracts": "^4.7.3",
         "@nomiclabs/hardhat-ethers": "^2.0.5",

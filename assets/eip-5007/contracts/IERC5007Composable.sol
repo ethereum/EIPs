@@ -4,39 +4,46 @@ pragma solidity ^0.8.0;
 
 interface IERC5007Composable /* is IERC5007 */ {
     /**
-     * @dev Returns the ancestor token id of the NFT.
-     *
+     * @dev Returns the asset id of the time NFT.
+     * Only NFTs with same asset id can be merged.
+     * 
      * Requirements:
      *
      * - `tokenId` must exist.
      */
-    function rootTokenId(uint256 tokenId) external view returns (uint256);
+    function assetId(uint256 tokenId) external view returns (uint256);
 
     /**
-     * @dev  Mint a new token from an old token.
-     * The rootTokenId of the new token is the same as the rootTokenId of the old token
+     * @dev Split an old token to two new tokens.
+     * The assetId of the new token is the same as the assetId of the old token
      *
      * Requirements:
      *
      * - `oldTokenId` must exist.
-     * - `newTokenId` must not exist.
-     * - `newTokenOwner` cannot be the zero address.
-     * - `newTokenStartTime`  require(oldTokenStartTime < newTokenStartTime && newTokenStartTime <= oldTokenEndTime)
+     * - `newToken1Id` must not exist.
+     * - `newToken1Owner` cannot be the zero address.
+     * - `newToken2Id` must not exist.
+     * - `newToken2Owner` cannot be the zero address.
+     * - `splitTime`  require(oldToken.startTime <= splitTime && splitTime < oldToken.EndTime)
      */
     function split(
         uint256 oldTokenId,
-        uint256 newTokenId,
-        address newTokenOwner,
-        int64 newTokenStartTime
+        uint256 newToken1Id,
+        address newToken1Owner,
+        uint256 newToken2Id,
+        address newToken2Owner,
+        uint64 splitTime
     ) external;
 
     /**
-     * @dev  Merge the first token and second token into the new token.
+     * @dev Merge the first token and second token into the new token.
      *
      * Requirements:
      *
      * - `firstTokenId` must exist.
-     * - `secondTokenId` must exist. require((firstToken.endTime + 1) == secondToken.startTime)
+     * - `secondTokenId` must exist.
+     * - require((firstToken.endTime + 1) == secondToken.startTime)
+     * - require((firstToken.assetId()) == secondToken.assetId())
      * - `newTokenOwner` cannot be the zero address.
      * - `newTokenId` must not exist.
      */

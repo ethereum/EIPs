@@ -3,9 +3,9 @@ const BN = require('bn.js');
 const secp256k1 = require('secp256k1');
 const keccak256 = require('keccak256');
 const Web3 = require('web3');
-const web3js = new Web3(Web3.givenProvider);
+const providerUrl = 'http://localhost:8545';
+const web3js = new Web3(providerUrl);
 const assert = require('assert');
-// const { util } = require('config');
 
 const CHAIN_ID = 0;
 const TOKEN_ID = 1;
@@ -112,7 +112,7 @@ contract('ERC6358NonFungible', function() {
         nonFungible = await NonFungible.new(CHAIN_ID, TOKEN_SYMBOL, TOKEN_SYMBOL, {from: owner});
         NonFungible.address = nonFungible.address;
         await nonFungible.setMembers([[CHAIN_ID, NonFungible.address]]);
-        await nonFungible.setCooingDownTime(COOL_DOWN);
+        await nonFungible.setCoolingDownTime(COOL_DOWN);
     }
 
     const mintToken = async function(from, toPk, tokenId) {
@@ -120,7 +120,7 @@ contract('ERC6358NonFungible', function() {
         let txData = encodeMint(from, toPk, tokenId, nonce);
         await nonFungible.sendOmniverseTransaction(txData);
         await utils.sleep(COOL_DOWN);
-        await utils.evmMine(1);
+        await utils.evmMine(1, web3js.currentProvider);
         let ret = await nonFungible.triggerExecution();
     }
     
@@ -134,7 +134,7 @@ contract('ERC6358NonFungible', function() {
                 let nonce = await nonFungible.getTransactionCount(user1Pk);
                 let txData = encodeTransfer({pk: user1Pk, sk: user1Sk}, user2Pk, TOKEN_ID, nonce);
                 txData.signature = txData.signature.slice(0, -2);
-                await utils.expectThrow(nonFungible.sendOmniverseTransaction(txData), 'Verify failed');
+                await utils.expectThrow(nonFungible.sendOmniverseTransaction(txData), 'Signature error');
             });
         });
 
@@ -143,7 +143,7 @@ contract('ERC6358NonFungible', function() {
                 let nonce = await nonFungible.getTransactionCount(user1Pk);
                 let txData = encodeTransfer({pk: user1Pk, sk: user1Sk}, user2Pk, TOKEN_ID, nonce);
                 txData.from = ownerPk;
-                await utils.expectThrow(nonFungible.sendOmniverseTransaction(txData), 'Signer not sender');
+                await utils.expectThrow(nonFungible.sendOmniverseTransaction(txData), 'Signature error');
             });
         });
 
@@ -164,7 +164,7 @@ contract('ERC6358NonFungible', function() {
                 let count = await nonFungible.getTransactionCount(ownerPk);
                 assert(count == 0, "The count should be zero");
                 await utils.sleep(COOL_DOWN);
-                await utils.evmMine(1);
+                await utils.evmMine(1, web3js.currentProvider);
                 ret = await nonFungible.triggerExecution();
                 count = await nonFungible.getTransactionCount(ownerPk);
                 assert(count == 1, "The count should be one");
@@ -192,10 +192,10 @@ contract('ERC6358NonFungible', function() {
         describe('Cooled down', function() {
             it('should succeed', async () => {
                 await utils.sleep(COOL_DOWN);
-                await utils.evmMine(1);
+                await utils.evmMine(1, web3js.currentProvider);
                 let nonce = await nonFungible.getTransactionCount(ownerPk);
                 await utils.sleep(COOL_DOWN);
-                await utils.evmMine(1);
+                await utils.evmMine(1, web3js.currentProvider);
                 ret = await nonFungible.triggerExecution();
                 let count = await nonFungible.getTransactionCount(ownerPk);
                 assert(count == 2);
@@ -209,6 +209,31 @@ contract('ERC6358NonFungible', function() {
                 await nonFungible.sendOmniverseTransaction(txData);
                 let malicious = await nonFungible.isMalicious(ownerPk);
                 assert(malicious, "It should be malicious");
+            });
+        });
+    });
+
+    describe('Personal signing', function() {
+        before(async function() {
+            await initContract();
+        });
+
+        describe('All conditions satisfied', function() {
+            it('should succeed', async () => {
+                let nonce = await nonFungible.getTransactionCount(ownerPk);
+                let txData = encodeMint({pk: ownerPk, sk: ownerSk}, user2Pk, TOKEN_ID, nonce);
+                let bData = getRawData(txData, MINT, [user2Pk, TOKEN_ID]);
+                let hash = keccak256(Buffer.concat([Buffer.from('\x19Ethereum Signed Message:\n' + bData.length), bData]));
+                txData.signature = signData(hash, ownerSk);
+                let ret = await nonFungible.sendOmniverseTransaction(txData);
+                assert(ret.logs[0].event == 'TransactionSent');
+                let count = await nonFungible.getTransactionCount(ownerPk);
+                assert(count == 0, "The count should be zero");
+                await utils.sleep(COOL_DOWN);
+                await utils.evmMine(1, web3js.currentProvider);
+                ret = await nonFungible.triggerExecution();
+                count = await nonFungible.getTransactionCount(ownerPk);
+                assert(count == 1, "The count should be one");
             });
         });
     });
@@ -235,7 +260,7 @@ contract('ERC6358NonFungible', function() {
                 let count = await nonFungible.getDelayedTxCount();
                 assert(count == 1, 'The number of delayed txs should be one');
                 await utils.sleep(COOL_DOWN);
-                await utils.evmMine(1);
+                await utils.evmMine(1, web3js.currentProvider);
                 ret = await nonFungible.triggerExecution();
             });
         });
@@ -277,7 +302,7 @@ contract('ERC6358NonFungible', function() {
         describe('Cooled down', function() {
             it('should be one transaction', async () => {
                 await utils.sleep(COOL_DOWN);
-                await utils.evmMine(1);
+                await utils.evmMine(1, web3js.currentProvider);
                 let tx = await nonFungible.getExecutableDelayedTx();
                 assert(tx.sender == ownerPk, 'There should be one transaction');
             });
@@ -324,7 +349,7 @@ contract('ERC6358NonFungible', function() {
                 let txData = encodeMint({pk: ownerPk, sk: ownerSk}, user1Pk, TOKEN_ID, nonce);
                 await nonFungible.sendOmniverseTransaction(txData);
                 await utils.sleep(COOL_DOWN);
-                await utils.evmMine(1);
+                await utils.evmMine(1, web3js.currentProvider);
                 let ret = await nonFungible.triggerExecution();
                 assert(ret.logs[0].event == 'OmniverseTokenTransfer');
                 let tokenOwner = await nonFungible.omniverseOwnerOf(TOKEN_ID);
@@ -363,7 +388,7 @@ contract('ERC6358NonFungible', function() {
                 let txData = encodeBurn({pk: ownerPk, sk: ownerSk}, user1Pk, TOKEN_ID, nonce);
                 await nonFungible.sendOmniverseTransaction(txData);
                 await utils.sleep(COOL_DOWN);
-                await utils.evmMine(1);
+                await utils.evmMine(1, web3js.currentProvider);
                 let ret = await nonFungible.triggerExecution();
                 await utils.expectThrow(nonFungible.omniverseOwnerOf(TOKEN_ID), "Token not exist");
                 assert(ret.logs[0].event == 'OmniverseTokenTransfer');
@@ -393,7 +418,7 @@ contract('ERC6358NonFungible', function() {
                 let txData = encodeTransfer({pk: user1Pk, sk: user1Sk}, user2Pk, TOKEN_ID, nonce);
                 await nonFungible.sendOmniverseTransaction(txData);
                 await utils.sleep(COOL_DOWN);
-                await utils.evmMine(1);
+                await utils.evmMine(1, web3js.currentProvider);
                 let ret = await nonFungible.triggerExecution();
                 assert(ret.logs[0].event == 'OmniverseTokenTransfer');
                 let tokenOwner = await nonFungible.omniverseOwnerOf(TOKEN_ID);

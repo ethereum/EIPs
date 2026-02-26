@@ -2,6 +2,9 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "./libraries/OmniverseProtocolHelper.sol";
 import "./interfaces/IERC6358NonFungible.sol";
 
@@ -27,7 +30,9 @@ struct NonFungible {
 /**
  * @notice Implementation of the {IERC6358NonFungible} interface
  */
-contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
+contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible, IERC721, IERC721Metadata {
+    using Strings for uint256;
+
     uint8 constant TRANSFER = 0;
     uint8 constant MINT = 1;
     uint8 constant BURN = 2;
@@ -52,9 +57,11 @@ contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
     }
 
     // Token name
-    string public name;
+    string private tokenName;
     // Token symbol
-    string public symbol;
+    string private tokenSymbol;
+    // Base URI
+    string public baseURI;
     // Chain id used to distinguish different chains
     uint32 chainId;
     // O-transaction cooling down time
@@ -85,8 +92,18 @@ contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
      */
     constructor(uint32 _chainId, string memory _name, string memory _symbol) {
         chainId = _chainId;
-        name = _name;
-        symbol = _symbol;
+        tokenName = _name;
+        tokenSymbol = _symbol;
+    }
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return
+            interfaceId == type(IERC721).interfaceId ||
+            interfaceId == type(IERC721Metadata).interfaceId ||
+            interfaceId == type(IERC165).interfaceId;
     }
 
     /**
@@ -128,6 +145,120 @@ contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
             _checkOmniverseBurn(nonFungible.exData, nonFungible.tokenId);
             _omniverseBurn(nonFungible.exData, nonFungible.tokenId);
         }
+    }
+
+    /**
+     * @notice See {IERC721-balanceOf}.
+     */
+    function balanceOf(address owner) public view returns (uint256 balance) {
+        bytes storage pk = accountsMap[owner];
+        if (pk.length == 0) {
+            balance = 0;
+        }
+        else {
+            balance = omniverseBalances[pk];
+        }
+    }
+
+    /**
+     * @notice See {IERC721-ownerOf}.
+     */
+    function ownerOf(uint256 tokenId) external view returns (address owner) {
+        bytes memory ret = this.omniverseOwnerOf(tokenId);
+        return OmniverseProtocolHelper.pkToAddress(ret);
+    }
+
+    /**
+     * @notice See {IERC721-safeTransferFrom}.
+     */
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes calldata data
+    ) external {
+
+    }
+
+    /**
+     * @notice See {IERC721-safeTransferFrom}.
+     */
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external {
+
+    }
+
+    /**
+     * @notice See {IERC721-transferFrom}.
+     */
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external {
+
+    }
+
+    /**
+     * @notice See {IERC721-approve}.
+     */
+    function approve(address /*to*/, uint256 /*tokenId*/) external {
+
+    }
+
+    /**
+     * @notice See {IERC721-setApprovalForAll}.
+     */
+    function setApprovalForAll(address /*operator*/, bool /*_approved*/) external {
+
+    }
+
+    /**
+     * @notice See {IERC721-getApproved}.
+     */
+    function getApproved(uint256 /*tokenId*/) external pure returns (address /*operator*/) {
+        revert("Forbidden");
+    }
+
+    /**
+     * @notice See {IERC721-isApprovedForAll}.
+     */
+    function isApprovedForAll(address /*owner*/, address /*operator*/) external pure returns (bool) {
+        return false;
+    }
+
+    /**
+     * @notice See {IERC721Metadata-name}.
+     */
+    function name() external view returns (string memory) {
+        return tokenName;
+    }
+
+    /**
+     * @notice See {IERC721Metadata-symbol}.
+     */
+    function symbol() external view returns (string memory) {
+        return tokenSymbol;
+    }
+
+    /**
+     * @notice See {IERC721Metadata-tokenURI}.
+     */
+    function tokenURI(uint256 tokenId) external view returns (string memory) {
+        bytes memory ret = omniverseOwners[tokenId];
+        require(keccak256(ret) != keccak256(bytes("")), "ERC721Metadata: URI query for nonexistent token");
+
+        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
+    }
+
+    /**
+     * @notice Sets the base URI.
+     */
+    function setBaseURI(string calldata _baseURI) public {
+        baseURI = _baseURI;
     }
     
     /**
@@ -187,27 +318,6 @@ contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
         bytes memory ret = omniverseOwners[_tokenId];
         require(keccak256(ret) != keccak256(bytes("")), "Token not exist");
         return ret;
-    }
-
-    /**
-     * @notice See {IERC721-balanceOf}.
-     */
-    function balanceOf(address account) public view returns (uint256) {
-        bytes storage pk = accountsMap[account];
-        if (pk.length == 0) {
-            return 0;
-        }
-        else {
-            return omniverseBalances[pk];
-        }
-    }
-
-    /**
-     * @notice See {IERC721-ownerOf}.
-     */
-    function ownerOf(uint256 tokenId) public view returns (address owner) {
-        bytes memory ret = this.omniverseOwnerOf(tokenId);
-        return _pkToAddress(ret);
     }
 
     /**
@@ -272,15 +382,17 @@ contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
 
         emit OmniverseTokenTransfer(_from, _to, _tokenId);
 
-        address toAddr = _pkToAddress(_to);
+        address fromAddr = OmniverseProtocolHelper.pkToAddress(_from);
+        address toAddr = OmniverseProtocolHelper.pkToAddress(_to);
         accountsMap[toAddr] = _to;
+        emit Transfer(fromAddr, toAddr, _tokenId);
     }
     
     /**
      * @notice Check if the public key is the owner
      */
     function _checkOwner(bytes memory _pk) internal view {
-        address fromAddr = _pkToAddress(_pk);
+        address fromAddr = OmniverseProtocolHelper.pkToAddress(_pk);
         require(fromAddr == owner(), "Not owner");
     }
 
@@ -301,8 +413,9 @@ contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
         omniverseBalances[_to] += 1;
         emit OmniverseTokenTransfer("", _to, _tokenId);
 
-        address toAddr = _pkToAddress(_to);
+        address toAddr = OmniverseProtocolHelper.pkToAddress(_to);
         accountsMap[toAddr] = _to;
+        emit Transfer(address(0), toAddr, _tokenId);
     }
 
     /**
@@ -319,14 +432,9 @@ contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
         delete omniverseOwners[_tokenId];
         omniverseBalances[_from] -= 1;
         emit OmniverseTokenTransfer(_from, "", _tokenId);
-    }
 
-    /**
-     * @notice Convert the public key to evm address
-     */
-    function _pkToAddress(bytes memory _pk) internal pure returns (address) {
-        bytes32 hash = keccak256(_pk);
-        return address(uint160(uint256(hash)));
+        address fromAddr = OmniverseProtocolHelper.pkToAddress(_from);
+        emit Transfer(fromAddr, address(0), _tokenId);
     }
 
     /**
@@ -374,7 +482,7 @@ contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
     /**
      * @notice Set the cooling down time of an omniverse transaction
      */
-    function setCooingDownTime(uint256 _time) external {
+    function setCoolingDownTime(uint256 _time) external {
         cdTime = _time;
     }
 

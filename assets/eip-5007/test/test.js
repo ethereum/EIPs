@@ -44,51 +44,63 @@ contract("test ERC5007", async accounts => {
         let token1InputStartTime =  new BigNumber(now - 10000);
         let token1InputEndTime = new BigNumber(now + 10000);
         let id1 = 1;
+        let assetId = 1000;
 
-        await demo.mint(Alice, id1, token1InputStartTime.toFixed(0), token1InputEndTime.toFixed(0));
+        console.log("mint NFT:")
+        await demo.mint(Alice, id1, assetId, token1InputStartTime.toFixed(0),
+         token1InputEndTime.toFixed(0));
 
         let token1OutputStartTime = new BigNumber( await demo.startTime(id1));
         let token1OutputEndTime = new BigNumber( await demo.endTime(id1));
+        let token1assetId = new BigNumber( await demo.assetId(id1));
         assert.equal(token1InputStartTime.comparedTo(token1OutputStartTime) == 0
-        && token1InputEndTime.comparedTo(token1OutputEndTime) == 0, true, "wrong data");
+        && token1InputEndTime.comparedTo(token1OutputEndTime) == 0 
+        && token1assetId.comparedTo(assetId) == 0,
+         true, "wrong data");
 
         let id2 = 2;
-        let token2InputStartTime = token1InputStartTime.plus(5000);
-        await demo.split(id1, id2, Bob, token2InputStartTime.toFixed(0));
-
-        token1OutputStartTime = new BigNumber( await demo.startTime(id1));
-        token1OutputEndTime = new BigNumber( await demo.endTime(id1));
-
-        let token2OutputStartTime = new BigNumber( await demo.startTime(id2));
-        let token2OutputEndTime = new BigNumber( await demo.endTime(id2));
-
-        assert.equal(token1InputStartTime.comparedTo(token1OutputStartTime) == 0
-        && token1OutputEndTime.comparedTo(token2InputStartTime.minus(1)) == 0, true, "wrong data");
-
-        assert.equal(token2InputStartTime.comparedTo(token2OutputStartTime) == 0
-        && token2OutputEndTime.comparedTo(token1InputEndTime) == 0, true, "wrong data");
-
-        let token1RootId = await demo.rootTokenId(id1);
-        let token2RootId = await demo.rootTokenId(id2);
-        assert.equal(token1RootId == id1 && token2RootId == id1, true, 'wrong data');
-
         let id3 = 3;
+        let splitTime = token1InputStartTime.plus(5000);
+        console.log("split NFT:")
+        await demo.split(id1, id2, Bob, id3, Carl, splitTime.toFixed(0));
+
+        let token2StartTime = new BigNumber( await demo.startTime(id2));
+        let token2EndTime = new BigNumber( await demo.endTime(id2));
+
+        let token3StartTime = new BigNumber( await demo.startTime(id3));
+        let token3EndTime = new BigNumber( await demo.endTime(id3));
+
+        assert.equal(token1InputStartTime.comparedTo(token2StartTime) == 0
+        && token2EndTime.comparedTo(splitTime) == 0, true, "wrong data");
+
+        assert.equal(token3StartTime.comparedTo(splitTime.plus(1)) == 0
+        && token3EndTime.comparedTo(token1InputEndTime) == 0, true, "wrong data");
+
+        let token2assetId = await demo.assetId(id2);
+        let token3assetId = await demo.assetId(id3);
+        assert.equal(token2assetId == assetId && token3assetId == assetId, true, 'wrong data');
+    
+        
+        console.log("merge NFT:")
+        let id4 = 4;
         await demo.setApprovalForAll(Alice, true,{from: Bob});
-        await demo.merge(id1, id2, Carl, id3);
+        await demo.setApprovalForAll(Alice, true,{from: Carl});
+        await demo.merge(id2, id3, Alice, id4);
 
-        let token3OutputStartTime = new BigNumber( await demo.startTime(id3));
-        let token3OutputEndTime = new BigNumber( await demo.endTime(id3));
-        let token3RootId = await demo.rootTokenId(id3);
-        let token3Owner = await demo.ownerOf(id3);
+        let token4StartTime = new BigNumber( await demo.startTime(id4));
+        let token4EndTime = new BigNumber( await demo.endTime(id4));
+        let token4assetId = await demo.assetId(id4);
+        let token4Owner = await demo.ownerOf(id4);
 
-        assert.equal(token1InputStartTime.comparedTo(token3OutputStartTime) == 0
-        && token3OutputEndTime.comparedTo(token1InputEndTime) == 0, true, "wrong start time or end time");
+        assert.equal(token1InputStartTime.comparedTo(token4StartTime) == 0
+        && token4EndTime.comparedTo(token1InputEndTime) == 0, true, "wrong start time or end time");
 
-        assert.equal(token3RootId == id1, true, 'wrong rootId');
-        assert.equal(token3Owner == Carl, true, 'wrong owner');
+        assert.equal(token4assetId == assetId, true, 'wrong rootId');
+        assert.equal(token4Owner == Alice, true, 'wrong owner');
+        
 
         console.log("IERC5007Composable InterfaceId:", await demo.getInterfaceId())
-        let isSupport = await demo.supportsInterface('0x620063db');
+        let isSupport = await demo.supportsInterface('0x75cf3842');
         assert.equal(isSupport, true , "supportsInterface error");
     });
 

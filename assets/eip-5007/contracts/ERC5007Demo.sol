@@ -18,8 +18,8 @@ contract ERC5007Demo is ERC5007 {
     function mint(
         address to_,
         uint256 tokenId_,
-        int64 startTime_,
-        int64 endTime_
+        uint64 startTime_,
+        uint64 endTime_
     ) public {
         _mintTimeNft(to_, tokenId_, startTime_, endTime_);
     }
