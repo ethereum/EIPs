@@ -48,6 +48,39 @@ cargo install eipw
 eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
 ```
 
+### Validation Examples
+
+Validate a single EIP file:
+```sh
+eipw --config ./config/eipw.toml EIPS/eip-1.md
+```
+
+Validate all EIPs in the repository:
+```sh
+eipw --config ./config/eipw.toml EIPS/
+```
+
+Validate with verbose output:
+```sh
+eipw --config ./config/eipw.toml --verbose EIPS/eip-1.md
+```
+
+### Common Validation Issues
+
+- **Missing required fields**: Ensure all required preamble fields are present (eip, title, description, author, discussions-to, status, type, created)
+- **Invalid date format**: Dates must be in ISO 8601 format (yyyy-mm-dd)
+- **Invalid EIP references**: Use the form `EIP-N` (not `EIPN` or `EIP N`)
+- **Invalid links**: External links should be absolute URLs, and relative links should point to valid files
+
+### Pre-submission Checklist
+
+Before submitting a PR, ensure your EIP passes:
+- ✅ `eipw` validation with no errors
+- ✅ All required sections are present
+- ✅ All links are valid and accessible
+- ✅ Markdown formatting follows best practices
+- ✅ Spell check passes
+
 ## Build the status page locally
 
 ### Install prerequisites
