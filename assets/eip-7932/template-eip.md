@@ -38,6 +38,12 @@ def verify(signature: Bytes, signing_data: Bytes) -> Bytes | Error:
     # Complicated cryptography here
     # ...
     return public_key
+
+def merge_detached_signature(detached_signature: bytes, public_key: bytes) -> bytes:
+    # ...
+    # Either concatenation or a no-op here
+    # ...
+    return detached_signature + public_key
 ```
 
 ## Rationale
