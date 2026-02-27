@@ -1,5 +1,5 @@
 ---
-eip: XXXX
+eip: 8175
 title: Amsterdam Transaction
 description: An extensible EIP-2718 transaction type with extension-based signatures and transaction sponsorship
 author: Dragan Rakita (@rakita)
