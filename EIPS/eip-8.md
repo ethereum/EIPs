@@ -96,7 +96,7 @@ All clients currently contain statements such as the following:
 if data['version'] != proto.version:
     log.debug('incompatible network protocols', peer=proto.peer,
         expected=proto.version, received=data['version'])
-    return proto.send_disconnect(reason=reasons.incompatibel_p2p_version)
+    return proto.send_disconnect(reason=reasons.incompatible_p2p_version)
 ```
 
 These checks make it impossible to change the version or structure of the hello packet.

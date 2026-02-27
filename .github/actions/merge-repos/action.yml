@@ -1,0 +1,24 @@
+name: Merge ERCs
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout ERCs
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      with:
+        repository: ethereum/ERCs
+        path: ERCs
+    - name: Merge Repos
+      shell: bash
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/ERCs/ERCS
+        mkdir -p $GITHUB_WORKSPACE/ERCs/EIPS
+        cp -rp $GITHUB_WORKSPACE/ERCs/ERCS/. $GITHUB_WORKSPACE/EIPS
+        cp -rp $GITHUB_WORKSPACE/ERCs/EIPS/. $GITHUB_WORKSPACE/EIPS
+        cp -rp $GITHUB_WORKSPACE/ERCs/assets/. $GITHUB_WORKSPACE/assets
+        cd $GITHUB_WORKSPACE/EIPS
+        find . -name "erc-*.md" -type f -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
+        cd $GITHUB_WORKSPACE/assets
+        find . -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
+        cd $GITHUB_WORKSPACE
+        rm -rf ERCs

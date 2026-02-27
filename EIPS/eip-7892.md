@@ -1,0 +1,239 @@
+---
+eip: 7892
+title: Blob Parameter Only Hardforks
+description: Defines a mechanism for scaling Ethereum’s blob capacity via specialized hard forks that modify only blob-related parameters.
+author: Mark Mackey (@ethDreamer), Raúl Kripalani (@raulk)
+discussions-to: https://ethereum-magicians.org/t/eip-7892-blob-parameter-only-hardforks/23018
+status: Final
+type: Informational
+created: 2025-02-28
+requires: 7840
+---
+
+## Abstract
+
+This EIP introduces **Blob Parameter Only (BPO) Hardforks**, a lightweight mechanism for incrementally scaling Ethereum’s blob capacity through targeted hard forks that modify only blob-related parameters: `target`, `max`, and `baseFeeUpdateFraction`. Unlike traditional hard forks, which require extensive coordination and introduce broader protocol changes, BPO forks enable rapid, low-overhead scaling of blob capacity in response to **real-world demand and network conditions**.
+
+## Motivation
+
+Ethereum's scaling strategy relies on Layer 2 (L2) solutions for transaction execution while using Ethereum as a **data availability (DA) layer**. However, the demand for DA has increased rapidly, and the current approach of only modifying blob parameters in large, infrequent hard forks is **not agile enough** to keep up with L2 growth. 
+
+The key motivations for BPO forks are as follows:
+
+1. **Continuous Scaling**  
+   - L2 DA demand is growing rapidly, leading to ongoing saturation of blob capacity.
+   - Large, infrequent blob parameter changes create high costs and inefficiencies.
+   - BPO forks allow for more frequent, safer capacity increases.
+
+2. **Reduced Operational Overhead**  
+   - Performance improvements and further testing will continue to unlock additional capacity.
+   - It is desirable to reduce the time between core devs agreeing on a parameter increase and its effective deployment.
+   - Full Ethereum hard forks require significant coordination, testing, and upgrade efforts across clients.
+   - By isolating blob parameter changes, BPO forks reduce the complexity of upgrades.
+
+3. **Enhanced Stability with New Scaling Technologies**
+   - Major scaling upgrades introduce uncertainty in optimal blob limits.
+   - Rather than forcing core developers to accept a suboptimal tradeoff between stability and capacity, BPO forks allow developers to safely increase parameters after observing mainnet performance and stability.
+
+4. **Predictable Upgrades for Builders**  
+   - Builders and L2s require confidence that Ethereum will continuously scale to support their needs.
+   - A structured BPO framework provides predictability, allowing rollups to commit to Ethereum over alternative DA solutions.
+
+## Specification
+
+### Definition
+
+BPO hardforks are defined as protocol upgrades that modify only blob-related parameters through configuration, without requiring any client-side code changes. The new parameters take effect immediately at the specified activation time.
+
+### Blob schedule configuration
+
+The following protocol parameters are now managed by the blob schedule configuration:
+
+- **Blob Target (`target`)**: The expected number of blobs per block.
+- **Blob Limit (`max`)**: The maximum number of blobs per block.
+- **Blob Base Fee Update Fraction (`baseFeeUpdateFraction`)**: Determines how blob gas pricing adjusts per block.
+
+To ensure consistency, when a regular hardfork changes any of these parameters, it MUST do so by adding an entry to the blob schedule configuration.
+
+### Execution layer configuration
+
+To facilitate these changes on the execution layer, each fork in the `blobSchedule` object defined in [EIP-7840](./eip-7840.md) is linked to an activation timestamp via a top-level `<fork_name>Time` field, which holds the Unix timestamp of the activation slot as a JSON number. BPO forks SHOULD be named using the convention `bpo<index>`, where `<index>` starts at `1`. Left padding is unnecessary since these labels are not subject to lexicographic sorting. Activation timestamps are required only for forks that occur **after** Prague.
+
+```json
+{
+  "blobSchedule": {
+    "cancun": {
+      "target": 3,
+      "max": 6,
+      "baseFeeUpdateFraction": 3338477
+    },
+    "prague": {
+      "target": 6,
+      "max": 9,
+      "baseFeeUpdateFraction": 5007716
+    },
+    "osaka": {
+      "target": 6,
+      "max": 9,
+      "baseFeeUpdateFraction": 5007716
+    },
+    "bpo1": {
+      "target": 10,
+      "max": 15,
+      "baseFeeUpdateFraction": 8346193
+    },
+    "bpo2": {
+      "target": 14,
+      "max": 21,
+      "baseFeeUpdateFraction": 11684671
+    }
+  },
+  "cancunTime": 0,
+  "pragueTime": 0,
+  "osakaTime": 1747387400,
+  "bpo1Time": 1757387400,
+  "bpo2Time": 1767387784
+}
+```
+
+Since there is no backporting, the values for `cancunTime` and `pragueTime` are set to 0. It should also be noted that the other parameters and schedules above are purely illustrative. Actual values and schedules are beyond the scope of this specification.
+
+### Blob base fee computations
+
+We modify the functions `get_base_fee_per_blob_gas` and `calc_excess_blob_gas` defined in [EIP-4844](./eip-4844.md) to explicitly use the blob schedule.
+In line with how updating `BLOB_BASE_FEE_UPDATE_FRACTION` was handled in [EIP-7691](./eip-7691.md), the functions use the *current* block's blob schedule.
+Moreover, `TARGET_BLOB_GAS_PER_BLOCK` is removed and replaced with `GAS_PER_BLOB * blob_schedule.target`, as it is now redundant. 
+
+```python
+class BlobSchedule:
+   target: U64
+   max: U64
+   base_fee_update_fraction: Uint
+
+ def calc_excess_blob_gas(parent: Header, blob_schedule: BlobSchedule) -> int:
+    target_blob_gas = GAS_PER_BLOB * blob_schedule.target
+    if parent.excess_blob_gas + parent.blob_gas_used < target_blob_gas :
+        return 0
+    else:
+        return parent.excess_blob_gas + parent.blob_gas_used - target_blob_gas
+
+def get_base_fee_per_blob_gas(header: Header, blob_schedule: BlobSchedule) -> int:
+    return fake_exponential(
+        MIN_BASE_FEE_PER_BLOB_GAS,
+        header.excess_blob_gas,
+        blob_schedule.base_fee_update_fraction
+    )
+```
+
+### Consensus layer configuration
+
+A new `BLOB_SCHEDULE` field is added to consensus layer configuration, containing a sequence of entries representing blob parameter changes **after** `ELECTRA_FORK_EPOCH`. There exists one entry per fork that changes blob parameters, whether it is a regular or a Blob-Parameter-Only fork.
+
+```yaml
+BLOB_SCHEDULE:
+  - EPOCH: 400000     # A future anonymous BPO fork
+    MAX_BLOBS_PER_BLOCK: 15
+  - EPOCH: 420000     # A future anonymous BPO fork
+    MAX_BLOBS_PER_BLOCK: 21
+```
+
+The parameters and schedules above are purely illustrative. Actual values and schedules are beyond the scope of this specification.
+
+**Requirements:**
+
+- Execution and consensus clients **MUST** share consistent BPO fork schedules.
+- The slot number in the EL's `blobSchedule` **MUST** align with the start of the epoch specified in the consensus layer configuration.
+- The `max` field in the EL's `blobSchedule` **MUST** equal the `MAX_BLOBS_PER_BLOCK` value in the consensus layer configuration.
+
+### Modified `compute_fork_digest`
+
+The `compute_fork_digest` helper is updated to account for BPO forks:
+
+```python
+@dataclass
+class BlobScheduleEntry:
+   epoch: Epoch
+   max_blobs_per_block: uint64       # Aligning with the type of MAX_BLOBS_PER_BLOCK
+
+def compute_fork_digest(
+  current_version: Version,       # Unchanged; refers to the baseline hardfork atop which the blob schedule is applied
+  genesis_validators_root: Root,  # Unchanged
+  current_epoch: Epoch,           # New
+  blob_schedule: Sequence[BlobScheduleEntry]  # New
+) -> ForkDigest:
+    """
+    Return the 4-byte fork digest for the ``current_version`` and ``genesis_validators_root``,
+    bitmasking blob parameters after ``ELECTRA_FORK_VERSION``.
+
+    This is a digest primarily used for domain separation on the p2p layer.
+    4-bytes suffices for practical separation of forks/chains.
+    """
+    base_digest = compute_fork_data_root(current_version, genesis_validators_root)[:4]
+
+    # Find the blob parameters applicable to this epoch.
+    sorted_schedule = sorted(blob_schedule, key=lambda e: e.epoch, reverse=True)
+    blob_params = None
+    for entry in sorted_schedule:
+      if current_epoch >= entry.epoch:
+        blob_params = entry
+        break
+
+    # This check enables us to roll out the BPO mechanism without a concurrent parameter change.
+    if blob_params is None:
+      return ForkDigest(base_digest)
+
+    # Safely bitmask blob parameters into the digest.
+    assert 0 <= blob_params.max_blobs_per_block <= 0xFFFFFFFF
+    mask = blob_params.max_blobs_per_block.to_bytes(4, 'big')
+    masked_digest = bytes(a ^ b for a, b in zip(base_digest, mask))
+    return ForkDigest(masked_digest)
+```
+
+### P2P Networking
+
+#### ENR
+
+In the consensus layer, ENRs are extended with an additional entry `nfd`, short for "next fork digest". This field communicates the digest of the next scheduled fork, regardless of whether it is a regular or BPO fork. This approach is preferred over encoding BPO-specific parameters because it is agnostic to specific use cases and offers greater long-term flexibility.
+
+| Key     | Value                   |
+| :-----  | :---------------------- |
+| `nfd`   | SSZ Bytes4 `ForkDigest` |
+
+When discovering and interfacing with peers, nodes MUST evaluate `nfd` alongside their existing consideration of the `ENRForkID::next_*` fields under the `eth2` key, to form a more accurate view of the peer's intended next fork.
+
+#### `Status` req/resp
+
+No changes are needed in this interaction, but it is noted that the response payload must correctly contain the updated `fork_digest`.
+
+#### Gossip topics
+
+No changes are required to topic structure or configuration. However, all topics will automatically rotate at a BPO fork due to changes in their `ForkDigestValue` component.
+
+## Rationale
+
+### Why not just use regular hardforks?
+
+Full hard forks require extensive coordination, testing, and implementation changes beyond parameter adjustments. For example, in Lighthouse, a typical hard fork implementation requires thousands of lines of boilerplate before any protocol changes occur. BPO forks streamline this process by avoiding the need for this boilerplate code.
+
+### Why specify parameters in the node configuration instead of code?
+
+Allowing blob parameters to be configured externally enables rapid experimentation, testing, and adjustments without requiring code changes across client implementations. Testing teams can investigate different parameters with minimal involvement from client implementers.
+
+### Why not create an on-chain voting mechanism for blob parameters?
+
+- Ethereum's recent gas limit increase to 36M took nearly a year to coordinate
+- Blob capacity is a rapidly evolving, moving target that the wider staking community is not currently well equipped to track
+- An on-chain mechanism would require much more extensive code changes, testing cycles, and debates about governance structures.
+- BPO forks provide a simpler, more predictable approach while leaving room for future on-chain voting mechanisms when blob capacity stabilizes
+
+## Backwards Compatibility
+
+BPO forks introduce no backwards compatibility concerns.
+
+## Security Considerations
+
+No security risks have been identified.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
