@@ -1,6 +1,6 @@
 ---
 eip: xxxx
-title: Static Control Flow for the EVM — Foundational Concepts & Context
+title: Static Control Flow for the EVM
 description: Understanding static control flow and its relation to Ethereum's scaling roadmap
 author: Greg Colvin (@gcolvin)
 discussions-to:
