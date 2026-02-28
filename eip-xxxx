@@ -9,6 +9,7 @@ type: Informational
 category: Core
 created: 2026-2-16
 ---
+
 ## Abstract
 
 This Informational EIP provides foundational context for understanding static control flow in the EVM. It covers the historical development of control flow mechanisms in computing, the technical foundations of control-flow analysis, and the impact of static control flow on Ethereum's scaling roadmap. This document serves as background material for EIPs including EIP-7979 (Call and Return Opcodes), EIP-8013 (Static Relative Jumps), EIP-3540 (EOF), and discussions around RISC-V migration and ZK verification infrastructure.
