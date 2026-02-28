@@ -23,11 +23,11 @@ layout: default
   {% else %}
     {% assign doc_prefix = "EIP" %}
   {% endif %}
-  {% assign is_draft_stage = page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %}
+  {% assign is_draft_stage = page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" or page.status == "Final" or page.status == "Living" %}
   {% capture doc_title %}
-    {{ doc_prefix }}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if is_draft_stage %} [DRAFT]{% endif %}
+    {{ doc_prefix }}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status != "Living" and page.status != "Final" %} [{{ page.status | upcase | xml_escape }}]{% endif %}
   {% endcapture %}
-  {% assign doc_title = doc_title | strip %}
+ {% assign doc_title = doc_title | strip %}
   <span class="h5">
     {% if page.status == "Stagnant" %}
       <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
@@ -41,6 +41,12 @@ layout: default
     {% if page.status == "Last Call" %}
       <span class="badge text-light bg-success" data-bs-toggle="tooltip" data-bs-title="This EIP is in the last call for review stage. The authors wish to finalize the EIP and ask you to provide feedback.">📢 Last Call</span>
     {% endif %}
+    {% if page.status == "Final" %}
+      <span class="badge text-light bg-success" data-bs-toggle="tooltip" data-bs-title="This EIP is finalized and is added as an Ethereum Standard. "> 🎉 Final</span>
+    {% endif %}
+    {% if page.status == "Living" %}
+      <span class="badge text-light bg-success" data-bs-toggle="tooltip" data-bs-title="This EIP is Living and accepts infrequent updates. "> 🎉 Living</span>
+    {% endif %}   
     {% if page.category == "ERC" %}
       <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Application-level standards and conventions, including contract standards such as token standards, name registries, URI schemes, library/package formats, and wallet formats." href="../erc">Standards Track: ERC</a>
     {% elsif page.category == "Interface" %}
