@@ -20,7 +20,7 @@ The current Engine API encodes all data as JSON, which is expensive. Every execu
 
 SSZ is already the native serialization format on the Consensus Layer. The Beacon API uses SSZ-over-REST for performance-sensitive endpoints. It makes sense for the Engine API to do the same — the CL already knows how to speak SSZ, and the EL already has SSZ support for data structures like blobs and execution requests.
 
-This EIP maps each `engine_*` method to a REST endpoint following the `/eth/v{N}/engine/{method}` convention, matching the style of the Beacon API. Request and response bodies are SSZ-encoded and served with `application/octet-stream`. This avoids the overhead of JSON entirely: no hex encoding, no string parsing, no field name repetition — just raw bytes.
+This EIP maps each `engine_*` method to a REST endpoint following the `/engine/v{N}/{method}` convention, matching the style of the Beacon API. Request and response bodies are SSZ-encoded and served with `application/octet-stream`. This avoids the overhead of JSON entirely: no hex encoding, no string parsing, no field name repetition — just raw bytes.
 
 For a typical execution payload (~100 KB JSON), SSZ encoding cuts the size roughly in half and eliminates the parsing overhead. At high throughput — many transactions per block, frequent payload exchanges — this adds up.
 
@@ -50,18 +50,18 @@ This EIP defines the `ssz_rest` protocol identifier for use with the communicati
 
 ### Endpoint Mapping
 
-Each JSON-RPC Engine API method maps to a REST endpoint under the `/eth/v{N}/engine/` prefix, where `{N}` is the method version number.
+Each JSON-RPC Engine API method maps to a REST endpoint under the `/engine/v{N}/` prefix, where `{N}` is the method version number.
 
 | JSON-RPC Method | HTTP Method | REST Endpoint |
 |----------------|-------------|---------------|
-| `engine_newPayloadV4` | POST | `/eth/v4/engine/newPayload` |
-| `engine_forkchoiceUpdatedV3` | POST | `/eth/v3/engine/forkchoiceUpdated` |
-| `engine_getPayloadV4` | GET | `/eth/v4/engine/getPayload/{payload_id}` |
-| `engine_getPayloadBodiesByHashV2` | POST | `/eth/v2/engine/getPayloadBodiesByHash` |
-| `engine_getPayloadBodiesByRangeV2` | POST | `/eth/v2/engine/getPayloadBodiesByRange` |
-| `engine_getBlobsV1` | POST | `/eth/v1/engine/getBlobs` |
-| `engine_getClientVersionV1` | GET | `/eth/v1/engine/getClientVersion` |
-| `engine_exchangeCapabilities` | POST | `/eth/v1/engine/exchangeCapabilities` |
+| `engine_newPayloadV4` | POST | `/engine/v4/new_payload` |
+| `engine_forkchoiceUpdatedV3` | POST | `/engine/v3/forkchoice_updated` |
+| `engine_getPayloadV4` | GET | `/engine/v4/get_payload/{payload_id}` |
+| `engine_getPayloadBodiesByHashV2` | POST | `/engine/v2/get_payload_bodies_by_hash` |
+| `engine_getPayloadBodiesByRangeV2` | POST | `/engine/v2/get_payload_bodies_by_range` |
+| `engine_getBlobsV1` | POST | `/engine/v1/get_blobs` |
+| `engine_getClientVersionV1` | GET | `/engine/v1/get_client_version` |
+| `engine_exchangeCapabilities` | POST | `/engine/v1/exchange_capabilities` |
 
 New method versions introduced by future forks follow the same pattern: increment the version in the path.
 
@@ -80,7 +80,7 @@ All types use the standard SSZ encoding as defined in the [consensus specs](http
 
 ### Endpoint Definitions
 
-#### POST `/eth/v4/engine/newPayload`
+#### POST `/engine/v4/new_payload`
 
 Equivalent to `engine_newPayloadV4`.
 
@@ -106,7 +106,7 @@ class PayloadStatus(Container):
 **Example:**
 
 ```
-POST /eth/v4/engine/newPayload HTTP/1.1
+POST /engine/v4/new_payload HTTP/1.1
 Host: localhost:6767
 Content-Type: application/octet-stream
 Authorization: Bearer <jwt-token>
@@ -123,7 +123,7 @@ Content-Type: application/octet-stream
 <SSZ-encoded PayloadStatus bytes>
 ```
 
-#### POST `/eth/v3/engine/forkchoiceUpdated`
+#### POST `/engine/v3/forkchoice_updated`
 
 Equivalent to `engine_forkchoiceUpdatedV3`.
 
@@ -155,7 +155,7 @@ class ForkchoiceUpdatedResponse(Container):
     payload_id: Union[None, ByteVector[8]]
 ```
 
-#### GET `/eth/v4/engine/getPayload/{payload_id}`
+#### GET `/engine/v4/get_payload/{payload_id}`
 
 Equivalent to `engine_getPayloadV4`. The `payload_id` is the 8-byte identifier hex-encoded in the URL path.
 
@@ -178,7 +178,7 @@ class BlobsBundle(Container):
 **Example:**
 
 ```
-GET /eth/v4/engine/getPayload/0x0301020304050607 HTTP/1.1
+GET /engine/v4/get_payload/0x0301020304050607 HTTP/1.1
 Host: localhost:6767
 Authorization: Bearer <jwt-token>
 ```
@@ -192,7 +192,7 @@ Content-Type: application/octet-stream
 <SSZ-encoded GetPayloadResponse bytes>
 ```
 
-#### POST `/eth/v2/engine/getPayloadBodiesByHash`
+#### POST `/engine/v2/get_payload_bodies_by_hash`
 
 Equivalent to `engine_getPayloadBodiesByHashV2`.
 
@@ -214,7 +214,7 @@ class ExecutionPayloadBody(Container):
     withdrawals: List[Withdrawal, MAX_WITHDRAWALS_PER_PAYLOAD]
 ```
 
-#### POST `/eth/v2/engine/getPayloadBodiesByRange`
+#### POST `/engine/v2/get_payload_bodies_by_range`
 
 Equivalent to `engine_getPayloadBodiesByRangeV2`.
 
@@ -228,7 +228,7 @@ class GetPayloadBodiesByRangeRequest(Container):
 
 **Response body** — same `GetPayloadBodiesResponse` as above.
 
-#### POST `/eth/v1/engine/getBlobs`
+#### POST `/engine/v1/get_blobs`
 
 Equivalent to `engine_getBlobsV1`.
 
@@ -250,7 +250,7 @@ class BlobAndProof(Container):
     proof: ByteVector[48]
 ```
 
-#### GET `/eth/v1/engine/getClientVersion`
+#### GET `/engine/v1/get_client_version`
 
 Equivalent to `engine_getClientVersionV1`.
 
@@ -264,7 +264,7 @@ class ClientVersion(Container):
     commit: ByteVector[4]
 ```
 
-#### POST `/eth/v1/engine/exchangeCapabilities`
+#### POST `/engine/v1/exchange_capabilities`
 
 Equivalent to `engine_exchangeCapabilities`.
 
@@ -301,7 +301,7 @@ Error response body:
 
 ### Versioning
 
-When a new version of an Engine API method is introduced (e.g., `engine_newPayloadV5`), a corresponding new REST endpoint is added (`/eth/v5/engine/newPayload`). The SSZ types for the new version may extend or modify the containers from the previous version.
+When a new version of an Engine API method is introduced (e.g., `engine_newPayloadV5`), a corresponding new REST endpoint is added (`/engine/v5/new_payload`). The SSZ types for the new version may extend or modify the containers from the previous version.
 
 Old endpoint versions MAY be deprecated following the same rules as the JSON-RPC Engine API.
 
