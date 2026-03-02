@@ -24,6 +24,37 @@
     background-color: #111100;
   }
 
+  .status-nav-label {
+    color: #aaa;
+  }
+
+  .status-link,
+  .status-link:visited,
+  .status-link:link {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: #ccc !important;
+  }
+
+  .status-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #eee !important;
+  }
+
+  .status-link.active,
+  .status-link.active:visited,
+  .status-link.active:link {
+    background-color: rgba(140, 135, 180, 0.7);
+    border-color: rgba(140, 135, 180, 0.7);
+    color: #fff !important;
+  }
+
+  .status-link.active:hover {
+    background-color: rgba(160, 155, 200, 0.8);
+    border-color: rgba(160, 155, 200, 0.8);
+  }
+
   :root {
     color-scheme: dark;
     --bs-body-color: #dee2e6;

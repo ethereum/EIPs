@@ -1,0 +1,23 @@
+{% assign eips = include.eips | sort: "eip" %}
+<table class="eiptable" id="eip-table">
+  <thead>
+    <tr>
+      <th class="eipnum">Number</th>
+      <th class="date">Review ends</th>
+      <th class="title">Title</th>
+      <th class="author">Author</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for page in eips %}
+      {% if page.eip %}
+        <tr data-status="{{ page.status }}">
+          <td class="eipnum"><a href="{{ page.url | relative_url }}">{{ page.eip | xml_escape }}</a></td>
+          <td class="date">{% if page.status == "Last Call" and page.last-call-deadline %}{{ page.last-call-deadline | xml_escape }}{% endif %}</td>
+          <td class="title">{{ page.title | xml_escape }}</td>
+          <td class="author">{% include authorlist.html authors=page.author %}</td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </tbody>
+</table>

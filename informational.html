@@ -1,7 +1,8 @@
 ---
 layout: page
 title: Informational
+category_filter: Informational
 ---
 
 {% assign eips=site.pages|where:"type","Informational" %}
-{% include eiptable.html eips=eips %}
+{% include eiplist.html eips=eips %}
