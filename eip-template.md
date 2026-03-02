@@ -91,6 +91,21 @@ TBD
 
 No backward compatibility issues found.
 
+## Chain-specific Considerations
+
+<!--
+
+  This section is optional.
+
+  All EIPs that require changes for non-mainnet chains must include a section describing these changes. This includes considerations that must be made for testnets, Gnosis chain, and EVM-compatible L2s.
+
+  The current placeholder is acceptable for a draft.
+
+  TODO: Remove this comment before submitting
+-->
+
+No chain-specific considerations.
+
 ## Test Cases
 
 <!--
