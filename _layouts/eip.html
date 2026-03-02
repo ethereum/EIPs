@@ -23,7 +23,11 @@ layout: default
   {% else %}
     {% assign doc_prefix = "EIP" %}
   {% endif %}
-  {% assign is_draft_stage = page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %}
+  {% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %}
+    {% assign is_draft_stage = true %}
+  {% else %}
+    {% assign is_draft_stage = false %}
+  {% endif %}
   {% capture doc_title %}
     {{ doc_prefix }}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if is_draft_stage %} [DRAFT]{% endif %}
   {% endcapture %}
