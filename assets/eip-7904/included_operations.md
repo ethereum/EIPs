@@ -75,9 +75,9 @@ An important consideration for repricing is whether poor performance is isolated
 - Operations that genuinely need repricing (multiple clients struggle)
 - Operations where a specific client needs optimization (only one client struggles)
 
-The chart shows the number of tests in which each clietn was the worst performer. We can see that **Besu** is the worst performer in the majority of tests, followed by Erigon.
+The chart shows the number of tests in which each client was the worst performer. We can see that **Besu** is the worst performer in the majority of tests, followed by Erigon.
 
-![worst_client_countt](./figures/worst_client_count.png)
+![worst_client_count](./figures/worst_client_count.png)
 
 The next plot shows the distribution of the performance ratio between the worst client and second-worst client. Each boxplot shows this distribution by the client (i.e., when each client is the worst performer).
 
@@ -144,7 +144,7 @@ We also observed test performing at less than 20Mgas/s. Since there are likely i
 
 - `test_extcode_ops` in Geth and Erigon
 - `test_xcall` in Geth
-- `test_artimetic` in Besu (only `opcode_ADD`)
+- `test_arithmetic` in Besu (only `opcode_ADD`)
 - `test_selfbalance` in Besu (only `contract_balance_0`)
 - `test_call_frame_context_ops` in Besu (`opcode_ORIGIN`)
 
