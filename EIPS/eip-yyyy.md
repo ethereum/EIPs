@@ -1,5 +1,5 @@
 ---
-eip: yyyy
+eip: 8178
 title: SSZ-REST Engine API Transport
 description: Defines the SSZ-REST communication channel for the Engine API with SSZ-encoded payloads over REST
 author: Giulio Rebuffo (@Giulio2002)
