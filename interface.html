@@ -3,5 +3,5 @@ layout: page
 title: Interface
 ---
 
-{% assign eips=site.pages|where:"type","Standards Track"|where:"category","Interface" %}
+{% assign eips=site.pages|where:"type","Standards Track"|where:"category","Interface"|where_exp:"page","page.url contains '/EIPS/'" %}
 {% include eiptable.html eips=eips %}

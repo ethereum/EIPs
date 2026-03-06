@@ -3,5 +3,5 @@ layout: page
 title: Meta
 ---
 
-{% assign eips=site.pages|where:"type","Meta" %}
+{% assign eips=site.pages|where:"type","Meta"|where_exp:"page","page.url contains '/EIPS/'" %}
 {% include eiptable.html eips=eips %}
