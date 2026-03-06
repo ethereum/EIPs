@@ -42,6 +42,123 @@
       "@context": "https://schema.org"
     }
   </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SiteNavigationElement",
+  "name": "Main Navigation",
+  "url": "{{site.url}}",
+  "hasPart": [
+    {
+      "@type": "SiteNavigationElement", 
+      "name": "All EIPs",
+      "url": "{{site.url}}/all"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Core", 
+      "url": "{{site.url}}/core"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Networking",
+      "url": "{{site.url}}/networking"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Interface",
+      "url": "{{site.url}}/interface"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "ERC",
+      "url": "{{site.url}}/erc"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Meta",
+      "url": "{{site.url}}/meta"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Informational",
+      "url": "{{site.url}}/informational"
+    }
+  ]
+}
+</script>
+{% if page.layout == "eip" %}
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"BreadcrumbList",
+  "itemListElement":[
+    {
+      "@type":"ListItem",
+      "position":1,
+      "name":"Ethereum Improvement Proposals",
+      "item":"{{ site.url }}"
+    },
+    {
+      "@type":"ListItem",
+      "position":2,
+      "name":"{% if page.category == 'ERC' %}ERC EIPs{% elsif page.category == 'Core' %}Core EIPs{% elsif page.category == 'Networking' %}Networking EIPs{% elsif page.category == 'Interface' %}Interface EIPs{% elsif page.type == 'Informational' %}Informational EIPs{% elsif page.type == 'Meta' %}Meta EIPs{% else %}All EIPs{% endif %}",
+      "item":"{% if page.category == 'ERC' %}{{ site.url }}/erc{% elsif page.category == 'Core' %}{{ site.url }}/core{% elsif page.category == 'Networking' %}{{ site.url }}/networking{% elsif page.category == 'Interface' %}{{ site.url }}/interface{% elsif page.type == 'Informational' %}{{ site.url }}/informational{% elsif page.type == 'Meta' %}{{ site.url }}/meta{% else %}{{ site.url }}/all{% endif %}"
+    },
+    {
+      "@type":"ListItem",
+      "position":3,
+      "name":"{% if page.category == 'ERC' %}ERC{% else %}EIP{% endif %}-{{ page.eip }}",
+      "item":"{{ site.url }}/EIPS/eip-{{ page.eip }}"
+    }
+  ]
+}
+</script>
+{% elsif page.url == "/" %}
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"BreadcrumbList",
+  "itemListElement":[
+    {
+      "@type":"ListItem",
+      "position":1,
+      "name":"{{ site.title }}",
+      "item":"{{ site.url }}"
+    }
+  ]
+}
+</script>
+{% elsif page.title == "All" or page.title == "ERC" or page.title == "Core"
+       or page.title == "Networking" or page.title == "Interface"
+       or page.title == "Meta" or page.title == "Informational" %}
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"CollectionPage",
+  "name":"{% if page.title == 'All' %}All EIPs{% else %}{{ page.title }}{% if page.title != 'Informational' and page.title != 'Meta' %} EIPs{% endif %}{% endif %}",
+  "description":"{% case page.title %}{% when 'All' %}Complete list of all Ethereum Improvement Proposals{% when 'ERC' %}Application-level standards and conventions{% when 'Core' %}Improvements requiring a consensus fork{% when 'Networking' %}Improvements around devp2p and Light Ethereum Subprotocol{% when 'Interface' %}Client API/RPC specifications and standards{% when 'Meta' %}Process proposals{% when 'Informational' %}Design issues and general guidelines{% endcase %}",
+  "url":"{{ site.url }}{{ page.url | remove: '.html' }}",
+  "breadcrumb":{
+    "@type":"BreadcrumbList",
+    "itemListElement":[
+      {
+        "@type":"ListItem",
+        "position":1,
+        "name":"Ethereum Improvement Proposals",
+        "item":"{{ site.url }}"
+      },
+      {
+        "@type":"ListItem",
+        "position":2,
+        "name":"{% if page.title == 'All' %}All EIPs{% else %}{{ page.title }}{% if page.title != 'Informational' and page.title != 'Meta' %} EIPs{% endif %}{% endif %}",
+        "item":"{{ site.url }}{{ page.url | remove: '.html' }}"
+      }
+    ]
+  }
+}
+</script>
+{% endif %}
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
   <link rel="icon" type="image/png" href="{{ '/assets/images/favicon.png' | relative_url }}" />
   {%- feed_meta -%}
