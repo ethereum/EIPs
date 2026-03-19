@@ -54,6 +54,8 @@ Phase 1 has value regardless of the final number. It turns `SLOT_DURATION_MS` fr
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 
+All arithmetic in this specification uses integer division (truncating toward zero). Formulas are written with the multiply performed before the divide to preserve precision.
+
 ### Parameters
 
 | Name | Value | Note |
@@ -79,16 +81,20 @@ For any given slot, clients MUST resolve `SLOT_DURATION_MS` by selecting the `SL
 The first block produced at or after the fork activation timestamp MUST set its gas limit to:
 
 ```
-fork_gas_limit = parent_gas_limit * new_slot_duration_ms / old_slot_duration_ms
+fork_gas_limit = parent_gas_limit * new_slot_duration_ms // old_slot_duration_ms
 ```
 
-where `new_slot_duration_ms` and `old_slot_duration_ms` are the `SLOT_DURATION_MS` values from the current and immediately preceding `SLOT_SCHEDULE` entries, respectively. This value is computed using integer division (truncating). The normal gas limit adjustment rule (±1/1024 of the parent gas limit) does not apply to this block; the fork block's gas limit MUST equal exactly `fork_gas_limit`. From the following block onward, normal gas limit voting resumes using `fork_gas_limit` as the base.
+where `new_slot_duration_ms` and `old_slot_duration_ms` are the `SLOT_DURATION_MS` values from the current and immediately preceding `SLOT_SCHEDULE` entries, respectively. The normal gas limit adjustment rule (±1/1024 of the parent gas limit per [EIP-1559](./eip-1559.md)) does not apply to this block; the fork block's gas limit MUST equal exactly `fork_gas_limit`. From the following block onward, normal gas limit voting resumes using `fork_gas_limit` as the base.
 
-The consensus layer communicates the expected gas limit to the execution layer via the engine API payload attributes for the fork block.
+### Blob parameter adjustment
 
-### Blob limit adjustment
+A new entry MUST be appended to the `BLOB_SCHEDULE` at `<FORK_EPOCH>` with:
 
-The blob target and blob limit MUST each be scaled by `new_slot_duration_ms / old_slot_duration_ms` (integer division, truncating) at the fork boundary. These are protocol-set constants and do not involve a voting mechanism. This preserves constant blob throughput per unit time.
+```
+new_max_blobs = old_max_blobs * new_slot_duration_ms // old_slot_duration_ms
+```
+
+where `old_max_blobs` is the `MAX_BLOBS_PER_BLOCK` from the most recent preceding `BLOB_SCHEDULE` entry. The blob target is derived from `MAX_BLOBS_PER_BLOCK` as usual. This preserves constant blob throughput per unit time.
 
 ### Consensus layer constant adjustments
 
@@ -96,19 +102,59 @@ The general principle for consensus layer constants is: **do not adjust unless t
 
 #### Issuance and rewards
 
-`BASE_REWARD_FACTOR` is applied once per epoch. With shorter slots, epochs occur more frequently — at eight-second slots there are approximately 50% more epochs per year than at twelve-second slots. Without adjustment, annual validator issuance rises by the same factor. `BASE_REWARD_FACTOR` MUST be scaled by `new_slot_duration_ms / old_slot_duration_ms` to preserve the current annualized issuance rate.
+`BASE_REWARD_FACTOR` is applied once per epoch. With shorter slots, epochs occur more frequently — at eight-second slots there are approximately 50% more epochs per year than at twelve-second slots. Without adjustment, annual validator issuance rises by the same factor. `BASE_REWARD_FACTOR` MUST be replaced with:
+
+```
+BASE_REWARD_FACTOR * new_slot_duration_ms // old_slot_duration_ms
+```
 
 #### Inactivity leak
 
-`INACTIVITY_PENALTY_QUOTIENT_BELLATRIX` governs how quickly offline validators lose balance during a finality failure. This penalty accrues per epoch; shorter epochs accelerate the leak in wall-clock time. The leak rate was calibrated so that the quadratic penalty reaches specific thresholds over specific real-time durations. `INACTIVITY_PENALTY_QUOTIENT_BELLATRIX` MUST be scaled by `old_slot_duration_ms / new_slot_duration_ms` to preserve the same wall-clock leak rate. `INACTIVITY_SCORE_BIAS` and `INACTIVITY_SCORE_RECOVERY_RATE` MUST be similarly adjusted.
+The inactivity penalty is quadratic in epochs: the penalty at epoch `k` of a finality failure is `effective_balance * k // INACTIVITY_PENALTY_QUOTIENT_BELLATRIX` (with `INACTIVITY_SCORE_BIAS` cancelling between the score numerator and the penalty denominator). The cumulative penalty after `K` epochs scales as `K²`. With shorter slots, there are more epochs per unit of wall-clock time, so `K` grows proportionally faster. Because the penalty is quadratic, preserving the same wall-clock leak rate requires scaling the quotient by the **square** of the epoch ratio. `INACTIVITY_PENALTY_QUOTIENT_BELLATRIX` MUST be replaced with:
+
+```
+INACTIVITY_PENALTY_QUOTIENT_BELLATRIX * old_slot_duration_ms * old_slot_duration_ms // (new_slot_duration_ms * new_slot_duration_ms)
+```
+
+`INACTIVITY_SCORE_BIAS` and `INACTIVITY_SCORE_RECOVERY_RATE` do not require adjustment. `INACTIVITY_SCORE_BIAS` appears in both the score accumulation (numerator) and the penalty denominator, so it cancels out of the penalty calculation entirely. `INACTIVITY_SCORE_RECOVERY_RATE` governs post-leak score decay; with more epochs per wall-clock time, recovery is modestly faster, which is benign.
 
 #### Data availability windows
 
-`MIN_EPOCHS_FOR_BLOB_SIDECARS_REQUESTS` and `MIN_EPOCHS_FOR_DATA_COLUMN_SIDECARS_REQUESTS` define the minimum duration nodes must serve blob and data column data to peers. This window has a hard external dependency: optimistic rollups rely on blob data availability for the duration of their challenge periods (typically seven days). At eight-second slots, the current value of 4096 epochs reduces the window from approximately 18 days to approximately 12 days. While 12 days still exceeds the standard seven-day challenge period, it significantly reduces the safety margin. Both constants MUST be scaled by `old_slot_duration_ms / new_slot_duration_ms` to preserve the current wall-clock data availability duration.
+`MIN_EPOCHS_FOR_BLOB_SIDECARS_REQUESTS` and `MIN_EPOCHS_FOR_DATA_COLUMN_SIDECARS_REQUESTS` define the minimum duration nodes must serve blob and data column data to peers. This window has a hard external dependency: optimistic rollups rely on blob data availability for the duration of their challenge periods (typically seven days). Both constants MUST be replaced with:
+
+```
+CONSTANT * old_slot_duration_ms // new_slot_duration_ms
+```
 
 #### Churn limits
 
-The validator churn limits (`CHURN_LIMIT_QUOTIENT`, `MIN_PER_EPOCH_CHURN_LIMIT`, `MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT`) are applied per epoch and govern how quickly validators can enter and exit the active set. The rate of validator turnover directly affects the weak subjectivity period: faster churn means the validator set can change more rapidly, which shrinks the window within which a syncing node can safely trust a weak subjectivity checkpoint without risking a long-range attack. The weak subjectivity period is a wall-clock security property. Per-epoch churn limits MUST be scaled by `new_slot_duration_ms / old_slot_duration_ms` to preserve the current wall-clock churn rate and weak subjectivity period.
+The validator churn limits (`CHURN_LIMIT_QUOTIENT`, `MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA`, `MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT`) are applied per epoch and govern how quickly validators can enter and exit the active set. The rate of validator turnover directly affects the weak subjectivity period: faster churn means the validator set can change more rapidly, which shrinks the window within which a syncing node can safely trust a weak subjectivity checkpoint. The weak subjectivity period is a wall-clock security property.
+
+Per-epoch churn limit values MUST be replaced with:
+
+```
+LIMIT * new_slot_duration_ms // old_slot_duration_ms
+```
+
+`CHURN_LIMIT_QUOTIENT`, which acts as a divisor in the churn calculation, MUST be replaced with:
+
+```
+CHURN_LIMIT_QUOTIENT * old_slot_duration_ms // new_slot_duration_ms
+```
+
+### Adjusted constants
+
+The following table lists concrete adjusted values assuming `SLOT_DURATION_MS = 8000`. The authoritative values are derived from the scaling formulas above applied to the slot duration at the time of activation.
+
+| Constant | Current | New |
+| -------- | ------- | --- |
+| `BASE_REWARD_FACTOR` | 64 | 42 |
+| `INACTIVITY_PENALTY_QUOTIENT_BELLATRIX` | 16,777,216 | 37,748,736 |
+| `MIN_EPOCHS_FOR_BLOB_SIDECARS_REQUESTS` | 4,096 | 6,144 |
+| `MIN_EPOCHS_FOR_DATA_COLUMN_SIDECARS_REQUESTS` | 4,096 | 6,144 |
+| `CHURN_LIMIT_QUOTIENT` | 65,536 | 98,304 |
+| `MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA` | 128,000,000,000 | 85,333,333,333 |
+| `MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT` | 256,000,000,000 | 170,666,666,666 |
 
 ## Rationale
 
@@ -118,11 +164,11 @@ The bottleneck is not picking a number. It is the hardcoded twelve-second assump
 
 ### Why eight seconds
 
-FOCIL is likely to be the consensus layer headliner for the next fork, and each layer is typically limited to one headliner. Six-second slots — as proposed in [EIP-7782](./eip-7782.md) — are a heavy lift; they may be infeasible as a non-headliner alongside FOCIL. Eight seconds is a middle path: conservative enough to ship alongside FOCIL, aggressive enough to move the needle on UX and MEV. Even ten seconds would be a meaningful win. The exact target follows from phase 2 performance characterization and may be revised before deployment.
+Six-second slots — as proposed in [EIP-7782](./eip-7782.md) — are a heavier lift that requires dedicated consensus layer headliner status. This EIP takes a different approach: build the variable slot timing infrastructure first, then reduce the slot duration conservatively as a non-headliner change. Eight seconds is a middle path: conservative enough to ship as a non-headliner, aggressive enough to move the needle on UX and MEV. Even ten seconds would be a meaningful win. The exact target follows from phase 2 performance characterization and may be revised before deployment.
 
 ### Why proportional gas scaling
 
-Scaling the gas limit by `new_slot_duration_ms / old_slot_duration_ms` preserves the gas-per-second invariant. Block validation, gas accounting, and state growth rates stay the same on a per-second basis. Deriving the scaling ratio from the slot schedule rather than introducing separate scaling parameters ensures a single source of truth — changing the target slot duration automatically produces the correct gas limit adjustment, eliminating the risk of mismatched parameters. The execution layer impact is deliberately minimal — this EIP is designed to ship as a non-headliner.
+Scaling the gas limit by `new_slot_duration_ms // old_slot_duration_ms` preserves the gas-per-second invariant. Block validation, gas accounting, and state growth rates stay the same on a per-second basis. Deriving the scaling ratio from the slot schedule rather than introducing separate scaling parameters ensures a single source of truth — changing the target slot duration automatically produces the correct gas limit adjustment, eliminating the risk of mismatched parameters.
 
 ### Why a protocol-enforced gas limit adjustment
 
@@ -140,11 +186,31 @@ After the fork block, normal ±1/1024 gas limit voting resumes. Validators could
 
 ### Attestation deadlines
 
-Intra-slot timing deadlines (attestation, aggregation, sync committee contributions, etc.) are already specified in basis points of `SLOT_DURATION_MS` and automatically scale with slot duration — no specification changes are required. Gloas introduces its own BPS values (`ATTESTATION_DUE_BPS_GLOAS` of 2500 and `AGGREGATE_DUE_BPS_GLOAS` of 5000), which at eight-second slots produce a 2.0-second attestation deadline and a 4.0-second aggregate deadline. Whether these absolute times remain feasible for network propagation is a Phase 2 question; the BPS values themselves may need tuning based on empirical results, but this is a configuration concern rather than a specification change.
+Intra-slot timing deadlines (attestation, aggregation, sync committee contributions, etc.) are specified in basis points of `SLOT_DURATION_MS` and automatically scale with slot duration — no specification changes are required. Whether the resulting absolute deadlines remain feasible for network propagation at shorter slot durations is a phase 2 question; the BPS values may need tuning based on empirical results, but this is a configuration concern rather than a specification change.
+
+### Why the inactivity leak requires quadratic scaling
+
+The inactivity penalty at epoch `k` of a finality failure is proportional to `k` (the score grows linearly). The cumulative penalty over `K` epochs is therefore proportional to `K²`. When slot duration shrinks by a factor `r = new / old`, there are `1/r` more epochs per unit of wall-clock time. A naïve linear scaling of `INACTIVITY_PENALTY_QUOTIENT_BELLATRIX` by `1/r` cancels only the linear increase in epoch count, leaving the quadratic term under-corrected — the leak would be `1/r` times faster in wall-clock time than intended. Scaling by `1/r²` correctly compensates for the quadratic accumulation, preserving the originally calibrated relationship between finality failure duration and validator balance loss.
+
+### Why `INACTIVITY_SCORE_BIAS` and `INACTIVITY_SCORE_RECOVERY_RATE` are unchanged
+
+In the penalty formula `effective_balance * inactivity_score // (INACTIVITY_SCORE_BIAS * INACTIVITY_PENALTY_QUOTIENT_BELLATRIX)`, the score after `k` offline epochs is `k * INACTIVITY_SCORE_BIAS`. Substituting:
+
+```
+penalty_at_epoch_k = effective_balance * k * INACTIVITY_SCORE_BIAS
+                     // (INACTIVITY_SCORE_BIAS * INACTIVITY_PENALTY_QUOTIENT_BELLATRIX)
+                   = effective_balance * k // INACTIVITY_PENALTY_QUOTIENT_BELLATRIX
+```
+
+`INACTIVITY_SCORE_BIAS` cancels entirely. Adjusting it would change the raw score numbers without affecting the economic outcome. `INACTIVITY_SCORE_RECOVERY_RATE` governs post-leak score decay; with more epochs per wall-clock time, scores recover faster — a benign side effect that requires no correction.
+
+### `SLOTS_PER_EPOCH` unchanged
+
+`SLOTS_PER_EPOCH` remains 32. With eight-second slots, epochs shrink from ~6.4 minutes to ~4.3 minutes. This means Ethereum finalizes in roughly 8.5 minutes instead of 13 — a 35% improvement to finality that falls out of shorter slots for free, with no changes to Casper FFG or the attestation mechanism.
 
 ### Minimal constant adjustment
 
-Many consensus layer constants are denominated in epochs or slots, and shorter slots cause their wall-clock durations to shrink proportionally. This EIP deliberately does not adjust the majority of these constants. Most were chosen as clean powers of two and have generous margins — for example, `EPOCHS_PER_SLASHINGS_VECTOR` shrinks from ~36 to ~24 days, but 24 days is still far longer than any plausible correlated attack window; `MIN_VALIDATOR_WITHDRAWABILITY_DELAY` shrinks from ~27 to ~18 hours, but slashing detection and processing takes minutes, not hours. Adjustments are made only where a concrete security or economic property would be violated: annualized issuance (which would rise 50%), inactivity leak timing (which was precisely calibrated), data availability windows (which have an external dependency on L2 challenge periods), and churn limits (which directly determine the weak subjectivity period).
+Many consensus layer constants are denominated in epochs or slots, and shorter slots cause their wall-clock durations to shrink proportionally. This EIP deliberately does not adjust the majority of these constants. Most were chosen as clean powers of two and have generous margins — for example, `EPOCHS_PER_SLASHINGS_VECTOR` shrinks from ~36 to ~24 days, but 24 days is still far longer than any plausible correlated attack window; `MIN_VALIDATOR_WITHDRAWABILITY_DELAY` shrinks from ~27 to ~18 hours, but slashing detection and processing takes minutes, not hours. Adjustments are made only where a concrete security or economic property would be violated: annualized issuance (which would rise ~50%), inactivity leak timing (which was precisely calibrated with a quadratic penalty structure), data availability windows (which have an external dependency on L2 challenge periods), and churn limits (which directly determine the weak subjectivity period).
 
 ### Fallback
 
@@ -152,25 +218,21 @@ If going below twelve seconds proves infeasible, the outcome defaults to the sta
 
 ## Backwards Compatibility
 
-This EIP requires a hard fork. The consensus layer bears most of the change: clients must replace hardcoded twelve-second slot assumptions with the `SLOT_SCHEDULE` lookup. The execution layer impact is limited to a one-time gas limit and blob limit adjustment at the fork boundary. Applications and tooling that assume twelve-second block times will need updating.
+This EIP requires a hard fork. The consensus layer bears most of the change: clients must replace hardcoded twelve-second slot assumptions with the `SLOT_SCHEDULE` lookup. The execution layer impact is limited to a one-time gas limit and blob parameter adjustment at the fork boundary. Applications and tooling that assume twelve-second block times will need updating.
 
 ## Security Considerations
 
 ### Network propagation
 
-Tighter slots shrink the window for block propagation and validation. With Gloas BPS values, the attestation deadline at eight-second slots is two seconds into the slot. Clients must reliably propagate and validate blocks within this window; failure to do so increases missed attestations and degrades consensus participation. Phase 2 (CL performance characterization) is explicitly designed to surface these bottlenecks before committing to a final slot duration.
+Tighter slots shrink the window for block propagation, validation, and attestation aggregation. Intra-slot timing deadlines are specified in basis points and scale automatically, but the resulting absolute durations must remain feasible for real-world network conditions. Phase 2 (CL performance characterization) is explicitly designed to surface these bottlenecks before committing to a final slot duration.
 
 ### Validator hardware requirements
 
-Shorter slots raise per-second computational and bandwidth demands. The eight-second target should be validated against the current validator hardware distribution to avoid increasing centralization pressure. Note that peak bandwidth per block is not affected — gas per block decreases proportionally with slot time.
-
-### Attestation aggregation
-
-With Gloas BPS values, the aggregate deadline at eight-second slots falls at four seconds into the slot, leaving four seconds before slot end — the same absolute margin as the Gloas aggregate deadline at twelve-second slots (six seconds into slot, six seconds remaining). However, the attestation-to-aggregate window (from attestation deadline to aggregate deadline) shrinks from three seconds (Gloas at 12s: 3.0s to 6.0s) to two seconds (Gloas at 8s: 2.0s to 4.0s). Subnet aggregation strategies may need optimization to maintain aggregate quality under this tighter window.
+Shorter slots raise per-second computational and bandwidth demands. The slot duration target should be validated against the current validator hardware distribution to avoid increasing centralization pressure. Note that peak bandwidth per block is not affected — gas per block decreases proportionally with slot time.
 
 ### Weak subjectivity period
 
-The weak subjectivity period depends on the rate at which the validator set can turn over. Without churn limit adjustment, per-epoch churn rates applied over 50% more epochs per year would allow the validator set to change faster in wall-clock time, shrinking the safe window for weak subjectivity checkpoints. This EIP scales churn limits to preserve the current wall-clock churn rate, maintaining the existing weak subjectivity period.
+The weak subjectivity period depends on the rate at which the validator set can turn over. Without churn limit adjustment, per-epoch churn rates applied over more epochs per year would allow the validator set to change faster in wall-clock time, shrinking the safe window for weak subjectivity checkpoints. This EIP scales churn limits to preserve the current wall-clock churn rate, maintaining the existing weak subjectivity period.
 
 ### Graceful degradation
 
