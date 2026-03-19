@@ -62,19 +62,9 @@ All arithmetic in this specification uses integer division (truncating toward ze
 | ---- | ----- | ---- |
 | `SLOT_DURATION_MS` | `8000` | Placeholder pending CL performance characterization |
 
-### Slot schedule
+### Slot duration
 
-A `SLOT_SCHEDULE` configuration parameter is added to the consensus layer:
-
-```
-SLOT_SCHEDULE:
-  - EPOCH: 0
-    SLOT_DURATION_MS: 12000
-  - EPOCH: <FORK_EPOCH>
-    SLOT_DURATION_MS: 8000
-```
-
-For any given slot, clients MUST resolve `SLOT_DURATION_MS` by selecting the `SLOT_SCHEDULE` entry with the greatest `EPOCH` less than or equal to the slot's epoch. All references to `SLOT_DURATION_MS` in the consensus specification MUST use this resolved value.
+At `<FORK_EPOCH>`, `SLOT_DURATION_MS` is set to `8000`. All consensus layer timing derivations MUST use the fork-activated value of `SLOT_DURATION_MS` from the fork epoch onward. Functions that compute wall-clock time from slot numbers, such as `compute_time_at_slot(...)`, MUST account for the duration change at the fork boundary.
 
 ### Gas limit adjustment
 
@@ -84,7 +74,7 @@ The first block produced at or after the fork activation timestamp MUST set its 
 fork_gas_limit = parent_gas_limit * new_slot_duration_ms // old_slot_duration_ms
 ```
 
-where `new_slot_duration_ms` and `old_slot_duration_ms` are the `SLOT_DURATION_MS` values from the current and immediately preceding `SLOT_SCHEDULE` entries, respectively. The normal gas limit adjustment rule (±1/1024 of the parent gas limit per [EIP-1559](./eip-1559.md)) does not apply to this block; the fork block's gas limit MUST equal exactly `fork_gas_limit`. From the following block onward, normal gas limit voting resumes using `fork_gas_limit` as the base.
+where `new_slot_duration_ms` and `old_slot_duration_ms` are the post-fork and pre-fork values of `SLOT_DURATION_MS`, respectively. The normal gas limit adjustment rule (±1/1024 of the parent gas limit per [EIP-1559](./eip-1559.md)) does not apply to this block; the fork block's gas limit MUST equal exactly `fork_gas_limit`. From the following block onward, normal gas limit voting resumes using `fork_gas_limit` as the base.
 
 ### Blob parameter adjustment
 
@@ -160,15 +150,15 @@ The following table lists concrete adjusted values assuming `SLOT_DURATION_MS = 
 
 ### Why infrastructure first
 
-The bottleneck is not picking a number. It is the hardcoded twelve-second assumption spread across every consensus and execution client. `SLOT_SCHEDULE` decouples slot duration from protocol upgrades: once it ships, changing slot time is a configuration update, not a hard fork. This also gives client teams a concrete reason to audit and clean up timing-related technical debt — work that compounds across future upgrades.
+The bottleneck is not picking a number. It is the hardcoded twelve-second assumption spread across every consensus and execution client. Delivering this change as a fork forces client teams to audit and remove these assumptions — once that work is done, future slot duration changes become straightforward fork-activated parameter updates rather than invasive refactors. The infrastructure work compounds across future upgrades.
 
 ### Why eight seconds
 
-Six-second slots — as proposed in [EIP-7782](./eip-7782.md) — are a heavier lift that requires dedicated consensus layer headliner status. This EIP takes a different approach: build the variable slot timing infrastructure first, then reduce the slot duration conservatively as a non-headliner change. Eight seconds is a middle path: conservative enough to ship as a non-headliner, aggressive enough to move the needle on UX and MEV. Even ten seconds would be a meaningful win. The exact target follows from phase 2 performance characterization and may be revised before deployment.
+This EIP takes the approach of building the variable slot timing infrastructure first, then reduce the slot duration conservatively as a non-headliner change. Eight seconds is chosen as a reasonable placeholder value that would provide a real UX win, if we discover we can go lower, we should. Even ten seconds would be a meaningful win. The exact target follows from phase 2 performance characterization and may be revised before deployment.
 
 ### Why proportional gas scaling
 
-Scaling the gas limit by `new_slot_duration_ms // old_slot_duration_ms` preserves the gas-per-second invariant. Block validation, gas accounting, and state growth rates stay the same on a per-second basis. Deriving the scaling ratio from the slot schedule rather than introducing separate scaling parameters ensures a single source of truth — changing the target slot duration automatically produces the correct gas limit adjustment, eliminating the risk of mismatched parameters.
+Scaling the gas limit by `new_slot_duration_ms // old_slot_duration_ms` preserves the gas-per-second invariant. Block validation, gas accounting, and state growth rates stay the same on a per-second basis. Deriving the scaling ratio from the slot duration change rather than introducing separate scaling parameters ensures a single source of truth — changing the target slot duration automatically produces the correct gas limit adjustment, eliminating the risk of mismatched parameters.
 
 ### Why a protocol-enforced gas limit adjustment
 
@@ -214,11 +204,11 @@ Many consensus layer constants are denominated in epochs or slots, and shorter s
 
 ### Fallback
 
-If going below twelve seconds proves infeasible, the outcome defaults to the status quo plus a properly characterized CL and future-ready infrastructure. `SLOT_SCHEDULE` ships regardless. The slot duration stays at twelve seconds until conditions permit a reduction — but the infrastructure to make that reduction is already in place.
+If going below twelve seconds proves infeasible, the outcome defaults to the status quo plus a properly characterized CL and future-ready infrastructure. The slot duration stays at twelve seconds, but the work of removing hardcoded timing assumptions delivers a cleaner client architecture and the readiness to reduce when conditions permit.
 
 ## Backwards Compatibility
 
-This EIP requires a hard fork. The consensus layer bears most of the change: clients must replace hardcoded twelve-second slot assumptions with the `SLOT_SCHEDULE` lookup. The execution layer impact is limited to a one-time gas limit and blob parameter adjustment at the fork boundary. Applications and tooling that assume twelve-second block times will need updating.
+This EIP requires a hard fork. The consensus layer bears most of the change: clients must replace hardcoded twelve-second slot assumptions with fork-aware timing derivations. The execution layer impact is limited to a one-time gas limit and blob parameter adjustment at the fork boundary. Applications and tooling that assume twelve-second block times will need updating.
 
 ## Security Considerations
 
@@ -228,15 +218,11 @@ Tighter slots shrink the window for block propagation, validation, and attestati
 
 ### Validator hardware requirements
 
-Shorter slots raise per-second computational and bandwidth demands. The slot duration target should be validated against the current validator hardware distribution to avoid increasing centralization pressure. Note that peak bandwidth per block is not affected — gas per block decreases proportionally with slot time.
+Shorter slots raise per-second computational and bandwidth demands. Validator hardware distribution should be considered when deciding the slot duration. Note that peak bandwidth per payload is not affected — gas per block and the number of blobs decreases proportionally with slot time.
 
 ### Weak subjectivity period
 
 The weak subjectivity period depends on the rate at which the validator set can turn over. Without churn limit adjustment, per-epoch churn rates applied over more epochs per year would allow the validator set to change faster in wall-clock time, shrinking the safe window for weak subjectivity checkpoints. This EIP scales churn limits to preserve the current wall-clock churn rate, maintaining the existing weak subjectivity period.
-
-### Graceful degradation
-
-`SLOT_SCHEDULE` provides a natural escape hatch: if the network degrades after the fork, a subsequent configuration change can revert to longer slots without additional protocol-level modifications.
 
 ## Copyright
 
