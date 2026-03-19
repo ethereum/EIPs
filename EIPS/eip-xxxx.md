@@ -58,86 +58,11 @@ All arithmetic in this specification uses integer division (truncating toward ze
 
 ### Parameters
 
-| Name | Value | Note |
-| ---- | ----- | ---- |
-| `SLOT_DURATION_MS` | `8000` | Placeholder pending CL performance characterization |
-
-### Slot duration
-
-At `<FORK_EPOCH>`, `SLOT_DURATION_MS` is set to `8000`. All consensus layer timing derivations MUST use the fork-activated value of `SLOT_DURATION_MS` from the fork epoch onward. Functions that compute wall-clock time from slot numbers, such as `compute_time_at_slot(...)`, MUST account for the duration change at the fork boundary.
-
-### Gas limit adjustment
-
-The first block produced at or after the fork activation timestamp MUST set its gas limit to:
-
-```
-fork_gas_limit = parent_gas_limit * new_slot_duration_ms // old_slot_duration_ms
-```
-
-where `new_slot_duration_ms` and `old_slot_duration_ms` are the post-fork and pre-fork values of `SLOT_DURATION_MS`, respectively. The normal gas limit adjustment rule (±1/1024 of the parent gas limit per [EIP-1559](./eip-1559.md)) does not apply to this block; the fork block's gas limit MUST equal exactly `fork_gas_limit`. From the following block onward, normal gas limit voting resumes using `fork_gas_limit` as the base.
-
-### Blob parameter adjustment
-
-A new entry MUST be appended to the `BLOB_SCHEDULE` at `<FORK_EPOCH>` with:
-
-```
-new_max_blobs = old_max_blobs * new_slot_duration_ms // old_slot_duration_ms
-```
-
-where `old_max_blobs` is the `MAX_BLOBS_PER_BLOCK` from the most recent preceding `BLOB_SCHEDULE` entry. The blob target is derived from `MAX_BLOBS_PER_BLOCK` as usual. This preserves constant blob throughput per unit time.
-
-### Consensus layer constant adjustments
-
-The general principle for consensus layer constants is: **do not adjust unless there is a concrete security or economic failure from leaving the value unchanged.** Most epoch-denominated and slot-denominated constants were chosen as clean powers of two that happened to produce reasonable wall-clock durations. Shorter slots make epochs arrive faster, which incidentally improves finality time, and the vast majority of constants tolerate this without issue. Only the following categories require adjustment.
-
-#### Issuance and rewards
-
-`BASE_REWARD_FACTOR` is applied once per epoch. With shorter slots, epochs occur more frequently — at eight-second slots there are approximately 50% more epochs per year than at twelve-second slots. Without adjustment, annual validator issuance rises by the same factor. `BASE_REWARD_FACTOR` MUST be replaced with:
-
-```
-BASE_REWARD_FACTOR * new_slot_duration_ms // old_slot_duration_ms
-```
-
-#### Inactivity leak
-
-The inactivity penalty is quadratic in epochs: the penalty at epoch `k` of a finality failure is `effective_balance * k // INACTIVITY_PENALTY_QUOTIENT_BELLATRIX` (with `INACTIVITY_SCORE_BIAS` cancelling between the score numerator and the penalty denominator). The cumulative penalty after `K` epochs scales as `K²`. With shorter slots, there are more epochs per unit of wall-clock time, so `K` grows proportionally faster. Because the penalty is quadratic, preserving the same wall-clock leak rate requires scaling the quotient by the **square** of the epoch ratio. `INACTIVITY_PENALTY_QUOTIENT_BELLATRIX` MUST be replaced with:
-
-```
-INACTIVITY_PENALTY_QUOTIENT_BELLATRIX * old_slot_duration_ms * old_slot_duration_ms // (new_slot_duration_ms * new_slot_duration_ms)
-```
-
-`INACTIVITY_SCORE_BIAS` and `INACTIVITY_SCORE_RECOVERY_RATE` do not require adjustment. `INACTIVITY_SCORE_BIAS` appears in both the score accumulation (numerator) and the penalty denominator, so it cancels out of the penalty calculation entirely. `INACTIVITY_SCORE_RECOVERY_RATE` governs post-leak score decay; with more epochs per wall-clock time, recovery is modestly faster, which is benign.
-
-#### Data availability windows
-
-`MIN_EPOCHS_FOR_BLOB_SIDECARS_REQUESTS` and `MIN_EPOCHS_FOR_DATA_COLUMN_SIDECARS_REQUESTS` define the minimum duration nodes must serve blob and data column data to peers. This window has a hard external dependency: optimistic rollups rely on blob data availability for the duration of their challenge periods (typically seven days). Both constants MUST be replaced with:
-
-```
-CONSTANT * old_slot_duration_ms // new_slot_duration_ms
-```
-
-#### Churn limits
-
-The validator churn limits (`CHURN_LIMIT_QUOTIENT`, `MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA`, `MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT`) are applied per epoch and govern how quickly validators can enter and exit the active set. The rate of validator turnover directly affects the weak subjectivity period: faster churn means the validator set can change more rapidly, which shrinks the window within which a syncing node can safely trust a weak subjectivity checkpoint. The weak subjectivity period is a wall-clock security property.
-
-Per-epoch churn limit values MUST be replaced with:
-
-```
-LIMIT * new_slot_duration_ms // old_slot_duration_ms
-```
-
-`CHURN_LIMIT_QUOTIENT`, which acts as a divisor in the churn calculation, MUST be replaced with:
-
-```
-CHURN_LIMIT_QUOTIENT * old_slot_duration_ms // new_slot_duration_ms
-```
-
-### Adjusted constants
-
-The following table lists concrete adjusted values assuming `SLOT_DURATION_MS = 8000`. The authoritative values are derived from the scaling formulas above applied to the slot duration at the time of activation.
+At `<FORK_EPOCH>`, the following constants take effect. All consensus layer timing derivations MUST use the fork-activated values from the fork epoch onward. Functions that compute wall-clock time from slot numbers, such as `compute_time_at_slot(...)`, MUST account for the duration change at the fork boundary.
 
 | Constant | Current | New |
 | -------- | ------- | --- |
+| `SLOT_DURATION_MS` | 12,000 | 8,000 |
 | `BASE_REWARD_FACTOR` | 64 | 42 |
 | `INACTIVITY_PENALTY_QUOTIENT_BELLATRIX` | 16,777,216 | 37,748,736 |
 | `MIN_EPOCHS_FOR_BLOB_SIDECARS_REQUESTS` | 4,096 | 6,144 |
@@ -145,6 +70,26 @@ The following table lists concrete adjusted values assuming `SLOT_DURATION_MS = 
 | `CHURN_LIMIT_QUOTIENT` | 65,536 | 98,304 |
 | `MIN_PER_EPOCH_CHURN_LIMIT_ELECTRA` | 128,000,000,000 | 85,333,333,333 |
 | `MAX_PER_EPOCH_ACTIVATION_EXIT_CHURN_LIMIT` | 256,000,000,000 | 170,666,666,666 |
+
+### Gas limit adjustment
+
+The first block produced at or after the fork activation timestamp MUST set its gas limit to:
+
+```
+fork_gas_limit = parent_gas_limit * SLOT_DURATION_MS // old_slot_duration_ms
+```
+
+where `old_slot_duration_ms` is the pre-fork value (12,000). The normal gas limit adjustment rule (±1/1024 per [EIP-1559](./eip-1559.md)) does not apply to this block. From the following block onward, normal gas limit voting resumes using `fork_gas_limit` as the base.
+
+### Blob parameter adjustment
+
+A new entry MUST be appended to the `BLOB_SCHEDULE` at `<FORK_EPOCH>` with:
+
+```
+new_max_blobs = old_max_blobs * SLOT_DURATION_MS // old_slot_duration_ms
+```
+
+where `old_max_blobs` is the `MAX_BLOBS_PER_BLOCK` from the most recent preceding `BLOB_SCHEDULE` entry. The blob target is derived from `MAX_BLOBS_PER_BLOCK` as usual.
 
 ## Rationale
 
@@ -155,6 +100,20 @@ The bottleneck is not picking a number. It is the hardcoded twelve-second assump
 ### Why eight seconds
 
 This EIP takes the approach of building the variable slot timing infrastructure first, then reduce the slot duration conservatively as a non-headliner change. Eight seconds is chosen as a reasonable placeholder value that would provide a real UX win, if we discover we can go lower, we should. Even ten seconds would be a meaningful win. The exact target follows from phase 2 performance characterization and may be revised before deployment.
+
+### Constant scaling
+
+The general principle is: **do not adjust a constant unless there is a concrete security or economic failure from leaving it unchanged.** Most epoch- and slot-denominated constants were chosen as clean powers of two with generous margins; shorter slots make epochs arrive faster, which incidentally improves finality time, and the vast majority tolerate this without issue. Only four categories require adjustment, each with a distinct scaling formula.
+
+**Issuance.** `BASE_REWARD_FACTOR` is applied once per epoch. More epochs per year means proportionally higher issuance. It scales linearly: `BASE_REWARD_FACTOR * new_slot_duration_ms // old_slot_duration_ms`. Integer truncation produces `42` rather than the ideal `42.667`, under-issuing by approximately 1.6% — a smaller deviation than typical validator participation rate fluctuations.
+
+**Inactivity leak.** The per-epoch penalty grows linearly with epoch count, making the cumulative penalty over `K` epochs proportional to `K²`. The quotient must therefore scale by the **square** of the epoch ratio: `INACTIVITY_PENALTY_QUOTIENT_BELLATRIX * old² // new²`. Because the quotient is a *divisor* in the penalty formula, a larger quotient produces a smaller per-epoch penalty, compensating for the increased number of epochs per wall-clock time.
+
+**Data availability windows.** `MIN_EPOCHS_FOR_BLOB_SIDECARS_REQUESTS` and `MIN_EPOCHS_FOR_DATA_COLUMN_SIDECARS_REQUESTS` have a hard external dependency on optimistic rollup challenge periods (typically seven days). They scale inversely to preserve wall-clock duration: `CONSTANT * old_slot_duration_ms // new_slot_duration_ms`.
+
+**Churn limits.** Validator churn rates determine the weak subjectivity period, a wall-clock security property. Per-epoch limits scale by `new // old`; `CHURN_LIMIT_QUOTIENT`, which acts as a divisor, scales by `old // new`.
+
+Blob parameters are also scaled proportionally. Integer division truncates when `old_max_blobs` is not a multiple of `old_slot_duration_ms // gcd(new_slot_duration_ms, old_slot_duration_ms)` (e.g., not a multiple of 3 for a 12→8 second transition), producing at most one blob of throughput reduction per slot.
 
 ### Why proportional gas scaling
 
