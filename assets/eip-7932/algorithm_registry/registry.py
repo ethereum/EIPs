@@ -39,7 +39,7 @@ def secp256k1_validate(signature: ByteVector[SECP256K1_SIGNATURE_SIZE]):
 
 
 class Secp256k1(AlgorithmEntry):
-    ALG_TYPE = 0xFF
+    ALG_TYPE = 0x00
     SIZE = 66
 
     def gas_cost(signing_data: bytes) -> uint64:
