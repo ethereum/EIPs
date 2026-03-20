@@ -28,13 +28,13 @@ test_cases = [
     (b"", (INVALID, 3000)),
 
     # Invalid algorithm (without data)
-    (b"\xFE", (INVALID, 3000)),
+    (b"\x7F", (INVALID, 3000)),
 
     # Invalid algorithm (with data at secp256k1 size)
-    (b"\xFE" + b"\x01" * 65 + b"\x00" * 32, (INVALID, 3000)), 
+    (b"\x7F" + b"\x01" * 65 + b"\x00" * 32, (INVALID, 3000)), 
 
     # Invalid algorithm (with data greater than secp256k1 size)
-    (b"\xFE" + b"\x01" * 66 + b"\x00" * 32, (INVALID, 3000)),
+    (b"\x7F" + b"\x01" * 66 + b"\x00" * 32, (INVALID, 3000)),
 
     #
     # secp256k1
