@@ -191,15 +191,7 @@ address = keccak256(SCHEME_FALCON || pubkey)[12:]
 
 The choice of hash-to-point variant (SHAKE256 vs Keccak-PRNG) is an implementation detail. This EIP does not prescribe which H2P function is used — both produce valid Falcon-512 verifications.
 
-**Scheme gas surcharge:** Falcon transactions carry substantially more data than ECDSA transactions. To prevent under-pricing and ensure fair resource accounting, Falcon transactions MUST pay an additional gas surcharge computed as:
-
-```
-falcon_surcharge = (signature_size + pubkey_size) * CALLDATA_GAS_PER_BYTE
-                 = (666 + 897) * 16
-                 = 25,008 gas
-```
-
-This surcharge is in addition to the Falcon verification gas (3,000 gas: 1,000 for H2P + 2,000 for FALCON_CORE), giving a total scheme gas surcharge of **28,008 gas**.
+**Scheme gas surcharge:** Falcon transactions carry substantially more data than ECDSA transactions. To prevent under-pricing and ensure fair resource accounting, Falcon transactions MUST pay an additional gas surcharge of **25,000 gas**, proportional to the extra signature and public key size.
 
 ### Intrinsic Gas
 
@@ -218,7 +210,7 @@ Where `scheme_gas_surcharge` is:
 |--------|-----------|-----------|
 | `SCHEME_SECP256K1` | 0 | Included in base 21,000 (same as today) |
 | `SCHEME_P256` | 0 | Included in base 21,000 (same cost as secp256k1) |
-| `SCHEME_FALCON` | 28,008 | 25,008 (calldata equivalent) + 3,000 (verification: 1,000 H2P + 2,000 FALCON_CORE) |
+| `SCHEME_FALCON` | 25,000 | Proportional to extra signature and public key size |
 
 This ensures Falcon transactions pay proportionally for the bandwidth, storage, and propagation costs imposed by their larger signatures.
 
@@ -269,7 +261,7 @@ P256 is intermediate: recovery is possible but requires a hint (the x-coordinate
 
 ### Why a size-based gas surcharge for Falcon?
 
-Falcon-512 signatures (666 bytes) and public keys (897 bytes) are ~24× larger than secp256k1 signatures (65 bytes). This extra data must be propagated across the network, stored by archive nodes, and processed during sync. The surcharge `(sig_size + pubkey_size) * 16` ensures that Falcon transactions pay proportionally for these costs, matching the existing calldata gas schedule. Without this, Falcon transactions would be systematically under-priced relative to their true resource consumption.
+Falcon-512 signatures (666 bytes) and public keys (897 bytes) are ~24× larger than secp256k1 signatures (65 bytes). This extra data must be propagated across the network, stored by archive nodes, and processed during sync. The 25,000 gas surcharge ensures that Falcon transactions pay proportionally for these costs. Without this, Falcon transactions would be systematically under-priced relative to their true resource consumption.
 
 ### Why Falcon-512 specifically?
 
@@ -303,7 +295,7 @@ Users MUST migrate to Falcon addresses before a cryptographically relevant quant
 
 ### Large signature DoS
 
-Falcon signatures are ~1.5 KB, roughly 24× larger than secp256k1. The `(sig_size + pubkey_size) * 16` gas surcharge ensures these transactions are not under-priced.
+Falcon signatures are ~1.5 KB, roughly 24× larger than secp256k1. The 25,000 gas surcharge ensures these transactions are not under-priced.
 
 ### Scheme downgrade attacks
 
