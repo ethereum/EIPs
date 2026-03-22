@@ -89,7 +89,7 @@ A SchemedTransaction is serialized as:
 | `data` | `bytes` | Calldata |
 | `access_list` | `List[AccessListEntry]` | [EIP-2930](./eip-2930.md) access list |
 | `scheme_id` | `uint8` | Signature algorithm identifier (`0x00`–`0xFF`) |
-| `signature_data` | `bytes` | Algorithm-specific signature bytes (see [Signature Formats](#signature-formats)) |
+| `signature_data` | `bytes` | Algorithm-specific signature bytes (see [Signature Formats](#signature-formats-and-address-derivation)) |
 
 This is intentionally identical to an [EIP-1559](./eip-1559.md) (type 2) transaction with two changes: the legacy `v, r, s` fields are replaced by `scheme_id` and `signature_data`.
 
