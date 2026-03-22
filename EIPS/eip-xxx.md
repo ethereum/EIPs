@@ -3,7 +3,7 @@ eip: xxx
 title: SchemedTransaction — Scheme-Agile Transactions
 description: A new EIP-2718 transaction type allowing users to choose between ECDSA (secp256k1), P256 (secp256r1), and Falcon-512 signature schemes, with sender address derived from the public key.
 author: Giulio Rebuffo (@Giulio2002) <giulio.rebuffo@gmail.com>, Ben Adams (@benaadams)
-discussions-to: https://ethereum-magicians.org/t/eip-xxx-schemedtransaction/00000
+discussions-to: https://ethereum-magicians.org/t/schemed-transaction/28044
 status: Draft
 type: Standards Track
 category: Core
