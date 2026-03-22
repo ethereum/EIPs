@@ -35,6 +35,8 @@ Many users and wallets need a simpler primitive: sign a standard transaction wit
 
 Rather than introducing new opcodes, account abstractions, or execution frame models, SchemedTransaction is a single new transaction type that reuses the existing [EIP-1559](./eip-1559.md) fields with only two changes: the legacy `v, r, s` fields are replaced by `scheme_id` and `signature_data`.
 
+Execution frame–based approaches (e.g., composable transaction types) can be layered on top of SchemedTransaction later if needed. However, frame-based designs have unresolved issues around mempool validation — verifying nested frames before inclusion is expensive and introduces new DoS vectors. SchemedTransaction sidesteps these problems entirely: signature verification is a single, cheap, stateless check at the transaction envelope level, exactly like today's ECDSA. This gives Ethereum immediate quantum resistance and native WebAuthn/passkey support without waiting for the frame model to mature.
+
 ## Specification
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
