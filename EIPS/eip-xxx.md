@@ -1,9 +1,9 @@
 ---
-eip: 8190
+eip: xxx
 title: SchemedTransaction — Scheme-Agile Transactions
 description: A new EIP-2718 transaction type allowing users to choose between ECDSA (secp256k1), P256 (secp256r1), and Falcon-512 signature schemes, with sender address derived from the public key.
 author: Giulio Rebuffo (@Giulio2002) <giulio.rebuffo@gmail.com>, Ben Adams (@benaadams)
-discussions-to: https://ethereum-magicians.org/t/eip-8190-schemedtransaction/00000
+discussions-to: https://ethereum-magicians.org/t/eip-xxx-schemedtransaction/00000
 status: Draft
 type: Standards Track
 category: Core
@@ -164,7 +164,7 @@ address = keccak256(SCHEME_P256 || pubkey)[12:]
 
 The `SCHEME_P256` byte is prefixed to the public key before hashing to ensure address domain separation — a P256 key and a secp256k1 key cannot collide on the same address.
 
-Scheme gas surcharge: **5,000 gas** (per [EIP-7951](./eip-7951.md) cost analysis: 8,000 for P256 verification minus 3,000 ecrecover savings in base cost).
+Scheme gas surcharge: **0** (P256 verification cost is absorbed into the base 21,000 intrinsic gas, making P256-signed transactions gas-equivalent to secp256k1).
 
 #### Falcon-512 (`0x02`)
 
@@ -215,7 +215,7 @@ Where `scheme_gas_surcharge` is:
 | Scheme | Surcharge | Breakdown |
 |--------|-----------|-----------|
 | `SCHEME_SECP256K1` | 0 | Included in base 21,000 (same as today) |
-| `SCHEME_P256` | 5,000 | P256 verification cost per [EIP-7951](./eip-7951.md) |
+| `SCHEME_P256` | 0 | Included in base 21,000 (same cost as secp256k1) |
 | `SCHEME_FALCON` | 28,008 | 25,008 (calldata equivalent) + 3,000 (verification: 1,000 H2P + 2,000 FALCON_CORE) |
 
 This ensures Falcon transactions pay proportionally for the bandwidth, storage, and propagation costs imposed by their larger signatures.
