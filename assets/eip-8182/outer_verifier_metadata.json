@@ -1,0 +1,13 @@
+{
+  "proofSystem": "UltraHonk BN254",
+  "proofEncoding": "outer proof as 354 big-endian 32-byte BN254 field elements",
+  "proofByteLength": 11328,
+  "proofFieldElementCount": 354,
+  "logN": 22,
+  "verifierPublicInputCount": 35,
+  "poolPublicInputCount": 19,
+  "outerVkAsset": "outer_vk.bin",
+  "outerVkSha256Asset": "outer_vk.sha256",
+  "outerVkBbHashAsset": "outer_vk.bb_hash.hex",
+  "transcriptVkHashAsset": "outer_verifier_transcript_vk_hash.hex"
+}
