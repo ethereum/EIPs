@@ -30,7 +30,7 @@ Ethereum's current goals of "Decentralization" and "Security" are all immeasurab
 
 As of this EIP being implemented, Ethereum's fundamental goal MUST be finding the holy grail.
 
-Once `blocknum \gte HOLY_GRAIL_BLOCK_NUMBER` all implementation MUST be fully compliant with this specification. If `blocknum \lt HOLY_GRAIL_BLOCK_NUMBER` clients MUST NOT perform any of the specified behaviors.
+Once `blocknum ≥ HOLY_GRAIL_BLOCK_NUMBER` all implementation MUST be fully compliant with this specification. If `blocknum ≪ HOLY_GRAIL_BLOCK_NUMBER` clients MUST NOT perform any of the specified behaviors.
 
 
 Upon reaching the holy grail, the quest has been completed and all clients MUST:
