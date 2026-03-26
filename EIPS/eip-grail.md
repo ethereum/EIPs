@@ -53,7 +53,7 @@ Ethereum currently does not know where it is. It does however, know when it isn'
 
 ### RPC modifications
 
-Once the grail has been found, it may displease the knights who say Ni, to counteract this. All RPC calls have been delegated to the knights to ensure cooperation between our quest for the grail and the knights.
+Once the grail has been found, it may displease the knights who say Ni. To counteract this, All RPC calls have been delegated to the knights to ensure cooperation between our quest for the grail and the knights.
 
 ### Grail celebrations
 
