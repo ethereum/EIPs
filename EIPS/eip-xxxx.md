@@ -2,7 +2,7 @@
 eip: xxxx
 title: Increase Maximum Contract Size to 64KiB
 description: Raise the maximum contract code size from 32KiB to 64KiB and initcode
-  size from 64KiB to 128KiB, with increased gas costs above 32KiB.
+  size from 64KiB to 128KiB, with chunk-based gas costs above 32KiB.
 author: Giulio Rebuffo (@Giulio2002)
 discussions-to: https://ethereum-magicians.org/t/increase-maximum-contract-size-to-48kb/24509
 status: Draft
@@ -16,9 +16,9 @@ requires: 170, 3860, 7954
 
 This EIP raises the maximum contract code size from 32KiB to 64KiB
 and the maximum initcode size from 64KiB to 128KiB. Code deployed
-beyond the current 32KiB boundary incurs a higher per-byte creation
-cost (500 gas/byte instead of 200 gas/byte), following the gas model
-established by [EIP-2926](./eip-2926.md).
+beyond the current 32KiB boundary incurs a chunk-based surcharge
+using a 31-byte chunk size, following the chunking model established
+by [EIP-2926](./eip-2926.md).
 
 ## Motivation
 
@@ -29,14 +29,14 @@ which increase deployment cost, complexity, and attack surface.
 
 A hard cap increase alone raises concerns about state bloat and
 denial-of-service via large code deployments. By introducing a
-tiered gas model — standard cost up to 32KiB, elevated cost above
-— this EIP balances developer flexibility with economic deterrence
-against gratuitous state growth.
+chunk-based surcharge for code beyond 32KiB — where each 31-byte
+chunk incurs an additional cost — this EIP balances developer
+flexibility with economic deterrence against gratuitous state
+growth.
 
-The elevated cost of 500 gas per byte for the extended region is
-inherited from [EIP-2926](./eip-2926.md), which establishes this
-rate for code written beyond the legacy boundary in the context of
-code merkleization. Reusing this constant ensures forward
+The chunk size of 31 bytes and the per-chunk gas cost are inherited
+from [EIP-2926](./eip-2926.md), which establishes this model for
+code merkleization. Reusing these constants ensures forward
 compatibility with chunk-based code storage proposals.
 
 ## Specification
@@ -52,8 +52,9 @@ in RFC 2119 and RFC 8174.
 |---|---|
 | `MAX_CODE_SIZE` | `65536` (`0x10000`, 64KiB) |
 | `MAX_INITCODE_SIZE` | `131072` (`0x20000`, 128KiB) |
+| `CHUNK_SIZE` | `31` (bytes) |
 | `STANDARD_CODE_DEPOSIT_COST` | `200` (gas per byte) |
-| `EXTENDED_CODE_DEPOSIT_COST` | `500` (gas per byte) |
+| `EXTENDED_CHUNK_COST` | `500` (gas per chunk) |
 | `EXTENDED_THRESHOLD` | `32768` (`0x8000`, 32KiB) |
 
 ### Code size limits
@@ -70,21 +71,20 @@ The gas cost for storing contract code during creation (`CREATE`,
 
 For a contract with final code of `N` bytes:
 
-- If `N <= EXTENDED_THRESHOLD`:
-  the cost is `N * STANDARD_CODE_DEPOSIT_COST` (unchanged).
-- If `N > EXTENDED_THRESHOLD`:
-  the cost is
-  `EXTENDED_THRESHOLD * STANDARD_CODE_DEPOSIT_COST + (N - EXTENDED_THRESHOLD) * EXTENDED_CODE_DEPOSIT_COST`.
+- The standard deposit cost of
+  `N * STANDARD_CODE_DEPOSIT_COST` applies to ALL bytes.
+- If `N > EXTENDED_THRESHOLD`, an additional chunk-based
+  surcharge is applied for the extended region:
+  `ceil((N - EXTENDED_THRESHOLD) / CHUNK_SIZE) * EXTENDED_CHUNK_COST`.
 
-In pseudocode:
+The total deposit cost is:
 
-```python
-def code_deposit_cost(code_size):
-    if code_size <= EXTENDED_THRESHOLD:
-        return code_size * STANDARD_CODE_DEPOSIT_COST
-    base = EXTENDED_THRESHOLD * STANDARD_CODE_DEPOSIT_COST
-    extended = (code_size - EXTENDED_THRESHOLD) * EXTENDED_CODE_DEPOSIT_COST
-    return base + extended
+```
+deposit_cost = N * 200
+if N > 32768:
+    extended_bytes = N - 32768
+    extended_chunks = (extended_bytes + 30) // 31
+    deposit_cost += extended_chunks * 500
 ```
 
 ### Initcode cost
@@ -95,47 +95,54 @@ to all initcode regardless of size.
 
 ## Rationale
 
-### Tiered gas model
+### Chunk-based surcharge
 
-A flat increase to 64KiB with no repricing would lower the
-economic cost of state bloat. The tiered model ensures that
-contracts within the pre-existing 32KiB boundary pay exactly
-what they pay today, while contracts that use the extended
-space pay a 2.5x premium per byte. This discourages
-unnecessary bloat while still making 64KiB contracts
-economically feasible.
+Rather than repricing the per-byte cost above 32KiB, this EIP
+applies a per-chunk surcharge on top of the standard deposit cost.
+The 31-byte chunk size matches [EIP-2926](./eip-2926.md) and
+represents the natural unit of account in a merkleized code trie.
+Larger code requires more chunks in the trie, more proof hashes
+in witnesses, and more storage overhead — the surcharge reflects
+this marginal cost.
 
 ### Cost comparison
 
-| Code size | Current (200/byte) | This EIP |
-|---|---|---|
-| 32KiB | 6,553,600 | 6,553,600 |
-| 48KiB | Rejected | 14,745,600 |
-| 64KiB | Rejected | 22,937,600 |
+| Code size | Standard deposit | Chunk surcharge | Total |
+|---|---|---|---|
+| 32KiB | 6,553,600 | 0 | 6,553,600 |
+| 48KiB | 9,830,400 | 528,500 | 10,358,900 |
+| 64KiB | 13,107,200 | 529,000 | 13,636,200 |
 
-A maximum-size 64KiB contract costs ~23M gas to deploy,
-which is within a single block's gas limit but expensive
-enough to deter frivolous use.
+Contracts within the 32KiB boundary pay exactly what they pay
+today. A maximum-size 64KiB contract costs ~13.6M gas to deploy,
+which fits in a single block but carries a meaningful chunk
+surcharge of ~529K gas.
 
-### 500 gas per byte
+### 31-byte chunk size
 
-The 500 gas/byte rate is inherited from
-[EIP-2926](./eip-2926.md), which introduces this cost for
-code chunks written beyond the legacy boundary in a
-merkleization context. Reusing this constant avoids
-introducing a new magic number and ensures compatibility
-if chunk-based code storage is adopted in the future.
+The chunk size of 31 bytes is inherited from
+[EIP-2926](./eip-2926.md). Each chunk in a merkleized code trie
+is stored as `FIO || code_chunk` (1 byte first-instruction-offset
++ 31 bytes code = 32 bytes), aligning with hash input sizes.
+
+### 500 gas per chunk
+
+The 500 gas per-chunk cost is inherited from
+[EIP-2926](./eip-2926.md), which establishes this rate for chunks
+written beyond the legacy boundary. Reusing this constant avoids
+introducing new magic numbers and ensures compatibility if
+chunk-based code storage is adopted.
 
 ### Power-of-two boundary
 
-64KiB (2^16) is a natural alignment boundary. It matches
-common memory page sizes and simplifies tooling and analysis.
+64KiB (2^16) is a natural alignment boundary. It matches common
+memory page sizes and simplifies tooling and analysis.
 
 ### Preserved initcode ratio
 
-The 2:1 ratio between initcode and runtime code limits
-from [EIP-3860](./eip-3860.md) is maintained (128KiB
-initcode for 64KiB runtime).
+The 2:1 ratio between initcode and runtime code limits from
+[EIP-3860](./eip-3860.md) is maintained (128KiB initcode for
+64KiB runtime).
 
 ## Backwards Compatibility
 
@@ -147,31 +154,31 @@ After activation:
 
 - Existing contracts are unaffected.
 - Contracts up to 32KiB deploy at unchanged cost.
-- Contracts between 32KiB and 64KiB deploy at the tiered
-  cost defined above.
+- Contracts between 32KiB and 64KiB deploy at the standard
+  per-byte cost plus the chunk-based surcharge defined above.
 
 ## Security Considerations
 
 ### State growth
 
-The elevated cost above 32KiB acts as an economic deterrent.
-Deploying a maximum-size 64KiB contract costs ~23M gas,
-consuming most of a block's gas limit for the deployment
-transaction alone.
+The chunk surcharge acts as an economic deterrent against
+unnecessary use of the extended region. Deploying a 64KiB
+contract costs ~13.6M gas, a meaningful fraction of a block's
+gas limit.
 
 ### Code-accessing opcodes
 
-`EXTCODECOPY` and `EXTCODESIZE` already charge gas
-proportional to the size of the code accessed. No changes
-to these opcodes are required.
+`EXTCODECOPY` and `EXTCODESIZE` already charge gas proportional
+to the size of the code accessed. No changes to these opcodes
+are required by this EIP.
 
 ### Forward compatibility with merkleization
 
-The 500 gas/byte rate aligns with
-[EIP-2926](./eip-2926.md). If chunk-based code
-merkleization is adopted, the gas model introduced here
-remains consistent and may be absorbed into the
-merkleization framework.
+The chunk size and per-chunk cost align with
+[EIP-2926](./eip-2926.md). If chunk-based code merkleization is
+adopted, the gas model introduced here remains consistent and
+may be absorbed into the merkleization framework with no
+repricing needed for the extended region.
 
 ## Copyright
 
