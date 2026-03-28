@@ -2,7 +2,7 @@
 eip: xxxx
 title: Increase Maximum Contract Size to 64KiB
 description: Raise the maximum contract code size from 24KiB to 64KiB and initcode size from 48KiB to 128KiB.
-author: Giulio Rebuffo (@Giulio2002), Ben Adams (@benaadams)
+author: Giulio Rebuffo (@Giulio2002)
 discussions-to: https://ethereum-magicians.org/t/increase-maximum-contract-size-to-48kb/24509
 status: Draft
 type: Standards Track
