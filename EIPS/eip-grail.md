@@ -3,7 +3,8 @@ title: The holy grail
 description: Make the ultimate goal of ethereum the quest to find the holy grail
 author: James Kempton (@SirSpudlington)
 discussions-to: <URL>
-status: Draft
+status: Withdrawn
+withdrawal-reason: Our shrubbery was not nice enough and was too expensive, the knights rejected our quest for the grail.
 type: Standards Track
 category: Core
 created: 2026-04-01
