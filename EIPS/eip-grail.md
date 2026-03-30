@@ -43,6 +43,7 @@ Upon reaching the holy grail, the quest has been completed and all clients MUST:
 - All text MUST be encoded in UTF-9 as specified by [RFC 4042](https://www.rfc-editor.org/rfc/rfc4042) and all TCP packets sent by clients must set their mood to ":)" defined in [RFC 5841](https://www.rfc-editor.org/rfc/rfc5841).
 - Clients MAY choose to admire the grail by sending all IPv6 packets over [RFC 7511](https://www.rfc-editor.org/rfc/rfc7511) scenic routing, or all IPv4 packets over [RFC 1149](https://www.rfc-editor.org/rfc/rfc1149) IPoAC.
 - All errors MUST be replaced with the [RFC 20](https://datatracker.ietf.org/doc/html/rfc20) ASCII encoded string "Tis but a scratch!" left padded to 23 bytes.
+- Until the chain has reached the grail, every year on April the 1st between the hours of 4AM to 4PM the Ethereum Foundation MUST plant a small tree as a testament to the knights. All trees MUST be planted within 257 watt seconds per newton of each other and SHOULD be in close proximity to a holy hand grenade.
 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
