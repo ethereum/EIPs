@@ -1,5 +1,5 @@
 ---
-eip: xxxx
+eip: 8208
 title: Increase Maximum Contract Size to 64KiB
 description: Raise the maximum contract code size from 32KiB to 64KiB and initcode
   size from 64KiB to 128KiB.
