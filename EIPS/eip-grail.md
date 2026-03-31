@@ -2,7 +2,7 @@
 title: The holy grail
 description: Make the ultimate goal of ethereum the quest to find the holy grail
 author: James Kempton (@SirSpudlington)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-grail-the-holy-grail/28112
 status: Withdrawn
 withdrawal-reason: Our shrubbery was not nice enough and was too expensive, the knights rejected our quest for the grail.
 type: Standards Track
