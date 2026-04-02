@@ -2,7 +2,7 @@
 eip: TBD
 title: Hash-Committed Account
 description: Account type where address commits to a Merkle root of spending conditions, not a public key
-author: Zakaria Saif (@zacksfF)
+author: Zakaria Saif <@zacksfF>
 discussions-to: https://ethereum-magicians.org/t/discussion-hash-committed-account-hca-quantum-safe-address-derivation-for-ethereum/28094
 status: Draft
 type: Standards Track
