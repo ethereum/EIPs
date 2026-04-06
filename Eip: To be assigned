@@ -164,7 +164,7 @@ if __name__ == '__main__':
 · The geometric identity H^2+Q^2=1 used in the companion signature EIP ensures the underlying security is quantum‑resistant.
 · Pruning thresholds must be chosen carefully to avoid merging active shards prematurely; a suggested value is 10^{-6} relative to the maximum possible volume.
 
-Copyright
+## Copyright
 
 Copyright and related rights waived via CC0.
 
