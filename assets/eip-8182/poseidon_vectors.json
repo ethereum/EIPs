@@ -7,8 +7,7 @@
     "authPolicyBlocks": 64
   },
   "constants": {
-    "mixedLabel": "0xbe7a629a2524bfe29defc5bf1bcacb1dee3d8e845ac9a2587dbf4b9346f0954",
-    "dummyNkHash": "0x156d014d2224f3fbefe52c4a6ff96512458675453a9af01da3419994a175667b"
+    "dummyOwnerNullifierKeyHash": "0x1597578662540dfdd307865f6954f523faec217c8c337da933cdb6f0b97861ab"
   },
   "hashExamples": {
     "hash2_0_0": "0x2098f5fb9e239eab3ceac3f27b81e481dc3124d55ffed523a839ee8446b64864",
@@ -217,17 +216,17 @@
       "0x28180793b764369e9f836ff9b58a824abb0b1346b37e110797016482e9efcb90"
     ]
   },
-  "canonicalIntentExample": {
+  "canonicalTransactionIntentExample": {
     "fields": {
       "policyVersion": "0x1",
       "authorizingAddress": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
-      "operationKind": "0x0",
+      "operationKind": "0x2",
       "tokenAddress": "0x0",
       "recipientAddress": "0x1000000000000000000000000000000000000001",
       "amount": "0x7b",
       "feeRecipientAddress": "0x0",
       "feeAmount": "0x0",
-      "lineageConstraintKind": "0x1",
+      "originMode": "0x1",
       "executionConstraintsFlags": "0x0",
       "lockedOutputBinding0": "0x0",
       "lockedOutputBinding1": "0x0",
@@ -236,35 +235,34 @@
       "validUntilSeconds": "0xe11",
       "executionChainId": "0x7a69"
     },
-    "intentDigest": "0xe653e7afd036e5b1d6fe2872ec7b17910ca3cfe7aeee400217701cf6deeecef",
-    "intentNullifier": "0x71d1a9fd39285cd579ecb0faa9dded95ccb1e7c765357cf6b77be1dc02bd239"
+    "transactionIntentDigest": "0x14dadc6b0424af48f6d299a22b7e8cd3553adf5bde798157188e8efc73d170d6",
+    "transactionReplayId": "0x141b46cc5f6dc0728f3f46fe43a188f55b5e9387198f164f9710e0d24014362d"
   },
-  "outputRandomnessExample": {
-    "outputSecret": "0x5678",
-    "slot0": "0x2b05d59842acc62b240f1d0cc991eb418fddb018d4a65c274e021598a114afd",
-    "slot1": "0x42e80b9232f47455e6814a7a37c4c81fdbe4ca98b0c59d783bbc3f1385998f",
-    "slot2": "0x2f3db8c62f0248cf42431533bc600c9c8d469183aa67a061568dfbaa9a3ac72f"
+  "noteSecretExample": {
+    "noteSecretSeed": "0x5678",
+    "output0": "0x9a30c7169353639e90408af99356936cf892a0804368969c6175bcf69d0cfd",
+    "output1": "0x245ad58c0ca32bd05072cae3589a3b921f857105945dc320dad0fa7ca2c3a36b",
+    "output2": "0x152d49d04e5870b830f28b7d9ba86388bb1d7b85ccf4e6cae1dd27ac65a93f87"
   },
-  "depositLabelExample": {
+  "depositOriginTagExample": {
     "executionChainId": "0x7a69",
     "depositorAddress": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
     "tokenAddress": "0x0",
     "publicAmountIn": "0x7b",
-    "intentNullifier": "0x71d1a9fd39285cd579ecb0faa9dded95ccb1e7c765357cf6b77be1dc02bd239",
-    "label": "0x7b9d62dd0e06722257348d08f5d3c1d7bfaeea28529b76c680e629dc81b97f1"
+    "transactionReplayId": "0x141b46cc5f6dc0728f3f46fe43a188f55b5e9387198f164f9710e0d24014362d",
+    "originTag": "0x2e761c1772fe1374e3ade0446037230df88321f29c5ea545249dee450f61ba3c"
   },
   "nullifierExamples": {
     "real": {
-      "nullifierKey": "0x1234",
-      "leafIndexU32": 7,
-      "randomness": "0x2b05d59842acc62b240f1d0cc991eb418fddb018d4a65c274e021598a114afd",
-      "nullifier": "0xd8984227983c45f1f458461169ae6a0c7748f31e02d1ee9f3c90ccda2925b16"
+      "ownerNullifierKey": "0x1234",
+      "noteSecret": "0x9a30c7169353639e90408af99356936cf892a0804368969c6175bcf69d0cfd",
+      "noteNullifier": "0x27d8dc64c65dd0c1a00880c8270a16e6e90b0e437a4ec3555365d8c398583ba6"
     },
     "phantom": {
-      "nullifierKey": "0x1234",
-      "intentNullifier": "0x71d1a9fd39285cd579ecb0faa9dded95ccb1e7c765357cf6b77be1dc02bd239",
-      "slotIndex": 0,
-      "nullifier": "0x279d99a68caed00786b7d06ef0eb02e01ee95cb4c4e0dc5eceecee2472e56d11"
+      "ownerNullifierKey": "0x1234",
+      "transactionReplayId": "0x141b46cc5f6dc0728f3f46fe43a188f55b5e9387198f164f9710e0d24014362d",
+      "inputIndex": 0,
+      "phantomNullifier": "0x16cb1b43931d31d68a8689760242a1a6f5ee0d8d8a9149abdc2de9fefc1316cd"
     }
   }
 }
