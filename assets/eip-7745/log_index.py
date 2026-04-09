@@ -407,9 +407,9 @@ def index_entry_gti(map_entry_index: Uint) -> U256:
     epoch_index = map_entry_index // (MAPS_PER_EPOCH * VALUES_PER_MAP)
     sub_index = map_entry_index % (MAPS_PER_EPOCH * VALUES_PER_MAP)
     epoch_root = gti_vector(GTI_EPOCH_HISTORY, epoch_index, LOG2_EPOCH_HISTORY)
-    index_entires_root = gti_merge(epoch_root, GTI_INDEX_ENTRIES)
+    index_entries_root = gti_merge(epoch_root, GTI_INDEX_ENTRIES)
     return gti_vector(
-        index_entires_root,
+        index_entries_root,
         sub_index,
         LOG2_MAPS_PER_EPOCH + LOG2_VALUES_PER_MAP,
     )
