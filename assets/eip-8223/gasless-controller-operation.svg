@@ -115,17 +115,17 @@
   <text class="label" x="280" y="698" text-anchor="middle">EOA = Signer Only</text>
   <text class="body" x="280" y="728" text-anchor="middle">The EOA holds no ETH, no tokens,</text>
   <text class="body" x="280" y="750" text-anchor="middle">no assets. It exists only to sign</text>
-  <text class="body" x="280" y="772" text-anchor="middle">transactions targeting the account.</text>
+  <text class="body" x="280" y="772" text-anchor="middle">transactions targeting the account(s)</text>
 
   <rect class="warn" x="530" y="660" width="380" height="130"/>
   <text class="label" x="720" y="698" text-anchor="middle">Account = Wallet + Identity</text>
   <text class="body" x="720" y="728" text-anchor="middle">Assets, execution, gas payment,</text>
   <text class="body" x="720" y="750" text-anchor="middle">address, and on-chain identity all</text>
-  <text class="body" x="720" y="772" text-anchor="middle">live at the account contract.</text>
+  <text class="body" x="720" y="772" text-anchor="middle">live at the account contract</text>
 
   <rect class="note" x="950" y="660" width="420" height="130"/>
   <text class="label" x="1160" y="698" text-anchor="middle">Validation = One SLOAD</text>
   <text class="body" x="1160" y="728" text-anchor="middle">Protocol reads one slot from one</text>
   <text class="body" x="1160" y="750" text-anchor="middle">known system contract. No code</text>
-  <text class="body" x="1160" y="772" text-anchor="middle">execution. FOCIL/VOPS compatible.</text>
+  <text class="body" x="1160" y="772" text-anchor="middle">execution. FOCIL/VOPS compatible</text>
 </svg>
