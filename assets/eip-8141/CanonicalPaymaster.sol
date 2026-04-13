@@ -5,7 +5,7 @@ pragma solidity ^0.8.24;
 /// @dev VERIFY frame calldata is expected to be exactly:
 ///      r (32 bytes) || s (32 bytes) || v (1 byte)
 ///      The signature is checked against TXPARAM(0x08), i.e. the canonical tx sig hash.
-///      On success, the contract calls APPROVE(0x1) to approve payment.
+///      On success, the contract calls APPROVE with scope=0x1 and offset/length=0 to approve payment.
 ///      This implementation supports only a single secp256k1 signer recovered via ecrecover.
 ///      ERC-1271 and other contract-signature schemes are not supported.
 contract CanonicalPaymaster {
