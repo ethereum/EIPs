@@ -4,8 +4,10 @@ pragma solidity ^0.8.24;
 /// @notice Minimal canonical paymaster for EIP-8141-style frame transactions.
 /// @dev VERIFY frame calldata is expected to be exactly:
 ///      r (32 bytes) || s (32 bytes) || v (1 byte)
-///      The signature is checked against TXPARAM(0x08, 0), i.e. the canonical tx sig hash.
-///      On success, the contract calls APPROVE(0x1) to approve payment.
+///      The signature is checked against TXPARAM(0x08), i.e. the canonical tx sig hash.
+///      On success, the contract calls APPROVE with scope=0x1 and offset/length=0 to approve payment.
+///      This implementation supports only a single secp256k1 signer recovered via ecrecover.
+///      ERC-1271 and other contract-signature schemes are not supported.
 contract CanonicalPaymaster {
     uint256 public constant WITHDRAWAL_DELAY = 12 hours;
 
@@ -15,6 +17,7 @@ contract CanonicalPaymaster {
 
     // Stored in contract storage instead of immutable so the deployed runtime code
     // is identical across all instances and can be recognized canonically by code match.
+    // This is the authorized secp256k1 signer address, not a generic contract-signature authority.
     address public owner;
 
     address payable public pendingWithdrawalTo;
@@ -96,8 +99,8 @@ contract CanonicalPaymaster {
 
     function _txSigHash() internal returns (bytes32 sigHash) {
         assembly {
-            // TXPARAM(0x08, 0) -> canonical frame transaction signature hash
-            sigHash := verbatim_0i_1o(hex"60006008b0")
+            // TXPARAM(0x08) -> canonical frame transaction signature hash
+            sigHash := verbatim_0i_1o(hex"6008b0")
         }
     }
 
