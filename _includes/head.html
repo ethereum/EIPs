@@ -4,20 +4,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   {% if page.layout == "eip" %}
     {% if page.category == "ERC" %}
-      <title>ERC-{{ page.eip }}: {{ page.title | escape }}</title>
-      <meta property="og:title" content="ERC-{{ page.eip }}: {{ page.title | escape }}" />
+      {%- assign doc_prefix = "ERC" -%}
     {% else %}
-      <title>EIP-{{ page.eip }}: {{ page.title | escape }}</title>
-      <meta property="og:title" content="EIP-{{ page.eip }}: {{ page.title | escape }}" />
+      {%- assign doc_prefix = "EIP" -%}
     {% endif %}
+    {%- capture meta_title -%}{{ doc_prefix }}-{{ page.eip }}: {{ page.title | escape }}{%- endcapture -%}
+    <title>{{ meta_title }}</title>
+    <meta property="og:title" content="{{ meta_title }}" />
     <meta name="description" content="{{page.description | escape }}" />
     <meta property="og:description" content="{{page.description | escape }}" />
     <meta name="twitter:description" content="{{page.description | escape }}" />
   {% else %}
-  <title>{{ page.title | escape }} | {{site.title}}</title>
+  {%- capture meta_title -%}{{ page.title | escape }} | {{site.title}}{%- endcapture -%}
+  <title>{{ meta_title }}</title>
     <meta
       property="og:title"
-      content="{{ page.title | escape }} | {{site.title}}"
+      content="{{ meta_title }}"
     />
     <meta name="description" content="{{site.description}}" />
     <meta property="og:description" content="{{site.description}}" />
