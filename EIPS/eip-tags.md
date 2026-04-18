@@ -28,6 +28,8 @@ The acceptable tags that may be found in an EIP are defined below.
 | `el:cryptography` | Introduction or modification of any new cryptographic primitive or algorithms. |
 | `el:data-availability` | Introduction or modification of any system with a primary purpose of providing data availability to external consumers outside of the EVM. |
 | `el:evm` | Introduction or modification of the processing or structure of EVM bytecode. |
+| `el:evm/opcode` | Introduction or modification of specific EVM opcodes. |
+| `el:evm/precompile` | Introduction or modification of precompiled contracts. |
 | `el:receipt` | Modifications to the structure or handling of transaction receipts.  |
 | `el:state` | Changes to how the state is structured or processed. |
 | `el:transaction` | Modification or introduction of a transactions structure or processing **or** introduction of new transaction types. (Excluding EVM processing) |
