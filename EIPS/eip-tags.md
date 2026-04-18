@@ -84,7 +84,7 @@ Introducing new tags must follow the below conditions:
 - Tags must map to one namespace
 - Tags can only be created if they are:
   - Blocking an EIP with the `meta:experimental` tag from finalizing
-  - Are currently present in the network
+  - Or have a reasonable implementation within a major client
 - Tags can only be removed if:
   - All EIPs using the tag are Withdrawn or Stagnant.
   - The tag does not have a reasonable implementation within a major client
