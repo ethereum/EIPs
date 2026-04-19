@@ -1,0 +1,337 @@
+---
+title: Deferred-Settlement Fungible Token Standard
+description: An extension of ERC-20 introducing a T+2 settlement period between trade and final ownership transfer.
+author: DeFi Jesus (@LevanIlashvili)
+status: Draft
+type: Standards Track
+category: ERC
+created: 2026-04-19
+requires: 20, 165
+---
+
+## Abstract
+
+This standard defines an extension of [ERC-20](./eip-20.md) in which token transfers do not settle atomically and require affirmative consent from both counterparties. Upon invocation of `transfer` or `transferFrom`, tokens are removed from the sender's available balance and placed into a pending settlement state. After a protocol-defined delay of two days ("T+2"), the transfer becomes eligible for finalisation. Finalisation requires the recipient to explicitly `acknowledge` the transfer; unacknowledged transfers may be `reject`ed by the recipient and are automatically reclaimable by the sender after an additional five-day window ("T+7").
+
+The proposal brings on-chain token transfers into alignment with the bilateral-consent, deferred-settlement conventions of established securities and interbank payment systems, with the intention of reducing a class of risks that the existing ERC-20 standard structurally cannot address.
+
+## Motivation
+
+The ERC-20 standard, finalised in 2015, specifies that a successful call to `transfer` results in an immediate, irrevocable change of balances. At the time of its authorship this was considered a feature. In light of subsequent developments it is now evident that it was the problem.
+
+Between 2020 and 2026, the Decentralised Finance ecosystem suffered losses exceeding US$12 billion to exploits, the overwhelming majority of which shared a single causal structure: an attacker initiated a transaction, the transaction settled in the same block, and by the time any party — user, protocol, or auditor — became aware of the event, recovery was impossible. The absence of a settlement window means that the set of parties capable of intervening between trade initiation and final transfer is the empty set.
+
+By contrast, the National Securities Clearing Corporation (NSCC), operating under a T+2 convention, has processed equities transactions in the multi-trillion-dollar range per annum for over a decade without a comparable loss event. The comparison is instructive.
+
+The existing ERC-20 specification is inadequate to address this risk because it admits no interval during which an erroneous, coerced, or fraudulent transfer may be identified and cancelled. This proposal introduces such an interval.
+
+### On the Insufficiency of Sender-Side Cancellation
+
+Earlier drafts of this standard provided only for sender-initiated cancellation within the settlement window. Further analysis has revealed a fundamental inadequacy in that design: a cancellation window only protects senders against *their own* erroneous transfers. It offers no protection in the case that concerns this specification most, namely the compromise of a sender's private key.
+
+Consider an attacker who has gained control of a sender's signing credentials. Under a sender-cancellation-only regime, the attacker initiates a transfer to an address they control, waits two days, and settles. The legitimate holder of the key has no mechanism to intervene — the attacker is, for the duration of the window, indistinguishable from the legitimate sender, and the only party empowered to cancel is precisely the compromised party. The cancellation window in this scenario does not protect the victim; it merely delays the theft by 48 hours.
+
+Bilateral consent — requiring the *recipient* to affirmatively accept each incoming transfer — closes this gap. An attacker in possession of the sender's key cannot compel the recipient (also controlled by the attacker, in the canonical theft scenario) to acknowledge the transfer faster than T+2, during which time the legitimate party, or any monitoring service acting on their behalf, may raise an alarm, freeze the affected account through any governance mechanism the token provides, or initiate recovery through off-chain channels. The attacker may acknowledge the transfer after T+2, but by that point the window for detection has been substantial.
+
+We note without further comment that this argument is structurally identical to the one underpinning ACH's five-day return window, SWIFT's recall mechanisms, and every other production-grade payment system that has been operating successfully since before the invention of the blockchain.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+### Overview
+
+A compliant ERC-20T2 token contract MUST maintain, in addition to the balance mapping defined in ERC-20, a data structure tracking pending (unsettled) transfers. Every transfer proceeds through one of four terminal outcomes via the following lifecycle:
+
+1. **Initiated (T+0).** The sender's available balance is debited. The transferred amount is recorded in a pending-transfer entry attributed to the recipient.
+2. **Settling (T+0 to T+2).** The transferred amount is held by the contract. The sender MAY `cancel` during this period, returning the tokens to their available balance.
+3. **Claimable (T+2 to T+7).** The cancellation right expires. The recipient MAY now `acknowledge` (crediting their available balance) or `reject` (returning the tokens to the sender). The sender MAY NOT cancel.
+4. **Terminal.** The pending transfer reaches one of four terminal states, each of which clears it from storage:
+   - *Settled* — recipient acknowledged during the claimable window.
+   - *Cancelled* — sender cancelled during the settling window.
+   - *Rejected* — recipient rejected during the claimable window.
+   - *Reclaimed* — the claimable window expired without acknowledgment; anyone may push the funds back to the sender after T+7.
+
+At no point in this lifecycle is there an interval during which the tokens are controlled by a single unilateral party. This is intentional.
+
+### Settlement Period
+
+The settlement period is defined as exactly `172800` seconds (two days), measured from `block.timestamp` at the time of initiation. Implementations MUST NOT expose a mechanism to shorten this period. Implementations MAY expose a mechanism to lengthen it, subject to the constraints in the Rationale.
+
+### Acknowledgment Window
+
+The acknowledgment window is defined as exactly `432000` seconds (five days), measured from the end of the settlement period. The combined lifecycle thus spans `604800` seconds (seven days, or T+7) from initiation to automatic reclamation. A pending transfer that has not been acknowledged, rejected, cancelled, or settled within this combined window MAY be `reclaim`ed by any party, returning the funds to the original sender's available balance.
+
+### Interface
+
+Compliant contracts MUST implement the ERC-20 interface and MUST additionally implement the following:
+
+```solidity
+pragma solidity ^0.8.20;
+
+interface IERC20T2 /* is IERC20 */ {
+    /// @notice Emitted when a transfer is initiated and enters the settlement period.
+    /// @param from The address from whose available balance the tokens were debited.
+    /// @param to The address to whose pending balance the tokens were credited.
+    /// @param amount The quantity of tokens entering settlement.
+    /// @param tradeId A unique identifier for this pending transfer.
+    /// @param settlesAt The Unix timestamp at which this transfer becomes eligible for acknowledgment.
+    /// @param expiresAt The Unix timestamp at which this transfer becomes eligible for reclamation.
+    event TransferInitiated(
+        address indexed from,
+        address indexed to,
+        uint256 amount,
+        bytes32 indexed tradeId,
+        uint256 settlesAt,
+        uint256 expiresAt
+    );
+
+    /// @notice Emitted when a pending transfer is acknowledged by the recipient.
+    event TransferAcknowledged(bytes32 indexed tradeId, address indexed acknowledger);
+
+    /// @notice Emitted when a pending transfer is cancelled by the sender.
+    event TransferCancelled(bytes32 indexed tradeId, address indexed canceller);
+
+    /// @notice Emitted when a pending transfer is rejected by the recipient.
+    event TransferRejected(bytes32 indexed tradeId, address indexed rejecter);
+
+    /// @notice Emitted when a pending transfer is reclaimed after the acknowledgment window expires.
+    event TransferReclaimed(bytes32 indexed tradeId, address indexed reclaimer);
+
+    /// @notice Returns the sender's available balance, excluding tokens in the settlement period.
+    function availableBalanceOf(address account) external view returns (uint256);
+
+    /// @notice Returns the sum of amounts credited to `account` that have not yet been acknowledged.
+    function pendingBalanceOf(address account) external view returns (uint256);
+
+    /// @notice Returns the sum of amounts debited from `account` that have not yet reached a terminal state.
+    function inFlightBalanceOf(address account) external view returns (uint256);
+
+    /// @notice Returns the details of a specific pending transfer.
+    function pendingTransferOf(bytes32 tradeId) external view returns (
+        address from,
+        address to,
+        uint256 amount,
+        uint256 settlesAt,
+        uint256 expiresAt,
+        bool exists
+    );
+
+    /// @notice Acknowledges receipt of a pending transfer, crediting the recipient's available balance.
+    /// @dev MUST revert if `block.timestamp < settlesAt` (acknowledgment before settlement window).
+    /// @dev MUST revert if `block.timestamp >= expiresAt` (acknowledgment after reclaim window opens).
+    /// @dev MUST be callable only by the recipient (`to`).
+    function acknowledge(bytes32 tradeId) external;
+
+    /// @notice Rejects a pending transfer, returning the funds to the sender.
+    /// @dev MUST be callable only by the recipient (`to`).
+    /// @dev MAY be called at any time before the transfer reaches a terminal state.
+    function reject(bytes32 tradeId) external;
+
+    /// @notice Cancels a pending transfer prior to the end of the settlement period.
+    /// @dev MUST be callable only by the original sender (`from`).
+    /// @dev MUST revert if `block.timestamp >= settlesAt`.
+    function cancel(bytes32 tradeId) external;
+
+    /// @notice Reclaims a pending transfer whose acknowledgment window has expired,
+    ///         returning the funds to the sender.
+    /// @dev MUST revert if `block.timestamp < expiresAt`.
+    /// @dev MAY be called by any address. Gas is paid by the caller.
+    function reclaim(bytes32 tradeId) external;
+
+    /// @notice Reclaims multiple expired pending transfers in a single transaction.
+    function reclaimBatch(bytes32[] calldata tradeIds) external;
+
+    /// @notice Atomically increases the allowance granted to `spender`.
+    /// @dev Provided in lieu of the classical `approve` race condition.
+    function increaseAllowance(address spender, uint256 addedValue) external returns (bool);
+
+    /// @notice Atomically decreases the allowance granted to `spender`.
+    /// @dev MUST revert on underflow.
+    function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool);
+}
+```
+
+### Behavioural Requirements
+
+**`balanceOf(address account)`** MUST return `availableBalanceOf(account)`. It MUST NOT include `pendingBalanceOf(account)`. Implementers are warned that this is a material departure from the semantics of ERC-20 `balanceOf` and is intentional. See Backwards Compatibility.
+
+**`transfer(address to, uint256 amount)`** MUST:
+1. Revert if `amount == 0`.
+2. Revert if `availableBalanceOf(msg.sender) < amount`.
+3. Decrement `availableBalanceOf(msg.sender)` by `amount`.
+4. Create a pending transfer entry with a fresh `tradeId`, `from = msg.sender`, `to = to`, `amount = amount`, `settlesAt = block.timestamp + 172800`, `expiresAt = settlesAt + 432000`.
+5. Emit `TransferInitiated`.
+6. Return `true`.
+
+The standard ERC-20 `Transfer(from, to, amount)` event MUST NOT be emitted at this stage. It MUST be emitted only upon successful `acknowledge`.
+
+**`transferFrom(address from, address to, uint256 amount)`** MUST behave analogously, and MUST decrement the allowance at initiation (T+0), not at acknowledgment. The rationale is discussed below.
+
+**`acknowledge(bytes32 tradeId)`** MUST:
+1. Revert if the pending transfer does not exist.
+2. Revert if `msg.sender != to`.
+3. Revert if `block.timestamp < settlesAt`.
+4. Revert if `block.timestamp >= expiresAt`.
+5. Delete the pending transfer entry.
+6. Credit `to`'s available balance by `amount`.
+7. Emit the standard ERC-20 `Transfer(from, to, amount)` event.
+8. Emit `TransferAcknowledged(tradeId, msg.sender)`.
+
+**`reject(bytes32 tradeId)`** MUST:
+1. Revert if the pending transfer does not exist.
+2. Revert if `msg.sender != to`.
+3. Delete the pending transfer entry.
+4. Credit `from`'s available balance by `amount`.
+5. Emit `TransferRejected(tradeId, msg.sender)`.
+
+A recipient MAY `reject` at any point before the pending transfer reaches a terminal state — including during the settlement window (prior to `settlesAt`). This is intentional. See Rationale.
+
+**`cancel(bytes32 tradeId)`** MUST:
+1. Revert if the pending transfer does not exist.
+2. Revert if `msg.sender != from`.
+3. Revert if `block.timestamp >= settlesAt`.
+4. Delete the pending transfer entry.
+5. Credit `from`'s available balance by `amount`.
+6. Emit `TransferCancelled(tradeId, msg.sender)`.
+
+**`reclaim(bytes32 tradeId)`** MUST:
+1. Revert if the pending transfer does not exist.
+2. Revert if `block.timestamp < expiresAt`.
+3. Delete the pending transfer entry.
+4. Credit `from`'s available balance by `amount`.
+5. Emit `TransferReclaimed(tradeId, msg.sender)`.
+
+Reclaim MAY be called by any address. The gas cost is borne by the caller. Implementations MAY introduce a fee mechanism to compensate reclaimers, though the standard does not specify one.
+
+### `tradeId` Construction
+
+The `tradeId` MUST be deterministically derived as:
+
+```solidity
+tradeId = keccak256(abi.encode(from, to, amount, block.timestamp, nonce));
+```
+
+where `nonce` is a monotonically increasing per-sender counter maintained by the contract. This ensures uniqueness and precludes a griefing vector in which an attacker repeats a previous `tradeId`.
+
+### ERC-165 Support
+
+Compliant contracts MUST return `true` for `supportsInterface(bytes4)` when queried with the interface ID of `IERC20T2` as defined above, computed as the XOR of the eleven function selectors defined in that interface.
+
+## Rationale
+
+### Why Two Days?
+
+The T+2 convention is drawn from established practice in traditional securities settlement and represents an empirically tested balance between operational finality and error-correction capacity. Shorter windows (T+1, T+0) have been proposed in traditional markets and have been met with significant resistance from settlement professionals, whose views on the subject deserve weight.
+
+A fixed on-chain period of `172800` seconds was selected over a variable business-day-aware period on the grounds of simplicity. A forthcoming extension is anticipated to introduce holiday-calendar awareness for tokens representing assets whose underlying markets are closed on weekends.
+
+### Why Debit the Sender at Initiation?
+
+Two alternatives were considered:
+
+1. *Reserve on the sender's balance without debiting it.* Rejected. This permits the sender to spend the same tokens twice within the settlement window via a sufficiently constructed smart-contract interaction, which would defeat the entire purpose of the standard.
+2. *Debit at settlement, not initiation.* Rejected. This shifts the settlement risk onto the recipient, which inverts the intended risk model and reintroduces the atomic-transfer failure mode this proposal seeks to eliminate.
+
+Debit-at-initiation with held balance is the only configuration in which neither party can reuse the funds during settlement.
+
+### Why Permit Anyone to Call `reclaim`?
+
+Reclamation of an expired transfer is a purely mechanical operation with no discretionary component; any party with an interest in freeing the sender's capital (most commonly the sender themselves) SHOULD be able to perform it. Permitting open invocation also enables a market for reclamation-as-a-service, in which third parties monitor the expired-transfer set and reclaim in batches for a fee. The standard does not specify a fee mechanism; implementations MAY introduce one.
+
+### Why Is Cancellation Restricted to the Sender?
+
+Cancellation is, in effect, a unilateral unwind of a transfer that the recipient has not yet had the opportunity to acknowledge. Permitting the recipient to cancel serves no legitimate purpose; recipients already possess `reject`, which achieves the same economic outcome without requiring the sender's cooperation. Permitting third parties to cancel introduces a clear griefing vector.
+
+### Why May the Recipient `reject` Before Settlement?
+
+A symmetric reading of the standard would require the recipient to wait until the settlement window opens before refusing a transfer. This would be unnecessarily restrictive. If a recipient knows at T+0 that a transfer is unwanted — for example, if the tokens come from an address the recipient has blocklisted, or represent an attempted payment for services the recipient has declined to provide — requiring them to wait 48 hours before rejecting serves no purpose other than to temporarily remove the sender's capital from circulation without benefit.
+
+Early rejection returns funds to the sender immediately and releases the contract's obligation. This is strictly Pareto-improving.
+
+### Why Decrement Allowance at Initiation?
+
+If allowance were decremented only at acknowledgment, a malicious spender could initiate the maximum allowed transfer, wait for the sender to revoke the allowance, and still have the transfer acknowledged. This would make allowance revocation ineffective for the duration of the settlement window, which is unacceptable.
+
+### Why Does `cancel` Not Restore the Allowance?
+
+A natural reading of `cancel` is that it should undo all effects of the `transferFrom` that produced the pending transfer, including the allowance debit. It does not.
+
+The reason is asymmetry of trust. If a sender can cancel a spender's `transferFrom` and thereby restore the spender's allowance, a hostile sender can repeatedly burn the spender's gas by initiating and cancelling, forcing the spender to retry indefinitely at no cost to the sender. Worse, a sender who intends to revoke an allowance but wishes to wait until the last moment can permit the spender to repeatedly initiate transfers that are cancelled just before settlement, locking the spender out of useful action for the full two-day window.
+
+Allowances, once consumed, stay consumed. Spenders MUST assume that an initiated transfer may be cancelled, rejected, or reclaimed and that the consumed allowance will not return in any of these cases. Senders who wish to re-authorise a cancelled spender SHOULD do so explicitly via `increaseAllowance`.
+
+### Why Forbid Zero-Amount Transfers?
+
+A zero-amount transfer performs no economic action but does consume a `tradeId`, a nonce slot, and a storage entry in `_pendingTransfers`. Permitting them introduces a free-ish storage-bloat vector (free modulo gas) for no corresponding benefit. The standard therefore requires `amount > 0`.
+
+This is a deliberate departure from ERC-20, which permits zero-value transfers for reasons of historical convention. The authors consider the historical convention a mistake.
+
+### Why a Five-Day Acknowledgment Window?
+
+The combined T+7 lifecycle mirrors the return window in the Automated Clearing House (ACH) system, in which a receiving institution has five business days to dispute a credit entry. The parallels are not accidental. ACH has processed settlement for half a century with loss rates that on-chain systems have not approached.
+
+A shorter window would pressure recipients into acknowledgment decisions under time constraints that the threat model this standard addresses does not justify. A longer window would extend the period during which the sender's capital is locked unproductively. Five days is the Schelling point.
+
+### Relationship to ERC-4626 and Other Vault Standards
+
+ERC-4626 vaults that wrap a compliant asset MUST be aware that deposits and redemptions will not reflect in share balances for two days. Vault implementers are STRONGLY RECOMMENDED to maintain a parallel pending-share accounting. This is not a deficiency of this standard.
+
+## Backwards Compatibility
+
+This standard is intentionally not backwards compatible with ERC-20 at the semantic level. A contract presenting itself as ERC-20 but implementing these semantics WILL cause integration failures in consumer contracts that assume atomic settlement. Such failures are a feature of the proposal.
+
+Integrators MUST detect compliance via ERC-165 and adjust their logic accordingly. In particular:
+
+- Decentralised exchanges MUST either reject such tokens or implement two-day order lifecycle management *and* recipient-acknowledgment workflows. Market-making strategies that assume silent receipt of filled orders are incompatible with this standard.
+- Flash loan providers MUST reject such tokens as the loan asset. A flash loan over a T+2 asset that also requires recipient acknowledgment is not a flash loan.
+- Liquidation engines operating on such collateral MUST account for the settlement window in their liquidation thresholds. Liquidators SHOULD expect that a liquidation initiated at time `t` returns collateral at time `t + 172800` at the earliest, contingent on their own acknowledgment, and SHOULD price this accordingly.
+- Recipient contracts intending to receive such tokens MUST implement a mechanism to call `acknowledge` within the T+2 to T+7 window. Contracts that cannot call `acknowledge` (for example, because they lack privileged entry points or depend on external keeper infrastructure that may become unavailable) MUST be prepared for all inbound transfers to be reclaimed by the sender after T+7. The authors note that this requirement eliminates the majority of "send-and-forget" integration patterns currently prevalent in DeFi. This is intentional.
+
+The authors note that the above requirements, while operationally demanding, collectively describe a financial system more closely resembling the one that currently moves global capital without losing it.
+
+## Reference Implementation
+
+A reference implementation in Solidity, together with a test suite covering the full lifecycle (initiation, settlement, acknowledgment, cancellation, rejection, reclamation, and allowance invariants) is maintained by the author and available on request. Integration of that code into the `assets/` directory of this repository will follow once an EIP number has been assigned.
+
+The key structure is a single mapping from `tradeId` (constructed as the keccak256 of `abi.encode(from, to, amount, block.timestamp, nonce)`) to a `PendingTransfer` struct `{from, to, amount, settlesAt, expiresAt}`, with four state-transition functions (`acknowledge`, `cancel`, `reject`, `reclaim`) each of which validates the caller, validates the time window, clears the storage entry, and credits the appropriate party's available balance.
+
+## Security Considerations
+
+### Custody of In-Flight Tokens
+
+Between initiation and terminal state, tokens are held by the contract itself. Implementations MUST NOT permit the pending-transfer mapping to be mutated by any mechanism other than `acknowledge`, `cancel`, `reject`, or `reclaim`. Upgrade patterns that preserve this mapping are RECOMMENDED; those that do not are considered unsafe.
+
+### Front-Running of `reclaim`
+
+Because `reclaim` is callable by any party after expiry, a motivated observer can front-run the intended reclaimer. This is not a vulnerability; the effect of a successful `reclaim` is deterministic (funds to `from`) and identical regardless of caller. The only cost is gas, which is borne by the caller.
+
+### Denial-of-Acknowledgment by Recipient Contract
+
+If the recipient is a contract that has not been designed to call `acknowledge`, inbound transfers will expire and be reclaimed at T+7. This is the intended behaviour. It is not a vulnerability of this standard; it is a correctness constraint on recipient contracts, equivalent to the long-standing ERC-20 requirement that recipients be prepared to handle received tokens. The authors consider the absence of a silent-receipt code path to be a direct improvement over ERC-20, under which tokens are frequently sent to contracts that do not know they own them.
+
+### Interaction with Block Timestamp Manipulation
+
+A validator may manipulate `block.timestamp` within the bounds permitted by consensus (approximately ±12 seconds on Ethereum mainnet). The settlement and reclaim windows are sufficiently large (172800 and 604800 seconds respectively) that such manipulation is immaterial.
+
+### The Settlement Window as Attack Surface
+
+It has been suggested that the T+2 window itself constitutes an attack surface, in that an attacker who compromises a key during the window may issue a `cancel` and reclaim funds that the victim believed were en route. This is correct, and is the intended behaviour. The alternative — a transfer that has already settled and cannot be cancelled — is precisely the condition this standard exists to eliminate. The authors note without further comment that any key-compromise scenario in which the attacker can call `cancel` is a scenario in which the attacker could have called `transfer` directly under the existing ERC-20 standard, with worse outcomes.
+
+### The Acknowledgment Requirement as Attack Surface
+
+A symmetric concern: an attacker who compromises a *recipient's* key may `reject` legitimate inbound transfers, returning funds to the sender. This, too, is the intended behaviour. The scenarios in which `reject` causes loss to the recipient are a strict subset of scenarios in which the attacker could have called `transfer` from the same compromised account to drain its balance directly. The acknowledgment requirement does not create attack surface; it exposes attack surface that already existed. It also provides the legitimate key-holder an additional 48-to-168-hour window during which unauthorised transactions are visible and reversible, which is 48-to-168 hours more than the present standard provides.
+
+### Denial-of-Acknowledgment via Recipient Inaction
+
+A more subtle scenario: a recipient who has legitimately received a transfer but who, due to operational failure, key loss, or death, cannot call `acknowledge` within the T+2-to-T+7 window will have the transfer reclaimed by the sender. This is not a theft; the funds return to their origin. It does, however, represent a class of situations in which a legitimate transfer silently fails to complete.
+
+The authors consider this an acceptable outcome. The alternative — silent, unacknowledged receipt — is the status quo under ERC-20, and the status quo has proven inadequate. Recipients who cannot acknowledge within a seven-day window have operational issues that sending them additional tokens will not resolve.
+
+### Systemic Liquidity Effects
+
+Wide adoption of this standard will reduce the velocity of on-chain capital by a factor approximately equal to `1 + (total_lifecycle / average_holding_period)`. The authors consider this a benefit.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
