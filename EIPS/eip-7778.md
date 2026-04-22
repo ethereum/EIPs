@@ -1,0 +1,82 @@
+---
+eip: 7778
+title: Block Gas Accounting without Refunds
+description: Prevent Block Gas Limit Circumvention by Excluding Refunds from Block Gas Accounting
+author: Ben Adams (@benaadams), Toni Wahrstätter (@nerolation)
+discussions-to: https://ethereum-magicians.org/t/eip-7778-prevent-block-gas-smuggling/21234
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-10-01
+---
+
+## Abstract
+
+This EIP modifies the block gas accounting mechanism to prevent the circumvention of block gas limits. It proposes that gas refunds, particularly those from SSTORE operations setting storage slots to zero, should not reduce the gas counted toward the block gas limit, while still being applied to transaction gas costs for users.
+
+## Motivation
+
+Currently, gas refunds from operations like clearing storage slots (setting to zero) reduce both the transaction gas cost for users and the gas counted toward the block gas limit. This creates a discrepancy between the computational work performed and the gas accounted for in the block.
+
+Example: Block `20878522` shows a net usage of 28.5 MGas, but contains 4.01 MGas of refunds, bringing the gross usage to 32.51 MGas—exceeding the block gas limit by 2.51 MGas.
+
+This mechanism can be exploited to perform more operations in a block than the gas limit intends to allow, potentially leading to:
+
+1. Network instability due to oversized blocks
+2. Denial-of-service vectors
+3. Computational loads exceeding the intended block gas limit
+
+## Specification
+
+### Gas Accounting Changes
+
+1. **User Gas Accounting (Unchanged):**
+
+   - Users continue to receive gas refunds for operations that qualify (e.g., setting storage to zero)
+   - Transaction gas: `gas_spent = max(tx_gas_used - gas_refund, calldata_floor_gas_cost)`
+
+2. **Block Gas Accounting (Modified):**
+
+   - When calculating gas for block gas limit enforcement, refunds are not subtracted
+   - Block gas accounting becomes: `block.gas_used += max(tx_gas_used, calldata_floor_gas_cost)` (incorporating the calldata floor from [EIP-7623](./eip-7623.md))
+   - Storage discounts that reflect actual reduced computational work (e.g., warm storage access, reverting to original values) remain applied to block gas accounting
+
+## Rationale
+
+### Aligning Gas Limits with Computational Work
+
+The block gas limit is designed to constrain the computational load per block. Gas refunds were introduced to incentivize "cleaning up" the state, not to allow exceeding computational limits. By excluding refunds from block gas accounting, we ensure the block gas limit effectively constrains computational load
+
+### Preserving User Incentives
+
+Users still receive gas refunds, maintaining incentives for efficient state management. Only the accounting for block-level constraints changes, not the economics for individual users
+
+## Backwards Compatibility
+
+- This change is not backwards compatible and requires a hard fork
+- User and developer experience for individual transactions remains unchanged
+- Block producers need to adjust their transaction selection algorithms to account for the new gas accounting rules
+
+## Test Cases
+
+1. **SSTORE Operations:**
+   - Setting storage to zero: User receives refund, but block gas accounting uses full cost
+   - Verify blocks containing many storage-clearing operations still adhere to gas limits
+
+2. **Block Gas Limit Edge Cases:**
+   - Construct blocks with varying amounts of refundable operations
+   - Ensure blocks cannot exceed gas limits through refund mechanisms
+
+3. **Transaction Gas vs Block Gas:**
+   - Verify that transaction costs for users remain unchanged
+   - Confirm block gas accounting properly excludes refunds
+
+## Security Considerations
+
+- Eliminates potential denial-of-service vectors that exploit gas refunds to exceed block computational limits
+- Improves predictability of block processing times by enforcing stricter limits on computational work
+- Prevents miners/validators from including transactions that collectively contain more computational work than intended
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
