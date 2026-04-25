@@ -21,33 +21,53 @@ Generic algorithm has a good reason to be in Ethereum, therefore it should be.
 This EIP defines a new [EIP-7932](../../EIPS/eip-7932.md) algorithmic type with the following parameters.
 
 ```python
-ALG_TYPE = 0xFA
-SIZE = 128
+ALG_TYPE = 0x7E
 
-def gas_cost(signing_data: Bytes) -> Uint64:
-    return Uint64(128 + len(signing_data))
+DETACHED_SIZE = 64
+AUTONOMOUS_SIZE = 128
+PUBLIC_KEY_SIZE = 64
 
-def validate(signature: Bytes) -> None | Error:
+def gas_cost(signing_data_len: uint64) -> uint64:
+    # This is an adaptation from the KECCAK256 opcode
+    # as this algorithm requires exactly 32 signing bytes.
+    # If an algorithm can directly sign data such as ML-DSA,
+    # it should and this function should represent the
+    # internal cost of hashing + a base fee.
+
+    minimum_word_size = (signing_data_len + 31) // 32
+    return uint64(30 + (6 * minimum_word_size))
+
+def validate_autonomous(signature: AutonomousSignature) -> None | Error:
     # ...
     # Simple cryptography here
     # ...
-    return None
 
-def verify(signature: Bytes, signing_data: Bytes) -> Bytes | Error:
+def validate_detached(signature: DetachedSignature) -> None | Error:
+    # ...
+    # Simple cryptography here
+    # ...
+
+def verify_autonomous(
+    signing_data: Bytes,
+    signature: AutonomousSignature
+) -> PublicKey | Error:
     # ...
     # Complicated cryptography here
     # ...
-    return public_key
+    return algorithm_type || untagged_public_key
 
-def merge_detached_signature(detached_signature: bytes, public_key: bytes) -> bytes:
+def verify_detached(
+    signing_data: Bytes,
+    signature: DetachedSignature,
+    public_key: PublicKey
+) -> None | Error:
     # ...
-    # Either concatenation or a no-op here
+    # Complicated cryptography here
     # ...
-    return detached_signature + public_key
 ```
 
 ## Rationale
-Generic algorithm has a good reason to be in Ethereum, therefore it should be.
+Generic algorithm has a good reason to be used in the EVM, therefore it should be.
 
 ## Backwards Compatibility
 No backward compatibility issues found.

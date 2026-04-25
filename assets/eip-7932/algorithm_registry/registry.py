@@ -1,3 +1,5 @@
+# TODO: Update this impl, current git ref #7a2e7ad98
+
 from typing import Callable, Dict
 from remerkleable.byte_arrays import ByteVector
 from remerkleable.basic import uint8, uint32, uint64, uint256
