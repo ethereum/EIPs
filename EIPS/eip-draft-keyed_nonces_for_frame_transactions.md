@@ -1,7 +1,7 @@
 ---
 eip: TBD
 title: Keyed Nonces for Frame Transactions
-description: Independent nonce domains for frame transactions, with APPROVE-atomic nonce consumption
+description: Independent nonce domains for frame transactions
 author: Thomas Thiery (@soispoke) <thomas.thiery@ethereum.org>
 discussions-to: TBD
 status: Draft
