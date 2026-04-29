@@ -1,6 +1,6 @@
 from algorithm_registry import helpers, registry
 
-INVALID = b"\x00" * 32
+INVALID = b""
 SIGRECOVER_BASE_GAS = 3000
 
 # Modified sigrecover precompile to also return gas
