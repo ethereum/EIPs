@@ -212,6 +212,8 @@ Replay protection is scoped to `(sender, nonce_key, nonce_seq)`. Different non-z
 
 Single-use-key applications, such as nullifiers, MUST authenticate at least `(sender, nonce_key, nonce_seq == 0)` in `VERIFY` and SHOULD bind the canonical signature hash via `TXPARAM(0x08)`. Treating `nonce_seq == 0` alone as authorization is unsafe. Applications deriving `nonce_key` from a per-use identifier SHOULD domain-separate the input and reject derived keys equal to `0`.
 
+`nonce_key` is `uint256` because privacy protocols often derive keys from 32-byte nullifiers, commitments, or hash outputs. [ERC-4337](./eip-4337.md) uses the same key/sequence model but has only one 32-byte nonce field, so it packs a 24-byte key and an 8-byte sequence into that field. This EIP uses two explicit fields: a 32-byte `nonce_key` and an 8-byte `nonce_seq`. That keeps ERC-4337's 64-bit sequence width, avoids truncating nullifier-derived labels, and makes ERC-4337-style 24-byte keys a subset of this EIP's key space.
+
 A non-zero-key frame transaction does not advance the sender's legacy account nonce during payment approval. If such a transaction executes `CREATE` at `tx.sender`, the created address depends on the sender's legacy account nonce at execution time. Another transaction that advances the sender's legacy nonce before inclusion can therefore change the `CREATE` address without invalidating the keyed transaction. Applications whose semantics depend on a `CREATE` address SHOULD use `CREATE2` or MUST authenticate the expected pre-state legacy nonce via `TXPARAM(0x0C)`.
 
 Nonce consumption persists through later-frame reverts and `SENDER` atomic-batch rollback because it is part of payment approval. Single-use applications SHOULD minimize post-approval revert paths.
