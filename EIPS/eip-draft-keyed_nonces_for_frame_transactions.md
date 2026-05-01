@@ -188,7 +188,7 @@ A contract-managed nullifier table inside a `VERIFY` frame is not sufficient: `V
 
 `nonce_key == 0` aliases the legacy account nonce so EIP-8141's existing replay behavior is preserved. Account deployment, `CREATE`, and `CREATE2` continue to affect account nonces by ordinary EVM rules. Only payment-approval nonce-bumping is replaced.
 
-`nonce_key` is `uint256` because privacy protocols often derive keys from 256-bit nullifiers. [ERC-4337](./eip-4337.md) already uses the same key/sequence concept; this EIP lifts it into consensus with explicit fields rather than bit-packing so that `TXPARAM(0x01)` remains a scalar sequence.
+`nonce_key` is `uint256` because privacy protocols often derive keys from 32-byte nullifiers, commitments, or hash outputs. [ERC-4337](./eip-4337.md) uses the same key/sequence model but has only one 32-byte nonce field, so it packs a 24-byte key and an 8-byte sequence into that field. This EIP uses two explicit fields: a 32-byte `nonce_key` and an 8-byte `nonce_seq`. That keeps ERC-4337's 64-bit sequence width, avoids truncating nullifier-derived labels, and makes ERC-4337-style 24-byte keys a subset of this EIP's key space.
 
 Keyed-nonce state lives in the storage of one `NONCE_MANAGER` system contract rather than extending account state, since the latter would change the account MPT layout. This minimizes consensus-surface change while keeping keyed state committed under the existing execution `stateRoot`.
 
@@ -211,8 +211,6 @@ If activated after EIP-8141, pre-fork frame transactions become invalid at the f
 Replay protection is scoped to `(sender, nonce_key, nonce_seq)`. Different non-zero keys remove only the replay-ordering dependency; transactions on different keys may still conflict on sender or payer balance, contract storage, paymaster state, or any other shared state. This EIP provides replay-domain separation, not confidentiality of key selection: `nonce_key` is visible in the payload and committed by `compute_sig_hash(tx)`.
 
 Single-use-key applications, such as nullifiers, MUST authenticate at least `(sender, nonce_key, nonce_seq == 0)` in `VERIFY` and SHOULD bind the canonical signature hash via `TXPARAM(0x08)`. Treating `nonce_seq == 0` alone as authorization is unsafe. Applications deriving `nonce_key` from a per-use identifier SHOULD domain-separate the input and reject derived keys equal to `0`.
-
-`nonce_key` is `uint256` because privacy protocols often derive keys from 32-byte nullifiers, commitments, or hash outputs. [ERC-4337](./eip-4337.md) uses the same key/sequence model but has only one 32-byte nonce field, so it packs a 24-byte key and an 8-byte sequence into that field. This EIP uses two explicit fields: a 32-byte `nonce_key` and an 8-byte `nonce_seq`. That keeps ERC-4337's 64-bit sequence width, avoids truncating nullifier-derived labels, and makes ERC-4337-style 24-byte keys a subset of this EIP's key space.
 
 A non-zero-key frame transaction does not advance the sender's legacy account nonce during payment approval. If such a transaction executes `CREATE` at `tx.sender`, the created address depends on the sender's legacy account nonce at execution time. Another transaction that advances the sender's legacy nonce before inclusion can therefore change the `CREATE` address without invalidating the keyed transaction. Applications whose semantics depend on a `CREATE` address SHOULD use `CREATE2` or MUST authenticate the expected pre-state legacy nonce via `TXPARAM(0x0C)`.
 
