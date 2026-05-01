@@ -2,11 +2,12 @@
 title: Remove SELFDESTRUCT Burn
 description: Eliminate the remaining cases where SELFDESTRUCT burns ETH.
 author: Paweł Bylica (@chfast)
-discussions-to: https://ethereum-magicians.org/t/eip-7708-eth-transfers-emit-a-log/20034/63
+discussions-to: TBD
 status: Draft
 type: Standards Track
 category: Core
 created: 2026-05-01
+requires: 6780
 ---
 
 ## Abstract
@@ -27,7 +28,14 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 `SELFDESTRUCT (0xff)` MUST NOT burn ETH.
 
-For an account marked for deletion by `SELFDESTRUCT` in the same transaction in which the account was created, transaction finalization is modified as follows.
+When `SELFDESTRUCT` is executed in the same transaction in which the executing contract was created:
+
+1. The current execution frame halts.
+2. If the beneficiary is different from the executing contract, `SELFDESTRUCT` transfers the entire account balance to the beneficiary.
+3. If the beneficiary is the executing contract, there is no balance transfer.
+4. The account is marked for deletion.
+
+For an account marked for deletion in this way, transaction finalization is modified as follows.
 
 Instead of deleting the account and its balance, finalization MUST:
 
@@ -38,15 +46,13 @@ Instead of deleting the account and its balance, finalization MUST:
 
 If the resulting balance is `0`, the account MUST be removed from the state. Otherwise, the account MUST remain in the state with empty code, empty storage, nonce `0`, and its preserved balance.
 
-When a contract created in the same transaction executes `SELFDESTRUCT` with itself as beneficiary, there is no balance transfer and no balance burn.
-
-All other `SELFDESTRUCT` behavior remains unchanged.
+For contracts not created in the same transaction in which `SELFDESTRUCT` is executed, the behavior remains unchanged from [EIP-6780](./eip-6780.md).
 
 ## Rationale
 
 This change removes burn behavior at its source instead of adding dedicated handling for it elsewhere.
 
-The chosen design preserves the state-clearing effect of `SELFDESTRUCT` for contracts created in the same transaction. This keeps the current behavior where the account does not survive as an executable contract, while removing only the special case where ETH disappears from the state.
+The chosen design preserves the state-clearing effect of `SELFDESTRUCT` for contracts created in the same transaction. The account may still survive in the state, but only as a balance-only account. This removes the special case where ETH disappears from the state while keeping the account non-executable after transaction finalization.
 
 Resetting the nonce to `0` ensures that a future `CREATE2` at the same address is not blocked by a preserved balance-only account.
 
@@ -58,15 +64,13 @@ This EIP requires a hard fork, since it modifies consensus rules.
 
 Previously it was possible to burn ETH by executing `SELFDESTRUCT` in a contract created in the same transaction, either by targeting the executing contract as beneficiary or by sending ETH to the contract after `SELFDESTRUCT` and before transaction finalization. After this EIP, ETH will not be burned in either case.
 
-All other `SELFDESTRUCT` behavior is unchanged from [EIP-6780](./eip-6780.md).
+Previously such contracts were always deleted at transaction finalization. After this EIP, a contract with zero final balance is still deleted, but a contract with nonzero final balance remains in the state as a balance-only account with empty code, empty storage, and nonce `0`.
+
+For contracts not created in the same transaction in which `SELFDESTRUCT` is executed, the behavior is unchanged from [EIP-6780](./eip-6780.md).
 
 ## Test Cases
 
-Tests should cover at least the following cases:
-
-1. A contract created in the same transaction executes `SELFDESTRUCT` with itself as beneficiary and nonzero balance. After transaction finalization, the account has empty code, empty storage, nonce `0`, and the original balance.
-2. A contract created in the same transaction executes `SELFDESTRUCT` with a different beneficiary, then receives additional ETH later in the same transaction. After transaction finalization, the later balance remains in the account instead of being burned.
-3. A contract created in the same transaction executes `SELFDESTRUCT` and has zero balance at transaction finalization. The account is removed from the state.
+TBD
 
 ## Security Considerations
 
