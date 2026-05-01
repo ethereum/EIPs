@@ -33,14 +33,14 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 When `SELFDESTRUCT` is executed in the same transaction in which the executing contract was created:
 
-1. the current execution frame halts,
-2. if the beneficiary differs from the executing contract, the entire account balance is transferred to the beneficiary,
+1. the current execution frame halts (unchanged),
+2. if the beneficiary differs from the executing contract, the entire account balance is transferred to the beneficiary (unchanged),
 3. if the beneficiary is the executing contract, there is no balance transfer and no ETH is burned,
-4. the account is marked for deletion.
+4. the account is marked for deletion (unchanged).
 
 For an account marked for deletion in this way, transaction finalization is modified as follows.
 
-Instead of deleting the account and its balance, finalization MUST:
+Instead of deleting the account, finalization MUST:
 
 1. clear the account code,
 2. clear all account storage,
@@ -54,6 +54,8 @@ Instead of deleting the account and its balance, finalization MUST:
 
 ## Rationale
 
+TODO: May contain AI slop.
+
 This change removes burn behavior at its source instead of adding dedicated handling for it elsewhere.
 
 The chosen design preserves the state-clearing effect of `SELFDESTRUCT` for contracts created in the same transaction. The account may still survive in the state, but only as a balance-only account. This removes the special case where ETH disappears from the state while keeping the account non-executable after transaction finalization.
@@ -63,6 +65,10 @@ Resetting the nonce to `0` ensures that a future `CREATE2` at the same address i
 An alternative would be to preserve the whole account, including nonce, code, and storage. That would remove the burn as well, but it would be a larger semantic change than necessary. This EIP removes only the burn behavior.
 
 ## Backwards Compatibility
+
+TODO: May contain AI slop.
+TODO: Make sure CREATE2-SELFDESTRUCT sandwitch works.
+
 
 This EIP requires a hard fork, since it modifies consensus rules.
 
@@ -77,6 +83,10 @@ For contracts not created in the same transaction in which `SELFDESTRUCT` is exe
 TBD
 
 ## Security Considerations
+
+TODO: May contain AI slop.
+TODO: Figure out if this is about EVM security or contracts recurity.
+TODO: Check if the just_created works off accounts with balance.
 
 Contracts that intentionally rely on ETH being destroyed by `SELFDESTRUCT` change behavior. After this EIP, such ETH remains owned by an account with no code and no storage.
 
