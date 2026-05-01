@@ -32,10 +32,10 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 When `SELFDESTRUCT` is executed in the same transaction in which the executing contract was created:
 
-1. The current execution frame halts.
-2. If the beneficiary is different from the executing contract, `SELFDESTRUCT` transfers the entire account balance to the beneficiary.
-3. If the beneficiary is the executing contract, there is no balance transfer.
-4. The account is marked for deletion.
+1. the current execution frame halts,
+2. if the beneficiary differs from the executing contract, the entire account balance is transferred to the beneficiary,
+3. if the beneficiary is the executing contract, there is no balance transfer,
+4. the account is marked for deletion.
 
 For an account marked for deletion in this way, transaction finalization is modified as follows.
 
