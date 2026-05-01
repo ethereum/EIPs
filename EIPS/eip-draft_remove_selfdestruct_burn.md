@@ -18,11 +18,15 @@ This EIP removes the remaining cases where `SELFDESTRUCT (0xff)` burns ETH. Acco
 
 The remaining burn behavior of `SELFDESTRUCT` is almost completely unused, but it still forces special-case handling in EVM implementations, specifications, and tests.
 
-After [EIP-6780](./eip-6780.md), ETH can only still be burned when a contract created in the same transaction executes `SELFDESTRUCT`, either to itself or before receiving more ETH later in the same transaction. A full replay of Ethereum mainnet from genesis to approximately block 24.95 million found only 2 post-Cancun burns through this path and 0 cases of balance being burned during transaction finalization. By comparison, pre-Cancun history contained 54 self-burns in total. This indicates that the remaining burn behavior is rarer than the burn behavior already removed by EIP-6780, so the complete removal proposed here should affect fewer transactions than the partial removal already introduced there.
+After [EIP-6780](./eip-6780.md), ETH can only still be burned when a contract created in the same transaction executes `SELFDESTRUCT`, either to itself or before receiving more ETH later in the same transaction.
+<!-- REVIEW: "before receiving more ETH later" attaches "before" to "executes", reading as a SELFDESTRUCT timing description rather than a burn case. Consider: "either with itself as the beneficiary, or where the contract receives additional ETH later in the same transaction." -->
+A full replay of Ethereum mainnet from genesis to approximately block 24.95 million found only 2 post-Cancun burns through this path and 0 cases of balance being burned during transaction finalization. By comparison, pre-Cancun history contained 54 self-burns in total. This indicates that the remaining burn behavior is rarer than the burn behavior already removed by EIP-6780, so the complete removal proposed here should affect fewer transactions than the partial removal already introduced there.
 
 Removing the final burn cases simplifies `SELFDESTRUCT` semantics and avoids preserving an exotic feature only to support behavior that is barely used in practice.
+<!-- REVIEW: "feature" and "behavior" both refer to the same burn semantics — reads circular. Consider: "and avoids preserving an exotic special case that is barely used in practice." -->
 
 As a consequence, this also removes the last EVM mechanism by which ETH can leave total supply.
+<!-- REVIEW: a reader may misread as "no more ETH burn anywhere" (EIP-1559 base fee still burns at protocol level). Consider sharpening: "this also removes the last EVM opcode that can reduce total ETH supply." -->
 
 ## Specification
 
