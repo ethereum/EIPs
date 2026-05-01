@@ -22,6 +22,8 @@ After [EIP-6780](./eip-6780.md), ETH can only still be burned when a contract cr
 
 Removing the final burn cases simplifies `SELFDESTRUCT` semantics and avoids preserving an exotic feature only to support behavior that is barely used in practice.
 
+As a consequence, this also removes the last EVM mechanism by which ETH can leave total supply.
+
 ## Specification
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).

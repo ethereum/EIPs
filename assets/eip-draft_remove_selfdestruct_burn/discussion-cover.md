@@ -16,3 +16,5 @@ I checked mainnet usage with a full replay up to about block 24.95M. The result 
 So the actual remaining burn behavior is extremely rare, and the only notable post-Cancun activity besides the 2 real burns is one contract repeatedly probing the already-broken path.
 
 The idea here is simple: remove the last path where `SELFDESTRUCT` can silently destroy ETH, instead of keeping this odd special case forever.
+
+As a side effect, this also removes the last EVM mechanism by which ETH can leave total supply.
