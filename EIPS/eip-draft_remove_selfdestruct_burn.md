@@ -12,18 +12,18 @@ requires: 6780
 
 ## Abstract
 
-This EIP removes the remaining cases where `SELFDESTRUCT (0xff)` burns ETH. Accounts marked for deletion still have their code, storage, and nonce cleared at transaction finalization, but any remaining balance is preserved.
+This EIP removes the remaining cases where `SELFDESTRUCT` burns ETH. Accounts marked for deletion still have their code, storage, and nonce cleared at transaction finalization, but any remaining balance is preserved.
 
 ## Motivation
 
 The remaining burn behavior of `SELFDESTRUCT` is almost completely unused, but it still forces special-case handling in EVM implementations, specifications, and tests.
 
-After [EIP-6780](./eip-6780.md), ETH can still be burned only when a contract created in the same transaction executes `SELFDESTRUCT`, either with itself as beneficiary or in a case where the contract receives additional ETH later in the same transaction.
-A full replay of Ethereum mainnet from genesis to approximately block 24.95 million found only 2 post-Cancun burns through this path and 0 cases of balance being burned during transaction finalization. By comparison, pre-Cancun history contained 54 self-burns in total. This indicates that the remaining burn behavior is rarer than the burn behavior already removed by EIP-6780, so the complete removal proposed here should affect fewer transactions than the partial removal already introduced there.
+After [EIP-6780](./eip-6780.md), ETH can still be burned only when a contract created in the same transaction executes `SELFDESTRUCT`, either with itself as beneficiary or in a case where the contract receives additional ETH (via `CALL` or via `SELFDESTRUCT`, potentially multiple times) later in the same transaction.
+A full replay of Ethereum mainnet from genesis to approximately block 24.95M found only 2 post-Cancun burns through this path and 0 cases of balance being burned during transaction finalization. By comparison, pre-Cancun history contained 54 self-burns in total. This indicates that the remaining burn behavior is rarer than the burn behavior already removed by EIP-6780, so the complete removal proposed here should affect fewer transactions than the partial removal already introduced there.
 
 Removing the final burn cases simplifies `SELFDESTRUCT` semantics and avoids preserving an exotic special case that is barely used in practice.
 
-As a consequence, this also removes the last EVM opcode by which ETH can leave total supply.
+As a consequence, this also removes the last EVM mechanism by which ETH can leave total supply.
 
 ## Specification
 
