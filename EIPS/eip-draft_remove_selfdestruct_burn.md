@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2026-05-01
-requires: 6780
+requires: 161, 6780
 ---
 
 ## Abstract
@@ -35,8 +35,7 @@ When `SELFDESTRUCT` is executed in the same transaction in which the executing c
 
 1. the current execution frame halts,
 2. if the beneficiary differs from the executing contract, the entire account balance is transferred to the beneficiary,
-3. if the beneficiary is the executing contract, there is no balance transfer,
-4. the account is marked for deletion.
+3. the account is marked for deletion.
 
 For an account marked for deletion in this way, transaction finalization is modified as follows.
 
@@ -47,9 +46,11 @@ Instead of deleting the account and its balance, finalization MUST:
 3. reset the account nonce to `0`,
 4. preserve the account balance.
 
-If the resulting balance is `0`, the account MUST be removed from the state. Otherwise, the account MUST remain in the state with empty code, empty storage, nonce `0`, and its preserved balance.
+### Clarifications
 
-For contracts not created in the same transaction in which `SELFDESTRUCT` is executed, the behavior remains unchanged from [EIP-6780](./eip-6780.md).
+- If the beneficiary is the executing contract, there is no balance transfer and no ETH is burned.
+- If the resulting balance is `0`, the account MUST be removed from the state according to the empty account clearing rule of [EIP-161](./eip-161.md). Otherwise, the account MUST remain in the state with empty code, empty storage, nonce `0`, and its preserved balance.
+- For contracts not created in the same transaction in which `SELFDESTRUCT` is executed, the behavior is unchanged from [EIP-6780](./eip-6780.md).
 
 ## Rationale
 
