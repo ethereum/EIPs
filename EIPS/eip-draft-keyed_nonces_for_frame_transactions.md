@@ -2,7 +2,7 @@
 eip: TBD
 title: Keyed Nonces for Frame Transactions
 description: Independent nonce domains for frame transactions
-author: Thomas Thiery (@soispoke) <thomas.thiery@ethereum.org>, Toni Wahrstätter (@nerolation) <toni.wahrstaetter@ethereum.org>
+author: Thomas Thiery (@soispoke) <https://github.com/soispoke>, Toni Wahrstätter (@nerolation) <https://github.com/nerolation>, lightclient (@lightclient) <https://github.com/lightclient>, Vitalik Buterin <https://github.com/vbuterin> 
 discussions-to: TBD
 status: Draft
 type: Standards Track
