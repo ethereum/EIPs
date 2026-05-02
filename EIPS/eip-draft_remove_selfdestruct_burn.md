@@ -27,30 +27,23 @@ As a consequence, this also removes the last EVM mechanism by which ETH can leav
 
 ## Specification
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+The behaviour of `SELFDESTRUCT` is changed in the following way:
 
-`SELFDESTRUCT (0xff)` MUST NOT burn ETH.
+1. When `SELFDESTRUCT` is executed in the same transaction as the contract was created,
+   and if the beneficiary address is the executing account address,
+   the balance of this account remains unchanged.
+2. During transaction finalization,
+   all accounts marked for selfdestruction,
+   instead of being deleted,
+   are modified as follows:
+  
+   1. nonce is reset to 0,
+   2. balance is unchanged,
+   3. code is cleared,
+   4. all storage is cleared.
 
-When `SELFDESTRUCT` is executed in the same transaction in which the executing contract was created:
-
-1. the current execution frame halts (unchanged),
-2. if the beneficiary differs from the executing contract, the entire account balance is transferred to the beneficiary (unchanged),
-3. if the beneficiary is the executing contract, there is no balance transfer and no ETH is burned,
-4. the account is marked for deletion (unchanged).
-
-For an account marked for deletion in this way, transaction finalization is modified as follows.
-
-Instead of deleting the account, finalization MUST:
-
-1. clear the account code,
-2. clear all account storage,
-3. reset the account nonce to `0`,
-4. preserve the account balance.
-
-### Clarifications
-
-- If the resulting balance is `0`, the account MUST be removed from the state according to the empty account clearing rule of [EIP-161](./eip-161.md). Otherwise, the account MUST remain in the state with empty code, empty storage, nonce `0`, and its preserved balance.
-- For contracts not created in the same transaction in which `SELFDESTRUCT` is executed, the behavior is unchanged from [EIP-6780](./eip-6780.md).
+3. Note: all other behavior of `SELFDESTRUCT` is unchanged.
+4. Note: if the resulting balance is 0, the account is *empty* and is deleted from the state by [EIP-161](./eip-161.md).
 
 ## Rationale
 
