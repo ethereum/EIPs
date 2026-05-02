@@ -12,7 +12,7 @@ requires: 161, 6780
 
 ## Abstract
 
-This EIP removes the remaining cases where `SELFDESTRUCT` burns ETH. Accounts marked for deletion still have their code, storage, and nonce cleared at transaction finalization, but any remaining balance is preserved.
+This EIP removes the remaining cases where `SELFDESTRUCT` burns ETH. Accounts marked for selfdestruction still have their code, storage, and nonce cleared at transaction finalization, but any remaining balance is preserved.
 
 ## Motivation
 
@@ -59,17 +59,17 @@ An alternative would be to preserve the whole account, including nonce, code, an
 
 ## Backwards Compatibility
 
-TODO: May contain AI slop.
-TODO: Make sure CREATE2-SELFDESTRUCT sandwitch works.
-
-
 This EIP requires a hard fork, since it modifies consensus rules.
 
 Previously it was possible to burn ETH by executing `SELFDESTRUCT` in a contract created in the same transaction, either by targeting the executing contract as beneficiary or by sending ETH to the contract after `SELFDESTRUCT` and before transaction finalization. After this EIP, ETH will not be burned in either case.
 
-Previously such contracts were always deleted at transaction finalization. After this EIP, a contract with zero final balance is still deleted, but a contract with nonzero final balance remains in the state as a balance-only account with empty code, empty storage, and nonce `0`.
+Previously such contracts were always deleted at transaction finalization. After this EIP, a contract with zero final balance is still deleted, but a contract with nonzero final balance remains in the state as a balance-only account with empty code, empty storage, and nonce 0.
+
+For the balance-only accounts created this way, `CREATE2` still may recreate a contract at the same address in a follow-up transaction. Such usage pattern remains operational.
 
 For contracts not created in the same transaction in which `SELFDESTRUCT` is executed, the behavior is unchanged from [EIP-6780](./eip-6780.md).
+
+Differently to Mainnet, the Optimizm-based L2 chains use the burn feature of the `SELFDESTRUCT` regularly. These systems require different addoption path.
 
 ## Test Cases
 
@@ -77,13 +77,11 @@ TBD
 
 ## Security Considerations
 
-TODO: May contain AI slop.
+1. `SELFDESTRUCT` behavior modification has combinatory effect on vast amount of test scenarios involving multi call/create contract interactions. This EIP requires significant testing effort. However, many existing test cases for EIP-6780 can be addapted to the new behavior.
+2. In case of usage expecting the ETH burn to happen the transaction will create dust-like accounts with potentially locked non-zero balance. However, the new account creation cost is properly included in the transaction cost. Only 2 such events have been recorded on Mainnet (Cancun–25M) so far.
+
 TODO: Figure out if this is about EVM security or contracts recurity.
 TODO: Check if the just_created works off accounts with balance.
-
-Contracts that intentionally rely on ETH being destroyed by `SELFDESTRUCT` change behavior. After this EIP, such ETH remains owned by an account with no code and no storage.
-
-This can leave balance-only accounts in the state in rare cases where ETH is sent to a self-destructed account later in the same transaction. This is not a new kind of account state, but implementations must handle it correctly.
 
 ## Copyright
 
