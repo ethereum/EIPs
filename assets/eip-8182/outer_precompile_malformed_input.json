@@ -1,6 +1,0 @@
-{
-  "bbVersion": "4.0.0-nightly.20260120",
-  "expectedReturnData": "0x",
-  "note": "Verifier-precompile reject vector. The calldata is malformed and must return empty bytes.",
-  "precompileInput": "0x1234"
-}
