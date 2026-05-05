@@ -1,0 +1,59 @@
+---
+eip: 9999
+title: Execution-Layer Reorg State Retention Window
+description: Require EL clients to retain enough state to re-execute across any reorg within the weak-subjectivity horizon
+author: Toni Wahrstätter (@nerolation), Kevaundray Wedderburn (@kevaundray)
+discussions-to:
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-04-24
+---
+
+## Abstract
+
+Define `REORG_RETENTION_WINDOW = 113_056` blocks (3533 epochs × 32 slots, ~15.7 days) and require EL clients to keep recent state reconstructible (via snapshots, reverse state diffs, or any equivalent representation, in memory or on disk) for every canonical block within this window, so any reorg up to the weak-subjectivity horizon can be processed locally.
+
+## Motivation
+
+EL clients have no protocol-defined floor on how far back recent state must remain reconstructible. [EIP-4444](./eip-4444.md) and successors govern long-term block-history expiry; state-pruning policy is left entirely to clients.
+
+To validate a post-reorg branch handed in via the engine API, an EL must execute its first block against the state of the common ancestor with the local chain. The CL's weak-subjectivity (WS) period bounds how deep a finality reversal a fresh-sync node can resolve without a new trusted checkpoint. If state has been pruned past that ancestor, the node cannot verify the new branch and must fall back to sync. A single retention floor aligned to the WS horizon closes this gap.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "SHOULD", and "MAY" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+`REORG_RETENTION_WINDOW = 113056` blocks.
+
+For every canonical block whose number is within `REORG_RETENTION_WINDOW` of the head, EL clients MUST be able to reconstruct its post-state without sync. The representation (full snapshots, reverse state diffs, or any equivalent) and its location (memory or disk) are unspecified. State older than the window MAY be discarded.
+
+This EIP does not constrain retention of block headers, bodies, or receipts; those are governed by [EIP-4444](./eip-4444.md) and successors.
+
+## Rationale
+
+### Choice of constant
+
+With `SAFETY_DECAY = 10` and a validator set above the churn-limit floor (`N > 4 · 65536`), `compute_weak_subjectivity_period` reduces to ~3,533 epochs independent of `N`, stake, or balance distribution; below the floor it scales linearly with `N`. Mainnet has sat well above the floor for years, so 3,533 epochs is the realistic upper bound on the WS period. Encoding it as `3533 × 32 = 113,056` blocks gives EL clients a single value without requiring them to track finalized beacon state.
+
+### State, not block data
+
+A deep reorg is processed by rolling state back to the common ancestor with the incoming branch and re-executing forward. The new branch's blocks arrive via the engine API or P2P; the local node does not need to have stored the displaced branch's headers, bodies, or receipts. What it strictly needs is the ability to reconstruct state at the ancestor, which makes state retention the load-bearing requirement for reorg recovery. Block-data retention is a separate, network-serving concern addressed by EIP-4444 and successors.
+
+### Reorg coverage
+
+Reorgs shallower than `REORG_RETENTION_WINDOW` can be resolved locally. Reorgs deeper than the window are out of scope for this EIP; recovery may require fresh sync from a trusted checkpoint.
+
+## Backwards Compatibility
+
+EL clients with state-pruning policies more aggressive than `REORG_RETENTION_WINDOW` must retain additional state (typically as reverse diffs) to comply.
+
+## Security Considerations
+
+### State beyond the window
+
+Reconstruction of state older than `REORG_RETENTION_WINDOW` is out of scope and served by archive nodes.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
