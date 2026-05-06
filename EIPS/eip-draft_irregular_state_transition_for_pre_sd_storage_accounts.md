@@ -29,7 +29,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### Mainnet account list
 
-The targeted Mainnet accounts are published as [`assets/eip-XXXX/still-matching.json`](../assets/eip-XXXX/still-matching.json) (28 entries). Each entry contains the 20-byte address, its `keccak256` hash of this address, and per non-zero-valued storage slot: the 32-byte slot key and its `keccak256` hash of this key.
+The targeted Mainnet accounts are published as [`assets/eip-XXXX/targeted-accounts.json`](../assets/eip-XXXX/targeted-accounts.json) (28 entries). Each entry contains the 20-byte address, its `keccak256` hash of this address, and per non-zero-valued storage slot: the 32-byte slot key and its `keccak256` hash of this key.
 
 The construction procedure and verification (storage-root reconstruction against `eth_getProof` on `latest`) are documented in [`assets/eip-XXXX/methodology.md`](../assets/eip-XXXX/methodology.md). The 224-entry pre-EIP-161-deletion superset at the Spurious Dragon block is published alongside, as [`assets/eip-XXXX/zero-nonce-matches.jsonl`](../assets/eip-XXXX/zero-nonce-matches.jsonl).
 

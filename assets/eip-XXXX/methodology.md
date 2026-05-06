@@ -17,7 +17,7 @@ Such an account can only have been produced by a pre–Spurious-Dragon contract 
 The matching set shrinks over time: [EIP-161](../../EIPS/eip-161.md)'s "empty" predicate (no code, zero nonce, zero balance) ignores storage, so a zero-balance account in our shape is EIP-161-empty and gets deleted on the next "touch". With `S(b)` the matching set at block `b`, `S(2,675,000) ⊇ S(latest)`. We enumerate in two stages:
 
 1. **Boundary scan** at the Spurious Dragon activation block (2,675,000), wich is the earliest moment at which the population is closed. Note that the fork block itself does not have to be checked, as this already sets a possible contract nonce to 1. Output: 224 entries, published as [zero-nonce-matches.jsonl](./zero-nonce-matches.jsonl).
-2. **`latest` filter** via `eth_getProof(address, [], "latest")`, keeping only addresses whose live state still satisfies the predicate. Output: 28 entries, published as [still-matching.json](./still-matching.json). [EIP-7523](../../EIPS/eip-7523.md) implies every survivor has non-zero balance.
+2. **`latest` filter** via `eth_getProof(address, [], "latest")`, keeping only addresses whose live state still satisfies the predicate. Output: 28 entries, published as [targeted-accounts.json](./targeted-accounts.json). [EIP-7523](../../EIPS/eip-7523.md) implies every survivor has non-zero balance.
 
 ## Boundary scan
 
@@ -40,7 +40,7 @@ Output schema (one JSON object per line):
 }
 ```
 
-The published [still-matching.json](./still-matching.json) is the same schema, additionally decorated with `currentStorageHash` (from `eth_getProof`) and packed into a JSON array.
+The published [targeted-accounts.json](./targeted-accounts.json) is the same schema, additionally decorated with `currentStorageHash` (from `eth_getProof`) and packed into a JSON array.
 
 ## Verification
 
@@ -67,7 +67,8 @@ go build -o ./build/bin/geth ./cmd/geth
 
 # 4. Filter + verify storage roots.
 go build -o ./verify-storage-root ./cmd/verify-storage-root
-cat zero-nonce-matches.jsonl | ./verify.sh > still-matching.jsonl
+cat zero-nonce-matches.jsonl | ./verify.sh > targeted-accounts.jsonl
+jq -s '.' targeted-accounts.jsonl > targeted-accounts.json
 ```
 
 The scan is deterministic per snapshot iteration; running it on a clean datadir yields the same `(address, slot_key)` pairs.
@@ -80,5 +81,5 @@ The scan is deterministic per snapshot iteration; running it on a clean datadir 
 
 ## Files
 
-- [still-matching.json](./still-matching.json): 28-entry survivor set on `latest` (the EIP's normative list).
+- [targeted-accounts.json](./targeted-accounts.json): 28-entry survivor set on `latest` (the EIP's normative list).
 - [zero-nonce-matches.jsonl](./zero-nonce-matches.jsonl): 224-entry boundary-block superset.
