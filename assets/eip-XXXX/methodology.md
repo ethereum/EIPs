@@ -13,9 +13,9 @@ We need every Ethereum Mainnet account whose state, today, satisfies all of:
 Such an account can only have been produced by a pre–Spurious-Dragon contract creation — either via the `CREATE` opcode or via a contract-creation transaction (one with an empty `to` field) — whose init code wrote to storage and finished without returning any deploy bytes. A minimal example of such init code is:
 
 ```
-60 42       PUSH1 0x42
+60 01       PUSH1 0x01
 60 00       PUSH1 0x00
-55          SSTORE        ; storage[0] = 0x42
+55          SSTORE        ; storage[0] = 0x01
 00          STOP          ; halt with no return data → empty deployed code
 ```
 
@@ -37,7 +37,7 @@ S(2,675,000)   ⊇   S(latest)
 
 This EIP scopes itself to `S(latest)` — accounts that still exist on Mainnet at the proposed fork block — because those are the only accounts whose state we need to mutate. The full enumeration is performed in two stages:
 
-1. Scan at block 2,675,000 for the **superset** (224 entries at the time of writing).
+1. Scan at block 2,675,000 for the **superset** (224 entries; published as [zero-nonce-matches.jsonl](./zero-nonce-matches.jsonl)).
 2. Filter that superset against Mainnet `latest` via `eth_getProof`, keeping only accounts whose live state still satisfies the predicate (28 entries; published as [still-matching.json](./still-matching.json)).
 
 [EIP-7523](../../EIPS/eip-7523.md) closes the loop on the second stage: every `S(latest)` account has non-zero balance, because any zero-balance account satisfying our predicate would have been EIP-161-empty and therefore deleted by the state-clearing transaction described in EIP-7523. The surviving 28 entries thus all have non-zero balance, which is exactly the invariant the EIP relies on.
@@ -208,5 +208,4 @@ The scan operates at block 2,675,000 *inclusive* — the *first* block at which 
 ## Files in this asset directory
 
 - [still-matching.json](./still-matching.json) — the 28-entry survivor set on Mainnet `latest`. This is the list the EIP's irregular state transition operates on.
-
-The full 224-entry superset (the boundary-block scan output) is not bundled in the EIP because the EIP's normative scope is `S(latest)`. Anyone reproducing the procedure in [Reproducing the scan](#reproducing-the-scan) will regenerate it from a clean datadir.
+- [zero-nonce-matches.jsonl](./zero-nonce-matches.jsonl) — the 224-entry boundary-block scan output at block 2,675,000 (the superset described above). Each line is one record of the schema in [Output schema](#output-schema). Anyone reproducing the procedure in [Reproducing the scan](#reproducing-the-scan) from a clean datadir will obtain the same set of `(address, slot_key)` pairs.

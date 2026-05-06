@@ -51,7 +51,7 @@ The set of targeted accounts on Ethereum Mainnet is fixed and is published as th
 
 Both preimages are mandatory. Some clients key the trie by hashed address and hashed slot, while others retain the preimages directly; including both forms allows every client to apply this EIP without an out-of-band lookup.
 
-The procedure used to construct this list, and the verification that it is complete and correct (every listed slot is necessary, no live account satisfying the predicate is missing, and the reconstructed storage root matches Mainnet's `storageHash`), is documented in [`assets/eip-XXXX/methodology.md`](../assets/eip-XXXX/methodology.md). Reviewers wishing to independently re-verify the list can follow the reproduction procedure described there.
+The procedure used to construct this list, and the verification that it is complete and correct (every listed slot is necessary, no live account satisfying the predicate is missing, and the reconstructed storage root matches Mainnet's `storageHash`), is documented in [`assets/eip-XXXX/methodology.md`](../assets/eip-XXXX/methodology.md). The 224-entry superset at the Spurious Dragon activation block — i.e. every account that ever satisfied the predicate, before EIP-161 deletion-on-touch swept the zero-balance subset — is also published, as [`assets/eip-XXXX/zero-nonce-matches.jsonl`](../assets/eip-XXXX/zero-nonce-matches.jsonl), so reviewers can audit the broader set from which `still-matching.json` was filtered. Reviewers wishing to independently re-verify the list can follow the reproduction procedure described in the methodology.
 
 ### State transition
 
