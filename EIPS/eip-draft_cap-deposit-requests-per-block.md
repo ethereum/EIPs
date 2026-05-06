@@ -1,6 +1,6 @@
 ---
 title: Cap deposit requests per block
-description: Limits the number of deposit requests in an Execution Layer block to 8191
+description: Limits the number of deposit requests in an Execution Layer block to 8192
 author: pk910 (@pk910), Barnabas Busa (@barnabasbusa)
 discussions-to: https://ethereum-magicians.org/t/eip-cap-deposit-requests-per-block/00000
 status: Draft
@@ -12,7 +12,7 @@ requires: 6110, 7685
 
 ## Abstract
 
-Introduces a per-block hard cap on the number of [EIP-6110](./eip-6110.md) deposit requests an Execution Layer block may produce. A block is invalid if the number of deposit requests derived from its receipts exceeds `MAX_DEPOSIT_REQUESTS_PER_BLOCK = 8191`. Execution Layer clients MUST enforce the cap during both block construction and block validation.
+Introduces a per-block hard cap on the number of [EIP-6110](./eip-6110.md) deposit requests an Execution Layer block may produce. A block is invalid if the number of deposit requests derived from its receipts exceeds `MAX_DEPOSIT_REQUESTS_PER_BLOCK = 8192`. Execution Layer clients MUST enforce the cap during both block construction and block validation.
 
 ## Motivation
 
@@ -42,7 +42,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 | Name | Value | Comment |
 | - | - | - |
-| `MAX_DEPOSIT_REQUESTS_PER_BLOCK` | `8191` | Maximum number of deposit requests permitted in a single Execution Layer block |
+| `MAX_DEPOSIT_REQUESTS_PER_BLOCK` | `8192` | Maximum number of deposit requests permitted in a single Execution Layer block |
 
 ### Definitions
 
@@ -71,7 +71,7 @@ Engine API responses (`engine_getPayloadV*`, `engine_newPayloadV*`) inherit the 
 
 ### Consensus Layer
 
-No Consensus Layer changes are required. The SSZ bound `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD = 8192` continues to apply and remains a strictly weaker constraint than the cap introduced here.
+No Consensus Layer changes are required. The SSZ bound `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD = 8192` continues to apply; the EL cap introduced here matches it exactly so that the Execution Layer never produces a deposit list the Consensus Layer cannot decode.
 
 ## Rationale
 
@@ -83,13 +83,15 @@ Raising `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD` on the Consensus Layer was considered
 * The CL SSZ bound is a serialization concern; the deposit-list size is fundamentally a property of EL execution. Putting the cap at the layer that produces the list is the natural place for it.
 * An EL-side cap also closes the bug where the EL silently produces undecodable payloads — even if the CL bound were raised, the underlying "EL is unaware of the limit" defect remains.
 
-### Choice of `8191`
+### Choice of `8192`
 
-`8191 = 2^13 − 1` is one below the existing SSZ list bound `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD = 8192`. Setting the EL cap one below the SSZ bound:
+`8192 = 2^13` matches the existing Consensus Layer SSZ list bound `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD` exactly. Setting the EL cap equal to the CL bound:
 
-* keeps a one-element gap so the SSZ list never reaches its declared capacity, which removes a class of edge cases around boundary lengths and possible future format extensions;
-* preserves the worst-case analysis already done in [EIP-6110](./eip-6110.md), which considered `8192` deposits as the optimistic-sync upper bound; and
-* is well above any practically reachable deposit volume per block (a 200M-gas block fits ~8200 deposits using batching, and current mainnet gas limits fit roughly an order of magnitude fewer).
+* directly closes the failure mode described in Motivation: a block with at most `8192` deposit requests is always SSZ-decodable, while `8193` or more is the first value that breaks Consensus Layer decoding;
+* keeps a single value to reason about across both layers rather than introducing a second one; and
+* preserves the worst-case analysis already done in [EIP-6110](./eip-6110.md), which considered `8192` deposits as the optimistic-sync upper bound, so no security re-analysis is required.
+
+`8192` is well above any practically reachable deposit volume per block under current mainnet gas limits (a 200M-gas block fits ~8200 deposits using batching, and 30M-gas blocks fit roughly two orders of magnitude fewer). A lower cap (e.g., `8191`) was considered but rejected: it would leave a one-element gap below the SSZ bound that serves no functional purpose and would introduce a second constant developers must keep in sync.
 
 ### Why a fixed deposit count rather than a gas reservation
 
@@ -97,7 +99,7 @@ A cap denominated in deposit count is independent of future deposit-contract gas
 
 ### Mandatory enforcement during block construction
 
-Liveness motivates this. If only block validation enforced the cap, an attacker could submit > 8191 deposit-bearing transactions and any honest block builder unaware of the cap would produce an invalid payload, causing the proposer to miss its slot. The cap must be enforced at the construction step so that every honest proposer can produce a valid block under any mempool state.
+Liveness motivates this. If only block validation enforced the cap, an attacker could submit enough deposit-bearing transactions to push the count above `8192`, and any honest block builder unaware of the cap would produce an invalid payload, causing the proposer to miss its slot. The cap must be enforced at the construction step so that every honest proposer can produce a valid block under any mempool state.
 
 ## Backwards Compatibility
 
@@ -111,19 +113,19 @@ Application-level consumers of deposit data are unaffected: the cap is below the
 
 The following describe expected validity outcomes once the EIP is active:
 
-1. A block whose receipts produce exactly `8191` deposit requests is valid (subject to all other rules).
-2. A block whose receipts produce `8192` deposit requests is invalid.
+1. A block whose receipts produce exactly `8192` deposit requests is valid (subject to all other rules).
+2. A block whose receipts produce `8193` deposit requests is invalid (the first count at which Consensus Layer SSZ decoding fails).
 3. A block whose receipts produce `12300` deposit requests (a value observed in practice during the failure described in Motivation) is invalid.
-4. During block construction at a high gas limit with a mempool containing > 8191 deposit-bearing transactions of equal priority fee, the produced block contains at most `8191` deposit requests.
+4. During block construction at a high gas limit with a mempool containing > 8192 deposit-bearing transactions of equal priority fee, the produced block contains at most `8192` deposit requests.
 5. A block with `0` deposit requests is valid.
-6. A block whose receipts produce a number of deposit requests strictly between `0` and `8191` (inclusive) is valid (subject to all other rules).
+6. A block whose receipts produce a number of deposit requests in the inclusive range `[0, 8192]` is valid (subject to all other rules).
 
 A reference adversarial scenario for cases 2–4 is the spamoor `deposit-contract-batch` configuration, which at ~193M gas reliably produces > 8192 deposits per block via a batching contract.
 
 ## Reference Implementation
 
 ```python
-MAX_DEPOSIT_REQUESTS_PER_BLOCK = 8191
+MAX_DEPOSIT_REQUESTS_PER_BLOCK = 8192
 
 # Validation: applied alongside other EIP-6110 deposit-request checks.
 def validate_deposit_requests_count(block) -> None:
@@ -146,7 +148,7 @@ Without this EIP, an attacker can break liveness on networks whose gas limit per
 
 ### Optimistic sync
 
-[EIP-6110](./eip-6110.md) identifies optimistic sync as the most consequential deposit-related DoS surface: a syncing node may have to apply up to `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD` deposits per block without validating their derivation. The cap here lowers that worst case from `8192` to `8191` and turns it into an EL-enforced rule rather than an SSZ-derived one, so the bound is insensitive to future gas-limit changes.
+[EIP-6110](./eip-6110.md) identifies optimistic sync as the most consequential deposit-related DoS surface: a syncing node may have to apply up to `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD` deposits per block without validating their derivation. This EIP does not change that worst-case bound (the cap matches the SSZ ceiling already considered in EIP-6110), but turns it into an EL-enforced rule rather than an SSZ-derived one, so the bound is insensitive to future gas-limit changes and is enforced at the layer that produces the deposit list.
 
 ### Builder dependence
 
@@ -154,7 +156,7 @@ Relying on external block builders to under-fill blocks is unsafe: an attacker c
 
 ### Liveness under legitimate deposit spikes
 
-The cap is far above any historically observed deposit volume; the largest cited daily volume in [EIP-6110](./eip-6110.md) was ~12,000 deposits across 24 hours (≈2 per block on average). A single-block cap of `8191` leaves multiple orders of magnitude of headroom for legitimate activity. Excess deposit-bearing transactions are simply included in subsequent blocks; deposits already accepted by the deposit contract are not lost.
+The cap is far above any historically observed deposit volume; the largest cited daily volume in [EIP-6110](./eip-6110.md) was ~12,000 deposits across 24 hours (≈2 per block on average). A single-block cap of `8192` leaves multiple orders of magnitude of headroom for legitimate activity. Excess deposit-bearing transactions are simply included in subsequent blocks; deposits already accepted by the deposit contract are not lost.
 
 ### Block-builder griefing
 
@@ -162,7 +164,7 @@ A builder cannot use the cap to grief the network beyond what is already possibl
 
 ### Weak subjectivity
 
-The cap interacts with the weak-subjectivity-period analysis in [EIP-6110](./eip-6110.md) by capping maximum top-ups per epoch at `MAX_DEPOSIT_REQUESTS_PER_BLOCK * SLOTS_PER_EPOCH`. Because this is below the SSZ-derived bound previously analyzed, the conclusions of that analysis continue to apply.
+The cap interacts with the weak-subjectivity-period analysis in [EIP-6110](./eip-6110.md) by capping maximum top-ups per epoch at `MAX_DEPOSIT_REQUESTS_PER_BLOCK * SLOTS_PER_EPOCH`. Because this matches the SSZ-derived bound previously analyzed, the conclusions of that analysis continue to apply unchanged.
 
 ## Copyright
 
