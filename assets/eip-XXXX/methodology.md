@@ -10,19 +10,20 @@ We need every Ethereum Mainnet account whose state, today, satisfies all of:
 - `codeHash == keccak256("") == 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470` (henceforth `EmptyCodeHash`),
 - `storageRoot != keccak256(RLP("")) == 0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421` (henceforth `EmptyRootHash`).
 
-Such an account can only have been produced by a pre–Spurious-Dragon `CREATE` whose init code wrote to storage and returned an empty deploy blob:
+Such an account can only have been produced by a pre–Spurious-Dragon contract creation — either via the `CREATE` opcode or via a contract-creation transaction (one with an empty `to` field) — whose init code wrote to storage and finished without returning any deploy bytes. A minimal example of such init code is:
 
 ```
 60 42       PUSH1 0x42
 60 00       PUSH1 0x00
 55          SSTORE        ; storage[0] = 0x42
-60 00 60 00 PUSH1 0x00 PUSH1 0x00
-F3          RETURN        ; 0 bytes of code
+00          STOP          ; halt with no return data → empty deployed code
 ```
 
-After Spurious Dragon ([EIP-161](../../EIPS/eip-161.md), part a), `CREATE` increments the new contract's nonce to 1 *before* the init code runs, so a contract whose code is empty but whose storage is non-empty necessarily has nonce ≥ 1. The set is therefore closed: no new account can enter it. Once an account is in this state, it is also stable — `SELFDESTRUCT` can only run from inside the contract, but the contract has no code.
+This is illustrative only: any init code path that performs at least one `SSTORE` and then halts with empty return data (whether via `STOP`, falling off the end of the bytecode, or `RETURN` with zero length) yields the same outcome. (Note that `PUSH1 0x00 PUSH1 0x00 RETURN` is semantically equivalent to `STOP` here but costs more gas and three extra code bytes; the form above is the cheapest minimal example.)
 
-The relevant cutoff for enumeration is therefore **block 2,675,000** (the EIP-158 / Spurious Dragon activation block on Mainnet, taken from `chainConfig.EIP158Block`), the earliest moment at which the population is closed.
+After Spurious Dragon ([EIP-161](../../EIPS/eip-161.md), part a), both contract-creation transactions and the `CREATE` opcode increment the new contract's nonce to 1 *before* the init code runs, so a contract whose code is empty but whose storage is non-empty necessarily has nonce ≥ 1. The set is therefore closed: no new account can enter it. Once an account is in this state, it is also stable — `SELFDESTRUCT` can only run from inside the contract, but the contract has no code.
+
+The relevant cutoff for enumeration is therefore **block 2,675,000** (the Spurious Dragon / EIP-161 activation block on Mainnet), the earliest moment at which the population is closed. (Geth's chain config exposes this boundary under the legacy field name `EIP158Block`. The two names refer to the same fork block; the field name predates the renumbering of the underlying state-clearing rules to EIP-161 and is kept here for code-reference fidelity only.)
 
 ## Why block 2,675,000 is a superset, and why we additionally filter on `latest`
 
@@ -36,7 +37,7 @@ S(2,675,000)   ⊇   S(latest)
 
 This EIP scopes itself to `S(latest)` — accounts that still exist on Mainnet at the proposed fork block — because those are the only accounts whose state we need to mutate. The full enumeration is performed in two stages:
 
-1. Scan at block 2,675,000 for the **superset** (224 entries; full output in [zero-nonce-matches.jsonl](#full-scan)).
+1. Scan at block 2,675,000 for the **superset** (224 entries at the time of writing).
 2. Filter that superset against Mainnet `latest` via `eth_getProof`, keeping only accounts whose live state still satisfies the predicate (28 entries; published as [still-matching.json](./still-matching.json)).
 
 [EIP-7523](../../EIPS/eip-7523.md) closes the loop on the second stage: every `S(latest)` account has non-zero balance, because any zero-balance account satisfying our predicate would have been EIP-161-empty and therefore deleted by the state-clearing transaction described in EIP-7523. The surviving 28 entries thus all have non-zero balance, which is exactly the invariant the EIP relies on.
@@ -58,7 +59,7 @@ The scanner has two modes:
 1. **Replay mode** (`geth snapshot find-zero-nonce-replay <era-dir>`) — replays the chain from genesis to block 2,675,000 using Era1 archives, builds a snapshot at the boundary state root, and walks the snapshot. Self-contained; produces the canonical evidence.
 2. **Scan-only mode** (`geth snapshot find-zero-nonce [<root>]`) — scans an existing snapshot. Useful on a snap-synced or fully-synced node, or for re-verification after replay.
 
-Both honour `--zero-nonce.matches <path>` (default `./zero-nonce-matches.jsonl`) and append in dedup-friendly fashion (a startup pass over the file populates an "already emitted" set, so re-runs are idempotent).
+Both honour `--zero-nonce.matches <path>` (default `./zero-nonce-matches.jsonl`) and append in dedup-friendly fashion (a startup pass over the file populates an "already emitted" set, so re-runs are idempotent). The output filename is configurable; in the rest of this document we refer to the **boundary-block scan output** as the file written by this flag, regardless of its concrete name on disk.
 
 ### Replay configuration
 
@@ -86,7 +87,7 @@ This is purely state-based: no tracer is attached to the EVM during replay (`vm.
 
 ## Output schema
 
-Each line of `zero-nonce-matches.jsonl` is one JSON object:
+Each line of the boundary-block scan output is one JSON object:
 
 ```jsonc
 {
@@ -152,7 +153,8 @@ go build -o ./build/bin/geth ./cmd/geth
 ./build/bin/geth --datadir /tmp/zero-nonce-replay \
     snapshot find-zero-nonce-replay $ERA_DIR
 
-# Output: ./zero-nonce-matches.jsonl  — the 224-entry superset at block 2,675,000.
+# Output: ./zero-nonce-matches.jsonl (default; configurable via --zero-nonce.matches).
+# At the time of writing this is the 224-entry superset at block 2,675,000.
 
 # 4. (optional) Re-verify against the same datadir's snapshot.
 ./build/bin/geth --datadir /tmp/zero-nonce-replay snapshot find-zero-nonce
@@ -164,7 +166,7 @@ cat zero-nonce-matches.jsonl | ./verify.sh > still-matching.jsonl
 # stderr: per-address trie-verification verdicts
 ```
 
-The scan is idempotent. A `zero-nonce-matches.jsonl` produced by step 3 can be regenerated and should match the published file byte-for-byte (modulo line ordering, which is deterministic per snapshot iteration).
+The scan is idempotent. A boundary-block scan output produced by step 3 can be regenerated from a clean datadir and is fully determined by the canonical chain — anyone running the procedure should obtain the same set of matching `(address, slot_key)` pairs (modulo line ordering, which is deterministic per snapshot iteration).
 
 ### Code layout
 
@@ -182,15 +184,15 @@ verify.sh                       Orchestration: liveness filter + trie verify.
 
 ### Genesis pre-allocations
 
-A handful of Mainnet genesis allocations set storage directly without going through a `CREATE`. They appear in the scan and are legitimately part of the targeted set: their storage is present, their code is empty, and their nonce is zero, exactly the predicate the EIP addresses. They are kept in the published list.
+A handful of Mainnet genesis allocations set storage directly without going through any contract-creation path. They appear in the scan and are legitimately part of the targeted set: their storage is present, their code is empty, and their nonce is zero, exactly the predicate the EIP addresses. They are kept in the published list.
 
 ### Snapshot completeness
 
 `find-zero-nonce` requires `rawdb.ReadSnapshotRoot(db) != 0`. Running it on a node mid-snap-sync, or on a hash-scheme datadir whose snapshot wasn't ever fully built, will miss accounts. The `find-zero-nonce-replay` pipeline guarantees a complete snapshot via `snapshot.New(NoBuild: false, AsyncBuild: false)` at the boundary root, which is why it is the canonical method.
 
-### EIP-158 boundary block semantics
+### Boundary block semantics
 
-The scan operates at block 2,675,000 *inclusive* — the *first* block at which EIP-158 rules are active. A newly-`CREATE`-d contract in that block already has nonce 1 (by the new rule), so it cannot appear in the matching set. Earlier blocks (created with nonce 0) settle into the post-state of block 2,675,000 unchanged.
+The scan operates at block 2,675,000 *inclusive* — the *first* block at which EIP-161 rules are active. A contract created in that block (whether by `CREATE` or by a contract-creation transaction) already has nonce 1 by the new rule, so it cannot appear in the matching set. Earlier blocks (created with nonce 0) settle into the post-state of block 2,675,000 unchanged.
 
 ### Operational gotchas
 
@@ -200,15 +202,11 @@ The scan operates at block 2,675,000 *inclusive* — the *first* block at which 
 
 ## Open follow-ups
 
-- Inline the storage *value* into `zero-nonce-matches.jsonl` so verification can be fully offline (no RPC). Roughly 10 LoC plus a test update — decode `stIter.Value()` via `rlp.DecodeBytes`, pad to 32 bytes, attach as `Value common.Hash` on `zeroNonceSlot`. The verifier would then consume it directly instead of re-querying `eth_getProof`.
-- A `--block <n>` flag on `find-zero-nonce-replay` to scan at a block other than `chainConfig.EIP158Block`. Currently hard-wired to that fork block, since that is the only point at which the matching set is closed by construction.
+- Inline the storage *value* into the boundary-block scan output so verification can be fully offline (no RPC). Roughly 10 LoC plus a test update — decode `stIter.Value()` via `rlp.DecodeBytes`, pad to 32 bytes, attach as `Value common.Hash` on `zeroNonceSlot`. The verifier would then consume it directly instead of re-querying `eth_getProof`.
+- A `--block <n>` flag on `find-zero-nonce-replay` to scan at a block other than the Spurious Dragon activation block. Currently hard-wired to that fork block, since that is the only point at which the matching set is closed by construction.
 
 ## Files in this asset directory
 
 - [still-matching.json](./still-matching.json) — the 28-entry survivor set on Mainnet `latest`. This is the list the EIP's irregular state transition operates on.
 
-The full 224-entry superset (`zero-nonce-matches.jsonl`) is not bundled in the EIP because the EIP's normative scope is `S(latest)`. It is available in the reproduction repository for any reviewer who wants to inspect the broader pre-EIP-161-deletion set.
-
-## Full scan
-
-The `zero-nonce-matches.jsonl` referenced above is produced by step 3 of [Reproducing the scan](#reproducing-the-scan). Anyone running that procedure will obtain a byte-equal file. The 28-entry [still-matching.json](./still-matching.json) bundled here is its `latest`-filtered subset.
+The full 224-entry superset (the boundary-block scan output) is not bundled in the EIP because the EIP's normative scope is `S(latest)`. Anyone reproducing the procedure in [Reproducing the scan](#reproducing-the-scan) will regenerate it from a clean datadir.
