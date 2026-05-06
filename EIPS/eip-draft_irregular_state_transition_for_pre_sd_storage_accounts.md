@@ -43,18 +43,15 @@ A *targeted account* is an account whose pre-fork state satisfies all of the fol
 
 ### Mainnet account list
 
-The set of targeted accounts on Ethereum Mainnet is fixed and is to be enumerated by the time this EIP is scheduled. Each entry consists of:
+The set of targeted accounts on Ethereum Mainnet is fixed and is published as the JSON file [`assets/eip-XXXX/still-matching.json`](../assets/eip-XXXX/still-matching.json). It contains 28 entries, matching the figure cited in [EIP-7610](./eip-7610.md). Each entry consists of:
 
-- the account preimage (the 20-byte address); and
-- for each non-zero storage slot of that account, the slot preimage (the 32-byte storage key) and its current value.
+- the account preimage (the 20-byte address) and its hash (`keccak256(address)`);
+- the current `balance`, `codeHash`, and `storageRoot` of the account; and
+- for each non-zero storage slot of that account, the slot preimage (the 32-byte storage key) and its hash (`keccak256(slot_key)`).
 
 Both preimages are mandatory. Some clients key the trie by hashed address and hashed slot, while others retain the preimages directly; including both forms allows every client to apply this EIP without an out-of-band lookup.
 
-```
-TBD: full Mainnet list (accounts and their storage slots) to be inserted prior to fork scheduling.
-```
-
-The current count is expected to be in line with the figure cited in [EIP-7610](./eip-7610.md) (28 accounts).
+The procedure used to construct this list, and the verification that it is complete and correct (every listed slot is necessary, no live account satisfying the predicate is missing, and the reconstructed storage root matches Mainnet's `storageHash`), is documented in [`assets/eip-XXXX/methodology.md`](../assets/eip-XXXX/methodology.md). Reviewers wishing to independently re-verify the list can follow the reproduction procedure described there.
 
 ### State transition
 
@@ -151,6 +148,8 @@ The list of Mainnet accounts MUST be reproducible from the canonical chain, so t
 4. The set of accounts satisfying (1)–(3) is the targeted set. For each such account, enumerate its non-zero storage slots and record both the address preimage and the slot preimages.
 
 Because this procedure depends only on the canonical state and pure functions of it, the list is uniquely determined and any client (or external reviewer) can produce it from a synced node. The list included in this EIP MUST be byte-equal to the output of this procedure run against Mainnet at the fork block height.
+
+A concrete implementation of this procedure, including the full scanner, the verification pipeline, and the rationale for working at the EIP-158 boundary block, is documented in [`assets/eip-XXXX/methodology.md`](../assets/eip-XXXX/methodology.md). The published list in [`assets/eip-XXXX/still-matching.json`](../assets/eip-XXXX/still-matching.json) is the byte-equal output of running that procedure against Mainnet, additionally filtered to accounts that still satisfy the predicate at `latest`.
 
 ### Pseudocode
 
