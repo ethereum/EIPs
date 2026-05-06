@@ -1,5 +1,4 @@
 ---
-eip: 8251
 title: Cap deposit requests per block
 description: Limits the number of deposit requests in an Execution Layer block to 8192
 author: pk910 (@pk910), Barnabas Busa (@barnabasbusa)
