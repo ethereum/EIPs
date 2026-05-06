@@ -21,7 +21,7 @@ The matching set shrinks over time: [EIP-161](../../EIPS/eip-161.md)'s "empty" p
 
 ## Boundary scan
 
-Implemented on a fork of Geth `v1.13.15` (the last `release/1.13` build with PoW execution and Era1 import. `v1.14+` cannot bootstrap a chain without `terminalTotalDifficulty`, which Mainnet pre-Spurious-Dragon lacks). The scanner:
+Implemented on a fork of Geth `v1.13.15` (the last `release/1.13` build with PoW execution and Era1 import. `v1.14+` cannot bootstrap a chain without `terminalTotalDifficulty`, which Mainnet pre-Spurious-Dragon lacks). The scanner code is hosted at `github.com/jochem-brouwer/go-ethereum`, branch `remove-account-with-state-which-is-not-eoa-Geth-v-1-13-15` (commit `96aa3bbea2e85037de79e6b38e341281646a32bf` at the time of writing). The scanner:
 
 1. Replays mainnet from genesis to block 2,675,000 with `Preimages = true` (such that we can walk the state/snapshot later and find the preimages necessary for the BAL for both the addresses and the storage keys) and archive mode (`TrieDirtyDisabled = true`, so a crash loses at most one block).
 2. Builds a snapshot at the boundary state root via `snapshot.New(NoBuild: false, AsyncBuild: false)`.
@@ -51,7 +51,7 @@ Two checks against Mainnet `latest`:
 
 ## Reproduction
 
-Reproducing the scan end-to-end requires the Geth fork on branch `remove-account-with-state-which-is-not-eoa-Geth-v-1-13-15`:
+Reproducing the scan end-to-end requires the Geth fork referenced above (`github.com/jochem-brouwer/go-ethereum`, branch `remove-account-with-state-which-is-not-eoa-Geth-v-1-13-15`, commit `96aa3bbea2e85037de79e6b38e341281646a32bf`):
 
 ```bash
 # 1. Fetch Era1 archives (any modern geth release, or a manual download also works).
