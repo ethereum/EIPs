@@ -152,9 +152,19 @@ Relying on external block builders to under-fill blocks is unsafe: an attacker c
 
 The cap is far above any historically observed deposit volume; the largest cited daily volume in [EIP-6110](./eip-6110.md) was ~12,000 deposits across 24 hours (≈2 per block on average). A single-block cap of `8192` leaves multiple orders of magnitude of headroom for legitimate activity. Excess deposit-bearing transactions are simply included in subsequent blocks; deposits already accepted by the deposit contract are not lost.
 
-### Block-builder griefing
+### Builder packing complexity (knapsack problem)
 
-A builder cannot use the cap to grief the network beyond what is already possible at the gas-limit boundary: any transaction it omits to stay under the cap is includable in the next block, and the deposit contract's per-deposit cost (≥ 1 ETH minimum deposit, ≥ 15,650 gas) makes filling the cap economically prohibitive in steady state.
+Without the cap, block construction is a one-dimensional packing problem: maximize fee revenue subject to `sum(gas) ≤ gas_limit`. A simple greedy by fee-per-gas is near-optimal.
+
+With the cap added, construction becomes a two-dimensional packing problem: maximize fee revenue subject to both `sum(gas) ≤ gas_limit` and `sum(deposit_request_count) ≤ MAX_DEPOSIT_REQUESTS_PER_BLOCK`. This is a 2D knapsack, which is NP-hard in general. Builders are expected to use heuristics (e.g., reserve a deposit-slot budget, drop deposit-bearing txs when the budget is exhausted), which are not optimal and are exploitable.
+
+A concrete griefing scenario: an adversary submits transactions that look attractive on a fee-per-gas basis but each emit many deposits. A naive greedy builder fills its deposit-slot budget early on these txs and is unable to include later, more profitable deposit-emitting transactions in the same block. The cost of the attack is bounded below by the deposit contract's per-deposit cost — at the minimum deposit of 1 ETH, fully saturating the cap costs at least `8192 × 1 ETH ≈ 8192 ETH` (on the order of tens of millions of USD at recent prices), which is the deterrent.
+
+This complexity is accepted as a tradeoff for the liveness guarantee. Alternative approaches that would avoid the second constraint — e.g., raising or removing the Consensus Layer SSZ bound, or pricing deposits up so the cap is never reached — were considered and rejected as discussed in [Rationale](#rationale).
+
+### Data size
+
+A block at the cap contains `8192` deposit requests of `192` bytes each, i.e. ~`1.5 MB` of deposit-list data. This is within the existing analysis from [EIP-6110](./eip-6110.md), which already considered `8192` deposits as the optimistic-sync upper bound.
 
 ### Weak subjectivity
 
