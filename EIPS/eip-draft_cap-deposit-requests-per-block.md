@@ -1,0 +1,169 @@
+---
+title: Cap deposit requests per block
+description: Limits the number of deposit requests in an Execution Layer block to 8191
+author: pk910 (@pk910), Barnabas Busa (@barnabasbusa)
+discussions-to: https://ethereum-magicians.org/t/eip-cap-deposit-requests-per-block/00000
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-05-06
+requires: 6110, 7685
+---
+
+## Abstract
+
+Introduces a per-block hard cap on the number of [EIP-6110](./eip-6110.md) deposit requests an Execution Layer block may produce. A block is invalid if the number of deposit requests derived from its receipts exceeds `MAX_DEPOSIT_REQUESTS_PER_BLOCK = 8191`. Execution Layer clients MUST enforce the cap during both block construction and block validation.
+
+## Motivation
+
+[EIP-6110](./eip-6110.md) places no Execution Layer limit on the number of deposit requests per block; the only existing bound is the Consensus Layer SSZ list cap `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD = 8192`, expressed in `execution_requests.deposits` of the beacon block body.
+
+This is a latent liveness failure as gas limits rise. Empirically, at a 193–200M gas limit a block can be filled with more than 8192 deposit requests using a batching contract (~410 deposits per 10M-gas transaction; ~8200 deposits at ~200M gas). When this happens:
+
+* The Execution Layer happily produces a payload containing more than 8192 deposit requests because no EL-side rule forbids it.
+* The Consensus Layer cannot decode the payload. A representative failure observed on Lighthouse:
+  ```
+  Failed to convert json to execution requests:
+    DecodeError("Failed to decode DepositRequest from EL:
+      BytesInvalid(\"VariableList of 12300 items exceeds maximum of 8192\")")
+  ```
+  The validator receives `400 Bad Request` from the beacon node when requesting a block, and proposal fails. The same SSZ bound applies to every Consensus Layer client, so the failure is not client-specific.
+* Subsequent block proposals on the same execution head fail for the same reason until the deposit backlog drains, breaking liveness.
+
+Relying on block builders to under-fill blocks is insufficient: an adversary willing to spend the gas can submit a flood of deposit-bearing transactions through the public mempool, and the same actor can trigger a builder circuit-breaker simultaneously, forcing fallback to local block production where no awareness of the cap exists today.
+
+The cap therefore must be a consensus rule enforced at the Execution Layer — the only layer that observes deposits before they are serialized into the engine API response.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+
+### Constants
+
+| Name | Value | Comment |
+| - | - | - |
+| `MAX_DEPOSIT_REQUESTS_PER_BLOCK` | `8191` | Maximum number of deposit requests permitted in a single Execution Layer block |
+
+### Definitions
+
+* **`FORK_BLOCK`** — the first block in a blockchain after this EIP has been activated.
+* **deposit-request count** of a block — the number of `DepositEvent` log entries emitted by `DEPOSIT_CONTRACT_ADDRESS` and matching `DEPOSIT_EVENT_SIGNATURE_HASH` across all receipts in the block, equivalently `len(get_deposit_request_data(block.receipts)) // 192` using the encoding defined in [EIP-6110](./eip-6110.md).
+
+### Block validity
+
+Beginning with `FORK_BLOCK`, in addition to the rules of [EIP-6110](./eip-6110.md), a block is invalid if its deposit-request count exceeds `MAX_DEPOSIT_REQUESTS_PER_BLOCK`:
+
+```python
+assert deposit_request_count(block) <= MAX_DEPOSIT_REQUESTS_PER_BLOCK
+```
+
+The check MUST be applied during Execution Layer block validation. A block whose deposit-request count exceeds the cap MUST be rejected with the same severity as any other consensus-rule violation; descendants building on it are also invalid.
+
+### Block construction
+
+Execution Layer clients building payloads (whether for `engine_getPayload`, locally-driven mining/validation, or any other path) MUST track the running deposit-request count of the block being assembled and MUST NOT include any transaction whose execution would cause that count to exceed `MAX_DEPOSIT_REQUESTS_PER_BLOCK`. A transaction that would push the count past the cap MUST be omitted from the block. Subsequent transactions with no impact on the deposit-request count MAY still be included subject to ordinary block-construction rules. Excluded deposit-bearing transactions remain eligible for inclusion in subsequent blocks.
+
+This requirement applies to all block-construction code paths, including those used as fallbacks when external block builders are unavailable. Clients MUST NOT delegate enforcement of this cap to builders.
+
+### Engine API
+
+Engine API responses (`engine_getPayloadV*`, `engine_newPayloadV*`) inherit the validity rule above: an Execution Layer client MUST NOT return a payload that violates the cap from `engine_getPayload`, and MUST report the payload as `INVALID` from `engine_newPayload` if it does.
+
+### Consensus Layer
+
+No Consensus Layer changes are required. The SSZ bound `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD = 8192` continues to apply and remains a strictly weaker constraint than the cap introduced here.
+
+## Rationale
+
+### Why fix this at the Execution Layer rather than raising the SSZ bound
+
+Raising `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD` on the Consensus Layer was considered as an alternative. It is not preferred because:
+
+* The processing cost on the CL is dominated by deposit signature verification (~one BLS verification per deposit), and the worst-case time per block is what we want to bound. Raising the SSZ cap moves the boundary up; it does not bound it. Each future gas-limit increase would re-open the same question.
+* The CL SSZ bound is a serialization concern; the deposit-list size is fundamentally a property of EL execution. Putting the cap at the layer that produces the list is the natural place for it.
+* An EL-side cap also closes the bug where the EL silently produces undecodable payloads — even if the CL bound were raised, the underlying "EL is unaware of the limit" defect remains.
+
+### Choice of `8191`
+
+`8191 = 2^13 − 1` is one below the existing SSZ list bound `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD = 8192`. Setting the EL cap one below the SSZ bound:
+
+* keeps a one-element gap so the SSZ list never reaches its declared capacity, which removes a class of edge cases around boundary lengths and possible future format extensions;
+* preserves the worst-case analysis already done in [EIP-6110](./eip-6110.md), which considered `8192` deposits as the optimistic-sync upper bound; and
+* is well above any practically reachable deposit volume per block (a 200M-gas block fits ~8200 deposits using batching, and current mainnet gas limits fit roughly an order of magnitude fewer).
+
+### Why a fixed deposit count rather than a gas reservation
+
+A cap denominated in deposit count is independent of future deposit-contract gas-cost changes, is simpler to reason about across forks, and matches the unit in which the Consensus Layer's processing cost scales (one signature verification per deposit).
+
+### Mandatory enforcement during block construction
+
+Liveness motivates this. If only block validation enforced the cap, an attacker could submit > 8191 deposit-bearing transactions and any honest block builder unaware of the cap would produce an invalid payload, causing the proposer to miss its slot. The cap must be enforced at the construction step so that every honest proposer can produce a valid block under any mempool state.
+
+## Backwards Compatibility
+
+This EIP introduces a new block-validity rule and is therefore a hard fork. Activation requires coordinated client upgrades.
+
+At present-day gas limits the cap is not reachable: a 30M-gas block holds roughly 1,271 deposits per [EIP-6110](./eip-6110.md)'s analysis, and even 200M-gas blocks reach the cap only with adversarially-constructed batching transactions. The cap therefore changes no historical block and only becomes binding under attack or at significantly higher gas limits than mainnet currently uses.
+
+Application-level consumers of deposit data are unaffected: the cap is below the existing SSZ list bound they already expect.
+
+## Test Cases
+
+The following describe expected validity outcomes once the EIP is active:
+
+1. A block whose receipts produce exactly `8191` deposit requests is valid (subject to all other rules).
+2. A block whose receipts produce `8192` deposit requests is invalid.
+3. A block whose receipts produce `12300` deposit requests (a value observed in practice during the failure described in Motivation) is invalid.
+4. During block construction at a high gas limit with a mempool containing > 8191 deposit-bearing transactions of equal priority fee, the produced block contains at most `8191` deposit requests.
+5. A block with `0` deposit requests is valid.
+6. A block whose receipts produce a number of deposit requests strictly between `0` and `8191` (inclusive) is valid (subject to all other rules).
+
+A reference adversarial scenario for cases 2–4 is the spamoor `deposit-contract-batch` configuration, which at ~193M gas reliably produces > 8192 deposits per block via a batching contract.
+
+## Reference Implementation
+
+```python
+MAX_DEPOSIT_REQUESTS_PER_BLOCK = 8191
+
+# Validation: applied alongside other EIP-6110 deposit-request checks.
+def validate_deposit_requests_count(block) -> None:
+    deposit_requests = get_deposit_request_data(block.receipts)  # from EIP-6110
+    count = len(deposit_requests) // 192  # each entry is 48+32+8+96+8 = 192 bytes
+    assert count <= MAX_DEPOSIT_REQUESTS_PER_BLOCK, "too many deposit requests"
+
+# Construction: invoked when deciding whether to include a candidate transaction.
+def can_include_transaction(running_count: int, tx_deposit_request_count: int) -> bool:
+    return running_count + tx_deposit_request_count <= MAX_DEPOSIT_REQUESTS_PER_BLOCK
+```
+
+`tx_deposit_request_count` is the number of `DepositEvent` logs the transaction would emit upon execution against the current block state; clients already track receipts during block assembly and can derive this count alongside ordinary receipt construction.
+
+## Security Considerations
+
+### Liveness — primary motivation
+
+Without this EIP, an attacker can break liveness on networks whose gas limit permits more than 8192 deposits per block by spamming deposit-bearing transactions (observed empirically at ~193M gas). The Consensus Layer cannot decode such payloads (`VariableList of N items exceeds maximum of 8192`) and proposers using affected blocks miss their slot. Enforcing the cap at the Execution Layer — including during construction — closes this attack and makes liveness independent of future gas-limit increases.
+
+### Optimistic sync
+
+[EIP-6110](./eip-6110.md) identifies optimistic sync as the most consequential deposit-related DoS surface: a syncing node may have to apply up to `MAX_DEPOSIT_REQUESTS_PER_PAYLOAD` deposits per block without validating their derivation. The cap here lowers that worst case from `8192` to `8191` and turns it into an EL-enforced rule rather than an SSZ-derived one, so the bound is insensitive to future gas-limit changes.
+
+### Builder dependence
+
+Relying on external block builders to under-fill blocks is unsafe: an attacker can simultaneously spam deposit transactions and trigger circuit-breakers that force fallback to local block production. Mandating EL-side enforcement during construction ensures every honest validator can produce a valid block regardless of builder availability.
+
+### Liveness under legitimate deposit spikes
+
+The cap is far above any historically observed deposit volume; the largest cited daily volume in [EIP-6110](./eip-6110.md) was ~12,000 deposits across 24 hours (≈2 per block on average). A single-block cap of `8191` leaves multiple orders of magnitude of headroom for legitimate activity. Excess deposit-bearing transactions are simply included in subsequent blocks; deposits already accepted by the deposit contract are not lost.
+
+### Block-builder griefing
+
+A builder cannot use the cap to grief the network beyond what is already possible at the gas-limit boundary: any transaction it omits to stay under the cap is includable in the next block, and the deposit contract's per-deposit cost (≥ 1 ETH minimum deposit, ≥ 15,650 gas) makes filling the cap economically prohibitive in steady state.
+
+### Weak subjectivity
+
+The cap interacts with the weak-subjectivity-period analysis in [EIP-6110](./eip-6110.md) by capping maximum top-ups per epoch at `MAX_DEPOSIT_REQUESTS_PER_BLOCK * SLOTS_PER_EPOCH`. Because this is below the SSZ-derived bound previously analyzed, the conclusions of that analysis continue to apply.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
