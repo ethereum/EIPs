@@ -73,12 +73,6 @@ jq -s '.' targeted-accounts.jsonl > targeted-accounts.json
 
 The scan is deterministic per snapshot iteration; running it on a clean datadir yields the same `(address, slot_key)` pairs.
 
-## Caveats
-
-- **Genesis pre-allocations.** A few Mainnet genesis allocations set storage directly. They satisfy the predicate and are kept in the list.
-- **Snapshot completeness.** The scan-only mode requires a fully built snapshot; the replay pipeline guarantees this at the boundary root.
-- **Boundary block inclusivity.** Block 2,675,000 is the *first* EIP-161-active block, so any contract created in it already has nonce 1.
-
 ## Files
 
 - [targeted-accounts.json](./targeted-accounts.json): 28-entry survivor set on `latest` (the EIP's normative list).
