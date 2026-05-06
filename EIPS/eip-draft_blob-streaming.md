@@ -2,13 +2,13 @@
 eip: XXXX
 title: Blob Streaming
 description: Introduces ahead-of-time blob propagation via ticket-based capacity reservation.
-author: Marios  (@mariosioannou-create), Bharath (@bharath-123), Francesco D'Amato (@fradamt), Julian Ma (@ma-julian), Raúl Kripalani (@raulk), Bosul Mun (@healthykim), Csaba Kiraly (@cskiraly), 
+author: Marios (@mariosioannou-create), Bharath (@bharath-123), Francesco D'Amato (@fradamt), Julian Ma (@ma-julian), Raúl Kripalani (@raulk), Bosul Mun (@healthykim), Csaba Kiraly (@cskiraly)
 discussions-to: https://ethereum-magicians.org/t/placeholder/0
 status: Draft
 type: Standards Track
 category: Core
 created: 2026-05-06
-requires: 4844, 4788, 7002, 7594, 7732, 7918
+requires: 4788, 4844, 7002, 7594, 7732, 7918
 ---
 
 ## Abstract
@@ -109,9 +109,9 @@ def validate_blob_transactions(block: Block, bf_aot: int):
 
         if tx.max_fee_per_blob_gas > 0:
             # JIT blob transaction
-            assert tx.max_fee_per_blob_gas >= blob_base_fee, "JIT blob fee too low"
+            assert tx.max_fee_per_blob_gas >= bf_aot, "JIT blob fee too low"
             # Deduct and burn blob fee: n_blobs * GAS_PER_BLOB * bf_aot
-            blob_fee = n_blobs * GAS_PER_BLOB * blob_base_feebf_aot
+            blob_fee = n_blobs * GAS_PER_BLOB * bf_aot
             assert tx.sender.balance >= blob_fee
             tx.sender.balance -= blob_fee
             # blob_fee is burned (not transferred to coinbase)
@@ -123,7 +123,6 @@ def validate_blob_transactions(block: Block, bf_aot: int):
 
     # Capacity checks
     assert jit_blob_count <= MAX_JIT_BLOBS_PER_BLOCK
-    
 ```
 
 Where `blob_base_fee` is the blob base fee read from the ticket contract at the start of the block.
@@ -151,8 +150,7 @@ Replacement of blob transactions with a valid ticket is possible but can be carr
 | Opcode | Byte | Change |
 | - | - | - |
 | `BLOBHASH` | `0x49` | No change. Per-transaction indexing works for both JIT and AOT. |
-| `BLOBBASEFEE` | `0x4A` | Returns 
-cached from the ticket contract at block start. |
+| `BLOBBASEFEE` | `0x4A` | Returns the blob base fee cached from the ticket contract at block start. |
 
 The `BLOBBASEFEE` opcode continues to return the blob base fee, but the source changes from a header field computation to a contract state read cached at the beginning of block processing.
 
