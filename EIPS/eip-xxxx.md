@@ -1,5 +1,5 @@
 ---
-eip: 9999
+eip: 8252
 title: Execution-Layer Reorg State Retention Window
 description: Require EL clients to retain enough state to re-execute across any reorg within the weak-subjectivity horizon
 author: Toni Wahrstätter (@nerolation), Kevaundray Wedderburn (@kevaundray)
