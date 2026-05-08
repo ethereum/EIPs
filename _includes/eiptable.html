@@ -17,6 +17,9 @@
         {% if status == "Last Call" %}
           <tr>
           <th class="eipnum">Number</th><th class="date">Review ends</th><th class="title">Title</th><th class="author">Author</th></tr>
+        {% elsif status == "Withdrawn" %}
+        <tr>
+          <th class="eipnum">Number</th><th class="withdrawn-reason">Withdrawn Reason</th><th class="title">Title</th><th class="author">Author</th></tr>      
         {% else %}
           <tr><th class="eipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
         {% endif %}
@@ -26,6 +29,8 @@
           <td class="eipnum"><a href="{{page.url|relative_url}}">{{page.eip|xml_escape}}</a></td>
           {% if status == "Last Call" and page.last-call-deadline != undefined %}
             <td class="date">{{ page.last-call-deadline | xml_escape }}</td>
+          {% elsif status == "Withdrawn" %}
+            <td class="withdrawn-reason">{{ page.withdrawal-reason | xml_escape }}</td>
           {% endif %}
           <td class="title">{{page.title|xml_escape}}</td>
           <td class="author">{% include authorlist.html authors=page.author %}</td>
