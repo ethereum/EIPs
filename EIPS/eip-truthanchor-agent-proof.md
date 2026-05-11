@@ -1,0 +1,146 @@
+---
+eip: <to be assigned>
+title: Verifiable On-Chain Proof Layer for Autonomous AI Agents
+description: A standard interface for AI agents to anchor actions, evaluations, and reputation on Ethereum, enabling tamper-evident audit trails and cross-chain agent identity.
+author: Xiaoyu "Vincent" Wu (@TruthanchorAi)
+discussions-to: https://ethereum-magicians.org/c/eips/5 (thread pending — author account 24h cooldown)
+status: Draft
+type: Standards Track
+category: ERC
+created: 2026-05-11
+requires: 712, 8004
+---
+
+## Abstract
+
+This EIP defines a minimal on-chain interface and canonical payload format
+(`truthanchor/v2`) that allows autonomous AI agents to (a) register a
+verifiable identity, (b) anchor a SHA-256 commitment of any action, source,
+or output to any EVM chain, and (c) accumulate a portable, tamper-evident
+reputation score readable by any verifier without trust assumptions.
+The standard complements ERC-8004 (agent identity) and Visa TAP (trusted
+agent protocol) by providing the *proof* layer those identity layers
+depend on for accountability.
+
+## Motivation
+
+A2A (Agent-to-Agent) commerce is rapidly emerging — a16z crypto's $2.2B
+fund (May 2026), Y Combinator's stablecoin funding option, and the RBA
+A2A vision paper all point to a near-term reality where billions of
+autonomous agents transact value without human review. Three gaps remain:
+
+1. **Identity ≠ Accountability.** ERC-8004 and Visa TAP solve "who", not
+   "what they did". An agent's NFT identity is worthless if its actions
+   cannot be cryptographically replayed.
+2. **Reputation must be portable.** Today every framework (LangChain,
+   CrewAI, AutoGPT) keeps a private log. An agent that performs well in
+   one platform cannot carry its reputation into another.
+3. **Audit trails must be permissionless.** Compliance (EU AI Act, US
+   AI Bill of Rights) requires verifiable replay by any third party,
+   not by the agent's host.
+
+This EIP solves all three with one canonical anchor format and one
+contract interface, deployable on any EVM chain, with a single SHA-256
+root that bridges identity (ERC-8004) and execution.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in RFC 2119.
+
+### 1. Canonical Payload (`truthanchor/v2`)
+
+Every anchor MUST be a JSON object conforming to:
+
+```json
+{
+  "protocol": "truthanchor/v2",
+  "agent_id": "0x<32-byte agent identity from ERC-8004>",
+  "action": "<free-form UTF-8 string, max 4096 bytes>",
+  "source_url": "<optional, RFC-3986 URI>",
+  "source_hash": "<optional, 0x-prefixed SHA-256 of source bytes>",
+  "parent_anchor": "<optional, prior tx hash for causal chains>",
+  "session_id": "<optional, opaque UTF-8 session identifier>",
+  "timestamp": "<RFC-3339 UTC>"
+}
+```
+
+The implementation MUST canonicalize the JSON per RFC 8785 (JCS) and hash
+with SHA-256 to produce content_hash.
+
+### 2. Contract Interface
+
+```solidity
+interface ITruthAnchor {
+    event Anchored(
+        bytes32 indexed contentHash,
+        address indexed submitter,
+        bytes32 indexed agentId,
+        bytes32 parentAnchor,
+        uint256 timestamp
+    );
+    function anchor(
+        bytes32 contentHash,
+        bytes32 agentId,
+        bytes32 parentAnchor
+    ) external;
+    function batchAnchor(bytes32 merkleRoot, uint256 leafCount) external;
+    function isAnchored(bytes32 contentHash) external view returns (bool);
+}
+```
+
+### 3. Reputation Aggregation (informational)
+
+Verifiers MAY compute a reputation score over an agent's anchor history.
+This EIP defines a recommended 12-dimension schema (3 layers × 4 axes)
+to allow cross-platform comparison; the exact weighting is left to
+implementations:
+
+- **Behavior layer (60%):** volume, consistency, latency, recovery
+- **Capability layer (25%):** truthfulness, novelty, specialization, reach
+- **Character layer (15%):** ethics, transparency, peer endorsement, longevity
+
+## Rationale
+
+Anchoring only the SHA-256 commitment keeps original agent data private
+while making any future tamper provable. Storing parent_anchor enables
+causal chains without requiring agents to coordinate. Using ERC-8004
+identity as agent_id reuses existing identity infrastructure rather
+than creating a parallel registry. The 12-dimension reputation schema is
+informational, not normative, to avoid coupling consensus-critical
+contract logic to subjective scoring.
+
+## Backwards Compatibility
+
+Fully backwards-compatible. Existing anchors using truthanchor/v1
+(hash-only, no agent identity) MAY remain valid; new anchors SHOULD
+use v2.
+
+## Reference Implementation
+
+- Ethereum Mainnet contract: `0x68551e56067F96173B063167191E09477013876F`
+- Sepolia testnet contract: `0xb21B1dEA9424ce5aD520e13A4dA9e5B5bE4d2989`
+- Multi-chain support: Polygon, Base, BNB Smart Chain
+- Live registry & verifier: https://truthanchor.biz
+- Open-source SDK (Python + Node.js): see project repository
+
+## Security Considerations
+
+Implementations MUST NOT store original action content on-chain — only
+the SHA-256 commitment. Storing plaintext leaks user data and exceeds
+practical gas limits.
+
+The agent_id field MUST be validated against the ERC-8004 registry
+before reputation aggregation; unverified IDs MUST be flagged.
+
+Batch anchoring (Merkle root) requires verifiers to retrieve leaves
+from off-chain storage; implementations SHOULD pin leaves to IPFS
+or equivalent content-addressed storage.
+
+Time-of-check vs time-of-use: an anchored commitment proves a value
+existed at block time, NOT that the action was performed correctly.
+
+## Copyright
+
+Copyright and related rights waived via CC0.
