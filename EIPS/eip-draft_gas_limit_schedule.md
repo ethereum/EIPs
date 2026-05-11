@@ -3,7 +3,7 @@ eip: xxxx
 title: Gas Limit Schedule
 description: Move the block gas limit to a hard-fork-scheduled, consensus-enforced parameter, removing proposer/builder/operator configurability.
 author: Barnabas Busa (@barnabasbusa)
-discussions-to: https://ethereum-magicians.org/t/eip-xxxx-gas-limit-schedule
+discussions-to: https://ethereum-magicians.org/t/eip-xxxxx-gas-limit-schedule-gpo/28494
 status: Draft
 type: Standards Track
 category: Core
