@@ -12,9 +12,9 @@
       "height": 36,
       "text": "EIP-8025 — Execution Proof Flow",
       "fontSize": 24,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:54:14.275Z",
-      "version": 3
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "prover-zone",
@@ -26,9 +26,9 @@
       "backgroundColor": "#e3f2fd",
       "strokeColor": "#1565c0",
       "strokeStyle": "dashed",
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:44:04.328Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "prover-zone-label",
@@ -39,9 +39,9 @@
       "height": 26,
       "text": "Proof-generating node (opt-in)",
       "fontSize": 16,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:44:06.720Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "verifier-zone",
@@ -53,9 +53,9 @@
       "backgroundColor": "#e8f5e9",
       "strokeColor": "#2e7d32",
       "strokeStyle": "dashed",
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:54:00.246Z",
-      "version": 3
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "verifier-zone-label",
@@ -66,9 +66,9 @@
       "height": 26,
       "text": "Proof-verifying node (opt-in)",
       "fontSize": 16,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:54:01.942Z",
-      "version": 3
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "gossip",
@@ -83,9 +83,9 @@
         "text": "CL p2p — execution_proof gossip topic\nSignedExecutionProof"
       },
       "fontSize": 16,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:44:26.953Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "prover-bn",
@@ -99,9 +99,9 @@
         "text": "Beacon Node (prover)\nactive validator"
       },
       "fontSize": 14,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:44:14.809Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "prover-pe",
@@ -115,9 +115,9 @@
         "text": "ProofEngine\nrequest_proofs / generate"
       },
       "fontSize": 14,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:44:16.657Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "prover-pn",
@@ -131,9 +131,9 @@
         "text": "Proof Node\n(runs guest, produces ExecutionProof)"
       },
       "fontSize": 13,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:44:18.497Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "verifier-bn",
@@ -147,9 +147,9 @@
         "text": "Beacon Node (verifier)\nstateless verification"
       },
       "fontSize": 14,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:54:03.725Z",
-      "version": 3
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "verifier-pe",
@@ -163,9 +163,9 @@
         "text": "ProofEngine\nverify_execution_proof"
       },
       "fontSize": 14,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:54:05.265Z",
-      "version": 3
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "verifier-pn",
@@ -179,9 +179,9 @@
         "text": "Proof Node\n(verifies ExecutionProof)"
       },
       "fontSize": 13,
-      "createdAt": "2026-05-13T20:40:39.363Z",
-      "updatedAt": "2026-05-13T20:54:07.106Z",
-      "version": 3
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "mp4j2vjbx2u3c3wnhxs",
@@ -202,9 +202,9 @@
           80
         ]
       ],
-      "createdAt": "2026-05-13T20:44:40.105Z",
-      "updatedAt": "2026-05-13T20:46:46.779Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
     },
     {
       "id": "mp4j2vjb6792xqov4pe",
@@ -226,9 +226,9 @@
           -80
         ]
       ],
-      "createdAt": "2026-05-13T20:44:40.105Z",
-      "updatedAt": "2026-05-13T20:46:49.031Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
     },
     {
       "id": "mp4j2vjbldd5v7bs4t",
@@ -249,8 +249,8 @@
           80
         ]
       ],
-      "createdAt": "2026-05-13T20:44:40.105Z",
-      "updatedAt": "2026-05-13T20:44:40.105Z",
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
       "version": 1
     },
     {
@@ -273,9 +273,9 @@
           -80
         ]
       ],
-      "createdAt": "2026-05-13T20:44:40.105Z",
-      "updatedAt": "2026-05-13T20:46:50.933Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
     },
     {
       "id": "mp4j2vjbi2r5xb1y17d",
@@ -296,9 +296,9 @@
           80
         ]
       ],
-      "createdAt": "2026-05-13T20:44:40.105Z",
-      "updatedAt": "2026-05-13T20:54:09.133Z",
-      "version": 4
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
     },
     {
       "id": "mp4j2vjbktzvzn0napj",
@@ -319,9 +319,9 @@
           80
         ]
       ],
-      "createdAt": "2026-05-13T20:44:40.105Z",
-      "updatedAt": "2026-05-13T20:54:10.876Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
     },
     {
       "id": "mp4j2vjb78jd2egr8sl",
@@ -331,7 +331,7 @@
       "strokeColor": "#2e7d32",
       "strokeStyle": "dashed",
       "label": {
-        "text": "9. result"
+        "text": "9. valid / invalid"
       },
       "points": [
         [
@@ -343,9 +343,9 @@
           -80
         ]
       ],
-      "createdAt": "2026-05-13T20:44:40.105Z",
-      "updatedAt": "2026-05-13T20:54:12.651Z",
-      "version": 3
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:26:19.112Z",
+      "version": 2
     },
     {
       "id": "mp4j6p0l11mfpxb866ta",
@@ -372,15 +372,15 @@
       "end": {
         "id": "gossip"
       },
-      "createdAt": "2026-05-13T20:47:38.279Z",
-      "updatedAt": "2026-05-13T20:49:49.425Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
     },
     {
       "id": "mp4j6p0lp4i8ujpurl",
       "type": "arrow",
-      "x": 983.5129597803684,
-      "y": 304.7349525140801,
+      "x": 985.4411238915615,
+      "y": 306.95437793633437,
       "strokeColor": "#ef6c00",
       "label": {
         "text": "6"
@@ -391,8 +391,8 @@
           0
         ],
         [
-          115.24120050006445,
-          -70.55764383230542
+          149.49367346291785,
+          -73.42745766667636
         ]
       ],
       "start": {
@@ -401,9 +401,33 @@
       "end": {
         "id": "verifier-bn"
       },
-      "createdAt": "2026-05-13T20:47:38.279Z",
-      "updatedAt": "2026-05-13T20:49:51.927Z",
-      "version": 2
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
+    },
+    {
+      "id": "mp4kjysoi4nvnotxaie",
+      "type": "arrow",
+      "x": 1390,
+      "y": 310,
+      "strokeColor": "#2e7d32",
+      "strokeStyle": "dashed",
+      "label": {
+        "text": "10. result"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          -80
+        ]
+      ],
+      "createdAt": "2026-05-13T21:25:57.098Z",
+      "updatedAt": "2026-05-13T21:25:57.098Z",
+      "version": 1
     }
   ],
   "appState": {
