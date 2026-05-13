@@ -1,0 +1,437 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "mcp-excalidraw-server",
+  "elements": [
+    {
+      "id": "title-flow",
+      "type": "text",
+      "x": 475,
+      "y": 30,
+      "width": 600,
+      "height": 36,
+      "text": "EIP-8025 — Execution Proof Flow",
+      "fontSize": 24,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "prover-zone",
+      "type": "rectangle",
+      "x": 50,
+      "y": 100,
+      "width": 520,
+      "height": 540,
+      "backgroundColor": "#e3f2fd",
+      "strokeColor": "#1565c0",
+      "strokeStyle": "dashed",
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "prover-zone-label",
+      "type": "text",
+      "x": 70,
+      "y": 110,
+      "width": 400,
+      "height": 26,
+      "text": "Proof-generating node (opt-in)",
+      "fontSize": 16,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "verifier-zone",
+      "type": "rectangle",
+      "x": 1010,
+      "y": 100,
+      "width": 520,
+      "height": 540,
+      "backgroundColor": "#e8f5e9",
+      "strokeColor": "#2e7d32",
+      "strokeStyle": "dashed",
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "verifier-zone-label",
+      "type": "text",
+      "x": 1030,
+      "y": 110,
+      "width": 400,
+      "height": 26,
+      "text": "Proof-verifying node (opt-in)",
+      "fontSize": 16,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "gossip",
+      "type": "ellipse",
+      "x": 605,
+      "y": 270,
+      "width": 380,
+      "height": 110,
+      "backgroundColor": "#fff8e1",
+      "strokeColor": "#ef6c00",
+      "label": {
+        "text": "CL p2p — execution_proof gossip topic\nSignedExecutionProof"
+      },
+      "fontSize": 16,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "prover-bn",
+      "type": "rectangle",
+      "x": 80,
+      "y": 160,
+      "width": 460,
+      "height": 70,
+      "backgroundColor": "#bbdefb",
+      "label": {
+        "text": "Beacon Node (prover)\nactive validator"
+      },
+      "fontSize": 14,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "prover-pe",
+      "type": "rectangle",
+      "x": 80,
+      "y": 310,
+      "width": 460,
+      "height": 70,
+      "backgroundColor": "#bbdefb",
+      "label": {
+        "text": "ProofEngine\nrequest_proofs / generate"
+      },
+      "fontSize": 14,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "prover-pn",
+      "type": "rectangle",
+      "x": 80,
+      "y": 460,
+      "width": 460,
+      "height": 70,
+      "backgroundColor": "#bbdefb",
+      "label": {
+        "text": "Proof Node\n(runs guest, produces ExecutionProof)"
+      },
+      "fontSize": 13,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "verifier-bn",
+      "type": "rectangle",
+      "x": 1040,
+      "y": 160,
+      "width": 460,
+      "height": 70,
+      "backgroundColor": "#c8e6c9",
+      "label": {
+        "text": "Beacon Node (verifier)\nstateless verification"
+      },
+      "fontSize": 14,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "verifier-pe",
+      "type": "rectangle",
+      "x": 1040,
+      "y": 310,
+      "width": 460,
+      "height": 70,
+      "backgroundColor": "#c8e6c9",
+      "label": {
+        "text": "ProofEngine\nverify_execution_proof"
+      },
+      "fontSize": 14,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "verifier-pn",
+      "type": "rectangle",
+      "x": 1040,
+      "y": 460,
+      "width": 460,
+      "height": 70,
+      "backgroundColor": "#c8e6c9",
+      "label": {
+        "text": "Proof Node\n(verifies ExecutionProof)"
+      },
+      "fontSize": 13,
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "mp4j2vjbx2u3c3wnhxs",
+      "type": "arrow",
+      "x": 190,
+      "y": 230,
+      "strokeColor": "#1565c0",
+      "label": {
+        "text": "1. request"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          80
+        ]
+      ],
+      "createdAt": "2026-05-13T21:25:51.362Z",
+      "updatedAt": "2026-05-13T21:25:51.362Z",
+      "version": 1
+    },
+    {
+      "id": "mp4j2vjb6792xqov4pe",
+      "type": "arrow",
+      "x": 430,
+      "y": 310,
+      "strokeColor": "#1565c0",
+      "strokeStyle": "dashed",
+      "label": {
+        "text": "4. proof"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          -80
+        ]
+      ],
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
+    },
+    {
+      "id": "mp4j2vjbldd5v7bs4t",
+      "type": "arrow",
+      "x": 190,
+      "y": 380,
+      "strokeColor": "#1565c0",
+      "label": {
+        "text": "2. generate"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          80
+        ]
+      ],
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
+    },
+    {
+      "id": "mp4j2vjbes3yrjwkoqj",
+      "type": "arrow",
+      "x": 430,
+      "y": 460,
+      "strokeColor": "#1565c0",
+      "strokeStyle": "dashed",
+      "label": {
+        "text": "3. ready"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          -80
+        ]
+      ],
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
+    },
+    {
+      "id": "mp4j2vjbi2r5xb1y17d",
+      "type": "arrow",
+      "x": 1150,
+      "y": 230,
+      "strokeColor": "#2e7d32",
+      "label": {
+        "text": "7. check_proof"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          80
+        ]
+      ],
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
+    },
+    {
+      "id": "mp4j2vjbktzvzn0napj",
+      "type": "arrow",
+      "x": 1150,
+      "y": 380,
+      "strokeColor": "#2e7d32",
+      "label": {
+        "text": "8. verify"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          80
+        ]
+      ],
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
+    },
+    {
+      "id": "mp4j2vjb78jd2egr8sl",
+      "type": "arrow",
+      "x": 1390,
+      "y": 460,
+      "strokeColor": "#2e7d32",
+      "strokeStyle": "dashed",
+      "label": {
+        "text": "9. valid / invalid"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          -80
+        ]
+      ],
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:26:19.112Z",
+      "version": 2
+    },
+    {
+      "id": "mp4j6p0l11mfpxb866ta",
+      "type": "arrow",
+      "x": 447.80998124807365,
+      "y": 233.41802128325028,
+      "strokeColor": "#ef6c00",
+      "label": {
+        "text": "5"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          156.4352773113468,
+          73.92434771698916
+        ]
+      ],
+      "start": {
+        "id": "prover-bn"
+      },
+      "end": {
+        "id": "gossip"
+      },
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
+    },
+    {
+      "id": "mp4j6p0lp4i8ujpurl",
+      "type": "arrow",
+      "x": 985.4411238915615,
+      "y": 306.95437793633437,
+      "strokeColor": "#ef6c00",
+      "label": {
+        "text": "6"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          149.49367346291785,
+          -73.42745766667636
+        ]
+      ],
+      "start": {
+        "id": "gossip"
+      },
+      "end": {
+        "id": "verifier-bn"
+      },
+      "createdAt": "2026-05-13T21:25:51.363Z",
+      "updatedAt": "2026-05-13T21:25:51.363Z",
+      "version": 1
+    },
+    {
+      "id": "mp4kjysoi4nvnotxaie",
+      "type": "arrow",
+      "x": 1390,
+      "y": 310,
+      "strokeColor": "#2e7d32",
+      "strokeStyle": "dashed",
+      "label": {
+        "text": "10. result"
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          -80
+        ]
+      ],
+      "createdAt": "2026-05-13T21:25:57.098Z",
+      "updatedAt": "2026-05-13T21:25:57.098Z",
+      "version": 1
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff",
+    "gridSize": null
+  }
+}
