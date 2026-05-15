@@ -8,17 +8,17 @@ import "./BaseBidOnAddresses.sol";
 /// It was considered to allow the DAO to adjust registration date to pay salary retrospectively,
 /// but this seems giving too much rights to the DAO similarly as if it had the right to declare anyone dead.
 ///
-/// It would cause this effect: A scientist who is already great may register then his date is moved back
+/// It would cause this effect: A scientist who is already great may register, then his date is moved back
 /// in time and instantly he or she receives a very big sum of money to his account.
 /// If it is done erroneously, there may be no way to move the registration date again forward in time,
 /// because the tokens may be already withdrawn. And it cannot be done in a fully decentralized way because
-/// it needs oracles. So errors are seem inevitable.
+/// it needs oracles. So errors seem inevitable.
 /// On the other hand, somebody malicious may create and register in my system a pool of Ethereum addresses that
 /// individuals can receive from them as if they themselves registered in the past.
-/// So it in some cases (if the registration date is past the contract deployment) this issue is impossible to
+/// So in some cases (if the registration date is past the contract deployment) this issue is impossible to
 /// mitigate.
 ///
-/// The salary is paid in minted tokens groups into "chains":
+/// The salary is paid in minted tokens grouped into "chains":
 /// the original salary token and anyone can replace it by another token, next in the chain.
 contract BaseSalary is BaseBidOnAddresses {
     /// Salary receiver registered.
@@ -86,7 +86,7 @@ contract BaseSalary is BaseBidOnAddresses {
         uint _lastSalaryDate = lastSalaryDates[_condition];
         require(_lastSalaryDate != 0, "You are not registered.");
         // Note: Even if you withdraw once per 20 years, you will get only 630,720,000 tokens.
-        // This number is probably not to big to be displayed well in UIs.
+        // This number is probably not too big to be displayed well in UIs.
         uint256 _amount = (block.timestamp - _lastSalaryDate) * 10**18; // one token per second
         _mintToCustomer(msg.sender, firstToLastConditionInChain[_condition], _amount, _data);
         lastSalaryDates[_condition] = block.timestamp;
@@ -100,7 +100,7 @@ contract BaseSalary is BaseBidOnAddresses {
     /// Anyone can request to recalculate anyone's salary.
     ///
     /// It's also useful to punish someone for decreasing his work performance or an evil act.
-    /// This is to be called among other when a person dies.
+    /// This is to be called among others when a person dies.
     ///
     /// Recalculation is also forced when a salary receiver transfers away his current salary token.
     /// It is useful to remove a trader's incentive to kill the issuer to reduce the circulating supply.
@@ -126,7 +126,7 @@ contract BaseSalary is BaseBidOnAddresses {
     /// Make a new condition that replaces the old one.
     /// The same can be done by transferring to yourself 0 tokens, but this method uses less gas.
     ///
-    /// We need to create a new condition every time when an outgoimg transfer of a conditional token happens.
+    /// We need to create a new condition every time when an outgoing transfer of a conditional token happens.
     /// Otherwise an investor would gain if he kills a scientist to reduce the circulating supply of his token to increase the price.
     /// Allowing old tokens to be exchangeable for new ones? (Allowing the reverse swap would create killer's gain.)
     /// Additional benefit of this solution: We can have different rewards at different stages of project,
@@ -144,7 +144,7 @@ contract BaseSalary is BaseBidOnAddresses {
     ///
     /// Old token is 1:1 converted to the new token.
     ///
-    /// Remark: To make easy to exchange the token even if it is recreated, we can make a wrapper or locker
+    /// Remark: To make it easy to exchange the token even if it is recreated, we can make a wrapper or locker
     /// token that uses `firstConditionInChain[]` to aggregate several tokens together.
     /// A similar wrapper (the customer need to `setApprovalForAll()` on it) that uses
     /// `firstToLastConditionInChain[]` can be used to transfer away recreated tokens

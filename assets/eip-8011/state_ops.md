@@ -1,0 +1,22 @@
+# State operations
+
+```python
+# Environmental Ops
+BALANCE = 0x31
+EXTCODESIZE = 0x3B
+EXTCODECOPY = 0x3C
+EXTCODEHASH = 0x3F
+
+# Storage Ops
+SLOAD = 0x54
+SSTORE = 0x55
+
+# System Operations
+CREATE = 0xF0
+CALL = 0xF1
+CALLCODE = 0xF2
+DELEGATECALL = 0xF4
+CREATE2 = 0xF5
+STATICCALL = 0xFA
+SELFDESTRUCT = 0xFF
+```

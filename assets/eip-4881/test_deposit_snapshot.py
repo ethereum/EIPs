@@ -3,7 +3,7 @@ import pytest
 import yaml
 from dataclasses import dataclass
 from deposit_snapshot import DepositTree,DepositTreeSnapshot
-from eip_4881 import DepositData,DEPOSIT_CONTRACT_DEPTH,Eth1Data,Hash32,sha256,uint64,zerohashes
+from eip_4881 import DepositData,Eth1Data,Hash32,sha256,uint64,zerohashes
 
 @dataclass
 class DepositTestCase:
