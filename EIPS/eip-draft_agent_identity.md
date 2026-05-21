@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
-title: Agent Identity, Capability, and Reputation Standard
-description: A standard for on-chain identity, capability declaration, stake-based trust, audit verification, and reputation tracking for autonomous AI agents.
+title: Agent Identity, Capability, and Reputation
+description: On-chain identity, capability declaration, stake-based trust, audit verification, and reputation tracking for autonomous AI agents.
 author: Panini (@Brooks1003)
 discussions-to: https://github.com/Brooks1003/base-agent-registry/discussions
 status: Draft
