@@ -1,0 +1,70 @@
+---
+eip: 9999
+title: Storage Roots in Block Access Lists
+description: Extend EIP-7928 with per-account post-block storage trie roots so partially stateful nodes can verify the state root
+author: Toni Wahrstätter (@nerolation), Carlos Perez (@CPerezz)
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-storage-roots-in-block-access-lists/28585
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-05-21
+requires: 7928
+---
+
+## Abstract
+
+This EIP extends [EIP-7928](./eip-7928.md) by attaching the post-block storage trie root to every Block Access List (BAL) entry that records state modifications. Partially stateful nodes can then verify the post-block state root without holding the full storage tries of modified accounts.
+
+## Motivation
+
+A BAL exposes per-slot post-values but not the post-block storage trie root of each modified account. A node that holds only a partition of the state therefore cannot derive the storage root for a modified account it does not store, and so cannot reconstruct the state-trie leaf needed to verify the post-block state root.
+
+Including the post-block storage root for every modified account closes this gap. Combined with the balance, nonce, and code information already present in the BAL, any node can assemble the full state-trie leaf for every modified account regardless of which portion of state it retains.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "SHOULD", and "MAY" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+
+### Modified `AccountChanges`
+
+Each `AccountChanges` entry whose state-change lists (`storage_changes`, `balance_changes`, `nonce_changes`, or `code_changes`) are not all empty MUST carry an additional trailing field `storage_root`:
+
+```
+StorageRoot = bytes32
+
+AccountChanges = [
+    Address,
+    List[SlotChanges],     # storage_changes
+    List[StorageKey],      # storage_reads
+    List[BalanceChange],   # balance_changes
+    List[NonceChange],     # nonce_changes
+    List[CodeChange],      # code_changes
+    StorageRoot,           # post-block storage trie root (new)
+]
+```
+
+`storage_root` is the root of the account's storage trie evaluated against the post-block state. For accounts whose storage trie is empty post-block, `storage_root` MUST be the canonical empty trie root `0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421`.
+
+Entries that describe accessed-but-unchanged accounts (every change list empty) MUST NOT include `storage_root` and retain the six-field layout from [EIP-7928](./eip-7928.md).
+
+### Validation
+
+A block is invalid if, for any `AccountChanges` carrying `storage_root`, the value does not equal the storage trie root produced by executing the block.
+
+All other rules from [EIP-7928](./eip-7928.md), including ordering, uniqueness, `block_access_list_hash` computation, and engine API encoding, remain unchanged. `storage_root` is included in the RLP that the hash commits to.
+
+## Rationale
+
+The storage root is the single piece of post-block state that cannot be reconstructed from BAL contents alone, since it depends on the entire storage trie of the account rather than only the modified slots. Balance, nonce, and code are already recoverable from the BAL diffs, so committing to the storage root is sufficient to derive the full state-trie leaf. Restricting the field to accounts with state changes keeps the overhead at 32 bytes per modified account; touched-only entries add nothing.
+
+## Backwards Compatibility
+
+This proposal alters the BAL encoding introduced by [EIP-7928](./eip-7928.md) and requires a hard fork. The two encodings are not interchangeable: clients implementing only EIP-7928 will reject blocks under this EIP and vice versa.
+
+## Security Considerations
+
+`storage_root` is a redundant commitment over data already produced during execution, so any divergence is detected as part of normal BAL validation. The added bandwidth is bounded by `32 * modified_accounts`, well below the BAL size envelope described in [EIP-7928](./eip-7928.md).
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
