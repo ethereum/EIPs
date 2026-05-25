@@ -1,0 +1,394 @@
+---
+eip: TBD
+title: Recent Root References for Frame Transactions
+description: Frame transactions can declare verified recent roots
+author: Thomas Thiery (@soispoke), Vitalik Buterin (@vbuterin), Toni Wahrstätter (@nerolation)
+discussions-to: TBD
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-05-15
+requires: 7843, 8141
+---
+
+## Abstract
+
+EIP-8141 frame transactions can reference recent roots without reading mutable storage during validation. A root source writes roots to a system contract, with each root keyed by `(source_id, slot)`, where `source_id` derives from the writer address and a salt. A frame transaction may declare recent root references of the form:
+
+```text
+(source_id, slot, root)
+```
+
+Before frame execution, clients check each reference against the transaction pre-state. The check succeeds only if the named root is stored for the named source and slot, and the slot is still recent. Validation code can then read the verified reference through transaction introspection.
+
+## Motivation
+
+EIP-8141 validation must not read arbitrary storage controlled by another account or application in the public mempool. Some validation rules still need to depend on recent application state, such as privacy tree roots, wallet authorization roots, or account validation roots.
+
+Recent root references let a transaction explicitly name recent roots in its signed transaction envelope. Each reference maps to one system-contract storage key and can be checked before validation code runs.
+
+Privacy applications, for example, keep a tree of commitments and prove spends against a recent tree root. With this EIP, the application writes roots by slot, and spend transactions reference one of those roots directly instead of reading the application's changing tree state during validation.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+This specification is a delta against EIP-8141. Terms not defined here, including `FrameTx`, `FRAME_TX_TYPE`, `VERIFY`, `EXPIRY_VERIFIER`, frame modes, and `TXPARAM`, have the meanings defined in EIP-8141.
+
+### Constants
+
+| Name                                 |                                                                            Value |
+| ------------------------------------ | -------------------------------------------------------------------------------: |
+| `FORK_TIMESTAMP`                     |                                                                            `TBD` |
+| `RECENT_ROOT_ADDRESS`                 |                                                                            `TBD` |
+| `RECENT_ROOT_CODE`                    |                                                                            `TBD` |
+| `RECENT_ROOT_LENGTH`                  |                                                                           `8192` |
+| `RECENT_ROOT_USABLE_WINDOW`           |                                                                           `8191` |
+| `MAX_RECENT_ROOT_REFERENCES`          |                                                                             `16` |
+| `RECENT_ROOT_ENTRY_DOMAIN`            |                                                  `keccak256("RECENT_ROOT_ENTRY")` |
+| `RECENT_ROOT_STORAGE_DOMAIN`          |                                                `keccak256("RECENT_ROOT_STORAGE")` |
+| `RECENT_ROOT_REFERENCE_ADDRESS_GAS`   |                                                       `ACCESS_LIST_ADDRESS_COST` |
+| `RECENT_ROOT_REFERENCE_GAS`           | `ACCESS_LIST_STORAGE_KEY_COST + 2 * KECCAK256_BASE_GAS + 7 * KECCAK256_WORD_GAS` |
+| `TXPARAM_RECENT_ROOT_REFERENCE_COUNT` |                                                                           `0x0D` |
+| `RECENTROOTREFLOAD`                   |                                                                           `0xB4` |
+| `RECENTROOTREFLOAD_GAS`               |                                                                              `3` |
+
+All concatenations below use fixed-length encodings. Domains are 32 bytes. Addresses are 20 bytes. Slots and indices are unsigned 64-bit big-endian integers. Roots, salts, source identifiers, entry hashes, and storage keys are 32 bytes.
+
+### Current slot
+
+For block validation, `current_slot` is the consensus slot of the beacon block that contains the execution payload being validated.
+
+Execution clients MUST obtain `current_slot` from the EIP-7843 `slotNumber` field. Clients MUST NOT derive `current_slot` from `block.timestamp` using a fixed slot duration.
+
+For transaction pool handling, `current_slot` is the node's current slot at receipt, recheck, or eviction time. It is local policy, not block validity.
+
+References MUST target slots strictly before `current_slot`. A root written during slot `S` becomes referenceable beginning in slot `S + 1`.
+
+### Root sources
+
+A root source is identified by:
+
+```text
+source_id = keccak256(source_address || salt)
+```
+
+where `source_address` is an address and `salt` is a `bytes32` value.
+
+The source address MAY be an externally owned account or a contract, and MAY use multiple root sources by using different salts. Applications using a root source are responsible for controlling who can write to it and how salts are allocated.
+
+### Entry and storage keys
+
+The committed entry for `(source_id, slot, root)` is:
+
+```text
+entry_hash = keccak256(
+    RECENT_ROOT_ENTRY_DOMAIN ||
+    source_id ||
+    uint64_be(slot) ||
+    root
+)
+```
+
+The storage key for index `i` is:
+
+```text
+storage_key = keccak256(
+    RECENT_ROOT_STORAGE_DOMAIN ||
+    source_id ||
+    uint64_be(i)
+)
+```
+
+Each root source has a conceptual array:
+
+```text
+entries: bytes32[RECENT_ROOT_LENGTH]
+```
+
+`entries[i]` is stored at `RECENT_ROOT_ADDRESS[storage_key]`. All entries are initially zero.
+
+Each root source uses at most `RECENT_ROOT_LENGTH` storage keys. The global storage footprint is `RECENT_ROOT_LENGTH` keys per written `source_id`.
+
+### Recent root contract
+
+At activation, clients MUST create or update the account at `RECENT_ROOT_ADDRESS` as specified in [Activation](#activation).
+
+The contract accepts one write operation with 64 bytes of calldata:
+
+```text
+salt: bytes32
+root: bytes32
+```
+
+Bytes `0..31` are `salt`. Bytes `32..63` are `root`.
+
+Calls MUST revert unless calldata is exactly 64 bytes and call value is zero.
+
+In static context, the write MUST fail and storage MUST remain unchanged.
+
+The source address for a successful write is `msg.sender` of the call to `RECENT_ROOT_ADDRESS`.
+
+Only a direct call to `RECENT_ROOT_ADDRESS` can write recent-root storage. `DELEGATECALL` and `CALLCODE` MUST NOT write recent-root storage.
+
+When a successful call is made during slot `S`, the contract computes:
+
+```text
+source_address = msg.sender
+source_id = keccak256(source_address || salt)
+i = S mod RECENT_ROOT_LENGTH
+entry_hash = keccak256(
+    RECENT_ROOT_ENTRY_DOMAIN ||
+    source_id ||
+    uint64_be(S) ||
+    root
+)
+storage_key = keccak256(
+    RECENT_ROOT_STORAGE_DOMAIN ||
+    source_id ||
+    uint64_be(i)
+)
+```
+
+and sets:
+
+```text
+storage[storage_key] = entry_hash
+```
+
+The call follows normal EVM execution and gas accounting. A successful call returns zero bytes. The contract exposes no read operation.
+
+Each `(source_id, S)` has at most one referenceable root on the canonical chain. Multiple writes by the same source address and salt during slot `S` target the same storage key. If multiple writes are included, the final write in canonical block execution order overwrites earlier writes. Only that final root is referenceable beginning in slot `S + 1`.
+
+### Transaction payload
+
+The pre-fork EIP-8141 frame-transaction payload has eight fields:
+
+```text
+[chain_id, nonce, sender, frames,
+ max_priority_fee_per_gas, max_fee_per_gas,
+ max_fee_per_blob_gas, blob_versioned_hashes]
+```
+
+The post-fork frame-transaction payload becomes:
+
+```text
+[chain_id, nonce, sender, frames,
+ max_priority_fee_per_gas, max_fee_per_gas,
+ max_fee_per_blob_gas, blob_versioned_hashes,
+ recent_root_references]
+```
+
+where:
+
+```text
+recent_root_references = [[source_id, slot, root], ...]
+```
+
+`recent_root_references` MUST be an RLP list. Each item MUST be an RLP list of exactly three elements. `source_id` MUST be a byte string of length 32. `slot` MUST be a canonical RLP integer satisfying `slot < 2**64`. `root` MUST be a byte string of length 32. Consensus treats `root` as opaque bytes; applications define what it commits to. The number of references MUST NOT exceed `MAX_RECENT_ROOT_REFERENCES`.
+
+The `slot` field is a slot number, not a timestamp or block number.
+
+The frame layout and frame execution rules are otherwise unchanged. `recent_root_references` is a top-level transaction field and is included in `compute_sig_hash(tx)`.
+
+The post-fork signature hash follows EIP-8141 over the nine-field payload:
+
+```python
+def compute_sig_hash(tx: FrameTx) -> Hash:
+    for i, frame in enumerate(tx.frames):
+        if frame.mode == VERIFY and frame.target != EXPIRY_VERIFIER:
+            tx.frames[i].data = Bytes()
+    return keccak(bytes([FRAME_TX_TYPE]) + rlp(tx))
+```
+
+where `rlp(tx)` is the post-fork nine-field payload. `recent_root_references` is not elided by the VERIFY-frame data elision rule.
+
+Frame data, including VERIFY frame data, MUST NOT add, remove, or modify the transaction's recent root reference set.
+
+### Static validity
+
+Decoders MUST reject a post-fork frame transaction if any of the following is true:
+
+* the payload does not match the post-fork schema;
+* `recent_root_references` is not an RLP list;
+* `len(recent_root_references) > MAX_RECENT_ROOT_REFERENCES`;
+* any reference is not an RLP list of exactly three elements;
+* any `source_id` is not a byte string of length 32;
+* any `slot` is not a canonical RLP integer or satisfies `slot >= 2**64`;
+* any `root` is not a byte string of length 32.
+
+### Reference validity
+
+Within block execution, recent root references are checked after the EIP-8141 nonce check and before frame execution, against the transaction pre-state. The transaction pre-state includes all prior transactions in the same block.
+
+Competing blocks at the same slot may have different recent-root state, and a reference is valid only in a block whose transaction pre-state contains the referenced entry. `current_slot` is the consensus slot of that block.
+
+A recent root reference `(source_id, slot, root)` is valid only if:
+
+```text
+1 <= current_slot - slot <= RECENT_ROOT_USABLE_WINDOW
+i = slot mod RECENT_ROOT_LENGTH
+entry_hash = keccak256(
+    RECENT_ROOT_ENTRY_DOMAIN ||
+    source_id ||
+    uint64_be(slot) ||
+    root
+)
+storage_key = keccak256(
+    RECENT_ROOT_STORAGE_DOMAIN ||
+    source_id ||
+    uint64_be(i)
+)
+RECENT_ROOT_ADDRESS[storage_key] == entry_hash
+```
+
+If any reference is invalid, the transaction is invalid and no frame is executed. A block containing such a transaction is invalid.
+
+Duplicate references are valid. They are checked, charged, and preserved independently. Accessed address and storage-key sets deduplicate normally.
+
+Each valid reference MUST add `RECENT_ROOT_ADDRESS` and its `storage_key` to the transaction's accessed address and storage-key sets. This affects warm/cold gas accounting only.
+
+### Access lists
+
+Recent root writes are ordinary writes to `RECENT_ROOT_ADDRESS[storage_key]`.
+
+### Gas accounting
+
+For post-fork frame transactions, the EIP-8141 gas-limit formula is modified to include recent root references:
+
+```text
+tx_gas_limit =
+    FRAME_TX_INTRINSIC_COST
+    + len(tx.frames) * FRAME_TX_PER_FRAME_COST
+    + calldata_cost(recent_root_calldata)
+    + recent_root_reference_intrinsic_gas
+    + sum(frame.gas_limit for all frames)
+```
+
+where:
+
+```text
+recent_root_reference_intrinsic_gas =
+    0
+        if len(recent_root_references) == 0
+    RECENT_ROOT_REFERENCE_ADDRESS_GAS
+        + len(recent_root_references) * RECENT_ROOT_REFERENCE_GAS
+        otherwise
+```
+
+and:
+
+```text
+recent_root_calldata = rlp(tx.frames) || rlp(recent_root_references)
+```
+
+The EIP-7623 calldata cost MUST be computed over `recent_root_calldata` as one byte string.
+
+`RECENT_ROOT_REFERENCE_GAS` covers one declared storage key and the two Keccak computations used to derive `storage_key` and `entry_hash`.
+
+### TXPARAM and RECENTROOTREFLOAD
+
+One new `TXPARAM` index and one new opcode are added:
+
+| Name                                 |  Value | Return value                 |
+| ------------------------------------ | -----: | ---------------------------- |
+| `TXPARAM_RECENT_ROOT_REFERENCE_COUNT` | `0x0D` | `len(recent_root_references)` |
+
+`TXPARAM(TXPARAM_RECENT_ROOT_REFERENCE_COUNT)` costs the standard `TXPARAM` gas.
+
+`RECENTROOTREFLOAD` pops two stack items:
+
+```text
+field
+index
+```
+
+where `field` is the top stack item and `index` is the second stack item. It pushes one word from `recent_root_references[index]`:
+
+| `field` | Return value                               |
+| ------: | ------------------------------------------ |
+|     `0` | `source_id`                                 |
+|     `1` | `slot`, as a zero-extended 256-bit integer |
+|     `2` | `root`                                     |
+
+`RECENTROOTREFLOAD` costs `RECENTROOTREFLOAD_GAS`. It MUST exceptional-halt if `index >= len(recent_root_references)` or `field > 2`.
+
+`RECENTROOTREFLOAD` reads only fields from the signed transaction envelope. It does not read recent root contract storage. It MAY be used in any frame mode, including VERIFY frames.
+
+### Public mempool handling
+
+Recent root storage is not exposed to validation code through EVM execution. During public mempool validation, recent root state may affect a transaction only through pre-execution reference checks and declared roots exposed by introspection.
+
+Nodes SHOULD admit a transaction to the public mempool only if all declared recent root references are valid against the node's current head.
+
+Nodes SHOULD NOT admit a transaction while any reference has `slot >= current_slot`. Nodes MAY evict a transaction with any reference where `current_slot - slot >= RECENT_ROOT_LENGTH`.
+
+Nodes SHOULD recheck pending transactions with recent root references when the head changes, when the node's current slot advances, or after any reorg that may affect referenced entries.
+
+### Activation
+
+This EIP MUST activate at or after EIP-8141.
+
+If `timestamp < FORK_TIMESTAMP`, clients MUST apply the pre-fork EIP-8141 `FRAME_TX_TYPE` schema and MUST NOT apply recent root logic.
+
+If `timestamp >= FORK_TIMESTAMP`, clients MUST apply the post-fork `FRAME_TX_TYPE` schema defined in this EIP.
+
+For every block `B` with `B.timestamp >= FORK_TIMESTAMP` whose parent has `parent.timestamp < FORK_TIMESTAMP`, clients MUST initialize `RECENT_ROOT_ADDRESS` against `B`'s parent state before executing any transaction in `B`.
+
+If `RECENT_ROOT_ADDRESS` does not exist, clients MUST create it with balance 0, nonce 1, code `RECENT_ROOT_CODE`, and empty storage.
+
+If `RECENT_ROOT_ADDRESS` already exists with empty code and empty storage, clients MUST set its code to `RECENT_ROOT_CODE`, set its nonce to `max(existing_nonce, 1)`, preserve its balance, and leave storage empty.
+
+The fork configuration MUST choose a `RECENT_ROOT_ADDRESS` with empty code and empty storage in the parent state of the first post-fork payload. If this condition is false at activation, the payload is invalid.
+
+For all other blocks, clients MUST NOT run this initialization. Clients MUST handle reorgs across the fork boundary by applying or undoing this transition according to the canonical chain.
+
+Pre-fork frame transactions and authorizations bound to the pre-fork canonical signature hash do not survive the boundary and MUST be evicted from mempools and regenerated.
+
+## Rationale
+
+EIP-8141 validation needs inputs that are known before validation starts. General reads from storage controlled by another account or application are unsafe for the public mempool because one mutable cell can invalidate many pending transactions.
+
+Recent root references provide a narrow exception. The root is declared in the signed transaction envelope, checked by clients before validation code runs, and exposed to validation code only through introspection. Recent root references are intentionally narrow: each reference names one recent `bytes32` root and one system-contract storage key.
+
+### Entry binding
+
+Each stored entry commits to the root source, slot, and root. This prevents an old root at the same array index, or a root from another root source, from satisfying a reference.
+
+### Window choice
+
+References are limited to slots strictly before `current_slot`. During slot `S`, writes update index `S mod RECENT_ROOT_LENGTH`, but references to `S` are invalid and references old enough to share that index are expired. Current-slot writes therefore cannot invalidate currently valid references.
+
+`RECENT_ROOT_LENGTH = 8192` gives `RECENT_ROOT_USABLE_WINDOW = 8191`, because the current slot is not referenceable.
+
+### Implicit source creation
+
+No creation transaction is required. A root source is created implicitly when a source address first writes with a new `(source_address, salt)` pair. Each root source has a bounded rolling window. Aggregate storage grows linearly with the number of written root sources. State growth is paid incrementally by the writes that create storage entries.
+
+### Bounded validation work
+
+For validation checks, each declared reference names exactly one storage key under `RECENT_ROOT_ADDRESS`.
+
+`MAX_RECENT_ROOT_REFERENCES = 16` bounds pre-execution reference checks while covering the expected root set for privacy, wallet authorization, and historical state root use cases.
+
+## Backwards Compatibility
+
+This EIP does not modify EIP-7702 or other transaction types. An EIP-7702-delegated EOA may be a source address; `source_id` is derived from `msg.sender` of the write call.
+
+References to slots before this EIP's activation are not satisfiable because recent root storage is empty at activation.
+
+## Security Considerations
+
+Consensus treats `root` as an opaque `bytes32`. Applications define what it commits to and MUST bind the expected `source_id`, slot window, and root in their validation logic. A privacy proof using root `R` should include `(source_id, slot, R)` or an application-specific commitment to those fields as a public input, and validation logic MUST check the same tuple through `RECENTROOTREFLOAD`.
+
+Each `(source_id, slot)` has one referenceable root on the canonical chain. The referenceable root is last-write-wins according to canonical execution order and is finalized with the containing block. An application that needs multiple roots from the same slot SHOULD write an aggregate commitment.
+
+This EIP does not guarantee inclusion of root writes. Applications that rely on timely root publication need their own publication path, redundant root sources, or an inclusion policy for write transactions.
+
+The same `(source_address, salt)` pair produces the same `source_id` on different chains, but each chain maintains independent recent root state. Proofs, bridge messages, and offchain attestations that carry recent root references MUST bind the intended chain domain outside the tuple.
+
+Recent roots create ordinary persistent storage under `RECENT_ROOT_ADDRESS`. Existing root sources overwrite at most `RECENT_ROOT_LENGTH` cells, while new root sources create additional cells. The natural pricing point for aggregate state growth is source creation, not recurring writes. Future versions MAY add a one-time source registration cost or first-write surcharge for each new `source_id`.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](/LICENSE).
