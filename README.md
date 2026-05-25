@@ -27,6 +27,15 @@ Consider any document not published at <https://eips.ethereum.org/> as a working
 
 ## Validation and Automerging
 
+Before opening a pull request, run the repository validation locally:
+
+bundle install
+bundle exec rake
+
+Pull requests that only fix formatting, metadata, links, or other editorial nits should pass validation before review. This reduces CI noise and editor overhead.
+
+Do not submit new ERCs or ERC updates to this repository. Use <https://github.com/ethereum/ercs> instead.
+
 All pull requests in this repository must pass automated checks before they can be automatically merged:
 
 - [eip-review-bot](https://github.com/ethereum/eip-review-bot/) determines when PRs can be automatically merged [^1]
@@ -43,10 +52,8 @@ It is possible to run the EIP validator locally:
 
 Make sure to add cargo's `bin` directory to your environment (typically `$HOME/.cargo/bin` in your `PATH` environment variable)
 
-```sh
 cargo install eipw
 eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
-```
 
 ## Build the status page locally
 
@@ -56,32 +63,24 @@ eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
 
 2. Check whether you have Ruby 3.1.4 installed. Later [versions are not supported](https://stackoverflow.com/questions/14351272/undefined-method-exists-for-fileclass-nomethoderror).
 
-   ```sh
-   ruby --version
-   ```
-
+      ruby --version
+   
 3. If you don't have Ruby installed, install Ruby 3.1.4.
 
 4. Install Bundler:
 
-   ```sh
-   gem install bundler
-   ```
-
+      gem install bundler
+   
 5. Install dependencies:
 
-   ```sh
-   bundle install
-   ```
-
+      bundle install
+   
 ### Build your local Jekyll site
 
 1. Bundle assets and start the server:
 
-   ```sh
-   bundle exec jekyll serve
-   ```
-
+      bundle exec jekyll serve
+   
 2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
 
 More information on Jekyll and GitHub Pages [here](https://docs.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
