@@ -1,17 +1,14 @@
 ---
-eip: 9999
-title: Batching attestations at source
+eip: 8243
+title: Batching Attestations at Source
 description: Allow validators scheduled for duty on the same committee to publish a single pre-aggregated attestation in place of N individual ones
 author: Raúl Kripalani (@raulk), Toni Wahrstätter (@nerolation), Mikhail Kalinin (@mkalinin)
 discussions-to: 
 status: Draft
 type: Standards Track
-category: Consensus
+category: Core
 created: 2026-05-01
-requires:
 ---
-
-# EIP-XXXX: Batching attestations at source
 
 ## Abstract
 
@@ -21,7 +18,7 @@ Introduce the ability to batch attestations at source, allowing operators runnin
 
 Ethereum has ~1M active validators today. With 100% participation, every slot triggers N x 1/32 attestations (around 31k), distributed over 64 subnets handling ~485 attestations each. Large operators run many validators, all typically sharing the same consensus view, and therefore typically voting in unison for head.
 
-As we push towards shorter slots and faster finality, we need to drastically reduce the volume of attestations while maintaining protocol and consensus integrity. While EIP-7251 achieves this via validator balance consolidation, uptake has been relatively slow.
+As we push towards shorter slots and faster finality, we need to drastically reduce the volume of attestations while maintaining protocol and consensus integrity. While [EIP-7251](./eip-7251.md) achieves this via validator balance consolidation, uptake has been relatively slow.
 
 By increasing attestation information efficiency in the way this EIP proposes, we can reduce the total volume of attestations without requiring an explicit validator transaction. In fact, multi-validator setups already meet most preconditions to implement this solution transparently: all it requires is for validator clients to sign an extra preimage to consent to inclusion within the batch.
 
@@ -314,7 +311,7 @@ Batch efficiency scales with the number of validators under an operator concurre
 
 This change is largely orthogonal to batching and may be split into a separate EIP.
 
-## Backwards compatibility
+## Backwards Compatibility
 
 The `beacon_attestation_{subnet_id}` topic message type changes from `SingleAttestation` to `WireAttestation`. Nodes must upgrade simultaneously at the fork boundary.
 
@@ -330,7 +327,15 @@ The on-chain `Attestation` container and `process_attestation` are unchanged, so
 
 Subnet reduction would require a coordinated upgrade with a transition period for dual subscription.
 
-## Security considerations
+## Test Cases
+
+TBD.
+
+## Reference Implementation
+
+TBD.
+
+## Security Considerations
 
 ### Spam bound
 
@@ -342,7 +347,7 @@ A passive observer harvesting V's `SingleAttestation` signature cannot construct
 
 ### Leaked singles do not suppress batches
 
-A validator V issuing both a `SingleAttestation` and a seal to batcher B (for example, due to misconfigured active-active VC redundancy) does not cause B's batch to be suppressed. The batch carries V's vote alongside others; if V's single arrives first, the batch is still accepted because its other members' votes are unseen. Conversely, if the batch arrives first, V's redundant single is dropped. In all orderings, no vote is lost, no party is penalized, and the on-chain `Attestation` reflects V exactly once.
+A validator V issuing both a `SingleAttestation` and a seal to batcher B (for example, due to misconfigured active-active validator client redundancy) does not cause B's batch to be suppressed. The batch carries V's vote alongside others; if V's single arrives first, the batch is still accepted because its other members' votes are unseen. Conversely, if the batch arrives first, V's redundant single is dropped. In all orderings, no vote is lost, no party is penalized, and the on-chain `Attestation` reflects V exactly once.
 
 ### Operational discipline
 
@@ -380,18 +385,6 @@ Batches reveal which validators are co-located under the same operator. However,
 
 Fewer subnets means higher message volume per subnet. Determining the optimal `BATCH_SUBNET_REDUCTION_FACTOR` requires simulation.
 
-## Test cases
-
-TBD.
-
-## Reference implementation
-
-TBD.
-
-## Open questions
-
-TBD.
-
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via [CC0](../LICENSE.md).
