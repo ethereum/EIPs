@@ -10,14 +10,14 @@ pragma experimental ABIEncoderV2;  // for `Fp` / `Fp2` struct calldata in `depos
 // on the EIP-7002 (withdrawals) / EIP-7251 (consolidations) "request bus":
 //
 //   * BuilderDepositContract  @ BUILDER_DEPOSIT_CONTRACT_ADDRESS  (request type 0x03)
-//       deposit(pubkey, wc, signature, pubkey_y, signature_y) — verifies the BLS
-//       proof-of-possession on chain via the EIP-2537 precompiles, then appends
-//       a deposit record to the in-state request queue.
+//       deposit(pubkey, wc, amount_gwei, signature, pubkey_y, signature_y) —
+//       verifies the BLS proof-of-possession on chain via the EIP-2537
+//       precompiles, then appends a deposit record to the in-state request queue.
 //
 //   * BuilderTopUpContract    @ BUILDER_TOPUP_CONTRACT_ADDRESS    (request type 0x04)
-//       top_up(pubkey) — unverified additional stake for an already-registered
-//       builder; appends a top-up record to its queue. The consensus layer
-//       rejects top-ups whose `pubkey` is not in the builder set.
+//       top_up(pubkey, amount_gwei) — unverified additional stake for an
+//       already-registered builder; appends a top-up record to its queue. The
+//       consensus layer rejects top-ups whose `pubkey` is not in the builder set.
 //
 // Neither contract emits logs. Both share the `RequestQueue` base: a user call
 // appends a record; at the end of the block a `SYSTEM_ADDRESS` call with empty
@@ -49,38 +49,134 @@ pragma experimental ABIEncoderV2;  // for `Fp` / `Fp2` struct calldata in `depos
 //     are pre-verified and carry no signature (the CL trusts the EL check).
 // ───────────────────────────────────────────────────────────────────────────────
 
-// EIP-7002-style request queue shared by both builder predeploys. A user call
-// appends an opaque record; the end-of-block `SYSTEM_ADDRESS` system call drains
-// up to MAX_REQUESTS_PER_BLOCK records (FIFO) and returns their concatenation as
-// the predeploy's flat `request_data`. No fee: callers of the derived contracts
-// already lock staked value, which is the anti-spam gate.
+// EIP-7002 / EIP-7251 style request bus shared by both builder predeploys.
+//
+// A user call appends an opaque record (and increments the per-block request
+// count). The end-of-block `SYSTEM_ADDRESS` system call drains up to
+// MAX_REQUESTS_PER_BLOCK records (FIFO) and returns their concatenation as the
+// predeploy's flat `request_data`, then updates the EIP-1559-style `excess`
+// counter from the per-block count and resets the count.
+//
+// The queue is a head/tail ring over a `mapping(uint => bytes)`, matching
+// EIP-7002's `dequeue_withdrawal_requests`: records are written at `queueTail`
+// and read from `queueHead`, and BOTH pointers are reset to 0 once the queue
+// empties (`new_queue_head_index == queue_tail_index` in EIP-7002), so the
+// mapping slots are reused by later requests. Storage is therefore bounded by
+// the peak in-flight queue depth, not by lifetime request volume — a plain
+// growable array would leak a slot per request forever, since draining only
+// advances the head.
+//
+// Each request carries a dynamic fee, computed exactly as in EIP-7002:
+// `fee = fake_exponential(MIN_REQUEST_FEE, excess, REQUEST_FEE_UPDATE_FRACTION)`.
+// When more than TARGET_REQUESTS_PER_BLOCK requests are submitted per block the
+// excess grows and the fee rises super-linearly, throttling demand. The fee is
+// charged on top of any staked value by the derived contract and is left locked
+// in the contract (effectively burned).
+//
+// Unlike EIP-7002/7251 there is no EXCESS_INHIBITOR: those contracts are
+// deployed before their activating fork and use the inhibitor to reject
+// requests until the first system call. These predeploys are installed at the
+// fork with empty storage (`excess == 0`, i.e. the minimum fee), so there are
+// no pre-activation requests to inhibit.
 contract RequestQueue {
     // Address used to invoke the end-of-block system operation (EIP-7002/7251).
     address constant SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
 
-    // Maximum records drained into a single block. Mirrors EIP-7002's
-    // MAX_WITHDRAWAL_REQUESTS_PER_BLOCK; excess records wait for later blocks.
+    // Maximum records drained into a single block (mirrors EIP-7002); excess
+    // records wait for later blocks.
     uint constant MAX_REQUESTS_PER_BLOCK = 16;
+    // Per-block request count above which the fee starts to rise (mirrors EIP-7002).
+    uint constant TARGET_REQUESTS_PER_BLOCK = 2;
+    // Minimum request fee in wei, and the fee's update fraction (mirror EIP-7002).
+    uint constant MIN_REQUEST_FEE = 1;
+    uint constant REQUEST_FEE_UPDATE_FRACTION = 17;
 
-    // FIFO queue of opaque request records, drained from `queueHead`.
-    bytes[] internal queue;
+    // FIFO queue of opaque request records: a head/tail ring over a mapping
+    // (see the note above). `queueTail` is the next write index, `queueHead`
+    // the next read index; both reset to 0 when the queue empties.
+    mapping(uint => bytes) internal queue;
     uint internal queueHead;
+    uint internal queueTail;
 
-    // Append a request record. Called by the derived contract's entrypoint
-    // after it has validated (and, for deposits, BLS-verified) the request.
-    function _enqueue(bytes memory record) internal {
-        queue.push(record);
+    // EIP-1559-style fee state: `excess` accumulates per-block demand above
+    // TARGET; `count` is the number of requests added in the current block.
+    uint internal excess;
+    uint internal count;
+
+    // Current per-request fee (wei). Constant within a block: `excess` is only
+    // updated by the end-of-block system call.
+    function _getFee() internal view returns (uint) {
+        return _fakeExponential(MIN_REQUEST_FEE, excess, REQUEST_FEE_UPDATE_FRACTION);
     }
 
-    // End-of-block read-out. Only `SYSTEM_ADDRESS` may call it (with empty
-    // calldata). Pops up to MAX_REQUESTS_PER_BLOCK records FIFO, returns their
-    // concatenation as the flat `request_data`, and advances the head. The EL
-    // prepends this predeploy's EIP-7685 request-type byte.
-    fallback() external {
-        require(msg.sender == SYSTEM_ADDRESS, "RequestQueue: only system");
+    // EIP-7002 fee curve: factor * e^(numerator / denominator), via the same
+    // integer Taylor-series approximation used by EIP-1559 / EIP-4844.
+    function _fakeExponential(uint factor, uint numerator, uint denominator)
+        internal
+        pure
+        returns (uint)
+    {
+        uint i = 1;
+        uint output = 0;
+        uint numeratorAccum = factor * denominator;
+        while (numeratorAccum > 0) {
+            output += numeratorAccum;
+            numeratorAccum = (numeratorAccum * numerator) / (denominator * i);
+            i += 1;
+        }
+        return output / denominator;
+    }
 
+    // Append a request record and count it toward this block's demand. Called
+    // by the derived entrypoint after it has validated (and, for deposits,
+    // BLS-verified) the request and confirmed the fee was paid.
+    function _recordRequest(bytes memory record) internal {
+        queue[queueTail] = record;
+        queueTail += 1;
+        count += 1;
+    }
+
+    // 8-byte little-endian encoding of a uint64 (SSZ amount encoding).
+    function _le64(uint64 v) internal pure returns (bytes memory r) {
+        r = new bytes(8);
+        for (uint i = 0; i < 8; i++) {
+            r[i] = bytes1(uint8(v >> (8 * i)));
+        }
+    }
+
+    // Empty-calldata entry point. Two modes, dispatched on caller (as EIP-7002):
+    //   * SYSTEM_ADDRESS: end-of-block read-out — drain up to
+    //     MAX_REQUESTS_PER_BLOCK records FIFO, update `excess` from `count`,
+    //     reset `count`, and return the records as flat `request_data` (the EL
+    //     prepends this predeploy's request-type byte).
+    //   * any other caller: fee getter — return the current `_getFee()`.
+    fallback() external {
+        // Only the canonical empty-calldata call reaches the fallback meaningfully
+        // (the system read-out, or a fee query) — `deposit`/`top_up` have their own
+        // selectors. Reject any other calldata, as EIP-7002 does (it only treats
+        // zero-length input as the fee getter).
+        require(msg.data.length == 0, "RequestQueue: unexpected calldata");
+
+        if (msg.sender != SYSTEM_ADDRESS) {
+            // Fee getter.
+            uint fee = _getFee();
+            assembly {
+                let p := mload(0x40)
+                mstore(p, fee)
+                return(p, 0x20)
+            }
+        }
+
+        // Update the EIP-1559-style excess from this block's demand, then reset.
+        uint c = count;
+        excess = (excess + c > TARGET_REQUESTS_PER_BLOCK)
+            ? excess + c - TARGET_REQUESTS_PER_BLOCK
+            : 0;
+        count = 0;
+
+        // Drain up to MAX_REQUESTS_PER_BLOCK records (FIFO) from the head.
         uint head = queueHead;
-        uint tail = queue.length;
+        uint tail = queueTail;
         uint n = tail - head;
         if (n > MAX_REQUESTS_PER_BLOCK) {
             n = MAX_REQUESTS_PER_BLOCK;
@@ -91,7 +187,17 @@ contract RequestQueue {
         for (uint i = 0; i < n; i++) {
             out = abi.encodePacked(out, queue[head + i]);
         }
-        queueHead = head + n;
+
+        // EIP-7002 `dequeue_withdrawal_requests`: once the queue empties, reset
+        // BOTH pointers to 0 so the mapping slots are reused by later requests;
+        // otherwise just advance the head.
+        uint newHead = head + n;
+        if (newHead == tail) {
+            queueHead = 0;
+            queueTail = 0;
+        } else {
+            queueHead = newHead;
+        }
 
         assembly {
             return(add(out, 0x20), mload(out))
@@ -198,30 +304,35 @@ contract BuilderDepositContract is RequestQueue {
     // ── External entrypoint ────────────────────────────────────────────────
 
     /// @notice BLS-verified builder deposit. On success, appends a deposit
-    /// record to the request queue (no log). The deposited ETH is locked in the
-    /// contract; the consensus layer credits the builder from the dequeued
-    /// request at the end of the block.
+    /// record to the request queue (no log). `amount_gwei` is the stake to
+    /// credit and is the amount bound into the signed `DepositMessage`; the
+    /// caller MUST send `msg.value >= amount_gwei * 1 gwei + fee`, where `fee`
+    /// is the current request fee (call this contract with empty calldata to
+    /// read it). The staked ETH is locked in the contract; the consensus layer
+    /// credits the builder `amount_gwei` from the dequeued request.
     function deposit(
         bytes calldata pubkey,
         bytes32 withdrawal_credentials,
+        uint64 amount_gwei,
         bytes calldata signature,
         Fp calldata pubkey_y,
         Fp2 calldata signature_y
     ) external payable {
         require(pubkey.length == PUBLIC_KEY_LENGTH,    "BuilderDeposit: invalid pubkey length");
         require(signature.length == SIGNATURE_LENGTH,  "BuilderDeposit: invalid signature length");
-        require(msg.value >= BUILDER_MIN_DEPOSIT,      "BuilderDeposit: deposit value too low");
-        require(msg.value % 1 gwei == 0,               "BuilderDeposit: deposit value not multiple of gwei");
-        uint deposit_amount = msg.value / 1 gwei;
-        require(deposit_amount <= type(uint64).max,    "BuilderDeposit: deposit value too high");
+        uint stake = uint(amount_gwei) * 1 gwei;
+        require(stake >= BUILDER_MIN_DEPOSIT,          "BuilderDeposit: deposit value too low");
+        // Fee is charged on top of the stake; overpayment of the fee is
+        // forfeited, as in EIP-7002.
+        require(msg.value >= stake + _getFee(),        "BuilderDeposit: insufficient value for stake + fee");
         require(!_isInfinityFlagSet(pubkey[0]),        "BuilderDeposit: infinity pubkey");
         require(!_isInfinityFlagSet(signature[0]),     "BuilderDeposit: infinity signature");
 
         // BLS proof-of-possession check. Performed before the record is queued
         // so an invalid signature reverts the whole call and never enqueues.
-        bytes32 signingRoot = _computeDepositSigningRoot(
-            pubkey, withdrawal_credentials, uint64(deposit_amount)
-        );
+        // The amount is not part of the signed message (see
+        // `_computeDepositSigningRoot`); it is recorded below as the credited stake.
+        bytes32 signingRoot = _computeDepositSigningRoot(pubkey, withdrawal_credentials);
         G1Point memory pk        = _constructG1(pubkey, pubkey_y);
         G2Point memory sig       = _constructG2(signature, signature_y);
         G2Point memory msgPoint  = _hashToCurve(signingRoot);
@@ -230,28 +341,25 @@ contract BuilderDepositContract is RequestQueue {
             "BuilderDeposit: invalid BLS signature"
         );
 
-        _enqueue(abi.encodePacked(
-            pubkey, withdrawal_credentials, _le64(uint64(deposit_amount))
+        _recordRequest(abi.encodePacked(
+            pubkey, withdrawal_credentials, _le64(amount_gwei)
         ));
-    }
-
-    // 8-byte little-endian encoding of a uint64 (SSZ amount encoding).
-    function _le64(uint64 v) internal pure returns (bytes memory r) {
-        r = new bytes(8);
-        for (uint i = 0; i < 8; i++) {
-            r[i] = bytes1(uint8(v >> (8 * i)));
-        }
     }
 
     // ── Signing-root computation ───────────────────────────────────────────
 
     // Algorithm: SSZ `hash_tree_root` (consensus-specs §SSZ Merkleization) +
     // `compute_signing_root` (consensus-specs §Beacon-chain helpers).
-    // Returns `sha256(hash_tree_root(DepositMessage(...)) || DOMAIN_BUILDER_DEPOSIT)`.
+    //
+    // The builder deposit message is the 2-field container
+    // `(pubkey, withdrawal_credentials)` — the amount is deliberately NOT
+    // signed (the unverified `top_up` already lets stake be added without a
+    // signature, so binding it here would protect nothing). The signature is a
+    // proof of possession that binds only the key and the withdrawal target.
+    // Returns `sha256(hash_tree_root(pubkey, withdrawal_credentials) || DOMAIN_BUILDER_DEPOSIT)`.
     function _computeDepositSigningRoot(
         bytes memory pubkey,
-        bytes32 withdrawal_credentials,
-        uint64 amount_gwei
+        bytes32 withdrawal_credentials
     ) internal pure returns (bytes32) {
         // `pubkey` is 48 bytes; pad to 64 bytes and sha256 to get its SSZ root.
         bytes memory paddedPubkey = new bytes(64);
@@ -260,20 +368,11 @@ contract BuilderDepositContract is RequestQueue {
         }
         bytes32 pubkeyRoot = sha256(paddedPubkey);
 
-        // Left subtree of the DepositMessage SSZ Merkle tree:
+        // hash_tree_root of the 2-field container = sha256(field0 || field1):
         //   sha256(pubkey_root || withdrawal_credentials).
-        bytes32 leftNode = sha256(abi.encodePacked(pubkeyRoot, withdrawal_credentials));
+        bytes32 messageRoot = sha256(abi.encodePacked(pubkeyRoot, withdrawal_credentials));
 
-        // Right subtree: 64-byte buffer of [amount_gwei_LE(8) || zero(56)],
-        // hashed under sha256.
-        bytes memory amountAndZero = new bytes(64);
-        for (uint i = 0; i < 8; i++) {
-            amountAndZero[i] = bytes1(uint8(amount_gwei >> (8 * i)));
-        }
-        bytes32 rightNode = sha256(amountAndZero);
-
-        bytes32 depositMessageRoot = sha256(abi.encodePacked(leftNode, rightNode));
-        return sha256(abi.encodePacked(depositMessageRoot, DOMAIN_BUILDER_DEPOSIT));
+        return sha256(abi.encodePacked(messageRoot, DOMAIN_BUILDER_DEPOSIT));
     }
 
     // ── hash_to_curve (BLS12-381 G2) ───────────────────────────────────────
@@ -600,19 +699,17 @@ contract BuilderTopUpContract is RequestQueue {
     uint constant BUILDER_MIN_DEPOSIT = 1 ether;
 
     /// @notice Unverified top-up. On success, appends a top-up record to the
-    /// request queue (no log). The ETH is locked in the contract; the consensus
-    /// layer credits the existing builder from the dequeued request.
-    function top_up(bytes calldata pubkey) external payable {
+    /// request queue (no log). `amount_gwei` is the stake to add; the caller
+    /// MUST send `msg.value >= amount_gwei * 1 gwei + fee`, where `fee` is the
+    /// current request fee (read it by calling this contract with empty
+    /// calldata). The ETH is locked in the contract; the consensus layer
+    /// credits the existing builder from the dequeued request.
+    function top_up(bytes calldata pubkey, uint64 amount_gwei) external payable {
         require(pubkey.length == PUBLIC_KEY_LENGTH, "BuilderTopUp: invalid pubkey length");
-        require(msg.value >= BUILDER_MIN_DEPOSIT,   "BuilderTopUp: deposit value too low");
-        require(msg.value % 1 gwei == 0,            "BuilderTopUp: deposit value not multiple of gwei");
-        uint amount = msg.value / 1 gwei;
-        require(amount <= type(uint64).max,         "BuilderTopUp: deposit value too high");
+        uint stake = uint(amount_gwei) * 1 gwei;
+        require(stake >= BUILDER_MIN_DEPOSIT,       "BuilderTopUp: deposit value too low");
+        require(msg.value >= stake + _getFee(),     "BuilderTopUp: insufficient value for stake + fee");
 
-        bytes memory amountLE = new bytes(8);
-        for (uint i = 0; i < 8; i++) {
-            amountLE[i] = bytes1(uint8(uint64(amount) >> (8 * i)));
-        }
-        _enqueue(abi.encodePacked(pubkey, amountLE));
+        _recordRequest(abi.encodePacked(pubkey, _le64(amount_gwei)));
     }
 }

@@ -6,7 +6,7 @@ Reference Solidity for the proposal, plus cross-verification tests.
 
 | File | Purpose |
 | --- | --- |
-| `builder_deposit_contract.sol` | The two proposed predeploys plus a shared base: `RequestQueue` (EIP-7002-style queue + `SYSTEM_ADDRESS` end-of-block read), `BuilderDepositContract` (`deposit(...)`, BLS-verified, request type `0x03`), and `BuilderTopUpContract` (`top_up(...)`, unverified, request type `0x04`). |
+| `builder_deposit_contract.sol` | The two proposed predeploys plus a shared base: `RequestQueue` (EIP-7002-style queue + EIP-1559 fee + `SYSTEM_ADDRESS` end-of-block read), `BuilderDepositContract` (`deposit(...)`, BLS-verified, request type `0x03`), and `BuilderTopUpContract` (`top_up(...)`, unverified, request type `0x04`). |
 | `gen_vectors.py` | Python script that uses `py_ecc` (the canonical Eth2 reference) to produce cross-verification test vectors. |
 | `test/Vectors.sol` | Auto-generated Solidity library of test vectors. Regenerate by running `gen_vectors.py`. |
 | `test/TestHarness.sol` | `BuilderDepositHarness` / `BuilderTopUpHarness` — inherit the predeploys and expose the pending-queue depth (and the SSZ signing-root helper) for the tests. |
@@ -34,7 +34,7 @@ forge test -vv
 `evm_version = "prague"` in `foundry.toml` enables the EIP-2537 BLS precompiles, required for the three tests that exercise the pairing path. To run only the queue, system-read, and input-validation tests on an older EVM (no EIP-2537 needed):
 
 ```bash
-forge test -vv --evm-version cancun --no-match-test '(DepositEnqueuesAndReads|Tampered)'
+forge test -vv --evm-version cancun --no-match-test 'Deposit(EnqueuesAndReads|AmountNotBound|RejectsTamperedSignature)'
 ```
 
 ## Regenerating vectors
@@ -52,14 +52,19 @@ The script is deterministic: the secret key is hard-coded so the output is byte-
 | `testComputeSigningRoot` | `_computeDepositSigningRoot` matches `py_ecc`-derived SSZ `compute_signing_root` | no |
 | `testDepositEnqueuesAndReads` | A `py_ecc`-produced deposit is accepted, enqueued, and the `SYSTEM_ADDRESS` read returns the exact 88-byte record | **yes** |
 | `testTopUpEnqueuesAndReads` | `top_up(...)` enqueues; the system read returns the exact 56-byte record | no |
-| `testSystemReadRequiresSystemAddress` | An empty-calldata read from a non-`SYSTEM_ADDRESS` caller reverts | no |
+| `testFeeStartsAtMinimum` | The fee is `MIN_REQUEST_FEE` (1 wei) at `excess == 0` | no |
+| `testFeeRisesWithExcess` | A block of 18 requests then a system call sets `excess = 16`, so `fake_exponential(1, 16, 17) == 2` | no |
+| `testFeeGetterFallbackMatches` | A non-system empty-calldata call returns the current fee | no |
+| `testDepositAmountNotBoundToSignature` | The same signature is accepted with a different `amount_gwei` (the amount is unsigned); the record reflects the passed amount | **yes** |
+| `testDepositRejectsInsufficientValue` | `msg.value == stake` (no room for the fee) reverts; nothing enqueued | no |
+| `testSystemReadRequiresSystemAddress` | A non-`SYSTEM_ADDRESS` empty-calldata call is the fee getter and does NOT drain the queue | no |
 | `testPerBlockCapAndFifo` | 17 queued → first read drains the 16-record cap, second drains the remainder (FIFO) | no |
-| `testDepositRejectsTamperedAmount` | A different `msg.value` than was signed fails the pairing check; nothing enqueued | **yes** |
+| `testDepositRejectsTamperedAmount` | An `amount_gwei` different from the signed one fails the pairing check; nothing enqueued | **yes** |
 | `testDepositRejectsTamperedSignature` | Flipping a signature bit is rejected (subgroup/pairing failure); nothing enqueued | **yes** |
 | `testDepositRejectsPubkeySignBitFlip` | Flipping only the pubkey sign flag is rejected by the sign-bit binding (audit Finding 2 regression); nothing enqueued | no |
 | `testDepositRejectsSignatureSignBitFlip` | Flipping only the signature sign flag is rejected by the sign-bit binding; nothing enqueued | no |
 | `testDepositRejectsInfinityPubkey` | `pubkey` with infinity flag is rejected before BLS work; nothing enqueued | no |
-| `testDepositRejectsTooSmallAmount` | `msg.value < 1 ether` is rejected; nothing enqueued | no |
+| `testDepositRejectsTooSmallStake` | `amount_gwei * 1 gwei < 1 ether` is rejected; nothing enqueued | no |
 | `testDepositRejectsWrongPubkeyLength` | `pubkey.length != 48` is rejected; nothing enqueued | no |
-| `testTopUpRejectsTooSmallAmount` | `top_up` with `msg.value < 1 ether` is rejected; nothing enqueued | no |
+| `testTopUpRejectsTooSmallStake` | `top_up` stake `< 1 ether` is rejected; nothing enqueued | no |
 | `testTopUpRejectsWrongPubkeyLength` | `top_up` with `pubkey.length != 48` is rejected; nothing enqueued | no |

@@ -41,13 +41,14 @@ DOMAIN_BUILDER_DEPOSIT = bytes.fromhex(
     "0b000000f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a9"
 )
 
-def deposit_signing_root(pubkey: bytes, wc: bytes, amount_gwei: int) -> bytes:
-    """SSZ compute_signing_root(DepositMessage(pubkey, wc, amount), DOMAIN_BUILDER_DEPOSIT)."""
-    assert len(pubkey) == 48 and len(wc) == 32 and 0 <= amount_gwei < (1 << 64)
+def deposit_signing_root(pubkey: bytes, wc: bytes) -> bytes:
+    """compute_signing_root for the 2-field builder message (pubkey, wc).
+
+    The amount is intentionally NOT signed (see builder_deposit_contract.sol):
+    htr = sha256(pubkey_root || wc); signing_root = sha256(htr || DOMAIN)."""
+    assert len(pubkey) == 48 and len(wc) == 32
     pubkey_root = sha256(pubkey + b"\x00" * 16)
-    left = sha256(pubkey_root + wc)
-    right = sha256(amount_gwei.to_bytes(8, "little") + b"\x00" * 56)
-    msg_root = sha256(left + right)
+    msg_root = sha256(pubkey_root + wc)
     return sha256(msg_root + DOMAIN_BUILDER_DEPOSIT)
 
 def split_fp(x: int) -> tuple:
@@ -73,8 +74,8 @@ def deposit_test():
     sk = 0x4242424242424242424242424242424242424242424242424242424242424242
     pubkey = bls_pop.SkToPk(sk)
     wc = b"\x00" * 32
-    amount = 32_000_000_000  # 32 ETH in gwei
-    sr = deposit_signing_root(pubkey, wc, amount)
+    amount = 32_000_000_000  # 32 ETH in gwei (credited stake; NOT signed)
+    sr = deposit_signing_root(pubkey, wc)
     signature = bls_pop.Sign(sk, sr)
     assert bls_pop.Verify(pubkey, sr, signature), "py_ecc self-verify failed"
 

@@ -29,18 +29,18 @@ library Vectors {
     {
         pubkey = hex"b5b99c967e4c69822f427db1f6871dd119afb95ab9646ba2e707990a3db31777a59b66f69e89c2055699b0ade7357eae";
         withdrawal_credentials = 0x0000000000000000000000000000000000000000000000000000000000000000;
-        signature = hex"ab275ac905d68eb121c85caff35043de7e7bf478ec46b28a09eec700a4d2123572f18202f701d6a2974daddf7afba23b11199fa446bae3e67c630d45f62928dc3e3244317b485ff002e126e6b917ddcf4426f0903d68eb6743ab1a33fdaf56ed";
-        deposit_data_root = 0xcf743a69594fad43bccf7056e08b2a3b12a6696d0a7ccf0527c48d6cabd98f01;
+        signature = hex"a80fa59d29e8bac877966ed1d113c8b8f431de687c182d19f0a37951cb8a57e66757f69cbdefb2f58da6ea58e66d9a1d0504465cad3a02b8e8da35969b9cadbce789c6b0f2fa926882b526f928c10dff7386af66cccb0b162b37a75a246d5087";
+        deposit_data_root = 0x625d01daa2c4638988bb35d6ca0643efbfc44f23066c0cb26401b613cecb8e0e;
         amount_gwei = 32000000000;
         pubkey_y = BuilderDepositContract.Fp(0x1201d584a96bc82775861b0611171d2f, 0xfeaa2431c48856e23d3b747f7392fad645e0cdd5aa01b6a5b24b73ab584db4ad);
-        signature_y = BuilderDepositContract.Fp2(BuilderDepositContract.Fp(0x12ca72b79300a13c051ed9170061f030, 0xf53694950c73fdb4f8130911d0dac6b13b423450cb333b467102fd22666d6593), BuilderDepositContract.Fp(0x14454e59e30d8480bc2bf6f3d08196f9, 0x285f86d269689bc843fcf8006d8b1448bfd6d71010aca7cba6ebde8b1154aa90));
+        signature_y = BuilderDepositContract.Fp2(BuilderDepositContract.Fp(0x0291c03dc4b0cad5bbb54fed95b2f7b4, 0x26a18420768bbc16659cf22495b0d8f1723ebe189c876a6a21c9a828b4a27131), BuilderDepositContract.Fp(0x13edfbbff93a06436cd5c99133b038b8, 0xd2cc864627eef31c8324d7f5ee60f09b30408aafeb9cae41dd1a53f7bd768560));
     }
 
     /// @notice Expected `compute_signing_root` for `depositCase()`,
     /// computed in Python and baked in so the on-chain SSZ helper can be
     /// cross-checked without a second BLS pairing.
     function depositSigningRoot() internal pure returns (bytes32) {
-        return 0xf764d63dcac69648e80ba943a88eaf62ce01a4c53998971787c3dc78b6f006c2;
+        return 0x3a635e9092f64642776ebfde7fcdf130286f10ef9825007b76e107966983c1e4;
     }
 
 }

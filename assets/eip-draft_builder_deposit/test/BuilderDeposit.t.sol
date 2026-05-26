@@ -12,12 +12,13 @@ interface Vm {
     function prank(address) external;
 }
 
-/// @notice Tests for the EIP-7685 request-bus builder predeploys.
+/// @notice Tests for the EIP-7685 request-bus builder predeploys, including the
+/// EIP-1559-style request fee.
 ///
-/// Expected values come from py_ecc (see ../gen_vectors.py) baked into
-/// ./Vectors.sol. The full deposit-verification tests require the EIP-2537 BLS
-/// precompiles (foundry's default Prague EVM); the queue / system-read / input
-/// tests do not.
+/// Expected BLS values come from py_ecc (see ../gen_vectors.py) baked into
+/// ./Vectors.sol. The deposit-verification tests require the EIP-2537 BLS
+/// precompiles (foundry's default Prague EVM); the queue / fee / system-read /
+/// input tests do not.
 contract BuilderDepositTest {
 
     Vm constant vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
@@ -34,8 +35,6 @@ contract BuilderDepositTest {
         top = new BuilderTopUpHarness();
     }
 
-    // Drive the end-of-block system read: call the predeploy as SYSTEM_ADDRESS
-    // with empty calldata; the fallback returns the flat request_data.
     function _systemRead(address target) internal returns (bytes memory) {
         vm.prank(SYSTEM_ADDRESS);
         (bool ok, bytes memory ret) = target.call("");
@@ -48,15 +47,20 @@ contract BuilderDepositTest {
         for (uint i = 0; i < 8; i++) r[i] = bytes1(uint8(v >> (8 * i)));
     }
 
+    function _copy(bytes memory src) internal pure returns (bytes memory dst) {
+        dst = new bytes(src.length);
+        for (uint i = 0; i < src.length; i++) dst[i] = src[i];
+    }
+
     // ── Cross-check: SSZ signing root ──────────────────────────────────────
 
     function testComputeSigningRoot() public {
-        (bytes memory pubkey, bytes32 wc, , , uint64 amount_gwei, , ) = Vectors.depositCase();
-        bytes32 got = dep.computeDepositSigningRoot(pubkey, wc, amount_gwei);
+        (bytes memory pubkey, bytes32 wc, , , , , ) = Vectors.depositCase();
+        bytes32 got = dep.computeDepositSigningRoot(pubkey, wc);
         require(got == Vectors.depositSigningRoot(), "signing root mismatch vs py_ecc");
     }
 
-    // ── Happy path: verified deposit enqueues, system read emits the record ──
+    // ── Happy path: deposit / top-up enqueue, system read emits the record ──
 
     function testDepositEnqueuesAndReads() public {
         (
@@ -69,8 +73,8 @@ contract BuilderDepositTest {
             BuilderDepositContract.Fp2 memory signature_y
         ) = Vectors.depositCase();
 
-        require(dep.pendingCount() == 0, "starts empty");
-        dep.deposit{value: uint(amount_gwei) * 1 gwei}(pubkey, wc, signature, pubkey_y, signature_y);
+        uint value = uint(amount_gwei) * 1 gwei + dep.feeWei();
+        dep.deposit{value: value}(pubkey, wc, amount_gwei, signature, pubkey_y, signature_y);
         require(dep.pendingCount() == 1, "one record queued");
 
         bytes memory data = _systemRead(address(dep));
@@ -84,30 +88,82 @@ contract BuilderDepositTest {
         bytes memory pubkey = new bytes(48);
         for (uint i = 0; i < 48; i++) pubkey[i] = bytes1(uint8(i + 1));
 
-        top.top_up{value: 3 ether}(pubkey);
+        uint64 amount_gwei = 3_000_000_000; // 3 ETH
+        top.top_up{value: uint(amount_gwei) * 1 gwei + top.feeWei()}(pubkey, amount_gwei);
         require(top.pendingCount() == 1, "one top-up queued");
 
         bytes memory data = _systemRead(address(top));
-        bytes memory expected = abi.encodePacked(pubkey, _le64(3_000_000_000));
+        bytes memory expected = abi.encodePacked(pubkey, _le64(amount_gwei));
         require(data.length == TOPUP_RECORD_LEN, "top-up record length");
         require(keccak256(data) == keccak256(expected), "top-up record bytes mismatch");
         require(top.pendingCount() == 0, "queue drained");
     }
 
+    // ── EIP-1559-style request fee ─────────────────────────────────────────
+
+    function testFeeStartsAtMinimum() public {
+        require(dep.feeWei() == 1, "min fee is 1 wei at excess 0");
+        require(top.feeWei() == 1, "min fee is 1 wei at excess 0");
+    }
+
+    function testFeeRisesWithExcess() public {
+        // 18 top-ups in one block → count 18. The next system call sets
+        // excess = 18 - TARGET(2) = 16, and fake_exponential(1, 16, 17) == 2.
+        bytes memory pubkey = new bytes(48);
+        uint64 amount_gwei = 1_000_000_000; // 1 ETH
+        for (uint i = 0; i < 18; i++) {
+            top.top_up{value: uint(amount_gwei) * 1 gwei + top.feeWei()}(pubkey, amount_gwei);
+        }
+        require(top.feeWei() == 1, "fee unchanged until the system call updates excess");
+        _systemRead(address(top));
+        require(top.feeWei() == 2, "fee rises after a block above target");
+    }
+
+    function testFeeGetterFallbackMatches() public {
+        // A non-system empty-calldata call returns the current fee.
+        (bool ok, bytes memory ret) = address(top).call("");
+        require(ok, "fee getter call failed");
+        require(ret.length == 32, "fee getter returns a word");
+        require(abi.decode(ret, (uint)) == top.feeWei(), "fee getter mismatch");
+    }
+
+    function testDepositRejectsInsufficientValue() public {
+        (
+            bytes memory pubkey,
+            bytes32 wc,
+            bytes memory signature,
+            ,
+            uint64 amount_gwei,
+            BuilderDepositContract.Fp memory pubkey_y,
+            BuilderDepositContract.Fp2 memory signature_y
+        ) = Vectors.depositCase();
+        // Exactly the stake, with nothing left for the fee: must revert.
+        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(
+            pubkey, wc, amount_gwei, signature, pubkey_y, signature_y
+        ) {
+            require(false, "stake without fee should revert");
+        } catch {}
+        require(dep.pendingCount() == 0, "nothing enqueued on reject");
+    }
+
     // ── System read access control + FIFO / per-block cap ──────────────────
 
     function testSystemReadRequiresSystemAddress() public {
-        // Without the SYSTEM_ADDRESS prank, the fallback must revert.
-        (bool ok, ) = address(dep).call("");
-        require(!ok, "non-system system-read must revert");
+        // A non-system empty-calldata call is the fee getter, not a drain: it
+        // returns the fee and must NOT advance the queue.
+        bytes memory pubkey = new bytes(48);
+        uint64 amount_gwei = 1_000_000_000;
+        top.top_up{value: uint(amount_gwei) * 1 gwei + top.feeWei()}(pubkey, amount_gwei);
+        (bool ok, ) = address(top).call("");
+        require(ok, "fee getter should succeed");
+        require(top.pendingCount() == 1, "non-system call must not drain the queue");
     }
 
     function testPerBlockCapAndFifo() public {
         bytes memory pubkey = new bytes(48);
-        // Enqueue MAX_REQUESTS_PER_BLOCK + 1 = 17 top-ups (unverified, so easy
-        // to queue many without distinct signatures).
+        uint64 amount_gwei = 1_000_000_000;
         for (uint i = 0; i < 17; i++) {
-            top.top_up{value: 1 ether}(pubkey);
+            top.top_up{value: uint(amount_gwei) * 1 gwei + top.feeWei()}(pubkey, amount_gwei);
         }
         require(top.pendingCount() == 17, "17 queued");
 
@@ -120,9 +176,42 @@ contract BuilderDepositTest {
         require(top.pendingCount() == 0, "queue empty");
     }
 
+    // Audit Finding 1 regression: when the queue fully drains, both head and
+    // tail reset to 0 (EIP-7002 behavior), so storage is bounded by peak depth
+    // and the next request reuses index 0.
+    function testQueueResetsWhenDrained() public {
+        bytes memory pubkey = new bytes(48);
+        uint64 amount_gwei = 1_000_000_000;
+        for (uint i = 0; i < 3; i++) {
+            top.top_up{value: uint(amount_gwei) * 1 gwei + top.feeWei()}(pubkey, amount_gwei);
+        }
+        require(top.headIdx() == 0 && top.tailIdx() == 3, "3 queued at indices [0,3)");
+
+        _systemRead(address(top)); // drains all 3 (<= cap)
+        require(top.headIdx() == 0 && top.tailIdx() == 0, "head and tail reset to 0 on empty");
+        require(top.pendingCount() == 0, "queue empty");
+
+        // Next request reuses index 0 rather than advancing forever.
+        top.top_up{value: uint(amount_gwei) * 1 gwei + top.feeWei()}(pubkey, amount_gwei);
+        require(top.tailIdx() == 1, "tail restarts at 1 (slot reused)");
+    }
+
+    // Audit Finding 3 regression: the fallback only accepts empty calldata.
+    function testFallbackRejectsNonEmptyCalldata() public {
+        (bool ok, ) = address(top).call(hex"deadbeefdeadbeef");
+        require(!ok, "non-empty junk calldata must revert");
+        // Empty calldata still works (fee getter), confirming the guard is scoped.
+        (bool ok2, ) = address(top).call("");
+        require(ok2, "empty-calldata fee getter still works");
+    }
+
     // ── Negative paths: BLS check (nothing should enqueue) ─────────────────
 
-    function testDepositRejectsTamperedAmount() public {
+    // The amount is NOT part of the signed message, so the same signature is
+    // valid for any amount. Depositing with an amount different from the
+    // vector's must SUCCEED, and the queued record must reflect the amount that
+    // was actually passed.
+    function testDepositAmountNotBoundToSignature() public {
         (
             bytes memory pubkey,
             bytes32 wc,
@@ -132,12 +221,14 @@ contract BuilderDepositTest {
             BuilderDepositContract.Fp memory pubkey_y,
             BuilderDepositContract.Fp2 memory signature_y
         ) = Vectors.depositCase();
-        try dep.deposit{value: (uint(amount_gwei) + 1) * 1 gwei}(
-            pubkey, wc, signature, pubkey_y, signature_y
-        ) {
-            require(false, "tampered amount should revert");
-        } catch {}
-        require(dep.pendingCount() == 0, "nothing enqueued on reject");
+        uint64 differentAmount = amount_gwei + 5_000_000_000; // +5 ETH, unsigned
+        uint value = uint(differentAmount) * 1 gwei + dep.feeWei();
+        dep.deposit{value: value}(pubkey, wc, differentAmount, signature, pubkey_y, signature_y);
+        require(dep.pendingCount() == 1, "deposit with a different amount is accepted");
+
+        bytes memory data = _systemRead(address(dep));
+        bytes memory expected = abi.encodePacked(pubkey, wc, _le64(differentAmount));
+        require(keccak256(data) == keccak256(expected), "record reflects the passed amount");
     }
 
     function testDepositRejectsTamperedSignature() public {
@@ -152,9 +243,8 @@ contract BuilderDepositTest {
         ) = Vectors.depositCase();
         bytes memory tampered = _copy(signature);
         tampered[10] = tampered[10] ^ bytes1(uint8(1));
-        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(
-            pubkey, wc, tampered, pubkey_y, signature_y
-        ) {
+        uint value = uint(amount_gwei) * 1 gwei + dep.feeWei();
+        try dep.deposit{value: value}(pubkey, wc, amount_gwei, tampered, pubkey_y, signature_y) {
             require(false, "tampered signature should revert");
         } catch {}
         require(dep.pendingCount() == 0, "nothing enqueued on reject");
@@ -173,9 +263,8 @@ contract BuilderDepositTest {
         ) = Vectors.depositCase();
         bytes memory flipped = _copy(pubkey);
         flipped[0] = flipped[0] ^ bytes1(uint8(0x20));
-        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(
-            flipped, wc, signature, pubkey_y, signature_y
-        ) {
+        uint value = uint(amount_gwei) * 1 gwei + dep.feeWei();
+        try dep.deposit{value: value}(flipped, wc, amount_gwei, signature, pubkey_y, signature_y) {
             require(false, "pubkey sign-bit flip should revert");
         } catch {}
         require(dep.pendingCount() == 0, "nothing enqueued on reject");
@@ -193,9 +282,8 @@ contract BuilderDepositTest {
         ) = Vectors.depositCase();
         bytes memory flipped = _copy(signature);
         flipped[0] = flipped[0] ^ bytes1(uint8(0x20));
-        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(
-            pubkey, wc, flipped, pubkey_y, signature_y
-        ) {
+        uint value = uint(amount_gwei) * 1 gwei + dep.feeWei();
+        try dep.deposit{value: value}(pubkey, wc, amount_gwei, flipped, pubkey_y, signature_y) {
             require(false, "signature sign-bit flip should revert");
         } catch {}
         require(dep.pendingCount() == 0, "nothing enqueued on reject");
@@ -213,9 +301,8 @@ contract BuilderDepositTest {
         ) = Vectors.depositCase();
         bytes memory inf = _copy(pubkey);
         inf[0] = inf[0] | bytes1(uint8(0x40));
-        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(
-            inf, wc, signature, pubkey_y, signature_y
-        ) {
+        uint value = uint(amount_gwei) * 1 gwei + dep.feeWei();
+        try dep.deposit{value: value}(inf, wc, amount_gwei, signature, pubkey_y, signature_y) {
             require(false, "infinity pubkey should revert");
         } catch {}
         require(dep.pendingCount() == 0, "nothing enqueued on reject");
@@ -223,13 +310,14 @@ contract BuilderDepositTest {
 
     // ── Negative paths: input-shape validation ─────────────────────────────
 
-    function testDepositRejectsTooSmallAmount() public {
+    function testDepositRejectsTooSmallStake() public {
         bytes memory pubkey = new bytes(48);
         bytes memory signature = new bytes(96);
         BuilderDepositContract.Fp memory z = BuilderDepositContract.Fp(0, 0);
         BuilderDepositContract.Fp2 memory z2 = BuilderDepositContract.Fp2(z, z);
-        try dep.deposit{value: 0.5 ether}(pubkey, bytes32(0), signature, z, z2) {
-            require(false, "deposit < 1 ether should revert");
+        // 0.5 ETH stake (< 1 ETH minimum).
+        try dep.deposit{value: 1 ether}(pubkey, bytes32(0), 500_000_000, signature, z, z2) {
+            require(false, "stake < 1 ether should revert");
         } catch {}
         require(dep.pendingCount() == 0, "nothing enqueued on reject");
     }
@@ -239,32 +327,25 @@ contract BuilderDepositTest {
         bytes memory signature = new bytes(96);
         BuilderDepositContract.Fp memory z = BuilderDepositContract.Fp(0, 0);
         BuilderDepositContract.Fp2 memory z2 = BuilderDepositContract.Fp2(z, z);
-        try dep.deposit{value: 1 ether}(pubkey, bytes32(0), signature, z, z2) {
+        try dep.deposit{value: 2 ether}(pubkey, bytes32(0), 1_000_000_000, signature, z, z2) {
             require(false, "47-byte pubkey should revert");
         } catch {}
         require(dep.pendingCount() == 0, "nothing enqueued on reject");
     }
 
-    function testTopUpRejectsTooSmallAmount() public {
+    function testTopUpRejectsTooSmallStake() public {
         bytes memory pubkey = new bytes(48);
-        try top.top_up{value: 0.5 ether}(pubkey) {
-            require(false, "top_up < 1 ether should revert");
+        try top.top_up{value: 1 ether}(pubkey, 500_000_000) {
+            require(false, "top_up stake < 1 ether should revert");
         } catch {}
         require(top.pendingCount() == 0, "nothing enqueued on reject");
     }
 
     function testTopUpRejectsWrongPubkeyLength() public {
         bytes memory pubkey = new bytes(47);
-        try top.top_up{value: 1 ether}(pubkey) {
+        try top.top_up{value: 2 ether}(pubkey, 1_000_000_000) {
             require(false, "47-byte pubkey should revert");
         } catch {}
         require(top.pendingCount() == 0, "nothing enqueued on reject");
-    }
-
-    // ── helper ─────────────────────────────────────────────────────────────
-
-    function _copy(bytes memory src) internal pure returns (bytes memory dst) {
-        dst = new bytes(src.length);
-        for (uint i = 0; i < src.length; i++) dst[i] = src[i];
     }
 }
