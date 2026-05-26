@@ -133,13 +133,30 @@ top_up(
 
 The deposited ETH for both entrypoints is locked in the respective contract; the consensus layer credits the builder from the dequeued request.
 
+### Consensus layer request objects
+
+The consensus layer decodes each dequeued record into one of two SSZ containers, selected by request type:
+
+```python
+class BuilderDepositRequest(object):
+    pubkey: Bytes48
+    withdrawal_credentials: Bytes32
+    amount: uint64  # Gwei
+
+class BuilderTopUpRequest(object):
+    pubkey: Bytes48
+    amount: uint64  # Gwei
+```
+
+A type's `request_data` is the concatenation of the fixed-size SSZ serializations of its records — 88 bytes per `BuilderDepositRequest` (`pubkey ++ withdrawal_credentials ++ amount`) and 56 bytes per `BuilderTopUpRequest` (`pubkey ++ amount`), with `amount` little-endian — in the FIFO order the system call returns them. This matches the bytes the contract appends to its queue. Unlike the validator [EIP-6110](./eip-6110.md) `DepositRequest`, `BuilderDepositRequest` carries no `signature` (the execution layer has already verified it) and no `index`.
+
 ### Consensus-layer processing of records
 
 The consensus layer processes the two request types as follows:
 
-- A `BUILDER_DEPOSIT_REQUEST_TYPE` (`0x03`) record for a `pubkey` **not** yet in the builder set is a first deposit: it registers the builder with the record's `withdrawal_credentials` and credits its `amount_gwei`. The execution layer has already verified the proof-of-possession, so the consensus layer does not re-verify.
-- A `BUILDER_DEPOSIT_REQUEST_TYPE` (`0x03`) record for a `pubkey` **already** in the builder set MUST be treated as a top-up: it credits `amount_gwei` and MUST NOT change the existing `withdrawal_credentials`. This mirrors the validator deposit contract, where the proof-of-possession is checked only on a pubkey's first appearance and later deposits are stake additions. The rule is required because the `0x03` entrypoint's signature is replayable: it commits only to `(pubkey, withdrawal_credentials)` and is public in calldata once any deposit lands, so a third party can submit a further `0x03` record for an already-registered builder (funding it themselves). Treating it as a top-up makes that replay equivalent to a `BUILDER_TOPUP_REQUEST_TYPE` record — a permitted stake addition — and prevents it from re-registering or altering the builder.
-- A `BUILDER_TOPUP_REQUEST_TYPE` (`0x04`) record MUST be rejected if its `pubkey` is not already a registered builder, and otherwise credits `amount_gwei` without touching the withdrawal credentials.
+- A `BuilderDepositRequest` (type `0x03`) for a `pubkey` **not** yet in the builder set is a first deposit: it registers the builder with the record's `withdrawal_credentials` and credits its `amount`. The execution layer has already verified the proof-of-possession, so the consensus layer does not re-verify.
+- A `BuilderDepositRequest` (type `0x03`) for a `pubkey` **already** in the builder set MUST be treated as a top-up: it credits `amount` and MUST NOT change the existing `withdrawal_credentials` or re-register the builder. This mirrors the validator deposit contract, where the proof-of-possession is checked only on a pubkey's first appearance and later deposits are stake additions.
+- A `BuilderTopUpRequest` (type `0x04`) MUST be rejected if its `pubkey` is not already a registered builder, and otherwise credits `amount` without touching the withdrawal credentials.
 
 ## Rationale
 
