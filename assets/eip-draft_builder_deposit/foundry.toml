@@ -1,0 +1,21 @@
+[profile.default]
+# The verifier and harness target Solidity 0.6.11 (the same compiler that
+# produced the deployed deposit contract). Tests target the same pragma so
+# the harness can use plain inheritance instead of low-level calls.
+solc = "0.6.11"
+src = "."
+test = "test"
+out = "out"
+cache_path = "cache"
+
+# Modexp-only tests work on any post-Byzantium EVM. The full BLS verification
+# tests (testVerifyDeposit*) require EIP-2537 precompiles, which were
+# activated in Prague. Override on the command line for older targets:
+#     forge test --evm-version cancun --no-match-test VerifyDeposit
+evm_version = "prague"
+
+# `bytecode_hash = "none"` makes the runtime byte string deterministic
+# across rebuilds — useful when comparing against the canonical bytecode.
+bytecode_hash = "none"
+optimizer = true
+optimizer_runs = 200
