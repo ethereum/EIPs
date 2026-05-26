@@ -6,23 +6,32 @@ pragma experimental ABIEncoderV2;  // for `Fp` / `Fp2` struct calldata in `depos
 // ───────────────────────────────────────────────────────────────────────────────
 // EIP-XXXX: Builder Deposit Contract
 //
-// Predeploy installed at BUILDER_DEPOSIT_CONTRACT_ADDRESS. Exposes:
+// Two EIP-7685 request predeploys for the EIP-7732 builder population, modelled
+// on the EIP-7002 (withdrawals) / EIP-7251 (consolidations) "request bus":
 //
-//   * deposit(pubkey, wc, signature, pubkey_y, signature_y) — BLS proof-of-
-//     possession verified on chain via the EIP-2537 precompiles. Emits
-//     `BuilderDepositEvent`. The consensus layer trusts the EL pairing check
-//     and does not re-verify.
+//   * BuilderDepositContract  @ BUILDER_DEPOSIT_CONTRACT_ADDRESS  (request type 0x03)
+//       deposit(pubkey, wc, signature, pubkey_y, signature_y) — verifies the BLS
+//       proof-of-possession on chain via the EIP-2537 precompiles, then appends
+//       a deposit record to the in-state request queue.
 //
-//   * top_up(pubkey, wc) — unverified additional deposit for an already-
-//     registered builder. Emits `BuilderTopUpEvent`. The consensus layer
-//     rejects top-ups whose `pubkey` is not in the builder set.
+//   * BuilderTopUpContract    @ BUILDER_TOPUP_CONTRACT_ADDRESS    (request type 0x04)
+//       top_up(pubkey) — unverified additional stake for an already-registered
+//       builder; appends a top-up record to its queue. The consensus layer
+//       rejects top-ups whose `pubkey` is not in the builder set.
 //
-// Storage is intentionally minimal — a single monotonic `deposit_count`. The
-// consensus layer extracts builder deposits from the event log, not from a
-// Merkle tree on chain (so no `get_deposit_root` / `get_deposit_count` view
-// functions, unlike the validator deposit contract).
+// Neither contract emits logs. Both share the `RequestQueue` base: a user call
+// appends a record; at the end of the block a `SYSTEM_ADDRESS` call with empty
+// calldata pops up to MAX_REQUESTS_PER_BLOCK records and returns them as the
+// flat `request_data` for that predeploy's request type. The execution layer
+// prepends the type byte and commits the result in the block `requests_hash`
+// (EIP-7685). Each contract is a standard single-type request predeploy, so the
+// EL needs no new read semantics — exactly the withdrawals/consolidations model.
 //
-// Algorithms used:
+// Anti-spam is the staked value itself: every deposit/top-up locks >= 1 ETH and
+// (for deposits) pays for gas-metered BLS verification, so there is no EIP-1559
+// request fee (unlike EIP-7002/7251, whose requests would otherwise be free).
+//
+// Algorithms used (BuilderDepositContract):
 //   * Signing root      — SSZ `hash_tree_root` of `DepositMessage` mixed with
 //                         `DOMAIN_BUILDER_DEPOSIT` per `compute_signing_root`.
 //   * Hash-to-curve     — `expand_message_xmd` + SSWU/3-isogeny via EIP-2537
@@ -31,18 +40,66 @@ pragma experimental ABIEncoderV2;  // for `Fp` / `Fp2` struct calldata in `depos
 //                         via EIP-2537 `PAIRING_CHECK` (subgroup-checked).
 //   * Fp reduction      — `MODEXP` precompile (0x05) with exponent 1.
 //
-// Design notes (vs. the validator deposit contract):
-//   * No on-chain G1 / G2 decompression. Callers MUST supply affine Y
-//     coordinates. This removes the Fp / Fp2 arithmetic kernel and the
-//     Sarkar/Adj Fp2-sqrt routine from the canonical bytecode.
-//   * No "Y matches sign bit" check. A caller supplying ±Y substitutes ±pk
-//     (or ±σ) into the pairing equation, which then fails; the pairing check
-//     is the sole signature-correctness oracle.
-//   * No `IDepositContract` / ERC-165 inheritance — this is not a drop-in
-//     replacement for the validator deposit contract; the ABI is fresh.
+// Design notes:
+//   * Callers supply affine Y coordinates; there is no on-chain decompression
+//     or Fp/Fp2 arithmetic kernel. The supplied Y is bound to the compressed
+//     sign bit (see `_constructG1`/`_constructG2`), and a builder-specific
+//     signing domain prevents cross-context replay with validator deposits.
+//   * BLS verification gates entry into the deposit queue, so dequeued records
+//     are pre-verified and carry no signature (the CL trusts the EL check).
 // ───────────────────────────────────────────────────────────────────────────────
 
-contract BuilderDepositContract {
+// EIP-7002-style request queue shared by both builder predeploys. A user call
+// appends an opaque record; the end-of-block `SYSTEM_ADDRESS` system call drains
+// up to MAX_REQUESTS_PER_BLOCK records (FIFO) and returns their concatenation as
+// the predeploy's flat `request_data`. No fee: callers of the derived contracts
+// already lock staked value, which is the anti-spam gate.
+contract RequestQueue {
+    // Address used to invoke the end-of-block system operation (EIP-7002/7251).
+    address constant SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
+
+    // Maximum records drained into a single block. Mirrors EIP-7002's
+    // MAX_WITHDRAWAL_REQUESTS_PER_BLOCK; excess records wait for later blocks.
+    uint constant MAX_REQUESTS_PER_BLOCK = 16;
+
+    // FIFO queue of opaque request records, drained from `queueHead`.
+    bytes[] internal queue;
+    uint internal queueHead;
+
+    // Append a request record. Called by the derived contract's entrypoint
+    // after it has validated (and, for deposits, BLS-verified) the request.
+    function _enqueue(bytes memory record) internal {
+        queue.push(record);
+    }
+
+    // End-of-block read-out. Only `SYSTEM_ADDRESS` may call it (with empty
+    // calldata). Pops up to MAX_REQUESTS_PER_BLOCK records FIFO, returns their
+    // concatenation as the flat `request_data`, and advances the head. The EL
+    // prepends this predeploy's EIP-7685 request-type byte.
+    fallback() external {
+        require(msg.sender == SYSTEM_ADDRESS, "RequestQueue: only system");
+
+        uint head = queueHead;
+        uint tail = queue.length;
+        uint n = tail - head;
+        if (n > MAX_REQUESTS_PER_BLOCK) {
+            n = MAX_REQUESTS_PER_BLOCK;
+        }
+
+        // Concatenate the next `n` records into a single flat byte string.
+        bytes memory out;
+        for (uint i = 0; i < n; i++) {
+            out = abi.encodePacked(out, queue[head + i]);
+        }
+        queueHead = head + n;
+
+        assembly {
+            return(add(out, 0x20), mload(out))
+        }
+    }
+}
+
+contract BuilderDepositContract is RequestQueue {
 
     // ── Constants ──────────────────────────────────────────────────────────
 
@@ -128,40 +185,22 @@ contract BuilderDepositContract {
     // Point on BLS12-381 over Fp2.
     struct G2Point { Fp2 X; Fp2 Y; }
 
-    // ── Events ─────────────────────────────────────────────────────────────
+    // ── Request record ─────────────────────────────────────────────────────
+    //
+    // EIP-7685 `request_data` for a builder deposit (request type 0x03) is the
+    // concatenation of one record per dequeued deposit:
+    //
+    //   pubkey (48) ++ withdrawal_credentials (32) ++ amount_gwei (8, LE) = 88 bytes
+    //
+    // The signature is intentionally absent: it was verified at submission, so
+    // the consensus layer trusts the record without re-pairing.
 
-    /// @notice Emitted on a verified builder deposit. The CL trusts the EL's
-    /// pairing check; no second pairing on the consensus side.
-    event BuilderDepositEvent(
-        bytes   pubkey,                  // 48 bytes, compressed G1
-        bytes32 withdrawal_credentials,
-        uint64  amount_gwei,
-        bytes   signature,               // 96 bytes, compressed G2
-        uint64  index
-    );
+    // ── External entrypoint ────────────────────────────────────────────────
 
-    /// @notice Emitted on an unverified top-up. The CL MUST reject if the
-    /// pubkey is not already a registered builder. No `withdrawal_credentials`
-    /// field: a top-up only adds stake to an existing builder, and the CL uses
-    /// the credentials established by that builder's verified `BuilderDepositEvent`.
-    /// Omitting the field removes any ability for an unauthenticated caller to
-    /// influence a builder's withdrawal target.
-    event BuilderTopUpEvent(
-        bytes   pubkey,
-        uint64  amount_gwei,
-        uint64  index
-    );
-
-    // ── Storage ────────────────────────────────────────────────────────────
-
-    // Monotonic deposit index, incremented on every successful `deposit` or
-    // `top_up`. Used only as the `index` field of the emitted events; no
-    // on-chain Merkle tree depends on it.
-    uint64 internal deposit_count;
-
-    // ── External entrypoints ───────────────────────────────────────────────
-
-    /// @notice BLS-verified builder deposit.
+    /// @notice BLS-verified builder deposit. On success, appends a deposit
+    /// record to the request queue (no log). The deposited ETH is locked in the
+    /// contract; the consensus layer credits the builder from the dequeued
+    /// request at the end of the block.
     function deposit(
         bytes calldata pubkey,
         bytes32 withdrawal_credentials,
@@ -178,8 +217,8 @@ contract BuilderDepositContract {
         require(!_isInfinityFlagSet(pubkey[0]),        "BuilderDeposit: infinity pubkey");
         require(!_isInfinityFlagSet(signature[0]),     "BuilderDeposit: infinity signature");
 
-        // BLS proof-of-possession check. Performed before any state change or
-        // log emission so an invalid signature reverts the whole call.
+        // BLS proof-of-possession check. Performed before the record is queued
+        // so an invalid signature reverts the whole call and never enqueues.
         bytes32 signingRoot = _computeDepositSigningRoot(
             pubkey, withdrawal_credentials, uint64(deposit_amount)
         );
@@ -191,29 +230,17 @@ contract BuilderDepositContract {
             "BuilderDeposit: invalid BLS signature"
         );
 
-        uint64 idx = deposit_count;
-        deposit_count = idx + 1;
-        emit BuilderDepositEvent(
-            pubkey, withdrawal_credentials, uint64(deposit_amount), signature, idx
-        );
+        _enqueue(abi.encodePacked(
+            pubkey, withdrawal_credentials, _le64(uint64(deposit_amount))
+        ));
     }
 
-    /// @notice Unverified top-up for an existing builder. The CL rejects
-    /// top-ups against unregistered pubkeys. Takes only the `pubkey`: the
-    /// top-up adds stake to whatever builder is already registered under that
-    /// key, and cannot set or change its withdrawal credentials.
-    function top_up(
-        bytes calldata pubkey
-    ) external payable {
-        require(pubkey.length == PUBLIC_KEY_LENGTH, "BuilderDeposit: invalid pubkey length");
-        require(msg.value >= BUILDER_MIN_DEPOSIT,   "BuilderDeposit: deposit value too low");
-        require(msg.value % 1 gwei == 0,            "BuilderDeposit: deposit value not multiple of gwei");
-        uint deposit_amount = msg.value / 1 gwei;
-        require(deposit_amount <= type(uint64).max, "BuilderDeposit: deposit value too high");
-
-        uint64 idx = deposit_count;
-        deposit_count = idx + 1;
-        emit BuilderTopUpEvent(pubkey, uint64(deposit_amount), idx);
+    // 8-byte little-endian encoding of a uint64 (SSZ amount encoding).
+    function _le64(uint64 v) internal pure returns (bytes memory r) {
+        r = new bytes(8);
+        for (uint i = 0; i < 8; i++) {
+            r[i] = bytes1(uint8(v >> (8 * i)));
+        }
     }
 
     // ── Signing-root computation ───────────────────────────────────────────
@@ -548,5 +575,44 @@ contract BuilderDepositContract {
         // Fp2 is `a + b·u`; `.a` is the real coefficient, `.b` the imaginary.
         if (!_fpIsZero(y.b)) return _fpSignBit(y.b);
         return _fpSignBit(y.a);
+    }
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// Builder top-up predeploy — EIP-7685 request type 0x04, installed at
+// BUILDER_TOPUP_CONTRACT_ADDRESS.
+//
+// Unverified: adds stake to an already-registered builder. There is no BLS
+// check (a top-up does not register a new key), so this contract carries none
+// of the cryptographic machinery — just the shared request queue. The consensus
+// layer MUST reject top-ups whose pubkey is not already in the builder set.
+//
+// No `withdrawal_credentials`: a top-up only adds stake to an existing builder,
+// whose credentials are fixed by its verified deposit. Omitting the field
+// denies an unauthenticated caller any influence over a builder's withdrawal
+// target.
+//
+// EIP-7685 `request_data` is the concatenation of one record per dequeued
+// top-up: pubkey (48) ++ amount_gwei (8, LE) = 56 bytes.
+// ───────────────────────────────────────────────────────────────────────────────
+contract BuilderTopUpContract is RequestQueue {
+    uint constant PUBLIC_KEY_LENGTH   = 48;
+    uint constant BUILDER_MIN_DEPOSIT = 1 ether;
+
+    /// @notice Unverified top-up. On success, appends a top-up record to the
+    /// request queue (no log). The ETH is locked in the contract; the consensus
+    /// layer credits the existing builder from the dequeued request.
+    function top_up(bytes calldata pubkey) external payable {
+        require(pubkey.length == PUBLIC_KEY_LENGTH, "BuilderTopUp: invalid pubkey length");
+        require(msg.value >= BUILDER_MIN_DEPOSIT,   "BuilderTopUp: deposit value too low");
+        require(msg.value % 1 gwei == 0,            "BuilderTopUp: deposit value not multiple of gwei");
+        uint amount = msg.value / 1 gwei;
+        require(amount <= type(uint64).max,         "BuilderTopUp: deposit value too high");
+
+        bytes memory amountLE = new bytes(8);
+        for (uint i = 0; i < 8; i++) {
+            amountLE[i] = bytes1(uint8(uint64(amount) >> (8 * i)));
+        }
+        _enqueue(abi.encodePacked(pubkey, amountLE));
     }
 }

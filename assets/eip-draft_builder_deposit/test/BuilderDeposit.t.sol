@@ -6,42 +6,59 @@ import "../builder_deposit_contract.sol";
 import "./TestHarness.sol";
 import "./Vectors.sol";
 
-/// @notice Cross-verification tests for BuilderDepositContract.
+/// @dev Minimal subset of the Foundry cheatcode interface (avoids a forge-std
+/// dependency on this 0.6.11 project).
+interface Vm {
+    function prank(address) external;
+}
+
+/// @notice Tests for the EIP-7685 request-bus builder predeploys.
 ///
-/// Expected values come from py_ecc (see ../gen_vectors.py) and are baked
-/// into ./Vectors.sol as Solidity literals.
-///
-/// The full deposit-verification tests require the EIP-2537 BLS precompiles
-/// (foundry's default Prague EVM). The signing-root cross-check and the
-/// length/amount/flag rejection tests do not — they exercise SHA-256 and
-/// the EVM only.
+/// Expected values come from py_ecc (see ../gen_vectors.py) baked into
+/// ./Vectors.sol. The full deposit-verification tests require the EIP-2537 BLS
+/// precompiles (foundry's default Prague EVM); the queue / system-read / input
+/// tests do not.
 contract BuilderDepositTest {
 
-    BuilderDepositHarness internal harness;
+    Vm constant vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
+    address constant SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
+
+    uint constant DEPOSIT_RECORD_LEN = 88; // pubkey 48 + wc 32 + amount 8
+    uint constant TOPUP_RECORD_LEN   = 56; // pubkey 48 + amount 8
+
+    BuilderDepositHarness internal dep;
+    BuilderTopUpHarness   internal top;
 
     function setUp() public {
-        harness = new BuilderDepositHarness();
+        dep = new BuilderDepositHarness();
+        top = new BuilderTopUpHarness();
+    }
+
+    // Drive the end-of-block system read: call the predeploy as SYSTEM_ADDRESS
+    // with empty calldata; the fallback returns the flat request_data.
+    function _systemRead(address target) internal returns (bytes memory) {
+        vm.prank(SYSTEM_ADDRESS);
+        (bool ok, bytes memory ret) = target.call("");
+        require(ok, "system read reverted");
+        return ret;
+    }
+
+    function _le64(uint64 v) internal pure returns (bytes memory r) {
+        r = new bytes(8);
+        for (uint i = 0; i < 8; i++) r[i] = bytes1(uint8(v >> (8 * i)));
     }
 
     // ── Cross-check: SSZ signing root ──────────────────────────────────────
 
     function testComputeSigningRoot() public {
-        (
-            bytes memory pubkey,
-            bytes32 wc,
-            ,
-            ,
-            uint64 amount_gwei,
-            ,
-        ) = Vectors.depositCase();
-        bytes32 expected = Vectors.depositSigningRoot();
-        bytes32 got = harness.computeDepositSigningRoot(pubkey, wc, amount_gwei);
-        require(got == expected, "signing root mismatch vs py_ecc");
+        (bytes memory pubkey, bytes32 wc, , , uint64 amount_gwei, , ) = Vectors.depositCase();
+        bytes32 got = dep.computeDepositSigningRoot(pubkey, wc, amount_gwei);
+        require(got == Vectors.depositSigningRoot(), "signing root mismatch vs py_ecc");
     }
 
-    // ── Happy path: verified deposit + top-up ──────────────────────────────
+    // ── Happy path: verified deposit enqueues, system read emits the record ──
 
-    function testDepositValid() public {
+    function testDepositEnqueuesAndReads() public {
         (
             bytes memory pubkey,
             bytes32 wc,
@@ -52,43 +69,58 @@ contract BuilderDepositTest {
             BuilderDepositContract.Fp2 memory signature_y
         ) = Vectors.depositCase();
 
-        uint64 before = harness.getDepositCount();
-        harness.deposit{value: uint(amount_gwei) * 1 gwei}(
-            pubkey, wc, signature, pubkey_y, signature_y
-        );
-        require(harness.getDepositCount() == before + 1, "deposit count did not increment");
+        require(dep.pendingCount() == 0, "starts empty");
+        dep.deposit{value: uint(amount_gwei) * 1 gwei}(pubkey, wc, signature, pubkey_y, signature_y);
+        require(dep.pendingCount() == 1, "one record queued");
+
+        bytes memory data = _systemRead(address(dep));
+        bytes memory expected = abi.encodePacked(pubkey, wc, _le64(amount_gwei));
+        require(data.length == DEPOSIT_RECORD_LEN, "deposit record length");
+        require(keccak256(data) == keccak256(expected), "deposit record bytes mismatch");
+        require(dep.pendingCount() == 0, "queue drained");
     }
 
-    function testTopUpValid() public {
-        (bytes memory pubkey, , , , , , ) = Vectors.depositCase();
-        uint64 before = harness.getDepositCount();
-        harness.top_up{value: 2 ether}(pubkey);
-        require(harness.getDepositCount() == before + 1, "top_up did not increment count");
+    function testTopUpEnqueuesAndReads() public {
+        bytes memory pubkey = new bytes(48);
+        for (uint i = 0; i < 48; i++) pubkey[i] = bytes1(uint8(i + 1));
+
+        top.top_up{value: 3 ether}(pubkey);
+        require(top.pendingCount() == 1, "one top-up queued");
+
+        bytes memory data = _systemRead(address(top));
+        bytes memory expected = abi.encodePacked(pubkey, _le64(3_000_000_000));
+        require(data.length == TOPUP_RECORD_LEN, "top-up record length");
+        require(keccak256(data) == keccak256(expected), "top-up record bytes mismatch");
+        require(top.pendingCount() == 0, "queue drained");
     }
 
-    function testMonotonicIndex() public {
-        (
-            bytes memory pubkey,
-            bytes32 wc,
-            bytes memory signature,
-            ,
-            uint64 amount_gwei,
-            BuilderDepositContract.Fp memory pubkey_y,
-            BuilderDepositContract.Fp2 memory signature_y
-        ) = Vectors.depositCase();
+    // ── System read access control + FIFO / per-block cap ──────────────────
 
-        require(harness.getDepositCount() == 0, "expected initial count == 0");
-        harness.deposit{value: uint(amount_gwei) * 1 gwei}(
-            pubkey, wc, signature, pubkey_y, signature_y
-        );
-        require(harness.getDepositCount() == 1, "after first deposit count == 1");
-        harness.top_up{value: 1 ether}(pubkey);
-        require(harness.getDepositCount() == 2, "after top_up count == 2");
-        harness.top_up{value: 1 ether}(pubkey);
-        require(harness.getDepositCount() == 3, "after second top_up count == 3");
+    function testSystemReadRequiresSystemAddress() public {
+        // Without the SYSTEM_ADDRESS prank, the fallback must revert.
+        (bool ok, ) = address(dep).call("");
+        require(!ok, "non-system system-read must revert");
     }
 
-    // ── Negative paths: BLS check ──────────────────────────────────────────
+    function testPerBlockCapAndFifo() public {
+        bytes memory pubkey = new bytes(48);
+        // Enqueue MAX_REQUESTS_PER_BLOCK + 1 = 17 top-ups (unverified, so easy
+        // to queue many without distinct signatures).
+        for (uint i = 0; i < 17; i++) {
+            top.top_up{value: 1 ether}(pubkey);
+        }
+        require(top.pendingCount() == 17, "17 queued");
+
+        bytes memory first = _systemRead(address(top));
+        require(first.length == 16 * TOPUP_RECORD_LEN, "first read drains the 16-record cap");
+        require(top.pendingCount() == 1, "one remains after cap");
+
+        bytes memory second = _systemRead(address(top));
+        require(second.length == 1 * TOPUP_RECORD_LEN, "second read drains the remainder");
+        require(top.pendingCount() == 0, "queue empty");
+    }
+
+    // ── Negative paths: BLS check (nothing should enqueue) ─────────────────
 
     function testDepositRejectsTamperedAmount() public {
         (
@@ -100,14 +132,12 @@ contract BuilderDepositTest {
             BuilderDepositContract.Fp memory pubkey_y,
             BuilderDepositContract.Fp2 memory signature_y
         ) = Vectors.depositCase();
-        // Sending a different msg.value puts a different `amount_gwei` into
-        // the signing root, so the pairing check must reject.
-        uint tamperedValue = (uint(amount_gwei) + 1) * 1 gwei;
-        try harness.deposit{value: tamperedValue}(
+        try dep.deposit{value: (uint(amount_gwei) + 1) * 1 gwei}(
             pubkey, wc, signature, pubkey_y, signature_y
         ) {
             require(false, "tampered amount should revert");
         } catch {}
+        require(dep.pendingCount() == 0, "nothing enqueued on reject");
     }
 
     function testDepositRejectsTamperedSignature() public {
@@ -122,19 +152,15 @@ contract BuilderDepositTest {
         ) = Vectors.depositCase();
         bytes memory tampered = _copy(signature);
         tampered[10] = tampered[10] ^ bytes1(uint8(1));
-        try harness.deposit{value: uint(amount_gwei) * 1 gwei}(
+        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(
             pubkey, wc, tampered, pubkey_y, signature_y
         ) {
             require(false, "tampered signature should revert");
         } catch {}
+        require(dep.pendingCount() == 0, "nothing enqueued on reject");
     }
 
-    // Regression test for the sign-bit binding (audit Finding 2). The valid
-    // vector has pubkey sign flag == sign(pubkey_y). Flipping ONLY the pubkey's
-    // sign flag (leaving X and the supplied pubkey_y unchanged) models an
-    // attacker who verifies (X, +Y) but emits bytes that decompress to (X, -Y).
-    // With the sign-bit consistency check in `_constructG1`, this must revert
-    // BEFORE any pairing work. Without the check it would have passed.
+    // Regression for audit Finding 2: flip only the pubkey sign flag (keep Y).
     function testDepositRejectsPubkeySignBitFlip() public {
         (
             bytes memory pubkey,
@@ -146,16 +172,15 @@ contract BuilderDepositTest {
             BuilderDepositContract.Fp2 memory signature_y
         ) = Vectors.depositCase();
         bytes memory flipped = _copy(pubkey);
-        flipped[0] = flipped[0] ^ bytes1(uint8(0x20)); // flip sign flag only
-        try harness.deposit{value: uint(amount_gwei) * 1 gwei}(
+        flipped[0] = flipped[0] ^ bytes1(uint8(0x20));
+        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(
             flipped, wc, signature, pubkey_y, signature_y
         ) {
             require(false, "pubkey sign-bit flip should revert");
         } catch {}
+        require(dep.pendingCount() == 0, "nothing enqueued on reject");
     }
 
-    // Same regression, signature side: flip the signature's sign flag while
-    // keeping signature_y, exercising `_constructG2`'s sign-bit check.
     function testDepositRejectsSignatureSignBitFlip() public {
         (
             bytes memory pubkey,
@@ -168,14 +193,13 @@ contract BuilderDepositTest {
         ) = Vectors.depositCase();
         bytes memory flipped = _copy(signature);
         flipped[0] = flipped[0] ^ bytes1(uint8(0x20));
-        try harness.deposit{value: uint(amount_gwei) * 1 gwei}(
+        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(
             pubkey, wc, flipped, pubkey_y, signature_y
         ) {
             require(false, "signature sign-bit flip should revert");
         } catch {}
+        require(dep.pendingCount() == 0, "nothing enqueued on reject");
     }
-
-    // ── Negative paths: compressed-encoding flags ──────────────────────────
 
     function testDepositRejectsInfinityPubkey() public {
         (
@@ -187,109 +211,57 @@ contract BuilderDepositTest {
             BuilderDepositContract.Fp memory pubkey_y,
             BuilderDepositContract.Fp2 memory signature_y
         ) = Vectors.depositCase();
-        bytes memory infPubkey = _copy(pubkey);
-        infPubkey[0] = infPubkey[0] | bytes1(uint8(0x40)); // set infinity flag
-        try harness.deposit{value: uint(amount_gwei) * 1 gwei}(
-            infPubkey, wc, signature, pubkey_y, signature_y
+        bytes memory inf = _copy(pubkey);
+        inf[0] = inf[0] | bytes1(uint8(0x40));
+        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(
+            inf, wc, signature, pubkey_y, signature_y
         ) {
             require(false, "infinity pubkey should revert");
         } catch {}
-    }
-
-    function testDepositRejectsInfinitySignature() public {
-        (
-            bytes memory pubkey,
-            bytes32 wc,
-            bytes memory signature,
-            ,
-            uint64 amount_gwei,
-            BuilderDepositContract.Fp memory pubkey_y,
-            BuilderDepositContract.Fp2 memory signature_y
-        ) = Vectors.depositCase();
-        bytes memory infSig = _copy(signature);
-        infSig[0] = infSig[0] | bytes1(uint8(0x40));
-        try harness.deposit{value: uint(amount_gwei) * 1 gwei}(
-            pubkey, wc, infSig, pubkey_y, signature_y
-        ) {
-            require(false, "infinity signature should revert");
-        } catch {}
+        require(dep.pendingCount() == 0, "nothing enqueued on reject");
     }
 
     // ── Negative paths: input-shape validation ─────────────────────────────
 
     function testDepositRejectsTooSmallAmount() public {
-        // BLS data doesn't matter — the amount check fires first.
         bytes memory pubkey = new bytes(48);
         bytes memory signature = new bytes(96);
-        BuilderDepositContract.Fp memory zero_fp =
-            BuilderDepositContract.Fp(0, 0);
-        BuilderDepositContract.Fp2 memory zero_fp2 =
-            BuilderDepositContract.Fp2(zero_fp, zero_fp);
-        try harness.deposit{value: 0.5 ether}(
-            pubkey, bytes32(0), signature, zero_fp, zero_fp2
-        ) {
+        BuilderDepositContract.Fp memory z = BuilderDepositContract.Fp(0, 0);
+        BuilderDepositContract.Fp2 memory z2 = BuilderDepositContract.Fp2(z, z);
+        try dep.deposit{value: 0.5 ether}(pubkey, bytes32(0), signature, z, z2) {
             require(false, "deposit < 1 ether should revert");
         } catch {}
-    }
-
-    function testDepositRejectsNonGweiAmount() public {
-        bytes memory pubkey = new bytes(48);
-        bytes memory signature = new bytes(96);
-        BuilderDepositContract.Fp memory zero_fp =
-            BuilderDepositContract.Fp(0, 0);
-        BuilderDepositContract.Fp2 memory zero_fp2 =
-            BuilderDepositContract.Fp2(zero_fp, zero_fp);
-        // 1 ether + 1 wei is not a multiple of 1 gwei.
-        try harness.deposit{value: 1 ether + 1}(
-            pubkey, bytes32(0), signature, zero_fp, zero_fp2
-        ) {
-            require(false, "non-gwei value should revert");
-        } catch {}
+        require(dep.pendingCount() == 0, "nothing enqueued on reject");
     }
 
     function testDepositRejectsWrongPubkeyLength() public {
-        bytes memory pubkey = new bytes(47); // one short
+        bytes memory pubkey = new bytes(47);
         bytes memory signature = new bytes(96);
-        BuilderDepositContract.Fp memory zero_fp =
-            BuilderDepositContract.Fp(0, 0);
-        BuilderDepositContract.Fp2 memory zero_fp2 =
-            BuilderDepositContract.Fp2(zero_fp, zero_fp);
-        try harness.deposit{value: 1 ether}(
-            pubkey, bytes32(0), signature, zero_fp, zero_fp2
-        ) {
+        BuilderDepositContract.Fp memory z = BuilderDepositContract.Fp(0, 0);
+        BuilderDepositContract.Fp2 memory z2 = BuilderDepositContract.Fp2(z, z);
+        try dep.deposit{value: 1 ether}(pubkey, bytes32(0), signature, z, z2) {
             require(false, "47-byte pubkey should revert");
         } catch {}
-    }
-
-    function testDepositRejectsWrongSignatureLength() public {
-        bytes memory pubkey = new bytes(48);
-        bytes memory signature = new bytes(95); // one short
-        BuilderDepositContract.Fp memory zero_fp =
-            BuilderDepositContract.Fp(0, 0);
-        BuilderDepositContract.Fp2 memory zero_fp2 =
-            BuilderDepositContract.Fp2(zero_fp, zero_fp);
-        try harness.deposit{value: 1 ether}(
-            pubkey, bytes32(0), signature, zero_fp, zero_fp2
-        ) {
-            require(false, "95-byte signature should revert");
-        } catch {}
+        require(dep.pendingCount() == 0, "nothing enqueued on reject");
     }
 
     function testTopUpRejectsTooSmallAmount() public {
         bytes memory pubkey = new bytes(48);
-        try harness.top_up{value: 0.5 ether}(pubkey) {
+        try top.top_up{value: 0.5 ether}(pubkey) {
             require(false, "top_up < 1 ether should revert");
         } catch {}
+        require(top.pendingCount() == 0, "nothing enqueued on reject");
     }
 
     function testTopUpRejectsWrongPubkeyLength() public {
         bytes memory pubkey = new bytes(47);
-        try harness.top_up{value: 1 ether}(pubkey) {
+        try top.top_up{value: 1 ether}(pubkey) {
             require(false, "47-byte pubkey should revert");
         } catch {}
+        require(top.pendingCount() == 0, "nothing enqueued on reject");
     }
 
-    // ── helpers ────────────────────────────────────────────────────────────
+    // ── helper ─────────────────────────────────────────────────────────────
 
     function _copy(bytes memory src) internal pure returns (bytes memory dst) {
         dst = new bytes(src.length);

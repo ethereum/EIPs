@@ -6,10 +6,10 @@ Reference Solidity for the proposal, plus cross-verification tests.
 
 | File | Purpose |
 | --- | --- |
-| `builder_deposit_contract.sol` | The proposed predeploy. Two entrypoints: `deposit(...)` (BLS-verified, requires affine Y coordinates) and `top_up(...)` (unverified, CL re-validates). |
+| `builder_deposit_contract.sol` | The two proposed predeploys plus a shared base: `RequestQueue` (EIP-7002-style queue + `SYSTEM_ADDRESS` end-of-block read), `BuilderDepositContract` (`deposit(...)`, BLS-verified, request type `0x03`), and `BuilderTopUpContract` (`top_up(...)`, unverified, request type `0x04`). |
 | `gen_vectors.py` | Python script that uses `py_ecc` (the canonical Eth2 reference) to produce cross-verification test vectors. |
 | `test/Vectors.sol` | Auto-generated Solidity library of test vectors. Regenerate by running `gen_vectors.py`. |
-| `test/TestHarness.sol` | Thin wrapper that inherits `BuilderDepositContract` and exposes its `internal` SSZ signing-root helper + the `deposit_count` storage slot, for use by the tests. |
+| `test/TestHarness.sol` | `BuilderDepositHarness` / `BuilderTopUpHarness` — inherit the predeploys and expose the pending-queue depth (and the SSZ signing-root helper) for the tests. |
 | `test/BuilderDeposit.t.sol` | Foundry tests. |
 | `foundry.toml` | Foundry configuration (solc `0.6.11`, EVM `prague` by default). |
 
@@ -31,10 +31,10 @@ Run the test suite:
 forge test -vv
 ```
 
-`evm_version = "prague"` in `foundry.toml` enables the EIP-2537 BLS precompiles, required for the deposit-verification path. To run only the input-shape and signing-root tests on an older EVM (no EIP-2537 needed):
+`evm_version = "prague"` in `foundry.toml` enables the EIP-2537 BLS precompiles, required for the three tests that exercise the pairing path. To run only the queue, system-read, and input-validation tests on an older EVM (no EIP-2537 needed):
 
 ```bash
-forge test -vv --evm-version cancun --no-match-test 'Deposit(Valid|Rejects(Tampered|Infinity))'
+forge test -vv --evm-version cancun --no-match-test '(DepositEnqueuesAndReads|Tampered)'
 ```
 
 ## Regenerating vectors
@@ -47,21 +47,19 @@ The script is deterministic: the secret key is hard-coded so the output is byte-
 
 ## Test coverage
 
-| Test | What it cross-verifies | EIP-2537 required? |
+| Test | What it covers | EIP-2537 required? |
 | --- | --- | --- |
 | `testComputeSigningRoot` | `_computeDepositSigningRoot` matches `py_ecc`-derived SSZ `compute_signing_root` | no |
-| `testDepositValid` | A `py_ecc.G2ProofOfPossession.Sign`-produced signature is accepted; `deposit_count` increments | **yes** |
-| `testTopUpValid` | `top_up(...)` accepts a non-signed call; `deposit_count` increments | no |
-| `testMonotonicIndex` | Deposit + top_up + top_up increment the counter by 1 each | **yes** (for the deposit step) |
-| `testDepositRejectsTamperedAmount` | Sending a different `msg.value` than was signed fails the pairing check | **yes** |
-| `testDepositRejectsTamperedSignature` | Flipping a bit in the signature is rejected (subgroup or pairing failure) | **yes** |
-| `testDepositRejectsPubkeySignBitFlip` | Flipping only the pubkey sign flag (keeping Y) is rejected by the sign-bit binding — regression for audit Finding 2 | no |
-| `testDepositRejectsSignatureSignBitFlip` | Flipping only the signature sign flag (keeping Y) is rejected by the sign-bit binding | no |
-| `testDepositRejectsInfinityPubkey` | `pubkey` with infinity flag is rejected before BLS work | no |
-| `testDepositRejectsInfinitySignature` | `signature` with infinity flag is rejected before BLS work | no |
-| `testDepositRejectsTooSmallAmount` | `msg.value < 1 ether` is rejected | no |
-| `testDepositRejectsNonGweiAmount` | `msg.value` not aligned to 1 gwei is rejected | no |
-| `testDepositRejectsWrongPubkeyLength` | `pubkey.length != 48` is rejected | no |
-| `testDepositRejectsWrongSignatureLength` | `signature.length != 96` is rejected | no |
-| `testTopUpRejectsTooSmallAmount` | `top_up` with `msg.value < 1 ether` is rejected | no |
-| `testTopUpRejectsWrongPubkeyLength` | `top_up` with `pubkey.length != 48` is rejected | no |
+| `testDepositEnqueuesAndReads` | A `py_ecc`-produced deposit is accepted, enqueued, and the `SYSTEM_ADDRESS` read returns the exact 88-byte record | **yes** |
+| `testTopUpEnqueuesAndReads` | `top_up(...)` enqueues; the system read returns the exact 56-byte record | no |
+| `testSystemReadRequiresSystemAddress` | An empty-calldata read from a non-`SYSTEM_ADDRESS` caller reverts | no |
+| `testPerBlockCapAndFifo` | 17 queued → first read drains the 16-record cap, second drains the remainder (FIFO) | no |
+| `testDepositRejectsTamperedAmount` | A different `msg.value` than was signed fails the pairing check; nothing enqueued | **yes** |
+| `testDepositRejectsTamperedSignature` | Flipping a signature bit is rejected (subgroup/pairing failure); nothing enqueued | **yes** |
+| `testDepositRejectsPubkeySignBitFlip` | Flipping only the pubkey sign flag is rejected by the sign-bit binding (audit Finding 2 regression); nothing enqueued | no |
+| `testDepositRejectsSignatureSignBitFlip` | Flipping only the signature sign flag is rejected by the sign-bit binding; nothing enqueued | no |
+| `testDepositRejectsInfinityPubkey` | `pubkey` with infinity flag is rejected before BLS work; nothing enqueued | no |
+| `testDepositRejectsTooSmallAmount` | `msg.value < 1 ether` is rejected; nothing enqueued | no |
+| `testDepositRejectsWrongPubkeyLength` | `pubkey.length != 48` is rejected; nothing enqueued | no |
+| `testTopUpRejectsTooSmallAmount` | `top_up` with `msg.value < 1 ether` is rejected; nothing enqueued | no |
+| `testTopUpRejectsWrongPubkeyLength` | `top_up` with `pubkey.length != 48` is rejected; nothing enqueued | no |
