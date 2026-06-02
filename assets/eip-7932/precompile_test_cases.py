@@ -1,3 +1,5 @@
+# TODO: Update this impl, current git ref #7a2e7ad98
+
 import secp256k1
 
 from precompile import sigrecover_precompile
