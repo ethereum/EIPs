@@ -1,7 +1,7 @@
 ---
 title: Builder Deposit Contract
 description: Predeploy BLS-verifying builder deposit and top-up contracts as EIP-7685 requests, using EIP-2537 precompiles, for EIP-7732 builders
-author: Cayman (@wemeetagain)
+author: Cayman (@wemeetagain), Nico Flaig <nflaig@protonmail.com>, Matthew Keil <me@matthewkeil.com>
 discussions-to: <URL>
 status: Draft
 type: Standards Track
