@@ -4,32 +4,45 @@ pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;  // for `Fp` / `Fp2` struct calldata in `deposit`
 
 // ───────────────────────────────────────────────────────────────────────────────
-// EIP-XXXX: Builder Deposit Contract
+// EIP-XXXX: Builder Execution Requests
 //
-// Two EIP-7685 request predeploys for the EIP-7732 builder population, modelled
-// on the EIP-7002 (withdrawals) / EIP-7251 (consolidations) "request bus":
+// Three EIP-7685 request predeploys for the EIP-7732 builder population,
+// modelled on the EIP-7002 (withdrawals) / EIP-7251 (consolidations) "request
+// bus":
 //
-//   * BuilderDepositContract  @ BUILDER_DEPOSIT_CONTRACT_ADDRESS  (request type 0x03)
+//   * BuilderDepositContract     @ BUILDER_DEPOSIT_CONTRACT_ADDRESS     (request type 0x03)
 //       deposit(pubkey, wc, amount_gwei, signature, pubkey_y, signature_y) —
 //       verifies the BLS proof-of-possession on chain via the EIP-2537
 //       precompiles, then appends a deposit record to the in-state request queue.
 //
-//   * BuilderTopUpContract    @ BUILDER_TOPUP_CONTRACT_ADDRESS    (request type 0x04)
+//   * BuilderTopUpContract       @ BUILDER_TOPUP_CONTRACT_ADDRESS       (request type 0x04)
 //       top_up(pubkey, amount_gwei) — unverified additional stake for an
 //       already-registered builder; appends a top-up record to its queue. The
 //       consensus layer rejects top-ups whose `pubkey` is not in the builder set.
 //
-// Neither contract emits logs. Both share the `RequestQueue` base: a user call
-// appends a record; at the end of the block a `SYSTEM_ADDRESS` call with empty
-// calldata pops up to MAX_REQUESTS_PER_BLOCK records and returns them as the
-// flat `request_data` for that predeploy's request type. The execution layer
-// prepends the type byte and commits the result in the block `requests_hash`
-// (EIP-7685). Each contract is a standard single-type request predeploy, so the
-// EL needs no new read semantics — exactly the withdrawals/consolidations model.
+//   * BuilderWithdrawalContract  @ BUILDER_WITHDRAWAL_CONTRACT_ADDRESS  (request type 0x05)
+//       withdraw(pubkey, amount_gwei) — a semantic clone of the EIP-7002
+//       withdrawal predeploy, retargeted at the builder set. The builder's
+//       execution_address authorizes the request simply by being `msg.sender`,
+//       so there is no BLS check and no staked value — only the fee. An
+//       amount_gwei of 0 is a full exit, any amount_gwei > 0 a partial
+//       withdrawal. The consensus layer ignores records whose recorded
+//       source_address is not the target builder's execution_address.
 //
-// Anti-spam is the staked value itself: every deposit/top-up locks >= 1 ETH and
-// (for deposits) pays for gas-metered BLS verification, so there is no EIP-1559
-// request fee (unlike EIP-7002/7251, whose requests would otherwise be free).
+// None of the contracts emit logs. All three share the `RequestQueue` base: a
+// user call appends a record; at the end of the block a `SYSTEM_ADDRESS` call
+// with empty calldata pops up to MAX_REQUESTS_PER_BLOCK records and returns them
+// as the flat `request_data` for that predeploy's request type. The execution
+// layer prepends the type byte and commits the result in the block
+// `requests_hash` (EIP-7685). Each contract is a standard single-type request
+// predeploy, so the EL needs no new read semantics — exactly the
+// withdrawals/consolidations model.
+//
+// Anti-spam has two layers: every request carries the same EIP-1559-style
+// request fee as EIP-7002/7251 (see RequestQueue), and deposits/top-ups
+// additionally lock their staked value (>= 1 ETH), with a deposit also paying
+// for gas-metered BLS verification. Withdrawals/exits move no ETH on this layer,
+// so the fee alone meters them, exactly as in EIP-7002.
 //
 // Algorithms used (BuilderDepositContract):
 //   * Signing root      — SSZ `hash_tree_root` of `DepositMessage` mixed with
@@ -711,5 +724,51 @@ contract BuilderTopUpContract is RequestQueue {
         require(msg.value >= stake + _getFee(),     "BuilderTopUp: insufficient value for stake + fee");
 
         _recordRequest(abi.encodePacked(pubkey, _le64(amount_gwei)));
+    }
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// Builder withdrawal / exit predeploy — EIP-7685 request type 0x05, installed at
+// BUILDER_WITHDRAWAL_CONTRACT_ADDRESS.
+//
+// A semantic clone of the EIP-7002 withdrawal-request predeploy, retargeted at
+// the EIP-7732 builder set. A builder's `execution_address` (the 0x03 builder
+// withdrawal credential) authorizes a request simply by being `msg.sender` —
+// exactly as EIP-7002's 0x01 credential does — so this contract needs NO BLS
+// verification and locks NO stake: unlike a deposit or top-up, a withdrawal
+// moves no ETH on the execution layer, and the caller sends only the request
+// fee. `amount_gwei == 0` requests a full exit (the "voluntary exit"); any
+// `amount_gwei > 0` requests a partial withdrawal of that many gwei. The
+// consensus layer interprets the amount-zero sentinel exactly as it does for
+// validators under EIP-7002.
+//
+// EIP-7685 `request_data` is the concatenation of one record per dequeued
+// request:
+//   source_address (20) ++ pubkey (48) ++ amount_gwei (8, LE) = 76 bytes,
+// identical in shape to EIP-7002's `ValidatorWithdrawalRequest`. As with the
+// sibling builder predeploys this contract emits no logs (EIP-7002 emits a
+// log0; the request bus does not need it). The consensus layer MUST ignore a
+// record whose `source_address` does not match the target builder's
+// `execution_address`, so a third party cannot withdraw or exit a builder it
+// does not control.
+// ───────────────────────────────────────────────────────────────────────────────
+contract BuilderWithdrawalContract is RequestQueue {
+    uint constant PUBLIC_KEY_LENGTH = 48;
+
+    /// @notice Builder withdrawal / exit request. On success, appends a record
+    /// to the request queue (no log). `amount_gwei == 0` requests a full exit;
+    /// any `amount_gwei > 0` requests a partial withdrawal of that many gwei
+    /// from the builder's beacon-chain balance. Unlike `deposit`/`top_up` this
+    /// moves no ETH on the execution layer: the caller sends only
+    /// `msg.value >= fee`, where `fee` is the current request fee (read it by
+    /// calling this contract with empty calldata). The record's `source_address`
+    /// is `msg.sender`; the consensus layer honours the request only if it
+    /// equals the target builder's `execution_address`. There is intentionally
+    /// no minimum-amount check — `0` is the exit sentinel, mirroring EIP-7002.
+    function withdraw(bytes calldata pubkey, uint64 amount_gwei) external payable {
+        require(pubkey.length == PUBLIC_KEY_LENGTH, "BuilderWithdrawal: invalid pubkey length");
+        require(msg.value >= _getFee(),             "BuilderWithdrawal: insufficient value for fee");
+
+        _recordRequest(abi.encodePacked(msg.sender, pubkey, _le64(amount_gwei)));
     }
 }

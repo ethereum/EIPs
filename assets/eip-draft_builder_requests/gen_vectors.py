@@ -34,7 +34,7 @@ def sha256(b: bytes) -> bytes:
 # Builder-deposit signing domain — distinct 4-byte domain type (0x0b000000,
 # a placeholder pending consensus-specs allocation) with the same GENESIS
 # fork-data suffix as the validator deposit domain. Must match
-# DOMAIN_BUILDER_DEPOSIT in builder_deposit_contract.sol. Domain separation
+# DOMAIN_BUILDER_DEPOSIT in builder_requests.sol. Domain separation
 # from the validator deposit domain (0x03000000…) prevents cross-context
 # signature replay.
 DOMAIN_BUILDER_DEPOSIT = bytes.fromhex(
@@ -44,7 +44,7 @@ DOMAIN_BUILDER_DEPOSIT = bytes.fromhex(
 def deposit_signing_root(pubkey: bytes, wc: bytes) -> bytes:
     """compute_signing_root for the 2-field builder message (pubkey, wc).
 
-    The amount is intentionally NOT signed (see builder_deposit_contract.sol):
+    The amount is intentionally NOT signed (see builder_requests.sol):
     htr = sha256(pubkey_root || wc); signing_root = sha256(htr || DOMAIN)."""
     assert len(pubkey) == 48 and len(wc) == 32
     pubkey_root = sha256(pubkey + b"\x00" * 16)
@@ -123,7 +123,7 @@ def emit():
     p("pragma solidity 0.6.11;")
     p("pragma experimental ABIEncoderV2;")
     p("")
-    p('import "../builder_deposit_contract.sol";')
+    p('import "../builder_requests.sol";')
     p("")
     p("library Vectors {")
     p("")

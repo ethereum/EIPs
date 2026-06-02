@@ -2,7 +2,7 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-import "../builder_deposit_contract.sol";
+import "../builder_requests.sol";
 import "./TestHarness.sol";
 import "./Vectors.sol";
 
@@ -10,6 +10,7 @@ import "./Vectors.sol";
 /// dependency on this 0.6.11 project).
 interface Vm {
     function prank(address) external;
+    function deal(address, uint256) external;
 }
 
 /// @notice Tests for the EIP-7685 request-bus builder predeploys, including the
@@ -19,20 +20,23 @@ interface Vm {
 /// ./Vectors.sol. The deposit-verification tests require the EIP-2537 BLS
 /// precompiles (foundry's default Prague EVM); the queue / fee / system-read /
 /// input tests do not.
-contract BuilderDepositTest {
+contract BuilderRequestsTest {
 
     Vm constant vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
     address constant SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
 
-    uint constant DEPOSIT_RECORD_LEN = 88; // pubkey 48 + wc 32 + amount 8
-    uint constant TOPUP_RECORD_LEN   = 56; // pubkey 48 + amount 8
+    uint constant DEPOSIT_RECORD_LEN    = 88; // pubkey 48 + wc 32 + amount 8
+    uint constant TOPUP_RECORD_LEN      = 56; // pubkey 48 + amount 8
+    uint constant WITHDRAWAL_RECORD_LEN = 76; // source 20 + pubkey 48 + amount 8
 
-    BuilderDepositHarness internal dep;
-    BuilderTopUpHarness   internal top;
+    BuilderDepositHarness    internal dep;
+    BuilderTopUpHarness      internal top;
+    BuilderWithdrawalHarness internal wd;
 
     function setUp() public {
         dep = new BuilderDepositHarness();
         top = new BuilderTopUpHarness();
+        wd  = new BuilderWithdrawalHarness();
     }
 
     function _systemRead(address target) internal returns (bytes memory) {
@@ -347,5 +351,86 @@ contract BuilderDepositTest {
             require(false, "47-byte pubkey should revert");
         } catch {}
         require(top.pendingCount() == 0, "nothing enqueued on reject");
+    }
+
+    // ── Withdrawal / exit predeploy (EIP-7002-shaped, request type 0x05) ────
+
+    // A partial withdrawal (amount > 0) records source_address(msg.sender) ++
+    // pubkey ++ amount; the system read returns the exact 76-byte record.
+    function testWithdrawalEnqueuesAndReads() public {
+        bytes memory pubkey = new bytes(48);
+        for (uint i = 0; i < 48; i++) pubkey[i] = bytes1(uint8(i + 1));
+
+        uint64 amount_gwei = 4_000_000_000; // 4 ETH partial withdrawal
+        wd.withdraw{value: wd.feeWei()}(pubkey, amount_gwei);
+        require(wd.pendingCount() == 1, "one withdrawal queued");
+
+        bytes memory data = _systemRead(address(wd));
+        bytes memory expected = abi.encodePacked(address(this), pubkey, _le64(amount_gwei));
+        require(data.length == WITHDRAWAL_RECORD_LEN, "withdrawal record length");
+        require(keccak256(data) == keccak256(expected), "withdrawal record bytes mismatch");
+        require(wd.pendingCount() == 0, "queue drained");
+    }
+
+    // amount_gwei == 0 is the full-exit sentinel: it MUST be accepted (there is
+    // no minimum-amount check) and recorded with a zero amount, like EIP-7002.
+    function testExitEnqueuesWithZeroAmount() public {
+        bytes memory pubkey = new bytes(48);
+        for (uint i = 0; i < 48; i++) pubkey[i] = bytes1(uint8(0xa0 + i));
+
+        wd.withdraw{value: wd.feeWei()}(pubkey, 0);
+        require(wd.pendingCount() == 1, "exit (amount 0) is accepted and queued");
+
+        bytes memory data = _systemRead(address(wd));
+        bytes memory expected = abi.encodePacked(address(this), pubkey, _le64(0));
+        require(data.length == WITHDRAWAL_RECORD_LEN, "exit record length");
+        require(keccak256(data) == keccak256(expected), "exit record bytes mismatch");
+    }
+
+    // The recorded source_address is the caller, not a parameter: a withdrawal
+    // from a different address records that address (the builder's
+    // execution_address), which is what the CL checks for authorization. The
+    // fee is read before `vm.prank` so the prank applies to `withdraw`, not to
+    // the `feeWei()` argument call.
+    function testWithdrawalRecordsCaller() public {
+        address builderExecAddr = 0xb0b1DE7c0fFeE0000000000000000000000B5511;
+        bytes memory pubkey = new bytes(48);
+        for (uint i = 0; i < 48; i++) pubkey[i] = bytes1(uint8(i + 7));
+
+        uint64 amount_gwei = 1_500_000_000;
+        uint fee = wd.feeWei();
+        vm.deal(builderExecAddr, 1 ether); // fund the caller so it can pay the fee
+        vm.prank(builderExecAddr);
+        wd.withdraw{value: fee}(pubkey, amount_gwei);
+
+        bytes memory data = _systemRead(address(wd));
+        bytes memory expected = abi.encodePacked(builderExecAddr, pubkey, _le64(amount_gwei));
+        require(keccak256(data) == keccak256(expected), "source_address must be the caller");
+    }
+
+    // Unlike deposit/top-up, a withdrawal sends no stake — only the fee. A large
+    // amount_gwei with msg.value equal to just the (1 wei) fee must succeed.
+    function testWithdrawalRequiresNoStake() public {
+        bytes memory pubkey = new bytes(48);
+        uint64 amount_gwei = 1_000_000_000_000; // 1000 ETH, but no value is sent for it
+        wd.withdraw{value: wd.feeWei()}(pubkey, amount_gwei);
+        require(wd.pendingCount() == 1, "withdrawal needs only the fee, no staked value");
+    }
+
+    function testWithdrawalRejectsInsufficientFee() public {
+        bytes memory pubkey = new bytes(48);
+        // excess == 0 → fee is 1 wei; sending 0 cannot cover it.
+        try wd.withdraw{value: 0}(pubkey, 1_000_000_000) {
+            require(false, "withdrawal below the fee should revert");
+        } catch {}
+        require(wd.pendingCount() == 0, "nothing enqueued on reject");
+    }
+
+    function testWithdrawalRejectsWrongPubkeyLength() public {
+        bytes memory pubkey = new bytes(47);
+        try wd.withdraw{value: wd.feeWei()}(pubkey, 1_000_000_000) {
+            require(false, "47-byte pubkey should revert");
+        } catch {}
+        require(wd.pendingCount() == 0, "nothing enqueued on reject");
     }
 }

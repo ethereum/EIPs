@@ -7,7 +7,7 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-import "../builder_deposit_contract.sol";
+import "../builder_requests.sol";
 
 library Vectors {
 

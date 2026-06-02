@@ -1,4 +1,4 @@
-# EIP-XXXX: Builder Deposit Contract — Assets
+# EIP-XXXX: Builder Execution Requests — Assets
 
 Reference Solidity for the proposal, plus cross-verification tests.
 
@@ -6,11 +6,11 @@ Reference Solidity for the proposal, plus cross-verification tests.
 
 | File | Purpose |
 | --- | --- |
-| `builder_deposit_contract.sol` | The two proposed predeploys plus a shared base: `RequestQueue` (EIP-7002-style queue + EIP-1559 fee + `SYSTEM_ADDRESS` end-of-block read), `BuilderDepositContract` (`deposit(...)`, BLS-verified, request type `0x03`), and `BuilderTopUpContract` (`top_up(...)`, unverified, request type `0x04`). |
+| `builder_requests.sol` | The three proposed predeploys plus a shared base: `RequestQueue` (EIP-7002-style queue + EIP-1559 fee + `SYSTEM_ADDRESS` end-of-block read), `BuilderDepositContract` (`deposit(...)`, BLS-verified, request type `0x03`), `BuilderTopUpContract` (`top_up(...)`, unverified, request type `0x04`), and `BuilderWithdrawalContract` (`withdraw(...)`, EIP-7002-style withdrawal/exit, request type `0x05`). |
 | `gen_vectors.py` | Python script that uses `py_ecc` (the canonical Eth2 reference) to produce cross-verification test vectors. |
 | `test/Vectors.sol` | Auto-generated Solidity library of test vectors. Regenerate by running `gen_vectors.py`. |
-| `test/TestHarness.sol` | `BuilderDepositHarness` / `BuilderTopUpHarness` — inherit the predeploys and expose the pending-queue depth (and the SSZ signing-root helper) for the tests. |
-| `test/BuilderDeposit.t.sol` | Foundry tests. |
+| `test/TestHarness.sol` | `BuilderDepositHarness` / `BuilderTopUpHarness` / `BuilderWithdrawalHarness` — inherit the predeploys and expose the pending-queue depth (and the SSZ signing-root helper) for the tests. |
+| `test/BuilderRequests.t.sol` | Foundry tests. |
 | `foundry.toml` | Foundry configuration (solc `0.6.11`, EVM `prague` by default). |
 
 ## Running the tests
@@ -68,3 +68,9 @@ The script is deterministic: the secret key is hard-coded so the output is byte-
 | `testDepositRejectsWrongPubkeyLength` | `pubkey.length != 48` is rejected; nothing enqueued | no |
 | `testTopUpRejectsTooSmallStake` | `top_up` stake `< 1 ether` is rejected; nothing enqueued | no |
 | `testTopUpRejectsWrongPubkeyLength` | `top_up` with `pubkey.length != 48` is rejected; nothing enqueued | no |
+| `testWithdrawalEnqueuesAndReads` | A partial withdrawal (`amount > 0`) enqueues `source ++ pubkey ++ amount`; the system read returns the exact 76-byte record | no |
+| `testExitEnqueuesWithZeroAmount` | `withdraw(pubkey, 0)` (full-exit sentinel) is accepted and recorded with a zero amount | no |
+| `testWithdrawalRecordsCaller` | The recorded `source_address` is the caller (`msg.sender`), the field the CL checks against the builder's `execution_address` | no |
+| `testWithdrawalRequiresNoStake` | A withdrawal sends only the fee — no staked value — even for a large `amount_gwei` | no |
+| `testWithdrawalRejectsInsufficientFee` | `msg.value` below the fee reverts; nothing enqueued | no |
+| `testWithdrawalRejectsWrongPubkeyLength` | `withdraw` with `pubkey.length != 48` is rejected; nothing enqueued | no |

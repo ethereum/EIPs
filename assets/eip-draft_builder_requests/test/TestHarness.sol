@@ -2,7 +2,7 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-import "../builder_deposit_contract.sol";
+import "../builder_requests.sol";
 
 /// @notice Test harness for the deposit predeploy. Inherits BuilderDepositContract
 /// (so `deposit(...)` and the inherited `SYSTEM_ADDRESS` system-read `fallback`
@@ -40,4 +40,15 @@ contract BuilderTopUpHarness is BuilderTopUpContract {
     /// @notice Raw head/tail indices, to assert the EIP-7002 reset-on-empty.
     function headIdx() external view returns (uint) { return queueHead; }
     function tailIdx() external view returns (uint) { return queueTail; }
+}
+
+/// @notice Test harness for the withdrawal / exit predeploy.
+contract BuilderWithdrawalHarness is BuilderWithdrawalContract {
+    function pendingCount() external view returns (uint) {
+        return queueTail - queueHead;
+    }
+
+    function feeWei() external view returns (uint) {
+        return _getFee();
+    }
 }
