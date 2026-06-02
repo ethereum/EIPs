@@ -59,7 +59,8 @@ The script is deterministic: the secret key is hard-coded so the output is byte-
 | `testDepositRejectsInsufficientValue` | `msg.value == stake` (no room for the fee) reverts; nothing enqueued | no |
 | `testSystemReadRequiresSystemAddress` | A non-`SYSTEM_ADDRESS` empty-calldata call is the fee getter and does NOT drain the queue | no |
 | `testPerBlockCapAndFifo` | 17 queued → first read drains the 16-record cap, second drains the remainder (FIFO) | no |
-| `testDepositRejectsTamperedAmount` | An `amount_gwei` different from the signed one fails the pairing check; nothing enqueued | **yes** |
+| `testQueueResetsWhenDrained` | When the queue fully drains, head and tail reset to 0 so slots are reused; the next request restarts at index 0 | no |
+| `testFallbackRejectsNonEmptyCalldata` | The empty-calldata fallback rejects non-empty junk calldata; the empty-calldata fee getter still works | no |
 | `testDepositRejectsTamperedSignature` | Flipping a signature bit is rejected (subgroup/pairing failure); nothing enqueued | **yes** |
 | `testDepositRejectsPubkeySignBitFlip` | Flipping only the pubkey sign flag is rejected by the sign-bit binding (audit Finding 2 regression); nothing enqueued | no |
 | `testDepositRejectsSignatureSignBitFlip` | Flipping only the signature sign flag is rejected by the sign-bit binding; nothing enqueued | no |
@@ -74,3 +75,6 @@ The script is deterministic: the secret key is hard-coded so the output is byte-
 | `testWithdrawalRequiresNoStake` | A withdrawal sends only the fee — no staked value — even for a large `amount_gwei` | no |
 | `testWithdrawalRejectsInsufficientFee` | `msg.value` below the fee reverts; nothing enqueued | no |
 | `testWithdrawalRejectsWrongPubkeyLength` | `withdraw` with `pubkey.length != 48` is rejected; nothing enqueued | no |
+| `testFeeGetterRevertsWhileInhibited` | A freshly deployed contract is inhibited (`excess == EXCESS_INHIBITOR`); the fee getter reverts | no |
+| `testRequestRevertsWhileInhibited` | A request before the first system call reverts on the inhibited fee; nothing enqueued | no |
+| `testFirstSystemCallClearsInhibitor` | The first `SYSTEM_ADDRESS` call clears the inhibitor; the fee is then `MIN_REQUEST_FEE` | no |

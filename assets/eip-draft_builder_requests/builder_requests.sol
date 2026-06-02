@@ -62,7 +62,7 @@ pragma experimental ABIEncoderV2;  // for `Fp` / `Fp2` struct calldata in `depos
 //     are pre-verified and carry no signature (the CL trusts the EL check).
 // ───────────────────────────────────────────────────────────────────────────────
 
-// EIP-7002 / EIP-7251 style request bus shared by both builder predeploys.
+// EIP-7002 / EIP-7251 style request bus shared by all three builder predeploys.
 //
 // A user call appends an opaque record (and increments the per-block request
 // count). The end-of-block `SYSTEM_ADDRESS` system call drains up to
@@ -86,11 +86,12 @@ pragma experimental ABIEncoderV2;  // for `Fp` / `Fp2` struct calldata in `depos
 // charged on top of any staked value by the derived contract and is left locked
 // in the contract (effectively burned).
 //
-// Unlike EIP-7002/7251 there is no EXCESS_INHIBITOR: those contracts are
-// deployed before their activating fork and use the inhibitor to reject
-// requests until the first system call. These predeploys are installed at the
-// fork with empty storage (`excess == 0`, i.e. the minimum fee), so there are
-// no pre-activation requests to inhibit.
+// Like EIP-7002/7251, each contract is deployed by a transaction that can land
+// before the activating fork, so the constructor initializes `excess` to
+// EXCESS_INHIBITOR: `_getFee` reverts (and therefore no request can be enqueued)
+// until the first end-of-block system call clears the inhibitor. That system
+// call treats a current `excess` of EXCESS_INHIBITOR as 0, after which the fee
+// mechanism operates normally.
 contract RequestQueue {
     // Address used to invoke the end-of-block system operation (EIP-7002/7251).
     address constant SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
@@ -103,6 +104,10 @@ contract RequestQueue {
     // Minimum request fee in wei, and the fee's update fraction (mirror EIP-7002).
     uint constant MIN_REQUEST_FEE = 1;
     uint constant REQUEST_FEE_UPDATE_FRACTION = 17;
+    // Excess value that inhibits the fee getter before the first system call
+    // (mirrors EIP-7002/7251). The constructor sets `excess` to this; the first
+    // end-of-block system call clears it.
+    uint constant EXCESS_INHIBITOR = type(uint256).max;
 
     // FIFO queue of opaque request records: a head/tail ring over a mapping
     // (see the note above). `queueTail` is the next write index, `queueHead`
@@ -116,9 +121,18 @@ contract RequestQueue {
     uint internal excess;
     uint internal count;
 
+    // Deployed (like EIP-7002/7251) by a transaction that may precede the
+    // activating fork, so start inhibited: no request can be enqueued until the
+    // first end-of-block system call clears the inhibitor.
+    constructor() public {
+        excess = EXCESS_INHIBITOR;
+    }
+
     // Current per-request fee (wei). Constant within a block: `excess` is only
-    // updated by the end-of-block system call.
+    // updated by the end-of-block system call. Reverts while the inhibitor is
+    // set (before the first system call), exactly as EIP-7002/7251's fee getter.
     function _getFee() internal view returns (uint) {
+        require(excess != EXCESS_INHIBITOR, "RequestQueue: fee inhibited");
         return _fakeExponential(MIN_REQUEST_FEE, excess, REQUEST_FEE_UPDATE_FRACTION);
     }
 
@@ -181,9 +195,12 @@ contract RequestQueue {
         }
 
         // Update the EIP-1559-style excess from this block's demand, then reset.
+        // A current value of EXCESS_INHIBITOR (set at deployment) counts as 0, so
+        // the first system call clears the inhibitor (mirrors EIP-7002/7251).
         uint c = count;
-        excess = (excess + c > TARGET_REQUESTS_PER_BLOCK)
-            ? excess + c - TARGET_REQUESTS_PER_BLOCK
+        uint prevExcess = excess == EXCESS_INHIBITOR ? 0 : excess;
+        excess = (prevExcess + c > TARGET_REQUESTS_PER_BLOCK)
+            ? prevExcess + c - TARGET_REQUESTS_PER_BLOCK
             : 0;
         count = 0;
 
@@ -691,7 +708,7 @@ contract BuilderDepositContract is RequestQueue {
 }
 
 // ───────────────────────────────────────────────────────────────────────────────
-// Builder top-up predeploy — EIP-7685 request type 0x04, installed at
+// Builder top-up predeploy — EIP-7685 request type 0x04, deployed at
 // BUILDER_TOPUP_CONTRACT_ADDRESS.
 //
 // Unverified: adds stake to an already-registered builder. There is no BLS
@@ -728,7 +745,7 @@ contract BuilderTopUpContract is RequestQueue {
 }
 
 // ───────────────────────────────────────────────────────────────────────────────
-// Builder withdrawal / exit predeploy — EIP-7685 request type 0x05, installed at
+// Builder withdrawal / exit predeploy — EIP-7685 request type 0x05, deployed at
 // BUILDER_WITHDRAWAL_CONTRACT_ADDRESS.
 //
 // A semantic clone of the EIP-7002 withdrawal-request predeploy, retargeted at

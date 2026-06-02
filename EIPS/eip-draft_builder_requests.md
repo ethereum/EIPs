@@ -51,6 +51,7 @@ All address and request-type values below are placeholders pending allocation in
 | `TARGET_REQUESTS_PER_BLOCK` | `2` | Per-block request count above which the fee rises |
 | `MIN_REQUEST_FEE` | `1` | Minimum request fee, in wei |
 | `REQUEST_FEE_UPDATE_FRACTION` | `17` | Controls the fee's rate of change |
+| `EXCESS_INHIBITOR` | `2**256-1` | Excess value that makes the fee getter revert before the first system call (as in [EIP-7002](./eip-7002.md)/[EIP-7251](./eip-7251.md)); set at deployment, cleared by the first system call |
 | `BUILDER_MIN_DEPOSIT` | `1000000000000000000` | Minimum credited stake for a deposit or top-up, in wei (1 ETH — the [EIP-7732](./eip-7732.md) builder minimum). Withdrawals enforce no minimum |
 | `DOMAIN_BUILDER_DEPOSIT` | `0x0b000000f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a9` | Signing domain for builder deposit messages. The `0x0b000000` domain type is a placeholder pending consensus-specs allocation; it MUST differ from the validator `DOMAIN_DEPOSIT` (`0x03000000…`) so signatures are not interchangeable between the two contracts |
 | `BLS12_G2ADD` | `0x0d` | [EIP-2537](./eip-2537.md) precompile address |
@@ -60,11 +61,11 @@ All address and request-type values below are placeholders pending allocation in
 | `BUILDER_TOPUP_CONTRACT_RUNTIME_CODE` | _see [Reference Implementation](#reference-implementation)_ | Runtime bytecode of the builder top-up contract |
 | `BUILDER_WITHDRAWAL_CONTRACT_RUNTIME_CODE` | _see [Reference Implementation](#reference-implementation)_ | Runtime bytecode of the builder withdrawal/exit contract |
 
-### Fork transition
+### Deployment
 
-At the start of processing the first block where this EIP is active, before processing transactions, execution clients MUST install each predeploy — `BUILDER_DEPOSIT_CONTRACT_RUNTIME_CODE` at `BUILDER_DEPOSIT_CONTRACT_ADDRESS`, `BUILDER_TOPUP_CONTRACT_RUNTIME_CODE` at `BUILDER_TOPUP_CONTRACT_ADDRESS`, and `BUILDER_WITHDRAWAL_CONTRACT_RUNTIME_CODE` at `BUILDER_WITHDRAWAL_CONTRACT_ADDRESS` — if the account at the respective address is empty (zero `nonce`, empty `code`, empty `storage`, zero `balance`). Each installation MUST set `code` to the runtime code, `nonce = 1`, `balance = 0`, and leave `storage` empty.
+Each predeploy is deployed exactly as the [EIP-7002](./eip-7002.md) and [EIP-7251](./eip-7251.md) request contracts are: by a one-time presigned transaction from a single-use deployer account (the Nick's-method scheme), so that `BUILDER_DEPOSIT_CONTRACT_ADDRESS`, `BUILDER_TOPUP_CONTRACT_ADDRESS`, and `BUILDER_WITHDRAWAL_CONTRACT_ADDRESS` are the addresses cryptographically derived from those transactions. Each contract's init code sets its `excess` slot to `EXCESS_INHIBITOR`, so no request can be enqueued until the inhibitor is cleared (see [Request fee](#request-fee)). The concrete transactions — and therefore the final addresses — will be fixed once the runtime bytecode is audited and frozen.
 
-If any of these accounts is not empty at fork time, clients MUST abort initialisation. This matches the predeploy pattern used by [EIP-2935](./eip-2935.md), [EIP-4788](./eip-4788.md), [EIP-7002](./eip-7002.md), and [EIP-7251](./eip-7251.md).
+The deployment transactions MUST be included before the fork that activates this EIP. If there is no code at any of the three predeploy addresses once the EIP is active, every block from activation onward MUST be invalid — the same handling [EIP-7002](./eip-7002.md) and [EIP-7251](./eip-7251.md) specify for their predeploys.
 
 ### Request queue and system call
 
@@ -72,7 +73,7 @@ All three predeploys follow the [EIP-7002](./eip-7002.md) / [EIP-7251](./eip-725
 
 A call with empty calldata dispatches on the caller:
 
-- From `SYSTEM_ADDRESS` (the end-of-block system call): the predeploy MUST dequeue up to `MAX_REQUESTS_PER_BLOCK` records (oldest first), return their concatenation as that contract's `request_data`, advance its queue head past the returned records, then update `excess` from the number of requests added in the block (`excess = max(0, excess + count - TARGET_REQUESTS_PER_BLOCK)`) and reset that count. Records beyond the per-block cap remain queued for subsequent blocks.
+- From `SYSTEM_ADDRESS` (the end-of-block system call): the predeploy MUST dequeue up to `MAX_REQUESTS_PER_BLOCK` records (oldest first), return their concatenation as that contract's `request_data`, advance its queue head past the returned records, then update `excess` from the number of requests added in the block (`excess = max(0, excess + count - TARGET_REQUESTS_PER_BLOCK)`, treating a current value of `EXCESS_INHIBITOR` as `0` so the first system call clears the inhibitor) and reset that count. Records beyond the per-block cap remain queued for subsequent blocks.
 - From any other caller: the predeploy MUST return the current fee (the fee getter), without modifying state.
 
 The execution layer prepends the contract's request-type byte and includes `request_type ++ request_data` in the block requests list, committed via the `requests_hash` ([EIP-7685](./eip-7685.md)). None of the contracts emit logs.
@@ -87,7 +88,7 @@ fee = fake_exponential(MIN_REQUEST_FEE, excess, REQUEST_FEE_UPDATE_FRACTION)
 
 where `fake_exponential` is the integer approximation of `MIN_REQUEST_FEE · e^(excess / REQUEST_FEE_UPDATE_FRACTION)` used by [EIP-1559](./eip-1559.md). Because `excess` grows whenever a block contains more than `TARGET_REQUESTS_PER_BLOCK` requests and decays otherwise, the fee rises super-linearly under sustained demand and returns to `MIN_REQUEST_FEE` when demand subsides. The fee is charged on top of any staked value (see the entrypoints below) and is left locked in the contract.
 
-Unlike EIP-7002/7251, these predeploys carry no `EXCESS_INHIBITOR`: those contracts are deployed before their activating fork and use the inhibitor to reject requests until the first system call, whereas these are installed at the fork with empty storage (`excess = 0`, the minimum fee), so there are no pre-activation requests to inhibit.
+As in EIP-7002/7251, each contract's `excess` is initialized to `EXCESS_INHIBITOR` at deployment, and the fee getter reverts while `excess == EXCESS_INHIBITOR`. Since a request is only appended after its fee is paid, this blocks every request between deployment and the first end-of-block system call; that call clears the inhibitor (treating the prior `excess` as `0`), and normal fee operation runs from the activation block onward.
 
 ### Verified deposit entrypoint
 
@@ -212,7 +213,7 @@ A Foundry test suite under `../assets/eip-draft_builder_requests/test/` cross-ve
 
 ## Reference Implementation
 
-Solidity source for all three predeploys is published at [`../assets/eip-draft_builder_requests/builder_requests.sol`](../assets/eip-draft_builder_requests/builder_requests.sol), with the test harness, fixture generator, and Foundry configuration alongside it. The file defines a shared `RequestQueue` base plus `BuilderDepositContract`, `BuilderTopUpContract`, and `BuilderWithdrawalContract`. The optimised runtime bytecode of the current draft is approximately 7.5 KiB for the deposit contract, 1.5 KiB for the top-up contract, and 1.4 KiB for the withdrawal contract — all well within the [EIP-170](./eip-170.md) 24 KiB limit, with no on-chain field-arithmetic kernel or decompression path. The final runtime codes, the predeploy addresses, and the request-type bytes will be locked in once the contracts have been independently audited.
+Solidity source for all three predeploys is published at [`../assets/eip-draft_builder_requests/builder_requests.sol`](../assets/eip-draft_builder_requests/builder_requests.sol), with the test harness, fixture generator, and Foundry configuration alongside it. The file defines a shared `RequestQueue` base plus `BuilderDepositContract`, `BuilderTopUpContract`, and `BuilderWithdrawalContract`. The optimised runtime bytecode of the current draft is approximately 7.6 KiB for the deposit contract and about 1.6 KiB each for the top-up and withdrawal contracts — all well within the [EIP-170](./eip-170.md) 24 KiB limit, with no on-chain field-arithmetic kernel or decompression path. The final runtime codes, the predeploy addresses, and the request-type bytes will be locked in once the contracts have been independently audited.
 
 ## Security Considerations
 

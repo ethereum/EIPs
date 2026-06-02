@@ -37,6 +37,13 @@ contract BuilderRequestsTest {
         dep = new BuilderDepositHarness();
         top = new BuilderTopUpHarness();
         wd  = new BuilderWithdrawalHarness();
+        // Each predeploy starts with excess == EXCESS_INHIBITOR (set in the
+        // constructor, as EIP-7002/7251 do at deployment). The activation-block
+        // system call clears the inhibitor; run it here so the fee/queue tests
+        // below operate on an active contract.
+        _systemRead(address(dep));
+        _systemRead(address(top));
+        _systemRead(address(wd));
     }
 
     function _systemRead(address target) internal returns (bytes memory) {
@@ -432,5 +439,36 @@ contract BuilderRequestsTest {
             require(false, "47-byte pubkey should revert");
         } catch {}
         require(wd.pendingCount() == 0, "nothing enqueued on reject");
+    }
+
+    // ── EXCESS_INHIBITOR (pre-activation), as in EIP-7002/7251 ─────────────
+
+    // A freshly deployed contract starts inhibited (excess == EXCESS_INHIBITOR),
+    // so the fee getter reverts until the first system call. setUp() already
+    // activated dep/top/wd, so these tests use a fresh instance.
+    function testFeeGetterRevertsWhileInhibited() public {
+        BuilderTopUpHarness fresh = new BuilderTopUpHarness();
+        try fresh.feeWei() {
+            require(false, "fee getter must revert while inhibited");
+        } catch {}
+    }
+
+    // No request can be enqueued before activation: the entrypoint reverts when
+    // it reads the inhibited fee, even with ample value; nothing is queued.
+    function testRequestRevertsWhileInhibited() public {
+        BuilderTopUpHarness fresh = new BuilderTopUpHarness();
+        bytes memory pubkey = new bytes(48);
+        try fresh.top_up{value: 2 ether}(pubkey, 1_000_000_000) {
+            require(false, "request must revert while inhibited");
+        } catch {}
+        require(fresh.pendingCount() == 0, "nothing enqueued while inhibited");
+    }
+
+    // The first SYSTEM_ADDRESS call clears the inhibitor; the fee is then
+    // MIN_REQUEST_FEE (excess == 0).
+    function testFirstSystemCallClearsInhibitor() public {
+        BuilderTopUpHarness fresh = new BuilderTopUpHarness();
+        _systemRead(address(fresh));
+        require(fresh.feeWei() == 1, "fee is MIN_REQUEST_FEE once the inhibitor clears");
     }
 }
