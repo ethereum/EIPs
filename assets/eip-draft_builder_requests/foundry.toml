@@ -8,11 +8,11 @@ test = "test"
 out = "out"
 cache_path = "cache"
 
-# Modexp-only tests work on any post-Byzantium EVM. The full BLS verification
-# tests (testVerifyDeposit*) require EIP-2537 precompiles, which were
-# activated in Prague. Override on the command line for older targets:
-#     forge test --evm-version cancun --no-match-test VerifyDeposit
-evm_version = "prague"
+# The contracts use only basic EVM features (no precompiles). `istanbul` is the
+# newest target solc 0.6.11 supports; its opcode set is a subset of later forks,
+# so the bytecode runs unchanged on Prague and beyond. (The previous `prague`
+# setting was silently downgraded to istanbul, since 0.6.11 predates it.)
+evm_version = "istanbul"
 
 # `bytecode_hash = "none"` makes the runtime byte string deterministic
 # across rebuilds — useful when comparing against the canonical bytecode.
