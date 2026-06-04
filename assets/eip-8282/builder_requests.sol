@@ -3,7 +3,7 @@
 pragma solidity 0.6.11;
 
 // ───────────────────────────────────────────────────────────────────────────────
-// EIP-XXXX: Builder Execution Requests
+// EIP-8282: Builder Execution Requests
 //
 // Two EIP-7685 request predeploys for the EIP-7732 builder population, modelled
 // on the EIP-7002 (withdrawals) / EIP-7251 (consolidations) "request bus":

@@ -1,4 +1,4 @@
-# EIP-XXXX: Builder Execution Requests — Assets
+# EIP-8282: Builder Execution Requests — Assets
 
 Reference Solidity for the proposal, plus a Foundry test suite.
 
