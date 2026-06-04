@@ -1,12 +1,3 @@
-<style type="text/css">
-  .eiptable .title {
-    width: 67%;
-  }
-
-  .eiptable .author {
-    width: 33%;
-  }
-</style>
 {% for status in site.data.statuses %}
   {% assign eips = include.eips|where:"status",status|sort:"eip" %}
   {% assign count = eips|size %}

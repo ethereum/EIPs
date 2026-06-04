@@ -95,4 +95,88 @@
       }
     });
   </script>
+  <script type="text/javascript">
+    // EIP status filtering
+    document.addEventListener('DOMContentLoaded', function() {
+      var table = document.getElementById('eip-table');
+      if (!table) return;
+
+      // Statuses from _data/statuses.yaml
+      var statuses = [{% for status in site.data.statuses %}'{{ status }}'{% unless forloop.last %}, {% endunless %}{% endfor %}];
+
+      function filterByStatus(status) {
+        var rows = table.querySelectorAll('tbody tr');
+        var visibleCount = 0;
+        rows.forEach(function(row) {
+          if (!status || row.getAttribute('data-status') === status) {
+            row.classList.remove('hidden');
+            visibleCount++;
+          } else {
+            row.classList.add('hidden');
+          }
+        });
+
+        // Update active state on status links
+        document.querySelectorAll('.status-link').forEach(function(link) {
+          var linkStatus = link.getAttribute('data-status');
+          if (linkStatus === status || (!status && linkStatus === '')) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+
+        // Show "No EIPs" message if filter returns no results
+        var noResultsMsg = document.getElementById('no-results');
+        if (visibleCount === 0) {
+          table.style.display = 'none';
+          if (!noResultsMsg) {
+            noResultsMsg = document.createElement('p');
+            noResultsMsg.id = 'no-results';
+            noResultsMsg.textContent = 'No EIPs';
+            noResultsMsg.className = 'no-results';
+            table.parentNode.insertBefore(noResultsMsg, table.nextSibling);
+          }
+          noResultsMsg.style.display = '';
+        } else {
+          table.style.display = '';
+          if (noResultsMsg) noResultsMsg.style.display = 'none';
+        }
+      }
+
+      // Map hash to status name (e.g., 'last-call' -> 'Last Call')
+      function getStatusFromHash() {
+        var hash = window.location.hash.slice(1);
+        if (!hash) return '';
+        for (var i = 0; i < statuses.length; i++) {
+          if (statuses[i].toLowerCase().replace(/ /g, '-') === hash) {
+            return statuses[i];
+          }
+        }
+        return '';
+      }
+
+      // Apply filter on load
+      filterByStatus(getStatusFromHash());
+
+      // Apply filter on hash change
+      window.addEventListener('hashchange', function() {
+        filterByStatus(getStatusFromHash());
+      });
+
+      // Handle click on status links
+      document.querySelectorAll('.status-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          var status = this.getAttribute('data-status');
+          if (status) {
+            window.location.hash = status.toLowerCase().replace(/ /g, '-');
+          } else {
+            history.pushState('', document.title, window.location.pathname);
+            filterByStatus('');
+          }
+        });
+      });
+    });
+  </script>
 </head>
