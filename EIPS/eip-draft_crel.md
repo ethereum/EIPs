@@ -3,7 +3,7 @@ eip: <to be assigned by editors>
 title: Counterfactual Rejection Event Log (CREL) Standard
 description: Canonical on-chain event format for algorithmically rejected DEX trading candidates with post-rejection outcome fields.
 author: Arati Uday Kamat (@aartikamat) <arati.kamat@ieee.org>
-discussions-to: TBD (Ethereum Magicians thread URL to be added)
+discussions-to: https://ethereum-magicians.org/c/ercs/57
 status: Draft
 type: Standards Track
 category: ERC
