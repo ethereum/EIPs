@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned by editors>
+eip: 9999
 title: Counterfactual Rejection Event Log (CREL) Standard
 description: Canonical on-chain event format for algorithmically rejected DEX trading candidates with post-rejection outcome fields.
 author: Arati Uday Kamat (@aartikamat) <arati.kamat@ieee.org>
