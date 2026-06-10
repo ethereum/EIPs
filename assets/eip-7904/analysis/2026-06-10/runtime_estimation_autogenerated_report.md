@@ -2,6 +2,8 @@
 
 Per-spec NNLS fits of `test_runtime_ms` against `opcount`, one row per (target opcode, test, model_by combo, client).
 
+> Note: this is a bundled snapshot of the analysis output. The per-client regression, bootstrap, and diagnostic plots are omitted here; the figure-rich version is published on the live analysis site linked from the EIP's discussions-to thread.
+
 ## Contents
 
 - [DIV](#div)
@@ -54,11 +56,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/DIV__test_arithmetic__all__besu__regression.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__besu__bootstrap.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__besu__diagnostics.png)
 
 </details>
 
@@ -83,11 +82,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/DIV__test_arithmetic__all__erigon__regression.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__erigon__bootstrap.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__erigon__diagnostics.png)
 
 </details>
 
@@ -112,11 +108,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/DIV__test_arithmetic__all__ethrex__regression.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__ethrex__bootstrap.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -141,11 +134,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/DIV__test_arithmetic__all__geth__regression.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__geth__bootstrap.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__geth__diagnostics.png)
 
 </details>
 
@@ -170,11 +160,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/DIV__test_arithmetic__all__nethermind__regression.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__nethermind__bootstrap.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -199,11 +186,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/DIV__test_arithmetic__all__reth__regression.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__reth__bootstrap.png)
 
-![](figs/runtime/DIV__test_arithmetic__all__reth__diagnostics.png)
 
 </details>
 
@@ -241,11 +225,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SDIV__test_arithmetic__all__besu__regression.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__besu__bootstrap.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__besu__diagnostics.png)
 
 </details>
 
@@ -270,11 +251,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SDIV__test_arithmetic__all__erigon__regression.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__erigon__bootstrap.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__erigon__diagnostics.png)
 
 </details>
 
@@ -299,11 +277,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SDIV__test_arithmetic__all__ethrex__regression.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__ethrex__bootstrap.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -328,11 +303,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SDIV__test_arithmetic__all__geth__regression.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__geth__bootstrap.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__geth__diagnostics.png)
 
 </details>
 
@@ -357,11 +329,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SDIV__test_arithmetic__all__nethermind__regression.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__nethermind__bootstrap.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -386,11 +355,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SDIV__test_arithmetic__all__reth__regression.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__reth__bootstrap.png)
 
-![](figs/runtime/SDIV__test_arithmetic__all__reth__diagnostics.png)
 
 </details>
 
@@ -428,11 +394,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__127__besu__regression.png)
 
-![](figs/runtime/MOD__test_mod__127__besu__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__127__besu__diagnostics.png)
 
 </details>
 
@@ -457,11 +420,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__127__erigon__regression.png)
 
-![](figs/runtime/MOD__test_mod__127__erigon__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__127__erigon__diagnostics.png)
 
 </details>
 
@@ -486,11 +446,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__127__ethrex__regression.png)
 
-![](figs/runtime/MOD__test_mod__127__ethrex__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__127__ethrex__diagnostics.png)
 
 </details>
 
@@ -515,11 +472,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__127__geth__regression.png)
 
-![](figs/runtime/MOD__test_mod__127__geth__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__127__geth__diagnostics.png)
 
 </details>
 
@@ -544,11 +498,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__127__nethermind__regression.png)
 
-![](figs/runtime/MOD__test_mod__127__nethermind__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__127__nethermind__diagnostics.png)
 
 </details>
 
@@ -573,11 +524,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__127__reth__regression.png)
 
-![](figs/runtime/MOD__test_mod__127__reth__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__127__reth__diagnostics.png)
 
 </details>
 
@@ -613,11 +561,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__191__besu__regression.png)
 
-![](figs/runtime/MOD__test_mod__191__besu__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__191__besu__diagnostics.png)
 
 </details>
 
@@ -642,11 +587,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__191__erigon__regression.png)
 
-![](figs/runtime/MOD__test_mod__191__erigon__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__191__erigon__diagnostics.png)
 
 </details>
 
@@ -671,11 +613,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__191__ethrex__regression.png)
 
-![](figs/runtime/MOD__test_mod__191__ethrex__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__191__ethrex__diagnostics.png)
 
 </details>
 
@@ -700,11 +639,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__191__geth__regression.png)
 
-![](figs/runtime/MOD__test_mod__191__geth__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__191__geth__diagnostics.png)
 
 </details>
 
@@ -729,11 +665,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__191__nethermind__regression.png)
 
-![](figs/runtime/MOD__test_mod__191__nethermind__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__191__nethermind__diagnostics.png)
 
 </details>
 
@@ -758,11 +691,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__191__reth__regression.png)
 
-![](figs/runtime/MOD__test_mod__191__reth__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__191__reth__diagnostics.png)
 
 </details>
 
@@ -798,11 +728,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__255__besu__regression.png)
 
-![](figs/runtime/MOD__test_mod__255__besu__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__255__besu__diagnostics.png)
 
 </details>
 
@@ -827,11 +754,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__255__erigon__regression.png)
 
-![](figs/runtime/MOD__test_mod__255__erigon__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__255__erigon__diagnostics.png)
 
 </details>
 
@@ -856,11 +780,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__255__ethrex__regression.png)
 
-![](figs/runtime/MOD__test_mod__255__ethrex__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__255__ethrex__diagnostics.png)
 
 </details>
 
@@ -885,11 +806,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__255__geth__regression.png)
 
-![](figs/runtime/MOD__test_mod__255__geth__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__255__geth__diagnostics.png)
 
 </details>
 
@@ -914,11 +832,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__255__nethermind__regression.png)
 
-![](figs/runtime/MOD__test_mod__255__nethermind__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__255__nethermind__diagnostics.png)
 
 </details>
 
@@ -943,11 +858,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__255__reth__regression.png)
 
-![](figs/runtime/MOD__test_mod__255__reth__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__255__reth__diagnostics.png)
 
 </details>
 
@@ -983,11 +895,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__63__besu__regression.png)
 
-![](figs/runtime/MOD__test_mod__63__besu__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__63__besu__diagnostics.png)
 
 </details>
 
@@ -1012,11 +921,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__63__erigon__regression.png)
 
-![](figs/runtime/MOD__test_mod__63__erigon__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__63__erigon__diagnostics.png)
 
 </details>
 
@@ -1041,11 +947,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__63__ethrex__regression.png)
 
-![](figs/runtime/MOD__test_mod__63__ethrex__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__63__ethrex__diagnostics.png)
 
 </details>
 
@@ -1070,11 +973,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__63__geth__regression.png)
 
-![](figs/runtime/MOD__test_mod__63__geth__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__63__geth__diagnostics.png)
 
 </details>
 
@@ -1099,11 +999,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__63__nethermind__regression.png)
 
-![](figs/runtime/MOD__test_mod__63__nethermind__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__63__nethermind__diagnostics.png)
 
 </details>
 
@@ -1128,11 +1025,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MOD__test_mod__63__reth__regression.png)
 
-![](figs/runtime/MOD__test_mod__63__reth__bootstrap.png)
 
-![](figs/runtime/MOD__test_mod__63__reth__diagnostics.png)
 
 </details>
 
@@ -1170,11 +1064,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__127__besu__regression.png)
 
-![](figs/runtime/SMOD__test_mod__127__besu__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__127__besu__diagnostics.png)
 
 </details>
 
@@ -1199,11 +1090,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__127__erigon__regression.png)
 
-![](figs/runtime/SMOD__test_mod__127__erigon__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__127__erigon__diagnostics.png)
 
 </details>
 
@@ -1228,11 +1116,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__127__ethrex__regression.png)
 
-![](figs/runtime/SMOD__test_mod__127__ethrex__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__127__ethrex__diagnostics.png)
 
 </details>
 
@@ -1257,11 +1142,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__127__geth__regression.png)
 
-![](figs/runtime/SMOD__test_mod__127__geth__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__127__geth__diagnostics.png)
 
 </details>
 
@@ -1286,11 +1168,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__127__nethermind__regression.png)
 
-![](figs/runtime/SMOD__test_mod__127__nethermind__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__127__nethermind__diagnostics.png)
 
 </details>
 
@@ -1315,11 +1194,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__127__reth__regression.png)
 
-![](figs/runtime/SMOD__test_mod__127__reth__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__127__reth__diagnostics.png)
 
 </details>
 
@@ -1355,11 +1231,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__191__besu__regression.png)
 
-![](figs/runtime/SMOD__test_mod__191__besu__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__191__besu__diagnostics.png)
 
 </details>
 
@@ -1384,11 +1257,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__191__erigon__regression.png)
 
-![](figs/runtime/SMOD__test_mod__191__erigon__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__191__erigon__diagnostics.png)
 
 </details>
 
@@ -1413,11 +1283,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__191__ethrex__regression.png)
 
-![](figs/runtime/SMOD__test_mod__191__ethrex__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__191__ethrex__diagnostics.png)
 
 </details>
 
@@ -1442,11 +1309,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__191__geth__regression.png)
 
-![](figs/runtime/SMOD__test_mod__191__geth__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__191__geth__diagnostics.png)
 
 </details>
 
@@ -1471,11 +1335,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__191__nethermind__regression.png)
 
-![](figs/runtime/SMOD__test_mod__191__nethermind__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__191__nethermind__diagnostics.png)
 
 </details>
 
@@ -1500,11 +1361,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__191__reth__regression.png)
 
-![](figs/runtime/SMOD__test_mod__191__reth__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__191__reth__diagnostics.png)
 
 </details>
 
@@ -1540,11 +1398,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__255__besu__regression.png)
 
-![](figs/runtime/SMOD__test_mod__255__besu__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__255__besu__diagnostics.png)
 
 </details>
 
@@ -1569,11 +1424,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__255__erigon__regression.png)
 
-![](figs/runtime/SMOD__test_mod__255__erigon__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__255__erigon__diagnostics.png)
 
 </details>
 
@@ -1598,11 +1450,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__255__ethrex__regression.png)
 
-![](figs/runtime/SMOD__test_mod__255__ethrex__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__255__ethrex__diagnostics.png)
 
 </details>
 
@@ -1627,11 +1476,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__255__geth__regression.png)
 
-![](figs/runtime/SMOD__test_mod__255__geth__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__255__geth__diagnostics.png)
 
 </details>
 
@@ -1656,11 +1502,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__255__nethermind__regression.png)
 
-![](figs/runtime/SMOD__test_mod__255__nethermind__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__255__nethermind__diagnostics.png)
 
 </details>
 
@@ -1685,11 +1528,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__255__reth__regression.png)
 
-![](figs/runtime/SMOD__test_mod__255__reth__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__255__reth__diagnostics.png)
 
 </details>
 
@@ -1725,11 +1565,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__63__besu__regression.png)
 
-![](figs/runtime/SMOD__test_mod__63__besu__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__63__besu__diagnostics.png)
 
 </details>
 
@@ -1754,11 +1591,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__63__erigon__regression.png)
 
-![](figs/runtime/SMOD__test_mod__63__erigon__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__63__erigon__diagnostics.png)
 
 </details>
 
@@ -1783,11 +1617,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__63__ethrex__regression.png)
 
-![](figs/runtime/SMOD__test_mod__63__ethrex__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__63__ethrex__diagnostics.png)
 
 </details>
 
@@ -1812,11 +1643,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__63__geth__regression.png)
 
-![](figs/runtime/SMOD__test_mod__63__geth__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__63__geth__diagnostics.png)
 
 </details>
 
@@ -1841,11 +1669,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__63__nethermind__regression.png)
 
-![](figs/runtime/SMOD__test_mod__63__nethermind__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__63__nethermind__diagnostics.png)
 
 </details>
 
@@ -1870,11 +1695,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/SMOD__test_mod__63__reth__regression.png)
 
-![](figs/runtime/SMOD__test_mod__63__reth__bootstrap.png)
 
-![](figs/runtime/SMOD__test_mod__63__reth__diagnostics.png)
 
 </details>
 
@@ -1912,11 +1734,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__besu__regression.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__besu__bootstrap.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__besu__diagnostics.png)
 
 </details>
 
@@ -1941,11 +1760,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__erigon__regression.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__erigon__bootstrap.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__erigon__diagnostics.png)
 
 </details>
 
@@ -1970,11 +1786,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__ethrex__regression.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__ethrex__bootstrap.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__ethrex__diagnostics.png)
 
 </details>
 
@@ -1999,11 +1812,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__geth__regression.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__geth__bootstrap.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__geth__diagnostics.png)
 
 </details>
 
@@ -2028,11 +1838,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__nethermind__regression.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__nethermind__bootstrap.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__nethermind__diagnostics.png)
 
 </details>
 
@@ -2057,11 +1864,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__reth__regression.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__reth__bootstrap.png)
 
-![](figs/runtime/ADDMOD__test_mod_arithmetic__191__reth__diagnostics.png)
 
 </details>
 
@@ -2099,11 +1903,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__besu__regression.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__besu__bootstrap.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__besu__diagnostics.png)
 
 </details>
 
@@ -2128,11 +1929,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__erigon__regression.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__erigon__bootstrap.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__erigon__diagnostics.png)
 
 </details>
 
@@ -2157,11 +1955,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__ethrex__regression.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__ethrex__bootstrap.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__ethrex__diagnostics.png)
 
 </details>
 
@@ -2186,11 +1981,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__geth__regression.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__geth__bootstrap.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__geth__diagnostics.png)
 
 </details>
 
@@ -2215,11 +2007,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__nethermind__regression.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__nethermind__bootstrap.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__nethermind__diagnostics.png)
 
 </details>
 
@@ -2244,11 +2033,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__reth__regression.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__reth__bootstrap.png)
 
-![](figs/runtime/MULMOD__test_mod_arithmetic__191__reth__diagnostics.png)
 
 </details>
 
@@ -2287,11 +2073,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__besu__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__besu__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__besu__diagnostics.png)
 
 </details>
 
@@ -2317,11 +2100,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__erigon__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__erigon__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__erigon__diagnostics.png)
 
 </details>
 
@@ -2347,11 +2127,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__ethrex__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__ethrex__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__ethrex__diagnostics.png)
 
 </details>
 
@@ -2377,11 +2154,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__geth__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__geth__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__geth__diagnostics.png)
 
 </details>
 
@@ -2407,11 +2181,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__nethermind__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__nethermind__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__nethermind__diagnostics.png)
 
 </details>
 
@@ -2437,11 +2208,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__reth__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__reth__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__0__reth__diagnostics.png)
 
 </details>
 
@@ -2478,11 +2246,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__besu__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__besu__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__besu__diagnostics.png)
 
 </details>
 
@@ -2508,11 +2273,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__erigon__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__erigon__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__erigon__diagnostics.png)
 
 </details>
 
@@ -2538,11 +2300,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__ethrex__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__ethrex__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__ethrex__diagnostics.png)
 
 </details>
 
@@ -2568,11 +2327,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__geth__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__geth__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__geth__diagnostics.png)
 
 </details>
 
@@ -2598,11 +2354,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__nethermind__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__nethermind__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__nethermind__diagnostics.png)
 
 </details>
 
@@ -2628,11 +2381,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__reth__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__reth__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__1024__reth__diagnostics.png)
 
 </details>
 
@@ -2669,11 +2419,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__besu__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__besu__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__besu__diagnostics.png)
 
 </details>
 
@@ -2699,11 +2446,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__erigon__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__erigon__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__erigon__diagnostics.png)
 
 </details>
 
@@ -2729,11 +2473,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__ethrex__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__ethrex__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__ethrex__diagnostics.png)
 
 </details>
 
@@ -2759,11 +2500,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__geth__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__geth__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__geth__diagnostics.png)
 
 </details>
 
@@ -2789,11 +2527,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__nethermind__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__nethermind__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__nethermind__diagnostics.png)
 
 </details>
 
@@ -2819,11 +2554,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__reth__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__reth__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__256__reth__diagnostics.png)
 
 </details>
 
@@ -2860,11 +2592,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__besu__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__besu__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__besu__diagnostics.png)
 
 </details>
 
@@ -2890,11 +2619,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__erigon__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__erigon__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__erigon__diagnostics.png)
 
 </details>
 
@@ -2920,11 +2646,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__ethrex__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__ethrex__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__ethrex__diagnostics.png)
 
 </details>
 
@@ -2950,11 +2673,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__geth__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__geth__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__geth__diagnostics.png)
 
 </details>
 
@@ -2980,11 +2700,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__nethermind__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__nethermind__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__nethermind__diagnostics.png)
 
 </details>
 
@@ -3010,11 +2727,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__reth__regression.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__reth__bootstrap.png)
 
-![](figs/runtime/KECCAK256__test_keccak_diff_mem_msg_sizes__32__reth__diagnostics.png)
 
 </details>
 
@@ -3052,11 +2766,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__besu__regression.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__besu__bootstrap.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__besu__diagnostics.png)
 
 </details>
 
@@ -3081,11 +2792,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__erigon__regression.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__erigon__bootstrap.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__erigon__diagnostics.png)
 
 </details>
 
@@ -3110,11 +2818,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__ethrex__regression.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__ethrex__bootstrap.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -3139,11 +2844,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__geth__regression.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__geth__bootstrap.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__geth__diagnostics.png)
 
 </details>
 
@@ -3168,11 +2870,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__nethermind__regression.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__nethermind__bootstrap.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -3197,11 +2896,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__reth__regression.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__reth__bootstrap.png)
 
-![](figs/runtime/ECRECOVER__test_ecrecover__all__reth__diagnostics.png)
 
 </details>
 
@@ -3240,11 +2936,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__besu__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__besu__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__besu__diagnostics.png)
 
 </details>
 
@@ -3270,11 +2963,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__erigon__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__erigon__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__erigon__diagnostics.png)
 
 </details>
 
@@ -3300,11 +2990,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__ethrex__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__ethrex__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -3330,11 +3017,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__geth__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__geth__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__geth__diagnostics.png)
 
 </details>
 
@@ -3360,11 +3044,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__nethermind__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__nethermind__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -3390,11 +3071,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__reth__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__reth__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_benchmark__all__reth__diagnostics.png)
 
 </details>
 
@@ -3431,11 +3109,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__besu__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__besu__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__besu__diagnostics.png)
 
 </details>
 
@@ -3461,11 +3136,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__erigon__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__erigon__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__erigon__diagnostics.png)
 
 </details>
 
@@ -3491,11 +3163,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__ethrex__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__ethrex__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -3521,11 +3190,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__geth__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__geth__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__geth__diagnostics.png)
 
 </details>
 
@@ -3551,11 +3217,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__nethermind__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__nethermind__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -3581,11 +3244,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__reth__regression.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__reth__bootstrap.png)
 
-![](figs/runtime/BLAKE2F__test_blake2f_uncachable__all__reth__diagnostics.png)
 
 </details>
 
@@ -3623,11 +3283,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__besu__regression.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__besu__bootstrap.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__besu__diagnostics.png)
 
 </details>
 
@@ -3652,11 +3309,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__erigon__regression.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__erigon__bootstrap.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__erigon__diagnostics.png)
 
 </details>
 
@@ -3681,11 +3335,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__ethrex__regression.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__ethrex__bootstrap.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -3710,11 +3361,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__geth__regression.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__geth__bootstrap.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__geth__diagnostics.png)
 
 </details>
 
@@ -3739,11 +3387,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__nethermind__regression.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__nethermind__bootstrap.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -3768,11 +3413,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__reth__regression.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__reth__bootstrap.png)
 
-![](figs/runtime/BLS12_G1ADD__test_bls12_381__all__reth__diagnostics.png)
 
 </details>
 
@@ -3810,11 +3452,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__besu__regression.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__besu__bootstrap.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__besu__diagnostics.png)
 
 </details>
 
@@ -3839,11 +3478,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__erigon__regression.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__erigon__bootstrap.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__erigon__diagnostics.png)
 
 </details>
 
@@ -3868,11 +3504,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__ethrex__regression.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__ethrex__bootstrap.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -3897,11 +3530,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__geth__regression.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__geth__bootstrap.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__geth__diagnostics.png)
 
 </details>
 
@@ -3926,11 +3556,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__nethermind__regression.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__nethermind__bootstrap.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -3955,11 +3582,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__reth__regression.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__reth__bootstrap.png)
 
-![](figs/runtime/BLS12_G2ADD__test_bls12_381__all__reth__diagnostics.png)
 
 </details>
 
@@ -3997,11 +3621,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add__besu__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__besu__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__besu__diagnostics.png)
 
 </details>
 
@@ -4026,11 +3647,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add__erigon__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__erigon__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__erigon__diagnostics.png)
 
 </details>
 
@@ -4055,11 +3673,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add__ethrex__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__ethrex__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__ethrex__diagnostics.png)
 
 </details>
 
@@ -4084,11 +3699,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add__geth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__geth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__geth__diagnostics.png)
 
 </details>
 
@@ -4113,11 +3725,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add__nethermind__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__nethermind__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__nethermind__diagnostics.png)
 
 </details>
 
@@ -4142,11 +3751,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add__reth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__reth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add__reth__diagnostics.png)
 
 </details>
 
@@ -4182,11 +3788,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__besu__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__besu__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__besu__diagnostics.png)
 
 </details>
 
@@ -4211,11 +3814,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__erigon__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__erigon__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__erigon__diagnostics.png)
 
 </details>
 
@@ -4240,11 +3840,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__ethrex__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__ethrex__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__ethrex__diagnostics.png)
 
 </details>
 
@@ -4269,11 +3866,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__geth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__geth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__geth__diagnostics.png)
 
 </details>
 
@@ -4298,11 +3892,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__nethermind__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__nethermind__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__nethermind__diagnostics.png)
 
 </details>
 
@@ -4327,11 +3918,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__reth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__reth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_infinities__reth__diagnostics.png)
 
 </details>
 
@@ -4367,11 +3955,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__besu__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__besu__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__besu__diagnostics.png)
 
 </details>
 
@@ -4396,11 +3981,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__erigon__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__erigon__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__erigon__diagnostics.png)
 
 </details>
 
@@ -4425,11 +4007,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__ethrex__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__ethrex__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__ethrex__diagnostics.png)
 
 </details>
 
@@ -4454,11 +4033,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__geth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__geth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__geth__diagnostics.png)
 
 </details>
 
@@ -4483,11 +4059,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__nethermind__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__nethermind__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__nethermind__diagnostics.png)
 
 </details>
 
@@ -4512,11 +4085,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__reth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__reth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__add_negative__reth__diagnostics.png)
 
 </details>
 
@@ -4552,11 +4122,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__double__besu__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__besu__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__besu__diagnostics.png)
 
 </details>
 
@@ -4581,11 +4148,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__double__erigon__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__erigon__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__erigon__diagnostics.png)
 
 </details>
 
@@ -4610,11 +4174,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__double__ethrex__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__ethrex__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__ethrex__diagnostics.png)
 
 </details>
 
@@ -4639,11 +4200,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__double__geth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__geth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__geth__diagnostics.png)
 
 </details>
 
@@ -4668,11 +4226,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__double__nethermind__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__nethermind__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__nethermind__diagnostics.png)
 
 </details>
 
@@ -4697,11 +4252,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128__double__reth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__reth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128__double__reth__diagnostics.png)
 
 </details>
 
@@ -4737,11 +4289,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__besu__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__besu__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__besu__diagnostics.png)
 
 </details>
 
@@ -4766,11 +4315,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__erigon__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__erigon__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__erigon__diagnostics.png)
 
 </details>
 
@@ -4795,11 +4341,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__ethrex__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__ethrex__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -4824,11 +4367,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__geth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__geth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__geth__diagnostics.png)
 
 </details>
 
@@ -4853,11 +4393,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__nethermind__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__nethermind__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -4882,11 +4419,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__reth__regression.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__reth__bootstrap.png)
 
-![](figs/runtime/ECADD__test_alt_bn128_uncachable__all__reth__diagnostics.png)
 
 </details>
 
@@ -4925,11 +4459,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__besu__regression.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__besu__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__besu__diagnostics.png)
 
 </details>
 
@@ -4955,11 +4486,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__erigon__regression.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__erigon__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__erigon__diagnostics.png)
 
 </details>
 
@@ -4985,11 +4513,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__ethrex__regression.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__ethrex__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -5015,11 +4540,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__geth__regression.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__geth__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__geth__diagnostics.png)
 
 </details>
 
@@ -5045,11 +4567,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__nethermind__regression.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__nethermind__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -5075,11 +4594,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__reth__regression.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__reth__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_alt_bn128_benchmark__all__reth__diagnostics.png)
 
 </details>
 
@@ -5116,11 +4632,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__besu__regression.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__besu__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__besu__diagnostics.png)
 
 </details>
 
@@ -5146,11 +4659,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__erigon__regression.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__erigon__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__erigon__diagnostics.png)
 
 </details>
 
@@ -5176,11 +4686,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__ethrex__regression.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__ethrex__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -5206,11 +4713,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__geth__regression.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__geth__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__geth__diagnostics.png)
 
 </details>
 
@@ -5236,11 +4740,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__nethermind__regression.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__nethermind__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -5266,11 +4767,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__reth__regression.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__reth__bootstrap.png)
 
-![](figs/runtime/ECPAIRING__test_ec_pairing__all__reth__diagnostics.png)
 
 </details>
 
@@ -5308,11 +4806,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__besu__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__besu__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__besu__diagnostics.png)
 
 </details>
 
@@ -5337,11 +4832,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__erigon__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__erigon__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__erigon__diagnostics.png)
 
 </details>
 
@@ -5366,11 +4858,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__ethrex__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__ethrex__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -5395,11 +4884,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__geth__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__geth__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__geth__diagnostics.png)
 
 </details>
 
@@ -5424,11 +4910,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__nethermind__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__nethermind__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -5453,11 +4936,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__reth__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__reth__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation__all__reth__diagnostics.png)
 
 </details>
 
@@ -5493,11 +4973,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__besu__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__besu__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__besu__diagnostics.png)
 
 </details>
 
@@ -5522,11 +4999,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__erigon__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__erigon__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__erigon__diagnostics.png)
 
 </details>
 
@@ -5551,11 +5025,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__ethrex__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__ethrex__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -5580,11 +5051,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__geth__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__geth__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__geth__diagnostics.png)
 
 </details>
 
@@ -5609,11 +5077,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__nethermind__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__nethermind__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -5638,11 +5103,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__reth__regression.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__reth__bootstrap.png)
 
-![](figs/runtime/POINT_EVALUATION__test_point_evaluation_uncachable__all__reth__diagnostics.png)
 
 </details>
 
@@ -5680,11 +5142,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__besu__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__besu__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__besu__diagnostics.png)
 
 </details>
 
@@ -5709,11 +5168,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__erigon__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__erigon__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__erigon__diagnostics.png)
 
 </details>
 
@@ -5738,11 +5194,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__ethrex__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__ethrex__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -5767,11 +5220,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__geth__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__geth__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__geth__diagnostics.png)
 
 </details>
 
@@ -5796,11 +5246,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__nethermind__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__nethermind__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -5825,11 +5272,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__reth__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__reth__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify__all__reth__diagnostics.png)
 
 </details>
 
@@ -5865,11 +5309,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__besu__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__besu__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__besu__diagnostics.png)
 
 </details>
 
@@ -5894,11 +5335,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__erigon__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__erigon__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__erigon__diagnostics.png)
 
 </details>
 
@@ -5923,11 +5361,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__ethrex__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__ethrex__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__ethrex__diagnostics.png)
 
 </details>
 
@@ -5952,11 +5387,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__geth__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__geth__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__geth__diagnostics.png)
 
 </details>
 
@@ -5981,11 +5413,8 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__nethermind__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__nethermind__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__nethermind__diagnostics.png)
 
 </details>
 
@@ -6010,10 +5439,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__reth__regression.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__reth__bootstrap.png)
 
-![](figs/runtime/P256VERIFY__test_p256verify_uncachable__all__reth__diagnostics.png)
 
 </details>

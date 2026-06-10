@@ -2,6 +2,8 @@
 
 _Generated 2026-06-10 07:09:53Z · fork `osaka` · anchor_rate 100 Mgas/s_
 
+> Note: this is a bundled snapshot of the analysis output. The accompanying figures (heatmaps and per-parameter provenance plots) are omitted here; the figure-rich version is published on the live analysis site linked from the EIP's discussions-to thread.
+
 **Summary:** 18 parameters proposed — 1 increased, 16 decreased, 0 new, 0 unresolved · 0 warnings · 3 poor-fit selections
 
 ## Contents
@@ -62,7 +64,6 @@ Worst client vs. second-worst client per gas parameter. The `Ratio` column is `w
 
 Per-client proposed gas for each parameter. Cells are colored by `log2(proposed / current)` — red means the proposal is more expensive than the current gas cost, green means cheaper, and white sits at unchanged. Annotations show the absolute proposed gas value; blank rows are parameters with no prior baseline (see warnings below).
 
-![](figs/proposal/heatmap.png)
 
 ## Worst-case provenance per gas param
 
@@ -73,77 +74,66 @@ _Single-combo parameters omitted (see proposal table for the sole estimation): `
 <details>
 <summary><code>OPCODE_MOD</code> — 4 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__OPCODE_MOD.png)
 
 </details>
 
 <details>
 <summary><code>OPCODE_SMOD</code> — 4 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__OPCODE_SMOD.png)
 
 </details>
 
 <details>
 <summary><code>OPCODE_KECCAK256_BASE</code> — 4 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__OPCODE_KECCAK256_BASE.png)
 
 </details>
 
 <details>
 <summary><code>OPCODE_KECCAK256_PER_WORD</code> — 4 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__OPCODE_KECCAK256_PER_WORD.png)
 
 </details>
 
 <details>
 <summary><code>PRECOMPILE_BLAKE2F_BASE</code> — 2 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__PRECOMPILE_BLAKE2F_BASE.png)
 
 </details>
 
 <details>
 <summary><code>PRECOMPILE_BLAKE2F_PER_ROUND</code> — 2 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__PRECOMPILE_BLAKE2F_PER_ROUND.png)
 
 </details>
 
 <details>
 <summary><code>PRECOMPILE_ECADD</code> — 5 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__PRECOMPILE_ECADD.png)
 
 </details>
 
 <details>
 <summary><code>PRECOMPILE_ECPAIRING_BASE</code> — 2 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__PRECOMPILE_ECPAIRING_BASE.png)
 
 </details>
 
 <details>
 <summary><code>PRECOMPILE_ECPAIRING_PER_POINT</code> — 2 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__PRECOMPILE_ECPAIRING_PER_POINT.png)
 
 </details>
 
 <details>
 <summary><code>PRECOMPILE_POINT_EVALUATION</code> — 2 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__PRECOMPILE_POINT_EVALUATION.png)
 
 </details>
 
 <details>
 <summary><code>PRECOMPILE_P256VERIFY</code> — 2 combos × 6 clients</summary>
 
-![](figs/proposal/provenance__PRECOMPILE_P256VERIFY.png)
 
 </details>
 
