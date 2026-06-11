@@ -1,5 +1,4 @@
 ---
-eip: xxxx
 title: SETCODEFROM Code Reuse Instruction
 description: Adds an instruction that sets an account's code hash from an existing deployed contract.
 author: TBD
