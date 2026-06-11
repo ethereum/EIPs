@@ -13,20 +13,21 @@ requires: 712, 8004
 
 ## Abstract
 
-This ERC defines a triple-hash commitment scheme and EIP-712 attestation profile for proving that the input a model received is the input the user intended. It introduces three linked fields — `raw_input_hash`, `sanitization_pipeline_hash`, and `input_hash` — that together form a verifiable chain of custody for AI inference inputs. A verifier can confirm input integrity using only the committed hashes and the public sanitization specification, without trusting the agent, gateway, or execution environment. This standard occupies the input-provenance layer of the AI inference trust stack, complementing ERC-8004 (agent identity), ERC-8126 (agent verification), ERC-8263 (on-chain proof commitment and anchor layer), and OCP / ERC-8281 (observation commitment protocol).
+This ERC defines a triple-hash commitment scheme and EIP-712 attestation profile for proving that the input a model received is the input the user intended. It introduces three linked fields — `raw_input_hash`, `sanitization_pipeline_hash`, and `input_hash` — that together form a verifiable chain of custody for AI inference inputs. A verifier can confirm input integrity using only the committed hashes and the public sanitization specification, without trusting the agent, gateway, or execution environment. This standard occupies the input-provenance layer of the AI inference trust stack, complementing ERC-8004 (agent identity), ERC-8126 (agent verification), TruthAnchorV1 (on-chain proof commitment and anchor layer), and OCP (observation commitment protocol).
 
 ---
 
 ## Motivation
 
-On-chain AI agent systems built on standards such as ERC-8004, ERC-8126, ERC-8263, and ERC-8274 can attest to which agent is registered, which model ran, and what output was produced — but no standard defines how to commit to the *input* before inference. This creates a trust gap: an agent may sanitize, rewrite, or substitute the user's input between request submission and model execution, leaving no on-chain evidence of the transformation.
+On-chain AI agent systems built on standards such as ERC-8004, ERC-8126, TruthAnchorV1, and the proof verification layer can attest to which agent is registered, which model ran, and what output was produced — but no standard defines how to commit to the *input* before inference. This creates a trust gap: an agent may sanitize, rewrite, or substitute the user's input between request submission and model execution, leaving no on-chain evidence of the transformation.
 
 ERC-8126 (AI Agent Verification, Final) addresses the question "Is this agent trustworthy?" via risk scores and verification registries. It deliberately leaves the execution receipt layer out of scope — what the agent actually processed in a specific invocation. WYRIWE closes that gap.
 
 Without a committed input record:
+
 - A settlement contract cannot verify that the delivered output corresponds to the funded input.
-- A proof verifier (e.g. an `IProofVerifier` implementation per ERC-8274) cannot confirm the `inputHash` it receives matches what was originally requested.
-- A dispute resolution mechanism (e.g. ERC-8275 `CommitRevealSettler`) has no ground truth for what the model was actually asked to do.
+- A proof verifier (e.g. an `IProofVerifier`) cannot confirm the `inputHash` it receives matches what was originally requested.
+- A dispute resolution mechanism (e.g. a `CommitRevealSettler`) has no ground truth for what the model was actually asked to do.
 
 WYRIWE (What You Read Is What You Execute) closes this gap by defining a minimal, hash-based commitment that any compliant gateway MUST produce at execution time and that any verifier can check independently.
 
@@ -101,9 +102,9 @@ WyriweAttestation(bytes32 agentId,address registry,bytes32 modelHash,bytes32 raw
 
 Field ordering is as declared in the struct above and is normative. EIP-712 encoding is order-sensitive — a type string with fields in any other order produces a different `typeHash` and MUST NOT be used.
 
-**ERC-8274 claim classification:** A `WyriweAttestation` is an `attestation`-class claim. In ERC-8274 terminology, the corresponding `IProofVerifier` SHOULD return `proofSystem() = "attestation/wyriwe"`. When wrapped in an ERC-8274 outer claim container, `claimType` SHOULD be set to `Attestation`. The EIP-712 type string acts as the on-chain schema discriminator; `claimType` serves off-chain consumers (indexers, explorers, dispute interfaces) that read the raw signed struct without calling the verifier contract.
+**Claim classification:** A `WyriweAttestation` is an `attestation`-class claim. The corresponding `IProofVerifier` SHOULD return `proofSystem() = "attestation/wyriwe"`. When consumed in a proof-verification outer claim container, `claimType` SHOULD be set to `Attestation`. The EIP-712 type string acts as the on-chain schema discriminator; `claimType` serves off-chain consumers (indexers, explorers, dispute interfaces) that read the raw signed struct without calling the verifier contract.
 
-Note: `modelHash` commits to the model weights or manifest — what model ran. This is distinct from a TEE `codeMeasurement`, which commits to the execution environment. WYRIWE operates at the input-provenance layer, not the execution environment layer. For execution environment attestations, see ERC-8274 `tee/*` proof systems.
+Note: `modelHash` commits to the model weights or manifest — what model ran. This is distinct from a TEE `codeMeasurement`, which commits to the execution environment. WYRIWE operates at the input-provenance layer, not the execution environment layer. For execution environment attestations, see the `tee/*` proof systems in the proof verification framework.
 
 ### 4. EIP-712 Domain
 
@@ -147,7 +148,7 @@ Where `:inputHash` is the lowercase hex-encoded (no `0x` prefix) `inputHash` val
 
 ### 7. ClaimType Discriminator
 
-ERC-8274-compliant claim artifacts MUST carry a `claimType` field identifying the accountability model of the claim. This field is distinct from `proofSystem` and MUST NOT be conflated with it:
+Compliant claim artifacts MUST carry a `claimType` field identifying the accountability model of the claim. This field is distinct from `proofSystem` and MUST NOT be conflated with it:
 
 - `proofSystem` belongs to the `IProofVerifier` contract path and has contract context. It identifies the cryptographic mechanism that authenticated the artifact.
 - `claimType` belongs inside the signed artifact and travels without that context. It identifies the accountability and dispute model.
@@ -195,7 +196,7 @@ EIP-712 typed structured data signatures are natively verifiable on-chain by Eth
 
 ### Why include `agentId` and `registry`?
 
-Linking attestations to an ERC-8004 agent identity makes the attestation attributable — not just to a signing key, but to an on-chain registered agent. This is load-bearing for settlement systems (e.g. ERC-8274, ERC-8183) that need to associate an output with a specific funded agent.
+Linking attestations to an ERC-8004 agent identity makes the attestation attributable — not just to a signing key, but to an on-chain registered agent. This is load-bearing for settlement systems (e.g. ERC-8183) that need to associate an output with a specific funded agent.
 
 ### Why `IDENTITY_SENTINEL_CID` instead of a null value?
 
@@ -260,6 +261,7 @@ GET https://gateway.ensub.org/agent/verify/:inputHash
 ```
 
 Example query:
+
 ```
 https://gateway.ensub.org/agent/verify/758d61f26a44448384e5c4468a0dcb7a2abe456067b0f7b505bc28b9411fe931
 ```
@@ -271,7 +273,8 @@ Source code: https://github.com/Echo-Merlini/ccip-router
 **L4 judgment reference implementation:** `https://api.babyblueviper.com/ledger` — live production judgment validator tracking spec revisions. Each revision reviewed against deployed endpoints; `/commitment` and `/outcome` sub-paths conform to Appendix A. See Acknowledgements.
 
 **External implementations:**
-- WyriweVerifier (Jimmy Shi) — `IProofVerifier` wrapper for ERC-8274: https://ethereum-magicians.org/t/erc-8274-ai-inference-proof-verification/28083
+
+- WyriweVerifier (Jimmy Shi) — `IProofVerifier` wrapper: https://ethereum-magicians.org/t/erc-8274-ai-inference-proof-verification/28083
 - WyriweProofVerifier (mainnet): `0xd8a09d830b27697e1b24e8c9800e562d20318a09`
 - WyriweAttestationVerifier (mainnet): referenced in ccip-router npm package
 
@@ -305,11 +308,11 @@ WYRIWE commits to the *hash* of the input, not the input itself. The raw input a
 
 ---
 
-## Composition
+### Composition
 
 This section documents known application patterns that reuse WYRIWE's triple-hash shape at adjacent stack layers. The shape — `commitment = keccak256(abi.encode(inputCommitment, scopeBinding, attestingParty))` — is layer-agnostic; only the semantic content of each slot changes.
 
-### L2 Snapshot commitment (ERC-8275 / ccip-router)
+### L2 Snapshot commitment (ccip-router)
 
 The ccip-router's contribution settlement layer reuses the triple-hash directly:
 
@@ -320,7 +323,7 @@ commitmentHash  = keccak256(abi.encode(snapshotRoot, periodId, nodeAddress))
 
 Slot mapping against WYRIWE's L3 scheme:
 
-| WYRIWE (L3 input provenance) | ERC-8275 L2 snapshot settlement |
+| WYRIWE (L3 input provenance) | ccip-router L2 snapshot settlement |
 |---|---|
 | `rawInputHash` | `snapshotRoot` — commitment to contribution rows |
 | `sanitizationPipelineHash` | `periodId` — temporal scope of the settlement window |
@@ -392,7 +395,7 @@ Domain separator: `ERC8004AttestationGateway` / version `"1"` / `block.chainid` 
 
 **Design notes:**
 
-1. **Signature roles.** Only one signature is required — the executing agent's attestor signs the EIP-712 digest at reveal time. The validator's own signature lives inside the verdict artifact that `verdictHash` pins, so validator authenticity is carried without a second signature field. This keeps the ERC-8274 layering clean: `IProofVerifier` authenticates the attestation; the verdict artifact authenticates the judgment.
+1. **Signature roles.** Only one signature is required — the executing agent's attestor signs the EIP-712 digest at reveal time. The validator's own signature lives inside the verdict artifact that `verdictHash` pins, so validator authenticity is carried without a second signature field. This keeps the IProofVerifier layering clean: `IProofVerifier` authenticates the attestation; the verdict artifact authenticates the judgment.
 
 2. **Commit-reveal invariant.** `verdictTimestamp < executedTimestamp` MUST hold. `executedActionHash` SHOULD be committed at verdict time — when the post-verdict intent hash is knowable — not post-execution. `submitReveal` is then called post-execution with settlement evidence linked separately rather than hashed into the record. The verdict artifact is published at commit time (relay-anchored in the reference implementation). The reviewed→executed gap closes by the same argument as WYRIWE's reviewed→input gap: the executor can only reveal an action whose hash matches what was committed and judged. This two-step pattern maps directly to `CommitRevealSettler.submitCommit` / `submitReveal`.
 
@@ -413,6 +416,7 @@ Domain separator: `ERC8004AttestationGateway` / version `"1"` / `block.chainid` 
    Reference implementation: `api.babyblueviper.com/ledger/{n}/commitment` and `api.babyblueviper.com/ledger/{n}/outcome`.
 
 **Honesty conventions from the reference implementation** (generalise to any producer):
+
 - Entries predating the wiring carry a partial block with `executed_action_hash: null` and an explicit `"not backfilled by design"` status. A commitment you did not make at the time is not one you get to manufacture later.
 - Where a production system records a single timestamp per governance cycle, `executedTimestamp` is `null` with an ordering note rather than a fabricated reveal time. The strict `verdictTimestamp < executedTimestamp` invariant belongs to the on-chain attestation; an off-chain production mapping should record what it actually measured.
 
@@ -422,13 +426,13 @@ Reference implementation: [api.babyblueviper.com/ledger](https://api.babybluevip
 
 ---
 
-## Appendix A — Cross-system settlement: GenericCommitRevealSettler integration
+### Appendix A — Cross-system settlement: GenericCommitRevealSettler integration
 
 This appendix documents the integration pattern for judgment attestations with `GenericCommitRevealSettler` as a reference for any L4 producer. First demonstrated in the cross-system settlement of ledger entry 19 at [api.babyblueviper.com/ledger/19](https://api.babyblueviper.com/ledger/19) — commit block 11030402, reveal block 11030403.
 
 **Contract:** `GenericCommitRevealSettler` on Sepolia: `0xFe7Ab6d95f7567a311B98D029373d0fc1511aCCe`
 
-Bytes-opaque commit/reveal primitive. No bond, no NodeType gate. Verifies preimage binding only — usable for contribution snapshots (ERC-8275), judgment attestations (WYRIWE L4), OCP observations, or any future schema.
+Bytes-opaque commit/reveal primitive. No bond, no NodeType gate. Verifies preimage binding only — usable for contribution snapshots (mesh node settlement), judgment attestations (WYRIWE L4), OCP observations, or any future schema.
 
 ### Hash construction
 
@@ -497,7 +501,7 @@ The `Revealed` event emits the full `bytes record` — any observer can verify t
 
 ---
 
-## Appendix B — RecordPointer Schema
+### Appendix B — RecordPointer Schema
 
 The `RecordPointer` struct is the resolved payload schema for the `string recordPointer` field in `JudgmentExecutionAttestation`. It is NOT part of the EIP-712 signed type — the attestation is signed once and frozen at verdict time; the record it points to grows over time as `outcomeEvidence` accumulates. See design note 5.
 
@@ -583,7 +587,7 @@ Ledger entry at `https://api.babyblueviper.com/ledger/19`:
 
 ---
 
-## Appendix C — Identity-Transform Specification (IDENTITY_SENTINEL_CID)
+### Appendix C — Identity-Transform Specification (IDENTITY_SENTINEL_CID)
 
 This appendix reproduces the normative content of the identity-transform specification pinned at `ipfs://QmccvoM6aRVgZ2dtFWvT6Wm3DmTvoAUHHotK7uQufnStVR`. It is included here so the standard is self-contained in the event of IPFS unavailability. The content at the CID MUST match this text exactly. Any discrepancy between the pinned CID and this appendix is an error in the pinned content, not in this document.
 
@@ -608,27 +612,27 @@ The CID was derived from the above JSON content (UTF-8 encoded, no trailing newl
 
 ---
 
-## References
+### References
 
 - [ERC-8004](https://ethereum-magicians.org/t/erc-8004-trustless-agents/25098) — Verified Node Identity (agent identity layer)
 - [ERC-8126](https://eips.ethereum.org/EIPS/eip-8126) — AI Agent Verification (Final)
-- [ERC-8263](https://ethereum-magicians.org/t/erc-8263) — Onchain Proof Layer for AI Agent Actions (Vincent Wu / @TruthAnchor-AI)
-- [ERC-8274](https://ethereum-magicians.org/t/erc-8274-ai-inference-proof-verification/28083) — AI Inference Proof Verification (Jimmy Shi)
-- [ERC-8275](https://ethereum-magicians.org/t/erc-8275-agent-service-discovery-and-escrow-payments/28622) — Mesh Node Compensation (Panini)
-- [ERC-8281 / OCP](https://github.com/damonzwicker/observation-commitment-protocol) — Observation Commitment Protocol (Damon Zwicker)
+- [TruthAnchorV1 draft](https://ethereum-magicians.org/t/erc-8263) — Onchain Proof Layer for AI Agent Actions (Vincent Wu / @TruthAnchor-AI)
+- [Inference Proof Verification draft](https://ethereum-magicians.org/t/erc-8274-ai-inference-proof-verification/28083) — AI Inference Proof Verification (Jimmy Shi)
+- [Mesh Node Compensation draft](https://ethereum-magicians.org/t/erc-8275-agent-service-discovery-and-escrow-payments/28622) — Mesh Node Compensation (Panini)
+- [OCP draft](https://github.com/damonzwicker/observation-commitment-protocol) — Observation Commitment Protocol (Damon Zwicker)
 - [OCP Composition Note](https://gist.github.com/damonzwicker/8742e742bdc627b8e2179c00b81289dc) — L3+L4 AI inference attestation profile
-- [Live AnchorProof interop tx](https://etherscan.io/tx/0xc32b66ae9446e0d5282a6fc813ba106126a8da05bced638b83840d9c2510e4d0) — ccip-router `commitmentHash` carried as `proofHash` in TruthAnchorV1 (ERC-8263), mainnet block 25289963. `agentIdScheme=1` (REGISTRY), `aux="ccip-router"`. Cross-reference: AttestationIndex `commitmentHash` in block 25289932.
-- [ERC-8274 Worked Example](https://gist.github.com/damonzwicker/b6bef149db0bb4faa390a760b516db51) — claimType field mapping, RecordPointer schema, and verify() semantics for judgment claims (Damon Zwicker)
+- [Live AnchorProof interop tx](https://etherscan.io/tx/0xc32b66ae9446e0d5282a6fc813ba106126a8da05bced638b83840d9c2510e4d0) — ccip-router `commitmentHash` carried as `proofHash` in TruthAnchorV1, mainnet block 25289963. `agentIdScheme=1` (REGISTRY), `aux="ccip-router"`. Cross-reference: AttestationIndex `commitmentHash` in block 25289932.
+- [Proof Verification Worked Example](https://gist.github.com/damonzwicker/b6bef149db0bb4faa390a760b516db51) — claimType field mapping, RecordPointer schema, and verify() semantics for judgment claims (Damon Zwicker)
 
 ---
 
-## Acknowledgements
+### Acknowledgements
 
-- **Vincent Wu** (@TruthAnchor-AI) — co-author. Contributions: ERC-8263 layer-boundary definition establishing the proof-commitment / anchor surface as a distinct primitive from OCP / ERC-8281 (observation commitment); TruthAnchorV1 / AnchorProof canonical event as the ERC-8263 anchor layer; separation of AttestationIndex (commitment store) from TruthAnchorV1 (event layer) as composable without either absorbing the other; interoperability path from gateway-produced signed attestation through to IProofVerifier-style settlement consumption.
+- **Vincent Wu** (@TruthAnchor-AI) — co-author. Contributions: TruthAnchorV1 layer-boundary definition establishing the proof-commitment / anchor surface as a distinct primitive from OCP (observation commitment); TruthAnchorV1 / AnchorProof canonical event as the anchor layer; separation of AttestationIndex (commitment store) from TruthAnchorV1 (event layer) as composable without either absorbing the other; interoperability path from gateway-produced signed attestation through to IProofVerifier-style settlement consumption.
 
-- **Jimmy Shi** — first external implementation of WYRIWE: WyriweVerifier for ERC-8274, wrapping the triple-hash scheme as an `IProofVerifier`. Co-author contributions include technical corrections to `inputHash` derivation (not keccak of the two hashes), `ATTESTATION_TYPEHASH` field names (`manifestHash→modelHash`, `agentId uint256→bytes32`, `timestamp uint64→uint256`), `block.chainid` dynamic requirement, and ERC-8274 `proofSystem = "attestation/wyriwe"` taxonomy placement.
+- **Jimmy Shi** — first external implementation of WYRIWE: WyriweVerifier wrapping the triple-hash scheme as an `IProofVerifier`. Co-author contributions include technical corrections to `inputHash` derivation (not keccak of the two hashes), `ATTESTATION_TYPEHASH` field names (`manifestHash→modelHash`, `agentId uint256→bytes32`, `timestamp uint64→uint256`), `block.chainid` dynamic requirement, and `proofSystem = "attestation/wyriwe"` taxonomy placement.
 
-- **Damon Zwicker** (@damonzwicker) — co-author. Contributions: `ClaimType` enum definition and proofSystem / claimType separation rationale (Section 7); `RecordPointer` typed schema formalizing the `commitmentProof` / `outcomeEvidence` distinction; `JudgmentVerificationCompleted` event definition; `verify()` three-layer accountability boundary for `ClaimType.Judgment`; OCP / ERC-8281 commitment discipline integration; ERC-8274 worked example gist.
+- **Damon Zwicker** (@damonzwicker) — co-author. Contributions: `ClaimType` enum definition and proofSystem / claimType separation rationale (Section 7); `RecordPointer` typed schema formalizing the `commitmentProof` / `outcomeEvidence` distinction; `JudgmentVerificationCompleted` event definition; `verify()` three-layer accountability boundary for `ClaimType.Judgment`; OCP commitment discipline integration; worked example gist (claimType field mapping, RecordPointer schema, verify() semantics).
 
 - **babyblueviper1** (@babyblueviper1) — co-author. Production judgment validator operator. Primary author of the L4 Composition section: `JudgmentExecutionAttestation` EIP-712 struct and triple-hash construction; slot-for-slot WYRIWE mapping; `claimType` field concept; `verify()` semantic clarification (authenticates verdict, does not endorse soundness); `recordPointer` field and commitment/outcome separability invariant; Nostr relay anchoring as timestamp commitment primitive; `codeMeasurement` MUST be absent for `claimType = Judgment`; `verdictHash` construction clarification (`verdict_artifact_ref` covers both IPFS CID and Nostr event ID forms); closing the `string recordPointer` vs inline struct question ("attestation frozen, record alive"); Appendix A verification against deployed code. Production reference implementation at [api.babyblueviper.com/ledger](https://api.babyblueviper.com/ledger) — running against real capital.
 
