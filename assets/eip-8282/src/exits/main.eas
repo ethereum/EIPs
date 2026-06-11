@@ -1,0 +1,403 @@
+;;  █████╗ ██████╗  █████╗ ██████╗   █████╗ ███████╗███╗   ███╗
+;; ██╔══██╗╚════██╗██╔══██╗╚════██╗ ██╔══██╗██╔════╝████╗ ████║
+;; ╚█████╔╝ █████╔╝╚█████╔╝ █████╔╝ ███████║███████╗██╔████╔██║
+;; ██╔══██╗██╔═══╝ ██╔══██╗██╔═══╝  ██╔══██║╚════██║██║╚██╔╝██║
+;; ╚█████╔╝███████╗╚█████╔╝███████╗ ██║  ██║███████║██║ ╚═╝ ██║
+;;  ╚════╝ ╚══════╝ ╚════╝ ╚══════╝ ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝
+;;
+;; This is an implementation of the EIP-8282 builder exit request contract. It
+;; is copied from the EIP-7002 withdrawals contract (the same code skeleton the
+;; EIP-7251 consolidations contract uses); the fee mechanism, the queue design,
+;; and the subroutines logic of the original smart contract remain.
+;;
+;; The difference from the EIP-7002 smart contract is in input data and the
+;; size of the queue item: the input is a bare 48-byte builder public key, with
+;; no amount field, so the record is (address ++ pubkey) and the contract does
+;; no amount handling at all. The fee parameters are unchanged.
+
+#pragma target "prague"
+
+;; ----------------------------------------------------------------------------
+;; CONSTANTS ------------------------------------------------------------------
+;; ----------------------------------------------------------------------------
+
+#define SYSTEM_ADDR = .address(0xfffffffffffffffffffffffffffffffffffffffe)
+
+#define SLOT_EXCESS = 0
+#define SLOT_COUNT = 1
+
+#define QUEUE_HEAD = 2
+#define QUEUE_TAIL = 3
+#define QUEUE_OFFSET = 4
+
+#define MIN_FEE = 1
+#define TARGET_PER_BLOCK = 2
+#define MAX_PER_BLOCK = 16
+#define FEE_UPDATE_FRACTION = 17
+#define EXCESS_INHIBITOR = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+
+#define INPUT_SIZE = 48    ;; the size of (pubkey)
+#define RECORD_SIZE = 68   ;; the size of (address ++ pubkey)
+#define SLOTS_PER_ITEM = 3 ;; (address, pubkey[0:32], pubkey[32:48])
+
+;; ----------------------------------------------------------------------------
+;; PROGRAM START --------------------------------------------------------------
+;; ----------------------------------------------------------------------------
+
+  ;; Protect the system subroutine by checking if the caller is the system
+  ;; address.
+  caller                ;; [caller]
+  push SYSTEM_ADDR      ;; [sysaddr, caller]
+  eq                    ;; [sysaddr == caller]
+  jumpi @read_requests  ;; []
+
+  ;; --------------------------------------------------------------------------
+  ;; USER SUBROUTINE ----------------------------------------------------------
+  ;; --------------------------------------------------------------------------
+
+  ;; Compute the fee using fake expo and the current excess exit requests.
+  push FEE_UPDATE_FRACTION
+  push SLOT_EXCESS      ;; [excess_slot, update_fraction]
+  sload                 ;; [excess, update_fraction]
+
+  ;; Check if the pre-fork inhibitor is still active, revert if so.
+  dup1                  ;; [excess, excess, update_fraction]
+  push EXCESS_INHIBITOR ;; [inhibitor, excess, excess, update_fraction]
+  eq                    ;; [inhibitor == excess, excess, update_fraction]
+  jumpi @revert         ;; [excess, update_fraction]
+
+  push MIN_FEE          ;; [min_fee, excess, update_fraction]
+  #include "../common/fake_expo.eas"
+
+  ;; If calldatasize matches the expected input size, go to adding the request.
+  calldatasize          ;; [calldatasize, req_fee]
+  push INPUT_SIZE       ;; [INPUT_SIZE, calldatasize, req_fee]
+  eq                    ;; [INPUT_SIZE == calldatasize, req_fee]
+  jumpi @handle_input   ;; [req_fee]
+
+  ;; Otherwise calldatasize must be zero.
+  calldatasize          ;; [calldatasize, req_fee]
+  jumpi @revert         ;; [req_fee]
+
+  ;; This is the read path, where we return the current fee.
+  ;; Reject any callvalue here to prevent lost funds.
+  callvalue             ;; [value, req_fee]
+  jumpi @revert         ;; [req_fee]
+
+  ;; Return req_fee.
+  push 0                ;; [0, req_fee]
+  mstore                ;; []
+  push 32               ;; [32]
+  push 0                ;; [0, 32]
+  return                ;; []
+
+handle_input:
+  ;; This is the write path. We expect the computed fee on the stack.
+  ;; Input data has the following layout:
+  ;;
+  ;;  +--------+
+  ;;  | pubkey |
+  ;;  +--------+
+  ;;      48
+
+  ;; Determine if the fee provided is enough to cover the exit request fee.
+  callvalue             ;; [callvalue, req_fee]
+  lt                    ;; [callvalue < req_fee]
+  jumpi @revert         ;; []
+
+  ;; The request can pay, increment exit request count.
+  push SLOT_COUNT
+  sload                 ;; [req_count]
+  push 1                ;; [1, req_count]
+  add                   ;; [req_count+1]
+  push SLOT_COUNT       ;; [slot, req_count+1]
+  sstore                ;; []
+
+  ;; Now insert request into queue. First, compute the base storage slot
+  push QUEUE_TAIL       ;; [tail_idx_slot]
+  sload                 ;; [tail_idx]
+  dup1                  ;; [tail_idx, tail_idx]
+  push SLOTS_PER_ITEM   ;; [slots, tail_idx, tail_idx]
+  mul                   ;; [slots*tail_idx, tail_idx]
+  push QUEUE_OFFSET     ;; [ost, slots*tail_idx, tail_idx]
+  add                   ;; [slot, tail_idx]
+
+  ;; Write address to queue.
+  caller                ;; [caller, slot, ..]
+  dup2                  ;; [slot, caller, slot, ..]
+  sstore                ;; [slot, ..]
+
+  push 1                ;; [1, slot, ..]
+  add                   ;; [slot, ..]
+
+  ;; Store pk[0:32] to queue.
+  push 0                ;; [0, slot, ..]
+  calldataload          ;; [pk[0:32], slot, ..]
+  dup2                  ;; [slot, pk[0:32], slot, ..]
+  sstore                ;; [slot, ..]
+
+  push 1                ;; [1, slot, ..]
+  add                   ;; [slot, ..]
+
+  ;; Store pk[32:48] to queue. The calldataload reads past the end of the
+  ;; input, so the low 16 bytes are zero.
+  push 32               ;; [32, slot, ..]
+  calldataload          ;; [pk[32:48], slot, ..]
+  swap1                 ;; [slot, pk[32:48], ..]
+  sstore                ;; [..]
+
+  ;; Assemble log data.
+  caller                ;; [caller, ..]
+  push 96               ;; [96, caller, ..]
+  shl                   ;; [caller, ..]
+  push 0                ;; [0, caller, ..]
+  mstore                ;; [..]
+  push INPUT_SIZE       ;; [size, ..]
+  push 0                ;; [ost, size, ..]
+  push 20               ;; [dest, ost, size, ..]
+  calldatacopy          ;; [..]
+
+  ;; Log record.
+  push RECORD_SIZE      ;; [size, ..]
+  push 0                ;; [idx, size, ..]
+  log0                  ;; [..]
+
+  ;; Increment queue tail over last and write to storage.
+  push 1                ;; [1, tail_idx]
+  add                   ;; [tail_idx+1]
+  push QUEUE_TAIL       ;; [tail_idx_slot, tail_idx+1]
+  sstore                ;; []
+
+  stop
+
+;; ----------------------------------------------------------------------------
+;; SYSTEM SUBROUTINE ----------------------------------------------------------
+;; ----------------------------------------------------------------------------
+;;
+;; Pop request from queue, update fee accumulator ~~ This is the logic executed
+;; by the protocol each block. It reads as many requests as available from the
+;; queue, until the max request per block is reached. The requests are returned
+;; as a contiguous array of bytes with each record being exactly RECORD_SIZE
+;; bytes.
+;;
+;;  Exit request record:
+;;
+;;  +------+--------+
+;;  | addr | pubkey |
+;;  +------+--------+
+;;     20      48
+;;
+;; Because the requests are stored across SLOTS_PER_ITEM storage slots, there
+;; is some shuffling to align the data.
+;;
+;; After reading the requests, they are removed from the queue by modifying the
+;; queue's head index. The excess requests accumulator is updated so that the
+;; new cost of submitting a request is reflected. Finally, the request count is
+;; reset.
+read_requests:
+  ;; Determine the size of the queue by calculating tail - head.
+  push QUEUE_TAIL       ;; [tail_idx_slot]
+  sload                 ;; [tail_idx]
+  push QUEUE_HEAD       ;; [head_idx_slot, tail_idx]
+  sload                 ;; [head_idx, tail_idx]
+
+  ;; Now compute the count.
+  dup1                  ;; [head_idx, head_idx, tail_idx]
+  dup3                  ;; [tail_idx, head_idx, head_idx, tail_idx]
+  sub                   ;; [count, head_idx, tail_idx]
+
+  ;; Determine if count is greater than the max requests.
+  dup1                  ;; [count, count, head_idx, tail_idx]
+  push MAX_PER_BLOCK    ;; [reqs_per_block, count, count, head_idx, tail_idx]
+  gt                    ;; [reqs_per_block > count, count, head_idx, tail_idx]
+  jumpi @begin_loop     ;; [count, head_idx, tail_idx]
+
+  ;; Discard count, use the max requests per block.
+  pop                   ;; [head_idx, tail_idx]
+  push MAX_PER_BLOCK    ;; [count, head_idx, tail_idx]
+
+begin_loop:
+  push 0                ;; [i, count, head_idx, tail_idx]
+
+accum_loop:
+  ;; This loop will read each request and byte bang it into a RECORD_SIZE byte
+  ;; chunk.
+
+  ;; Bounds check, ensure i < count.
+  dup2                  ;; [count, i, count, head_idx, tail_idx]
+  dup2                  ;; [i, count, i, count, head_idx, tail_idx]
+  eq                    ;; [i == count, i, count, head_idx, tail_idx]
+  jumpi @update_head    ;; [i, count, head_idx, tail_idx]
+
+  ;; Determine the storage slot of the address for this iteration. This value
+  ;; is also the base for the other storage slots containing the public key.
+  ;; The base slot will be (queue_offset + (queue_head + i)*3).
+  dup3                  ;; [head_idx, i, ..]
+  dup2                  ;; [i, head_idx, i, ..]
+  add                   ;; [i+head_idx, i, ..]
+  push SLOTS_PER_ITEM   ;; [3, i+head_idx, i, ..]
+  mul                   ;; [3*(i+head_idx), i, ..]
+  push QUEUE_OFFSET     ;; [offset, 3*(i+head_idx), i, ..]
+  add                   ;; [slotbase, i, ..]
+
+  ;; Write values to memory flat and contiguously. This requires combining the
+  ;; three storage elements (addr, pk1, pk2) so there is no padding.
+  ;;
+  ;; The slots have the following layout:
+  ;;
+  ;; 0: addr
+  ;;  0x00 | 00 00 00 00 00 00 00 00 00 00 00 00 aa aa aa aa
+  ;;  0x10 | aa aa aa aa aa aa aa aa aa aa aa aa aa aa aa aa
+  ;;
+  ;; 1: pk[0:32] -> pk1
+  ;;  0x00 | bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb
+  ;;  0x10 | bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb
+  ;;
+  ;; 2: pk[32:48] -> pk2
+  ;;  0x00 | bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb
+  ;;  0x10 | 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+  ;; Compute the output offset = i*RECORD_SIZE.
+  dup2                  ;; [i, slotbase, i, ..]
+  push RECORD_SIZE      ;; [size, i, slotbase, i, ..]
+  mul                   ;; [offset=size*i, slotbase, i, ..]
+
+  ;; Read slot 'addr' from storage.
+  dup2                  ;; [slotbase, offset, slotbase, ..]
+  sload                 ;; [addr, offset, slotbase, ..]
+
+  ;; Shift addr bytes.
+  push 12*8             ;; [96, addr, offset, slotbase, ..]
+  shl                   ;; [addr<<96, offset, slotbase, ..]
+
+  ;; Store addr at output offset = i*RECORD_SIZE.
+  dup2                  ;; [offset, addr<<96, offset, slotbase, ..]
+  mstore                ;; [offset, slotbase, ..]
+  push 20               ;; [20, offset, slotbase, ..]
+  add                   ;; [offset=offset+20, slotbase, ..]
+
+  ;; Read slot 'pk1' from storage.
+  dup2                  ;; [slotbase, offset, slotbase, ..]
+  push 1                ;; [1, slotbase, offset, slotbase, ..]
+  add                   ;; [slot, offset, slotbase, ..]
+  sload                 ;; [pk1, offset, slotbase, ..]
+
+  ;; Store pk1 at output offset = i*RECORD_SIZE + 20.
+  dup2                  ;; [offset, pk1, offset, slotbase, ..]
+  mstore                ;; [offset, slotbase, ..]
+  push 32               ;; [32, offset, slotbase, ..]
+  add                   ;; [offset=offset+32, slotbase, ..]
+
+  ;; Read slot 'pk2' from storage. The low 16 bytes are zero (see the write
+  ;; path), so the word can be stored as-is; the next record (or the return
+  ;; size) overwrites or cuts the trailing zero bytes.
+  swap1                 ;; [slotbase, offset, ..]
+  push 2                ;; [2, slotbase, offset, ..]
+  add                   ;; [slot, offset, ..]
+  sload                 ;; [pk2, offset, ..]
+
+  ;; Store pk2 at output offset = i*RECORD_SIZE + 52.
+  swap1                 ;; [offset, pk2, ..]
+  mstore                ;; [..]
+
+  ;; Increment i.
+  push 1                ;; [1, i, ..]
+  add                   ;; [i+1, ..]
+
+  jump @accum_loop      ;; [i, count, head_idx, tail_idx]
+
+update_head:
+  ;; All requests have been read, update queue by adding the count read to the
+  ;; current head index.
+  swap2                 ;; [head_idx, count, count, tail_idx]
+  add                   ;; [new_head_idx, count, tail_idx]
+
+  ;; If the new head is equal to the tail, reset the queue by zeroing them both.
+  dup1                  ;; [new_head_idx, new_head_idx, count, tail_idx]
+  swap3                 ;; [tail_idx, new_head_idx, count, new_head_idx]
+  eq                    ;; [new_head_idx == tail_idx, count, new_head_idx]
+  jumpi @reset_queue    ;; [count, new_head_idx]
+
+  ;; Otherwise, write the new head to storage.
+  swap1                 ;; [new_head_idx, count]
+  push QUEUE_HEAD       ;; [head_idx_slot, new_head_idx, count]
+  sstore                ;; [count]
+
+  jump @update_excess   ;; [count]
+
+reset_queue:
+  ;; Since the queue is empty, both the head and tail indexes can be zeroed.
+  swap1                 ;; [new_head_idx, count]
+  pop                   ;; [count]
+
+  push 0                ;; [0, count]
+  push QUEUE_HEAD       ;; [head_slot, 0, count]
+  sstore                ;; [count]
+
+  push 0                ;; [0, count]
+  push QUEUE_TAIL       ;; [tail_slot, 0, count]
+  sstore                ;; [count]
+
+update_excess:
+  ;; Update the new excess exit requests.
+  push SLOT_EXCESS      ;; [excess_slot, count]
+  sload                 ;; [excess, count]
+
+  ;; Check if excess needs to be reset to 0 for first iteration after
+  ;; activation.
+  dup1                  ;; [excess, excess, count]
+  push EXCESS_INHIBITOR ;; [inhibitor, excess, excess, count]
+  eq                    ;; [inhibitor == excess, excess, count]
+  iszero                ;; [inhibitor != excess, excess, count]
+  jumpi @skip_reset     ;; [excess, count]
+
+  ;; Drop the excess from stack and use 0.
+  pop                   ;; [count]
+  push 0                ;; [reset_excess, count]
+
+skip_reset:
+  push SLOT_COUNT       ;; [count_slot, excess, count]
+  sload                 ;; [count, excess, count]
+
+  ;; If the sum of the previous excess requests and requests added in the
+  ;; current block is greater than the target, subtract the target from the sum
+  ;; and set it as the new excess requests value.
+  push TARGET_PER_BLOCK ;; [target, count, excess, count]
+  dup3                  ;; [excess, target, count, excess, count]
+  dup3                  ;; [count, excess, target, count, excess, count]
+  add                   ;; [count+excess, target, count, excess, count]
+  gt                    ;; [count+excess > target, count, excess, count]
+  jumpi @compute_excess ;; [count, excess, count]
+
+  ;; Zero out excess.
+  pop                   ;; [excess, count]
+  pop                   ;; [count]
+  push 0                ;; [0, count]
+  jump @store_excess    ;; [0, count]
+
+compute_excess:
+  add                   ;; [count+excess, count]
+  push TARGET_PER_BLOCK ;; [target, count+excess, count]
+  swap1                 ;; [count+excess, target, count]
+  sub                   ;; [new_excess, count]
+
+store_excess:
+  push SLOT_EXCESS      ;; [excess_slot, new_excess, count]
+  sstore                ;; [count]
+
+  ;; Reset request count.
+  push 0                ;; [0, count]
+  push SLOT_COUNT       ;; [count_slot, 0, count]
+  sstore                ;; [count]
+
+  ;; Return the requests.
+  push RECORD_SIZE      ;; [record_size, count]
+  mul                   ;; [size]
+  push 0                ;; [0, size]
+  return                ;; []
+
+;; Revert subroutine.
+revert:
+  push 0
+  push 0
+  revert

@@ -1,21 +1,12 @@
 [profile.default]
-# The verifier and harness target Solidity 0.6.11 (the same compiler that
-# produced the deployed deposit contract). Tests target the same pragma so
-# the harness can use plain inheritance instead of low-level calls.
-solc = "0.6.11"
-src = "."
+src = "src"
 test = "test"
 out = "out"
 cache_path = "cache"
 
-# The contracts use only basic EVM features (no precompiles). `istanbul` is the
-# newest target solc 0.6.11 supports; its opcode set is a subset of later forks,
-# so the bytecode runs unchanged on Prague and beyond. (The previous `prague`
-# setting was silently downgraded to istanbul, since 0.6.11 predates it.)
-evm_version = "istanbul"
+# The predeploys target the same EVM the sys-asm contracts target.
+evm_version = "prague"
 
-# `bytecode_hash = "none"` makes the runtime byte string deterministic
-# across rebuilds — useful when comparing against the canonical bytecode.
-bytecode_hash = "none"
-optimizer = true
-optimizer_runs = 200
+# Tests assemble the .eas sources by shelling out to `geas` (see test/Geas.sol),
+# exactly as ethereum/sys-asm's own Foundry suite does.
+ffi = true

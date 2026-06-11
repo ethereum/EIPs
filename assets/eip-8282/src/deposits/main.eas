@@ -1,0 +1,598 @@
+;;  █████╗ ██████╗  █████╗ ██████╗   █████╗ ███████╗███╗   ███╗
+;; ██╔══██╗╚════██╗██╔══██╗╚════██╗ ██╔══██╗██╔════╝████╗ ████║
+;; ╚█████╔╝ █████╔╝╚█████╔╝ █████╔╝ ███████║███████╗██╔████╔██║
+;; ██╔══██╗██╔═══╝ ██╔══██╗██╔═══╝  ██╔══██║╚════██║██║╚██╔╝██║
+;; ╚█████╔╝███████╗╚█████╔╝███████╗ ██║  ██║███████║██║ ╚═╝ ██║
+;;  ╚════╝ ╚══════╝ ╚════╝ ╚══════╝ ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝
+;;
+;; This is an implementation of the EIP-8282 builder deposit request contract.
+;; It is copied from the EIP-7002 withdrawals contract (the same code skeleton
+;; the EIP-7251 consolidations contract uses); the fee mechanism, the queue
+;; design, and the subroutines logic of the original smart contract remain.
+;;
+;; The differences from the EIP-7002 smart contract are:
+;;
+;;   * input data and the size of the queue item: the input is a 184-byte
+;;     deposit (pubkey ++ withdrawal_credentials ++ amount ++ signature, with
+;;     the amount a big-endian uint64 of gwei) and the record carries no
+;;     source address, so the record equals the input with the amount
+;;     converted to little-endian on the read path (the same conversion, and
+;;     the same macro, the EIP-7002 contract uses for its amount);
+;;   * two added checks on the write path: the amount must be at least
+;;     MIN_AMOUNT, and the call value must cover amount * 1 gwei of stake on
+;;     top of the request fee.
+
+#pragma target "prague"
+
+;; ----------------------------------------------------------------------------
+;; CONSTANTS ------------------------------------------------------------------
+;; ----------------------------------------------------------------------------
+
+#define SYSTEM_ADDR = .address(0xfffffffffffffffffffffffffffffffffffffffe)
+
+#define SLOT_EXCESS = 0
+#define SLOT_COUNT = 1
+
+#define QUEUE_HEAD = 2
+#define QUEUE_TAIL = 3
+#define QUEUE_OFFSET = 4
+
+#define MIN_FEE = 1
+#define TARGET_PER_BLOCK = 2
+#define MAX_PER_BLOCK = 16
+#define FEE_UPDATE_FRACTION = 17
+#define EXCESS_INHIBITOR = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+
+#define MIN_AMOUNT = 1000000000 ;; minimum deposit amount in gwei (1 ETH, the EIP-7732 builder minimum)
+#define GWEI = 1000000000       ;; wei per gwei
+
+#define INPUT_SIZE = 184   ;; the size of (pubkey ++ withdrawal_credentials ++ amount ++ signature)
+#define RECORD_SIZE = 184  ;; the size of (pubkey ++ withdrawal_credentials ++ amount ++ signature)
+#define SLOTS_PER_ITEM = 6 ;; (pk[0:32], pk[32:48]+wc[0:16], wc[16:32]+amount+sig[0:8], sig[8:40], sig[40:72], sig[72:96])
+
+;; ----------------------------------------------------------------------------
+;; PROGRAM START --------------------------------------------------------------
+;; ----------------------------------------------------------------------------
+
+  ;; Protect the system subroutine by checking if the caller is the system
+  ;; address.
+  caller                ;; [caller]
+  push SYSTEM_ADDR      ;; [sysaddr, caller]
+  eq                    ;; [sysaddr == caller]
+  jumpi @read_requests  ;; []
+
+  ;; --------------------------------------------------------------------------
+  ;; USER SUBROUTINE ----------------------------------------------------------
+  ;; --------------------------------------------------------------------------
+
+  ;; Compute the fee using fake expo and the current excess deposit requests.
+  push FEE_UPDATE_FRACTION
+  push SLOT_EXCESS      ;; [excess_slot, update_fraction]
+  sload                 ;; [excess, update_fraction]
+
+  ;; Check if the pre-fork inhibitor is still active, revert if so.
+  dup1                  ;; [excess, excess, update_fraction]
+  push EXCESS_INHIBITOR ;; [inhibitor, excess, excess, update_fraction]
+  eq                    ;; [inhibitor == excess, excess, update_fraction]
+  jumpi @revert         ;; [excess, update_fraction]
+
+  push MIN_FEE          ;; [min_fee, excess, update_fraction]
+  #include "../common/fake_expo.eas"
+
+  ;; If calldatasize matches the expected input size, go to adding the request.
+  calldatasize          ;; [calldatasize, req_fee]
+  push INPUT_SIZE       ;; [INPUT_SIZE, calldatasize, req_fee]
+  eq                    ;; [INPUT_SIZE == calldatasize, req_fee]
+  jumpi @handle_input   ;; [req_fee]
+
+  ;; Otherwise calldatasize must be zero.
+  calldatasize          ;; [calldatasize, req_fee]
+  jumpi @revert         ;; [req_fee]
+
+  ;; This is the read path, where we return the current fee.
+  ;; Reject any callvalue here to prevent lost funds.
+  callvalue             ;; [value, req_fee]
+  jumpi @revert         ;; [req_fee]
+
+  ;; Return req_fee.
+  push 0                ;; [0, req_fee]
+  mstore                ;; []
+  push 32               ;; [32]
+  push 0                ;; [0, 32]
+  return                ;; []
+
+handle_input:
+  ;; This is the write path. We expect the computed fee on the stack.
+  ;; Input data has the following layout:
+  ;;
+  ;;  +--------+------------------------+--------+-----------+
+  ;;  | pubkey | withdrawal_credentials | amount | signature |
+  ;;  +--------+------------------------+--------+-----------+
+  ;;      48               32                8         96
+  ;;
+  ;; The amount is a big-endian uint64 of gwei.
+
+  ;; Determine if the value provided is enough to cover the deposit request
+  ;; fee. Keep a copy of the fee for the stake check below.
+  dup1                  ;; [req_fee, req_fee]
+  callvalue             ;; [callvalue, req_fee, req_fee]
+  lt                    ;; [callvalue < req_fee, req_fee]
+  jumpi @revert         ;; [req_fee]
+
+  ;; Load the big-endian uint64 amount from input[80:88].
+  push 56               ;; [56, req_fee]
+  calldataload          ;; [input[56:88], req_fee]
+  push uint64_mask      ;; [mask, input[56:88], req_fee]
+  and                   ;; [amount, req_fee]
+
+  ;; Determine if the amount is at least the minimum deposit amount.
+  dup1                  ;; [amount, amount, req_fee]
+  push MIN_AMOUNT       ;; [min_amount, amount, amount, req_fee]
+  gt                    ;; [min_amount > amount, amount, req_fee]
+  jumpi @revert         ;; [amount, req_fee]
+
+  ;; Determine if the value provided beyond the fee covers the stake, i.e.
+  ;; callvalue - req_fee >= amount * 1 gwei. The subtraction cannot underflow
+  ;; (the fee check above passed) and the multiplication cannot overflow
+  ;; (amount < 2**64).
+  push GWEI             ;; [gwei, amount, req_fee]
+  mul                   ;; [amount_wei, req_fee]
+  swap1                 ;; [req_fee, amount_wei]
+  callvalue             ;; [callvalue, req_fee, amount_wei]
+  sub                   ;; [callvalue-req_fee, amount_wei]
+  lt                    ;; [callvalue-req_fee < amount_wei]
+  jumpi @revert         ;; []
+
+  ;; The request can pay, increment deposit request count.
+  push SLOT_COUNT
+  sload                 ;; [req_count]
+  push 1                ;; [1, req_count]
+  add                   ;; [req_count+1]
+  push SLOT_COUNT       ;; [slot, req_count+1]
+  sstore                ;; []
+
+  ;; Now insert request into queue. First, compute the base storage slot
+  push QUEUE_TAIL       ;; [tail_idx_slot]
+  sload                 ;; [tail_idx]
+  dup1                  ;; [tail_idx, tail_idx]
+  push SLOTS_PER_ITEM   ;; [slots, tail_idx, tail_idx]
+  mul                   ;; [slots*tail_idx, tail_idx]
+  push QUEUE_OFFSET     ;; [ost, slots*tail_idx, tail_idx]
+  add                   ;; [slot, tail_idx]
+
+  ;; Store pk[0:32] to queue.
+  push 0                ;; [0, slot, ..]
+  calldataload          ;; [pk[0:32], slot, ..]
+  dup2                  ;; [slot, pk[0:32], slot, ..]
+  sstore                ;; [slot, ..]
+
+  push 1                ;; [1, slot, ..]
+  add                   ;; [slot, ..]
+
+  ;; Store pk[32:48] ++ wc[0:16] to queue.
+  push 32               ;; [32, slot, ..]
+  calldataload          ;; [pk[32:48] ++ wc[0:16], slot, ..]
+  dup2                  ;; [slot, pk[32:48] ++ wc[0:16], slot, ..]
+  sstore                ;; [slot, ..]
+
+  push 1                ;; [1, slot, ..]
+  add                   ;; [slot, ..]
+
+  ;; Store wc[16:32] ++ amount ++ sig[0:8] to queue. The amount is stored
+  ;; big-endian, exactly as submitted; the read path converts it.
+  push 64               ;; [64, slot, ..]
+  calldataload          ;; [wc[16:32] ++ amount ++ sig[0:8], slot, ..]
+  dup2                  ;; [slot, wc[16:32] ++ amount ++ sig[0:8], slot, ..]
+  sstore                ;; [slot, ..]
+
+  push 1                ;; [1, slot, ..]
+  add                   ;; [slot, ..]
+
+  ;; Store sig[8:40] to queue.
+  push 96               ;; [96, slot, ..]
+  calldataload          ;; [sig[8:40], slot, ..]
+  dup2                  ;; [slot, sig[8:40], slot, ..]
+  sstore                ;; [slot, ..]
+
+  push 1                ;; [1, slot, ..]
+  add                   ;; [slot, ..]
+
+  ;; Store sig[40:72] to queue.
+  push 128              ;; [128, slot, ..]
+  calldataload          ;; [sig[40:72], slot, ..]
+  dup2                  ;; [slot, sig[40:72], slot, ..]
+  sstore                ;; [slot, ..]
+
+  push 1                ;; [1, slot, ..]
+  add                   ;; [slot, ..]
+
+  ;; Store sig[72:96] to queue. The calldataload reads past the end of the
+  ;; input, so the low 8 bytes are zero.
+  push 160              ;; [160, slot, ..]
+  calldataload          ;; [sig[72:96], slot, ..]
+  swap1                 ;; [slot, sig[72:96], ..]
+  sstore                ;; [..]
+
+  ;; Assemble log data: the input verbatim (the amount big-endian, as
+  ;; submitted).
+  push INPUT_SIZE       ;; [size, ..]
+  push 0                ;; [ost, size, ..]
+  push 0                ;; [dest, ost, size, ..]
+  calldatacopy          ;; [..]
+
+  ;; Log record.
+  push RECORD_SIZE      ;; [size, ..]
+  push 0                ;; [idx, size, ..]
+  log0                  ;; [..]
+
+  ;; Increment queue tail over last and write to storage.
+  push 1                ;; [1, tail_idx]
+  add                   ;; [tail_idx+1]
+  push QUEUE_TAIL       ;; [tail_idx_slot, tail_idx+1]
+  sstore                ;; []
+
+  stop
+
+;; ----------------------------------------------------------------------------
+;; SYSTEM SUBROUTINE ----------------------------------------------------------
+;; ----------------------------------------------------------------------------
+;;
+;; Pop request from queue, update fee accumulator ~~ This is the logic executed
+;; by the protocol each block. It reads as many requests as available from the
+;; queue, until the max request per block is reached. The requests are returned
+;; as a contiguous array of bytes with each record being exactly RECORD_SIZE
+;; bytes.
+;;
+;;  Deposit request record:
+;;
+;;  +--------+------------------------+--------+-----------+
+;;  | pubkey | withdrawal_credentials | amount | signature |
+;;  +--------+------------------------+--------+-----------+
+;;      48               32                8         96
+;;
+;; The amount is returned little-endian (the SSZ encoding the consensus layer
+;; decodes), converted from the big-endian value submitted on the write path.
+;;
+;; Because the requests are stored across SLOTS_PER_ITEM storage slots, there
+;; is some shuffling to align the data.
+;;
+;; After reading the requests, they are removed from the queue by modifying the
+;; queue's head index. The excess requests accumulator is updated so that the
+;; new cost of submitting a request is reflected. Finally, the request count is
+;; reset.
+read_requests:
+  ;; Determine the size of the queue by calculating tail - head.
+  push QUEUE_TAIL       ;; [tail_idx_slot]
+  sload                 ;; [tail_idx]
+  push QUEUE_HEAD       ;; [head_idx_slot, tail_idx]
+  sload                 ;; [head_idx, tail_idx]
+
+  ;; Now compute the count.
+  dup1                  ;; [head_idx, head_idx, tail_idx]
+  dup3                  ;; [tail_idx, head_idx, head_idx, tail_idx]
+  sub                   ;; [count, head_idx, tail_idx]
+
+  ;; Determine if count is greater than the max requests.
+  dup1                  ;; [count, count, head_idx, tail_idx]
+  push MAX_PER_BLOCK    ;; [reqs_per_block, count, count, head_idx, tail_idx]
+  gt                    ;; [reqs_per_block > count, count, head_idx, tail_idx]
+  jumpi @begin_loop     ;; [count, head_idx, tail_idx]
+
+  ;; Discard count, use the max requests per block.
+  pop                   ;; [head_idx, tail_idx]
+  push MAX_PER_BLOCK    ;; [count, head_idx, tail_idx]
+
+begin_loop:
+  push 0                ;; [i, count, head_idx, tail_idx]
+
+accum_loop:
+  ;; This loop will read each request and byte bang it into a RECORD_SIZE byte
+  ;; chunk.
+
+  ;; Bounds check, ensure i < count.
+  dup2                  ;; [count, i, count, head_idx, tail_idx]
+  dup2                  ;; [i, count, i, count, head_idx, tail_idx]
+  eq                    ;; [i == count, i, count, head_idx, tail_idx]
+  jumpi @update_head    ;; [i, count, head_idx, tail_idx]
+
+  ;; Determine the base storage slot for this iteration. The base slot will be
+  ;; (queue_offset + (queue_head + i)*6).
+  dup3                  ;; [head_idx, i, ..]
+  dup2                  ;; [i, head_idx, i, ..]
+  add                   ;; [i+head_idx, i, ..]
+  push SLOTS_PER_ITEM   ;; [6, i+head_idx, i, ..]
+  mul                   ;; [6*(i+head_idx), i, ..]
+  push QUEUE_OFFSET     ;; [offset, 6*(i+head_idx), i, ..]
+  add                   ;; [slotbase, i, ..]
+
+  ;; Write values to memory flat and contiguously. The record equals the six
+  ;; storage words written back to back, except that the amount (record bytes
+  ;; 80..88, stored big-endian in the middle of the third word) is re-stored
+  ;; little-endian.
+  ;;
+  ;; The slots have the following layout:
+  ;;
+  ;; 0: pk[0:32] -> pk1
+  ;;  0x00 | bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb
+  ;;  0x10 | bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb
+  ;;
+  ;; 1: pk[32:48] ++ wc[0:16] -> pk2_wc1
+  ;;  0x00 | bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb bb
+  ;;  0x10 | cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc
+  ;;
+  ;; 2: wc[16:32] ++ amount ++ sig[0:8] -> wc2_am_sg1
+  ;;  0x00 | cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc
+  ;;  0x10 | dd dd dd dd dd dd dd dd ee ee ee ee ee ee ee ee
+  ;;
+  ;; 3: sig[8:40] -> sg2
+  ;;  0x00 | ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee
+  ;;  0x10 | ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee
+  ;;
+  ;; 4: sig[40:72] -> sg3
+  ;;  0x00 | ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee
+  ;;  0x10 | ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee
+  ;;
+  ;; 5: sig[72:96] -> sg4
+  ;;  0x00 | ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee
+  ;;  0x10 | ee ee ee ee ee ee ee ee 00 00 00 00 00 00 00 00
+
+  ;; Compute the output offset = i*RECORD_SIZE.
+  dup2                  ;; [i, slotbase, i, ..]
+  push RECORD_SIZE      ;; [size, i, slotbase, i, ..]
+  mul                   ;; [offset=size*i, slotbase, i, ..]
+
+  ;; Read slot 'pk1' from storage.
+  dup2                  ;; [slotbase, offset, slotbase, ..]
+  sload                 ;; [pk1, offset, slotbase, ..]
+
+  ;; Store pk1 at output offset = i*RECORD_SIZE.
+  dup2                  ;; [offset, pk1, offset, slotbase, ..]
+  mstore                ;; [offset, slotbase, ..]
+  push 32               ;; [32, offset, slotbase, ..]
+  add                   ;; [offset=offset+32, slotbase, ..]
+
+  ;; Read slot 'pk2_wc1' from storage.
+  dup2                  ;; [slotbase, offset, slotbase, ..]
+  push 1                ;; [1, slotbase, offset, slotbase, ..]
+  add                   ;; [slot, offset, slotbase, ..]
+  sload                 ;; [pk2_wc1, offset, slotbase, ..]
+
+  ;; Store pk2_wc1 at output offset = i*RECORD_SIZE + 32.
+  dup2                  ;; [offset, pk2_wc1, offset, slotbase, ..]
+  mstore                ;; [offset, slotbase, ..]
+  push 32               ;; [32, offset, slotbase, ..]
+  add                   ;; [offset=offset+64, slotbase, ..]
+
+  ;; Read slot 'wc2_am_sg1' from storage.
+  dup2                  ;; [slotbase, offset, slotbase, ..]
+  push 2                ;; [2, slotbase, offset, slotbase, ..]
+  add                   ;; [slot, offset, slotbase, ..]
+  sload                 ;; [wc2_am_sg1, offset, slotbase, ..]
+
+  ;; Store wc2_am_sg1 at output offset = i*RECORD_SIZE + 64 (the amount still
+  ;; big-endian; it is overwritten little-endian just below).
+  dup1                  ;; [wc2_am_sg1, wc2_am_sg1, offset, slotbase, ..]
+  dup3                  ;; [offset, wc2_am_sg1, wc2_am_sg1, offset, slotbase, ..]
+  mstore                ;; [wc2_am_sg1, offset, slotbase, ..]
+
+  ;; Extract am from wc2_am_sg1.
+  push 8*8              ;; [shft, wc2_am_sg1, offset, slotbase, ..]
+  shr                   ;; [wc2_am, offset, slotbase, ..]
+  push uint64_mask      ;; [mask, wc2_am, offset, slotbase, ..]
+  and                   ;; [am, offset, slotbase, ..]
+
+  ;; Store am at output offset = i*RECORD_SIZE + 80.
+  ;; Note we convert to little-endian.
+  dup2                  ;; [offset, am, offset, slotbase, ..]
+  push 16               ;; [16, offset, am, offset, slotbase, ..]
+  add                   ;; [offset+16, am, offset, slotbase, ..]
+  %mstore_uint64_le()   ;; [offset, slotbase, ..]
+
+  push 32               ;; [32, offset, slotbase, ..]
+  add                   ;; [offset=offset+96, slotbase, ..]
+
+  ;; Read slot 'sg2' from storage.
+  dup2                  ;; [slotbase, offset, slotbase, ..]
+  push 3                ;; [3, slotbase, offset, slotbase, ..]
+  add                   ;; [slot, offset, slotbase, ..]
+  sload                 ;; [sg2, offset, slotbase, ..]
+
+  ;; Store sg2 at output offset = i*RECORD_SIZE + 96.
+  dup2                  ;; [offset, sg2, offset, slotbase, ..]
+  mstore                ;; [offset, slotbase, ..]
+  push 32               ;; [32, offset, slotbase, ..]
+  add                   ;; [offset=offset+128, slotbase, ..]
+
+  ;; Read slot 'sg3' from storage.
+  dup2                  ;; [slotbase, offset, slotbase, ..]
+  push 4                ;; [4, slotbase, offset, slotbase, ..]
+  add                   ;; [slot, offset, slotbase, ..]
+  sload                 ;; [sg3, offset, slotbase, ..]
+
+  ;; Store sg3 at output offset = i*RECORD_SIZE + 128.
+  dup2                  ;; [offset, sg3, offset, slotbase, ..]
+  mstore                ;; [offset, slotbase, ..]
+  push 32               ;; [32, offset, slotbase, ..]
+  add                   ;; [offset=offset+160, slotbase, ..]
+
+  ;; Read slot 'sg4' from storage. The low 8 bytes are zero (see the write
+  ;; path), so the word can be stored as-is; the next record (or the return
+  ;; size) overwrites or cuts the trailing zero bytes.
+  swap1                 ;; [slotbase, offset, ..]
+  push 5                ;; [5, slotbase, offset, ..]
+  add                   ;; [slot, offset, ..]
+  sload                 ;; [sg4, offset, ..]
+
+  ;; Store sg4 at output offset = i*RECORD_SIZE + 160.
+  swap1                 ;; [offset, sg4, ..]
+  mstore                ;; [..]
+
+  ;; Increment i.
+  push 1                ;; [1, i, ..]
+  add                   ;; [i+1, ..]
+
+  jump @accum_loop      ;; [i, count, head_idx, tail_idx]
+
+update_head:
+  ;; All requests have been read, update queue by adding the count read to the
+  ;; current head index.
+  swap2                 ;; [head_idx, count, count, tail_idx]
+  add                   ;; [new_head_idx, count, tail_idx]
+
+  ;; If the new head is equal to the tail, reset the queue by zeroing them both.
+  dup1                  ;; [new_head_idx, new_head_idx, count, tail_idx]
+  swap3                 ;; [tail_idx, new_head_idx, count, new_head_idx]
+  eq                    ;; [new_head_idx == tail_idx, count, new_head_idx]
+  jumpi @reset_queue    ;; [count, new_head_idx]
+
+  ;; Otherwise, write the new head to storage.
+  swap1                 ;; [new_head_idx, count]
+  push QUEUE_HEAD       ;; [head_idx_slot, new_head_idx, count]
+  sstore                ;; [count]
+
+  jump @update_excess   ;; [count]
+
+reset_queue:
+  ;; Since the queue is empty, both the head and tail indexes can be zeroed.
+  swap1                 ;; [new_head_idx, count]
+  pop                   ;; [count]
+
+  push 0                ;; [0, count]
+  push QUEUE_HEAD       ;; [head_slot, 0, count]
+  sstore                ;; [count]
+
+  push 0                ;; [0, count]
+  push QUEUE_TAIL       ;; [tail_slot, 0, count]
+  sstore                ;; [count]
+
+update_excess:
+  ;; Update the new excess deposit requests.
+  push SLOT_EXCESS      ;; [excess_slot, count]
+  sload                 ;; [excess, count]
+
+  ;; Check if excess needs to be reset to 0 for first iteration after
+  ;; activation.
+  dup1                  ;; [excess, excess, count]
+  push EXCESS_INHIBITOR ;; [inhibitor, excess, excess, count]
+  eq                    ;; [inhibitor == excess, excess, count]
+  iszero                ;; [inhibitor != excess, excess, count]
+  jumpi @skip_reset     ;; [excess, count]
+
+  ;; Drop the excess from stack and use 0.
+  pop                   ;; [count]
+  push 0                ;; [reset_excess, count]
+
+skip_reset:
+  push SLOT_COUNT       ;; [count_slot, excess, count]
+  sload                 ;; [count, excess, count]
+
+  ;; If the sum of the previous excess requests and requests added in the
+  ;; current block is greater than the target, subtract the target from the sum
+  ;; and set it as the new excess requests value.
+  push TARGET_PER_BLOCK ;; [target, count, excess, count]
+  dup3                  ;; [excess, target, count, excess, count]
+  dup3                  ;; [count, excess, target, count, excess, count]
+  add                   ;; [count+excess, target, count, excess, count]
+  gt                    ;; [count+excess > target, count, excess, count]
+  jumpi @compute_excess ;; [count, excess, count]
+
+  ;; Zero out excess.
+  pop                   ;; [excess, count]
+  pop                   ;; [count]
+  push 0                ;; [0, count]
+  jump @store_excess    ;; [0, count]
+
+compute_excess:
+  add                   ;; [count+excess, count]
+  push TARGET_PER_BLOCK ;; [target, count+excess, count]
+  swap1                 ;; [count+excess, target, count]
+  sub                   ;; [new_excess, count]
+
+store_excess:
+  push SLOT_EXCESS      ;; [excess_slot, new_excess, count]
+  sstore                ;; [count]
+
+  ;; Reset request count.
+  push 0                ;; [0, count]
+  push SLOT_COUNT       ;; [count_slot, 0, count]
+  sstore                ;; [count]
+
+  ;; Return the requests.
+  push RECORD_SIZE      ;; [record_size, count]
+  mul                   ;; [size]
+  push 0                ;; [0, size]
+  return                ;; []
+
+;; Revert subroutine.
+revert:
+  push 0
+  push 0
+  revert
+
+;; ----------------------------------------------------------------------------
+;; MACROS ---------------------------------------------------------------------
+;; ----------------------------------------------------------------------------
+
+;; This defines a mask for accessing the low 8 bytes of a number.
+#define uint64_mask = 0xffffffffffffffff
+
+;; Helper for storing little-endian amount.
+#define %mstore_uint64_le() { ;; [offset, value]
+  dup2                  ;; [value, offset, value]
+  push 7*8              ;; [56, value, offset, value]
+  shr                   ;; [value>>56, offset, value]
+  dup2                  ;; [offset, value>>56, offset, value]
+  push 7                ;; [7, offset, value>>56, offset, value]
+  add                   ;; [offset+7, value>>56, offset, value]
+  mstore8               ;; [offset, value]
+
+  dup2                  ;; [value, offset, value]
+  push 6*8              ;; [48, value, offset, value]
+  shr                   ;; [value>>48, offset, value]
+  dup2                  ;; [offset, value>>48, offset, value]
+  push 6                ;; [6, offset, value>>48, offset, value]
+  add                   ;; [offset+6, value>>48, offset, value]
+  mstore8               ;; [offset, value]
+
+  dup2                  ;; [value, offset, value]
+  push 5*8              ;; [40, value, offset, value]
+  shr                   ;; [value>>40, offset, value]
+  dup2                  ;; [offset, value>>40, offset, value]
+  push 5                ;; [5, offset, value>>40, offset, value]
+  add                   ;; [offset+5, value>>40, offset, value]
+  mstore8               ;; [offset, value]
+
+  dup2                  ;; [value, offset, value]
+  push 4*8              ;; [32, value, offset, value]
+  shr                   ;; [value>>32, offset, value]
+  dup2                  ;; [offset, value>>32, offset, value]
+  push 4                ;; [4, offset, value>>32, offset, value]
+  add                   ;; [offset+4, value>>32, offset, value]
+  mstore8               ;; [offset, value]
+
+  dup2                  ;; [value, offset, value]
+  push 3*8              ;; [24, value, offset, value]
+  shr                   ;; [value>>24, offset, value]
+  dup2                  ;; [offset, value>>24, offset, value]
+  push 3                ;; [3, offset, value>>24, offset, value]
+  add                   ;; [offset+3, value>>24, offset, value]
+  mstore8               ;; [offset, value]
+
+  dup2                  ;; [value, offset, value]
+  push 2*8              ;; [16, value, offset, value]
+  shr                   ;; [value>>16, offset, value]
+  dup2                  ;; [offset, value>>16, offset, value]
+  push 2                ;; [2, offset, value>>16, offset, value]
+  add                   ;; [offset+2, value>>16, offset, value]
+  mstore8               ;; [offset, value]
+
+  dup2                  ;; [value, offset, value]
+  push 1*8              ;; [8, value, offset, value]
+  shr                   ;; [value>>8, offset, value]
+  dup2                  ;; [offset, value>>8, offset, value]
+  push 1                ;; [1, offset, value>>8, offset, value]
+  add                   ;; [offset+1, value>>8, offset, value]
+  mstore8               ;; [offset, value]
+
+  mstore8               ;; []
+}

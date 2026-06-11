@@ -1,272 +1,439 @@
 // SPDX-License-Identifier: CC0-1.0
-pragma solidity 0.6.11;
+pragma solidity ^0.8.13;
 
-import "../builder_requests.sol";
-import "./TestHarness.sol";
+import "./Geas.sol";
 
 /// @dev Minimal subset of the Foundry cheatcode interface (avoids a forge-std
-/// dependency on this 0.6.11 project).
+/// dependency).
 interface Vm {
+    struct Log {
+        bytes32[] topics;
+        bytes data;
+        address emitter;
+    }
+
+    function etch(address, bytes calldata) external;
+    function store(address, bytes32, bytes32) external;
+    function load(address, bytes32) external view returns (bytes32);
     function prank(address) external;
     function deal(address, uint256) external;
+    function recordLogs() external;
+    function getRecordedLogs() external returns (Log[] memory);
 }
 
-/// @notice Tests for the EIP-7685 request-bus builder predeploys (deposit/top-up
-/// and exit), the EIP-1559-style request fee, and the EXCESS_INHIBITOR. Neither
-/// contract performs on-chain BLS verification, so no precompiles or fixtures are
-/// needed — the deposit's signature is opaque calldata carried into the record
-/// for the consensus layer to verify on dequeue.
-contract BuilderRequestsTest {
+address constant sysaddr = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
 
+// Storage layout shared by both predeploys (and by the EIP-7002/7251
+// contracts they are copied from).
+uint256 constant excess_slot = 0;
+uint256 constant count_slot = 1;
+uint256 constant queue_head_slot = 2;
+uint256 constant queue_tail_slot = 3;
+
+uint256 constant target_per_block = 2;
+uint256 constant max_per_block = 16;
+bytes32 constant inhibitor = bytes32(type(uint256).max);
+
+/// @notice Shared harness: assembles a predeploy from its geas source via FFI,
+/// etches it, and mirrors deployment by storing the excess inhibitor (the
+/// ctor's only job). Helpers model the activation system call, the fee getter,
+/// and the EIP-7002 fee curve.
+abstract contract RequestContractTest {
     Vm constant vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
-    address constant SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
 
-    uint constant DEPOSIT_RECORD_LEN = 184; // pubkey 48 + wc 32 + amount 8 + signature 96
-    uint constant EXIT_RECORD_LEN    = 68;  // source 20 + pubkey 48
+    address addr; // contract under test
 
-    BuilderDepositHarness internal dep;
-    BuilderExitHarness    internal ex;
+    // etchInhibited deploys the runtime code at `where` in its pre-fork state:
+    // code etched, excess set to the inhibitor (what ctor.eas stores).
+    function etchInhibited(address where, string memory path) internal {
+        vm.etch(where, Geas.compile(path));
+        vm.store(where, bytes32(excess_slot), inhibitor);
+        addr = where;
+    }
+
+    // getRequests makes a call to the contract as the system address in order
+    // to trigger a dequeue action. The first such call after deployment clears
+    // the excess inhibitor (the activation block's system call).
+    function getRequests() internal returns (bytes memory) {
+        vm.prank(sysaddr);
+        (bool ok, bytes memory data) = addr.call("");
+        require(ok, "system call failed");
+        return data;
+    }
+
+    // fee calls the fee getter (empty calldata, non-system caller).
+    function fee() internal returns (uint256) {
+        (bool ok, bytes memory data) = addr.call("");
+        require(ok, "fee getter failed");
+        return uint256(bytes32(data));
+    }
+
+    function load(uint256 slot) internal view returns (uint256) {
+        return uint256(vm.load(addr, bytes32(slot)));
+    }
+
+    // fakeExponential is the EIP-1559/EIP-7002 fee curve; the contract's fee
+    // must equal fakeExponential(1, excess, 17).
+    function fakeExponential(uint256 factor, uint256 numerator, uint256 denominator)
+        internal
+        pure
+        returns (uint256)
+    {
+        uint256 i = 1;
+        uint256 output = 0;
+        uint256 accum = factor * denominator;
+        while (accum > 0) {
+            output += accum;
+            accum = (accum * numerator) / (denominator * i);
+            i += 1;
+        }
+        return output / denominator;
+    }
+
+    // expectLog asserts that exactly one anonymous log carrying `data` was
+    // recorded since the last recordLogs().
+    function expectLog(bytes memory data) internal {
+        Vm.Log[] memory logs = vm.getRecordedLogs();
+        assertEq(logs.length, 1, "expected exactly one log");
+        assertEq(logs[0].topics.length, 0, "expected an anonymous log");
+        assertEq(logs[0].emitter, addr, "unexpected log emitter");
+        assertEq(logs[0].data, data, "unexpected log data");
+    }
+
+    function pattern(uint8 b, uint256 len) internal pure returns (bytes memory out) {
+        out = new bytes(len);
+        for (uint256 i = 0; i < len; i++) {
+            out[i] = bytes1(b);
+        }
+    }
+
+    function slice(bytes memory data, uint256 start, uint256 len) internal pure returns (bytes memory out) {
+        out = new bytes(len);
+        for (uint256 i = 0; i < len; i++) {
+            out[i] = data[start + i];
+        }
+    }
+
+    function assertEq(uint256 a, uint256 b, string memory err) internal pure {
+        require(a == b, err);
+    }
+
+    function assertEq(address a, address b, string memory err) internal pure {
+        require(a == b, err);
+    }
+
+    function assertEq(bytes memory a, bytes memory b, string memory err) internal pure {
+        require(keccak256(a) == keccak256(b), err);
+    }
+
+    function assertStorage(uint256 slot, uint256 value, string memory err) internal view {
+        require(load(slot) == value, err);
+    }
+}
+
+/// @notice Tests for the builder deposit request contract (request type 0x03).
+/// The input is the raw 184-byte (pubkey ++ withdrawal_credentials ++ amount ++
+/// signature) with the amount a big-endian uint64 of gwei; the dequeued record
+/// is the same bytes with the amount little-endian. No on-chain BLS: the
+/// signature is opaque calldata for the consensus layer to verify on dequeue.
+contract BuilderDepositTest is RequestContractTest {
+    uint256 constant record_size = 184;
+    uint64 constant min_amount = 1_000_000_000; // 1 ETH in gwei
+    bytes32 constant wc = 0x0300000000000000000000001111111111111111111111111111111111111111;
 
     function setUp() public {
-        dep = new BuilderDepositHarness();
-        ex  = new BuilderExitHarness();
-        // Each predeploy starts with excess == EXCESS_INHIBITOR (set in the
-        // constructor, as EIP-7002/7251 do at deployment). The activation-block
-        // system call clears the inhibitor; run it here so the fee/queue tests
-        // below operate on an active contract.
-        _systemRead(address(dep));
-        _systemRead(address(ex));
+        etchInhibited(0x0000000000000000000000000000000000007732, "src/deposits/main.eas");
+        getRequests(); // activation system call clears the inhibitor
     }
 
-    function _systemRead(address target) internal returns (bytes memory) {
-        vm.prank(SYSTEM_ADDRESS);
-        (bool ok, bytes memory ret) = target.call("");
-        require(ok, "system read reverted");
-        return ret;
+    function makeDeposit(bytes memory pubkey, uint64 amount) internal pure returns (bytes memory) {
+        return abi.encodePacked(pubkey, wc, amount, pattern(0xBB, 96));
     }
 
-    function _le64(uint64 v) internal pure returns (bytes memory r) {
-        r = new bytes(8);
-        for (uint i = 0; i < 8; i++) r[i] = bytes1(uint8(v >> (8 * i)));
+    // expectedRecord is the input with the amount (bytes 80..88) reversed into
+    // little-endian, as the system call must return it.
+    function expectedRecord(bytes memory input) internal pure returns (bytes memory out) {
+        out = bytes.concat(input);
+        for (uint256 i = 0; i < 8; i++) {
+            out[80 + i] = input[87 - i];
+        }
     }
 
-    function _filled(uint len, uint8 seed) internal pure returns (bytes memory b) {
-        b = new bytes(len);
-        for (uint i = 0; i < len; i++) b[i] = bytes1(uint8(uint(seed) + i));
+    function addDeposit(bytes memory input, uint256 value) internal {
+        vm.deal(address(this), value);
+        (bool ok,) = addr.call{value: value}(input);
+        require(ok, "deposit failed");
     }
-
-    // ── Deposit (request type 0x03): deposit + top-up, carries the signature ──
 
     function testDepositEnqueuesAndReads() public {
-        bytes memory pubkey = _filled(48, 1);
-        bytes32 wc = 0x0300000000000000000000000000000000000000000000000000000000abcdef;
-        bytes memory signature = _filled(96, 100);
-        uint64 amount_gwei = 2_000_000_000; // 2 ETH
+        bytes memory input = makeDeposit(pattern(0xAA, 48), min_amount);
+        uint256 value = uint256(min_amount) * 1 gwei + fee();
 
-        uint value = uint(amount_gwei) * 1 gwei + dep.feeWei();
-        dep.deposit{value: value}(pubkey, wc, amount_gwei, signature);
-        require(dep.pendingCount() == 1, "one record queued");
+        vm.recordLogs();
+        addDeposit(input, value);
+        expectLog(input); // the log carries the input verbatim (amount big-endian)
+        assertStorage(count_slot, 1, "unexpected request count");
 
-        bytes memory data = _systemRead(address(dep));
-        bytes memory expected = abi.encodePacked(pubkey, wc, _le64(amount_gwei), signature);
-        require(data.length == DEPOSIT_RECORD_LEN, "deposit record length");
-        require(keccak256(data) == keccak256(expected), "deposit record bytes mismatch");
-        require(dep.pendingCount() == 0, "queue drained");
+        bytes memory req = getRequests();
+        assertEq(req.length, record_size, "unexpected request_data length");
+        assertEq(req, expectedRecord(input), "unexpected record");
+        assertStorage(count_slot, 0, "count not reset");
+        assertStorage(queue_head_slot, 0, "head not reset");
+        assertStorage(queue_tail_slot, 0, "tail not reset");
+        assertEq(fee(), 1, "fee should remain at minimum below target");
     }
 
-    function testDepositRejectsTooSmallStake() public {
-        bytes memory pubkey = _filled(48, 1);
-        bytes memory signature = _filled(96, 100);
-        // 0.5 ETH stake (< 1 ETH minimum); ample value so the stake check, not
-        // the value check, is what reverts.
-        try dep.deposit{value: 1 ether}(pubkey, bytes32(0), 500_000_000, signature) {
-            require(false, "stake < 1 ether should revert");
-        } catch {}
-        require(dep.pendingCount() == 0, "nothing enqueued on reject");
+    function testDepositAmountConvertedToLittleEndian() public {
+        uint64 amount = 0x0102030405060708;
+        bytes memory input = makeDeposit(pattern(0xAA, 48), amount);
+        addDeposit(input, uint256(amount) * 1 gwei + 1);
+
+        bytes memory req = getRequests();
+        assertEq(slice(req, 80, 8), hex"0807060504030201", "amount not little-endian");
+        assertEq(slice(req, 0, 80), slice(input, 0, 80), "prefix not verbatim");
+        assertEq(slice(req, 88, 96), slice(input, 88, 96), "signature not verbatim");
     }
 
-    function testDepositRejectsInsufficientValue() public {
-        bytes memory pubkey = _filled(48, 1);
-        bytes memory signature = _filled(96, 100);
-        uint64 amount_gwei = 2_000_000_000;
-        // Exactly the stake, with nothing left for the fee: must revert.
-        try dep.deposit{value: uint(amount_gwei) * 1 gwei}(pubkey, bytes32(0), amount_gwei, signature) {
-            require(false, "stake without fee should revert");
-        } catch {}
-        require(dep.pendingCount() == 0, "nothing enqueued on reject");
+    function testDepositRejectsAmountBelowMinimum() public {
+        bytes memory input = makeDeposit(pattern(0xAA, 48), min_amount - 1);
+        vm.deal(address(this), 2 ether);
+        (bool ok,) = addr.call{value: 2 ether}(input);
+        assertEq(ok ? 1 : 0, 0, "expected below-minimum amount to revert");
+        assertStorage(count_slot, 0, "nothing should be enqueued");
     }
 
-    function testDepositRejectsWrongPubkeyLength() public {
-        bytes memory pubkey = _filled(47, 1);
-        bytes memory signature = _filled(96, 100);
-        try dep.deposit{value: 2 ether}(pubkey, bytes32(0), 1_000_000_000, signature) {
-            require(false, "47-byte pubkey should revert");
-        } catch {}
-        require(dep.pendingCount() == 0, "nothing enqueued on reject");
+    function testDepositRejectsValueBelowStakePlusFee() public {
+        bytes memory input = makeDeposit(pattern(0xAA, 48), min_amount);
+        vm.deal(address(this), 4 ether);
+
+        // value == stake leaves nothing for the fee (fee is 1 wei here).
+        (bool ok,) = addr.call{value: 1 ether}(input);
+        assertEq(ok ? 1 : 0, 0, "expected stake-only value to revert");
+
+        // value == 0 fails the fee check itself.
+        (ok,) = addr.call{value: 0}(input);
+        assertEq(ok ? 1 : 0, 0, "expected zero value to revert");
+        assertStorage(count_slot, 0, "nothing should be enqueued");
+
+        // value == stake + fee succeeds.
+        (ok,) = addr.call{value: 1 ether + 1}(input);
+        assertEq(ok ? 1 : 0, 1, "expected exact stake + fee to succeed");
+        assertStorage(count_slot, 1, "expected one request");
     }
 
-    function testDepositRejectsWrongSignatureLength() public {
-        bytes memory pubkey = _filled(48, 1);
-        bytes memory signature = _filled(95, 100);
-        try dep.deposit{value: 2 ether}(pubkey, bytes32(0), 1_000_000_000, signature) {
-            require(false, "95-byte signature should revert");
-        } catch {}
-        require(dep.pendingCount() == 0, "nothing enqueued on reject");
+    function testDepositRejectsBadInputSize() public {
+        bytes memory input = makeDeposit(pattern(0xAA, 48), min_amount);
+        vm.deal(address(this), 8 ether);
+
+        // one byte short
+        (bool ok,) = addr.call{value: 2 ether}(slice(input, 0, 183));
+        assertEq(ok ? 1 : 0, 0, "183 bytes should revert");
+
+        // one byte long
+        (ok,) = addr.call{value: 2 ether}(bytes.concat(input, hex"00"));
+        assertEq(ok ? 1 : 0, 0, "185 bytes should revert");
+
+        // ABI-style call (4-byte selector prefix)
+        (ok,) = addr.call{value: 2 ether}(bytes.concat(hex"deadbeef", input));
+        assertEq(ok ? 1 : 0, 0, "selector-prefixed input should revert");
+
+        assertStorage(count_slot, 0, "nothing should be enqueued");
     }
 
-    // ── Exit (request type 0x04) ───────────────────────────────────────────
+    function testFeeGetterRejectsValue() public {
+        vm.deal(address(this), 1 ether);
+        (bool ok,) = addr.call{value: 1}("");
+        assertEq(ok ? 1 : 0, 0, "fee getter must reject callvalue");
+    }
+
+    function testQueueCapFifoAndReset() public {
+        // Enqueue one more deposit than the per-block cap.
+        for (uint256 i = 0; i < max_per_block + 1; i++) {
+            addDeposit(makeDeposit(pattern(uint8(i + 1), 48), min_amount), 1 ether + 1);
+        }
+        assertStorage(count_slot, max_per_block + 1, "unexpected request count");
+
+        // First system read drains exactly the cap, FIFO.
+        bytes memory req = getRequests();
+        assertEq(req.length, max_per_block * record_size, "expected capped read");
+        for (uint256 i = 0; i < max_per_block; i++) {
+            assertEq(
+                slice(req, i * record_size, 48),
+                pattern(uint8(i + 1), 48),
+                "records not FIFO"
+            );
+        }
+        assertStorage(queue_head_slot, max_per_block, "unexpected head");
+        assertStorage(queue_tail_slot, max_per_block + 1, "unexpected tail");
+        assertStorage(excess_slot, max_per_block + 1 - target_per_block, "unexpected excess");
+
+        // Second read returns the remainder and resets the queue.
+        req = getRequests();
+        assertEq(req.length, record_size, "expected single remaining record");
+        assertEq(slice(req, 0, 48), pattern(uint8(max_per_block + 1), 48), "wrong remaining record");
+        assertStorage(queue_head_slot, 0, "head not reset");
+        assertStorage(queue_tail_slot, 0, "tail not reset");
+
+        // The queue is reusable after the reset.
+        addDeposit(makeDeposit(pattern(0xEE, 48), min_amount), 1 ether + fee());
+        assertStorage(queue_tail_slot, 1, "queue not reusable after reset");
+    }
+
+    function testFeeMatchesFakeExponentialAndDecays() public {
+        for (uint256 i = 0; i < 18; i++) {
+            addDeposit(makeDeposit(pattern(uint8(i + 1), 48), min_amount), 1 ether + 1);
+        }
+        getRequests();
+        // excess = 0 + 18 - 2 = 16
+        assertStorage(excess_slot, 16, "unexpected excess");
+        assertEq(fee(), fakeExponential(1, 16, 17), "fee does not match curve");
+
+        // With no new requests, each system call decays excess by the target.
+        getRequests();
+        getRequests(); // drains the 2 remaining records
+        assertStorage(excess_slot, 12, "excess should decay by target per block");
+        getRequests();
+        assertStorage(excess_slot, 10, "excess should keep decaying");
+    }
+
+    function testInhibitorBlocksRequestsUntilFirstSystemCall() public {
+        // A freshly deployed (not yet activated) instance.
+        etchInhibited(0x0000000000000000000000000000000000007734, "src/deposits/main.eas");
+        vm.deal(address(this), 2 ether);
+
+        (bool ok,) = addr.call("");
+        assertEq(ok ? 1 : 0, 0, "fee getter must revert while inhibited");
+
+        (ok,) = addr.call{value: 1 ether + 1}(makeDeposit(pattern(0xAA, 48), min_amount));
+        assertEq(ok ? 1 : 0, 0, "deposit must revert while inhibited");
+
+        // The first system call clears the inhibitor.
+        getRequests();
+        assertStorage(excess_slot, 0, "inhibitor not cleared");
+        assertEq(fee(), 1, "fee should be at minimum after activation");
+    }
+
+    function testSystemCallDrainsRegardlessOfCalldata() public {
+        addDeposit(makeDeposit(pattern(0xAA, 48), min_amount), 1 ether + 1);
+
+        // The caller check runs before the calldata dispatch.
+        vm.prank(sysaddr);
+        (bool ok, bytes memory data) = addr.call(hex"01");
+        require(ok, "system call failed");
+        assertEq(data.length, record_size, "system call should drain the queue");
+    }
+
+    receive() external payable {}
+}
+
+/// @notice Tests for the builder exit request contract (request type 0x04).
+/// The input is the raw 48-byte builder pubkey; the dequeued record is
+/// (source_address ++ pubkey), where source_address is the caller.
+contract BuilderExitTest is RequestContractTest {
+    uint256 constant record_size = 68;
+
+    function setUp() public {
+        etchInhibited(0x0000000000000000000000000000000000007733, "src/exits/main.eas");
+        getRequests(); // activation system call clears the inhibitor
+    }
 
     function testExitEnqueuesAndReads() public {
-        bytes memory pubkey = _filled(48, 1);
-        ex.exit{value: ex.feeWei()}(pubkey);
-        require(ex.pendingCount() == 1, "one exit queued");
+        bytes memory pubkey = pattern(0xAB, 48);
+        bytes memory record = abi.encodePacked(address(this), pubkey);
 
-        bytes memory data = _systemRead(address(ex));
-        bytes memory expected = abi.encodePacked(address(this), pubkey);
-        require(data.length == EXIT_RECORD_LEN, "exit record length");
-        require(keccak256(data) == keccak256(expected), "exit record bytes mismatch");
-        require(ex.pendingCount() == 0, "queue drained");
+        vm.recordLogs();
+        vm.deal(address(this), 1 ether);
+        (bool ok,) = addr.call{value: fee()}(pubkey);
+        require(ok, "exit failed");
+        expectLog(record);
+        assertStorage(count_slot, 1, "unexpected request count");
+
+        bytes memory req = getRequests();
+        assertEq(req.length, record_size, "unexpected request_data length");
+        assertEq(req, record, "unexpected record");
+        assertStorage(count_slot, 0, "count not reset");
+        assertStorage(queue_head_slot, 0, "head not reset");
+        assertStorage(queue_tail_slot, 0, "tail not reset");
     }
 
-    // The recorded source_address is the caller (the builder's execution_address),
-    // which is what the CL checks for authorization. Fee is read before
-    // `vm.prank` so the prank applies to `exit`, not to the `feeWei()` call.
     function testExitRecordsCaller() public {
-        address builderExecAddr = 0xb0b1DE7c0fFeE0000000000000000000000B5511;
-        bytes memory pubkey = _filled(48, 7);
-        uint fee = ex.feeWei();
-        vm.deal(builderExecAddr, 1 ether);
-        vm.prank(builderExecAddr);
-        ex.exit{value: fee}(pubkey);
+        address caller = 0xCAfEcAfeCAfECaFeCaFecaFecaFECafECafeCaFe;
+        bytes memory pubkey = pattern(0xCD, 48);
 
-        bytes memory data = _systemRead(address(ex));
-        bytes memory expected = abi.encodePacked(builderExecAddr, pubkey);
-        require(keccak256(data) == keccak256(expected), "source_address must be the caller");
+        vm.deal(caller, 1 ether);
+        vm.prank(caller);
+        (bool ok,) = addr.call{value: 1}(pubkey);
+        require(ok, "exit failed");
+
+        bytes memory req = getRequests();
+        assertEq(address(bytes20(slice(req, 0, 20))), caller, "source_address must be the caller");
+        assertEq(slice(req, 20, 48), pubkey, "unexpected pubkey");
+    }
+
+    function testExitRejectsBadInputSize() public {
+        vm.deal(address(this), 1 ether);
+
+        (bool ok,) = addr.call{value: 1}(pattern(0xAB, 47));
+        assertEq(ok ? 1 : 0, 0, "47 bytes should revert");
+
+        (ok,) = addr.call{value: 1}(pattern(0xAB, 49));
+        assertEq(ok ? 1 : 0, 0, "49 bytes should revert");
+
+        (ok,) = addr.call{value: 1}(bytes.concat(hex"deadbeef", pattern(0xAB, 48)));
+        assertEq(ok ? 1 : 0, 0, "selector-prefixed input should revert");
+
+        assertStorage(count_slot, 0, "nothing should be enqueued");
     }
 
     function testExitRejectsInsufficientFee() public {
-        bytes memory pubkey = _filled(48, 1);
-        // excess == 0 → fee is 1 wei; sending 0 cannot cover it.
-        try ex.exit{value: 0}(pubkey) {
-            require(false, "exit below the fee should revert");
-        } catch {}
-        require(ex.pendingCount() == 0, "nothing enqueued on reject");
+        (bool ok,) = addr.call{value: 0}(pattern(0xAB, 48));
+        assertEq(ok ? 1 : 0, 0, "expected zero-fee exit to revert");
+        assertStorage(count_slot, 0, "nothing should be enqueued");
     }
 
-    function testExitRejectsWrongPubkeyLength() public {
-        bytes memory pubkey = _filled(47, 1);
-        try ex.exit{value: ex.feeWei()}(pubkey) {
-            require(false, "47-byte pubkey should revert");
-        } catch {}
-        require(ex.pendingCount() == 0, "nothing enqueued on reject");
+    function testFeeGetterRejectsValue() public {
+        vm.deal(address(this), 1 ether);
+        (bool ok,) = addr.call{value: 1}("");
+        assertEq(ok ? 1 : 0, 0, "fee getter must reject callvalue");
     }
 
-    // ── EIP-1559-style request fee ─────────────────────────────────────────
-
-    function testFeeStartsAtMinimum() public {
-        require(dep.feeWei() == 1, "min fee is 1 wei at excess 0");
-        require(ex.feeWei() == 1, "min fee is 1 wei at excess 0");
-    }
-
-    function testFeeRisesWithExcess() public {
-        // 18 exits in one block → count 18. The next system call sets
-        // excess = 18 - TARGET(2) = 16, and fake_exponential(1, 16, 17) == 2.
-        bytes memory pubkey = _filled(48, 1);
-        for (uint i = 0; i < 18; i++) {
-            ex.exit{value: ex.feeWei()}(pubkey);
+    function testQueueCapAndFifo() public {
+        vm.deal(address(this), 1 ether);
+        for (uint256 i = 0; i < max_per_block + 1; i++) {
+            (bool ok,) = addr.call{value: 1}(pattern(uint8(i + 1), 48));
+            require(ok, "exit failed");
         }
-        require(ex.feeWei() == 1, "fee unchanged until the system call updates excess");
-        _systemRead(address(ex));
-        require(ex.feeWei() == 2, "fee rises after a block above target");
-    }
 
-    function testFeeGetterFallbackMatches() public {
-        (bool ok, bytes memory ret) = address(ex).call("");
-        require(ok, "fee getter call failed");
-        require(ret.length == 32, "fee getter returns a word");
-        require(abi.decode(ret, (uint)) == ex.feeWei(), "fee getter mismatch");
-    }
-
-    // ── System read access control + FIFO / per-block cap ──────────────────
-
-    function testSystemReadRequiresSystemAddress() public {
-        bytes memory pubkey = _filled(48, 1);
-        ex.exit{value: ex.feeWei()}(pubkey);
-        (bool ok, ) = address(ex).call("");
-        require(ok, "fee getter should succeed");
-        require(ex.pendingCount() == 1, "non-system call must not drain the queue");
-    }
-
-    function testPerBlockCapAndFifo() public {
-        bytes memory pubkey = _filled(48, 1);
-        for (uint i = 0; i < 17; i++) {
-            ex.exit{value: ex.feeWei()}(pubkey);
+        bytes memory req = getRequests();
+        assertEq(req.length, max_per_block * record_size, "expected capped read");
+        for (uint256 i = 0; i < max_per_block; i++) {
+            assertEq(
+                slice(req, i * record_size + 20, 48),
+                pattern(uint8(i + 1), 48),
+                "records not FIFO"
+            );
         }
-        require(ex.pendingCount() == 17, "17 queued");
 
-        bytes memory first = _systemRead(address(ex));
-        require(first.length == 16 * EXIT_RECORD_LEN, "first read drains the 16-record cap");
-        require(ex.pendingCount() == 1, "one remains after cap");
-
-        bytes memory second = _systemRead(address(ex));
-        require(second.length == 1 * EXIT_RECORD_LEN, "second read drains the remainder");
-        require(ex.pendingCount() == 0, "queue empty");
+        req = getRequests();
+        assertEq(req.length, record_size, "expected single remaining record");
+        assertStorage(queue_head_slot, 0, "head not reset");
+        assertStorage(queue_tail_slot, 0, "tail not reset");
     }
 
-    // When the queue fully drains, both head and tail reset to 0 (EIP-7002
-    // behavior), so storage is bounded by peak depth and the next request reuses
-    // index 0.
-    function testQueueResetsWhenDrained() public {
-        bytes memory pubkey = _filled(48, 1);
-        for (uint i = 0; i < 3; i++) {
-            ex.exit{value: ex.feeWei()}(pubkey);
-        }
-        require(ex.headIdx() == 0 && ex.tailIdx() == 3, "3 queued at indices [0,3)");
+    function testInhibitorBlocksRequestsUntilFirstSystemCall() public {
+        etchInhibited(0x0000000000000000000000000000000000007735, "src/exits/main.eas");
+        vm.deal(address(this), 1 ether);
 
-        _systemRead(address(ex)); // drains all 3 (<= cap)
-        require(ex.headIdx() == 0 && ex.tailIdx() == 0, "head and tail reset to 0 on empty");
-        require(ex.pendingCount() == 0, "queue empty");
+        (bool ok,) = addr.call("");
+        assertEq(ok ? 1 : 0, 0, "fee getter must revert while inhibited");
 
-        ex.exit{value: ex.feeWei()}(pubkey);
-        require(ex.tailIdx() == 1, "tail restarts at 1 (slot reused)");
+        (ok,) = addr.call{value: 1}(pattern(0xAB, 48));
+        assertEq(ok ? 1 : 0, 0, "exit must revert while inhibited");
+
+        getRequests();
+        assertStorage(excess_slot, 0, "inhibitor not cleared");
+        assertEq(fee(), 1, "fee should be at minimum after activation");
     }
 
-    // The fallback only accepts empty calldata.
-    function testFallbackRejectsNonEmptyCalldata() public {
-        (bool ok, ) = address(ex).call(hex"deadbeefdeadbeef");
-        require(!ok, "non-empty junk calldata must revert");
-        (bool ok2, ) = address(ex).call("");
-        require(ok2, "empty-calldata fee getter still works");
-    }
-
-    // ── EXCESS_INHIBITOR (pre-activation), as in EIP-7002/7251 ─────────────
-
-    // A freshly deployed contract starts inhibited (excess == EXCESS_INHIBITOR),
-    // so the fee getter reverts until the first system call. setUp() already
-    // activated dep/ex, so these tests use a fresh instance.
-    function testFeeGetterRevertsWhileInhibited() public {
-        BuilderExitHarness fresh = new BuilderExitHarness();
-        try fresh.feeWei() {
-            require(false, "fee getter must revert while inhibited");
-        } catch {}
-    }
-
-    // No request can be enqueued before activation: the entrypoint reverts when
-    // it reads the inhibited fee, even with ample value; nothing is queued.
-    function testRequestRevertsWhileInhibited() public {
-        BuilderExitHarness fresh = new BuilderExitHarness();
-        bytes memory pubkey = _filled(48, 1);
-        try fresh.exit{value: 1 ether}(pubkey) {
-            require(false, "request must revert while inhibited");
-        } catch {}
-        require(fresh.pendingCount() == 0, "nothing enqueued while inhibited");
-    }
-
-    // The first SYSTEM_ADDRESS call clears the inhibitor; the fee is then
-    // MIN_REQUEST_FEE (excess == 0).
-    function testFirstSystemCallClearsInhibitor() public {
-        BuilderExitHarness fresh = new BuilderExitHarness();
-        _systemRead(address(fresh));
-        require(fresh.feeWei() == 1, "fee is MIN_REQUEST_FEE once the inhibitor clears");
-    }
+    receive() external payable {}
 }
