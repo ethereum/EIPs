@@ -247,9 +247,11 @@ contract BuilderDepositTest is RequestContractTest {
     }
 
     function testQueueCapFifoAndReset() public {
+        bytes[] memory inputs = new bytes[](max_per_block + 1);
         // Enqueue one more deposit than the per-block cap.
         for (uint256 i = 0; i < max_per_block + 1; i++) {
-            addDeposit(makeDeposit(pattern(uint8(i + 1), 48), min_amount), 1 ether + 1);
+            inputs[i] = makeDeposit(pattern(uint8(i + 1), 48), min_amount);
+            addDeposit(inputs[i], 1 ether + 1);
         }
         assertStorage(count_slot, max_per_block + 1, "unexpected request count");
 
@@ -257,11 +259,10 @@ contract BuilderDepositTest is RequestContractTest {
         bytes memory req = getRequests();
         assertEq(req.length, max_per_block * record_size, "expected capped read");
         for (uint256 i = 0; i < max_per_block; i++) {
-            assertEq(
-                slice(req, i * record_size, 48),
-                pattern(uint8(i + 1), 48),
-                "records not FIFO"
-            );
+            uint256 offset = i * record_size;
+            assertEq(slice(req, offset + 80, 8), hex"00CA9A3B00000000", "amount not little-endian");
+            assertEq(slice(req, offset, 80), slice(inputs[i], 0, 80), "prefix not verbatim");
+            assertEq(slice(req, offset + 88, 96), slice(inputs[i], 88, 96), "signature not verbatim");
         }
         assertStorage(queue_head_slot, max_per_block, "unexpected head");
         assertStorage(queue_tail_slot, max_per_block + 1, "unexpected tail");
