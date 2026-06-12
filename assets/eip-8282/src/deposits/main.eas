@@ -66,7 +66,7 @@
   ;; --------------------------------------------------------------------------
 
   ;; Compute the fee using fake expo and the current excess deposit requests.
-  push FEE_UPDATE_FRACTION
+  push FEE_UPDATE_FRACTION ;; [update_fraction]
   push SLOT_EXCESS      ;; [excess_slot, update_fraction]
   sload                 ;; [excess, update_fraction]
 
@@ -78,6 +78,7 @@
 
   push MIN_FEE          ;; [min_fee, excess, update_fraction]
   #include "../common/fake_expo.eas"
+                        ;; [req_fee]
 
   ;; If calldatasize matches the expected input size, go to adding the request.
   calldatasize          ;; [calldatasize, req_fee]
@@ -144,7 +145,7 @@ handle_input:
   jumpi @revert         ;; []
 
   ;; The request can pay, increment deposit request count.
-  push SLOT_COUNT
+  push SLOT_COUNT       ;; [count_slot]
   sload                 ;; [req_count]
   push 1                ;; [1, req_count]
   add                   ;; [req_count+1]
@@ -525,8 +526,8 @@ store_excess:
 
 ;; Revert subroutine.
 revert:
-  push 0
-  push 0
+  push 0                ;; [0, ..]
+  push 0                ;; [0, 0, ..]
   revert
 
 ;; ----------------------------------------------------------------------------
