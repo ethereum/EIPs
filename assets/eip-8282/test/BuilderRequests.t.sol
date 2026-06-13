@@ -129,6 +129,25 @@ abstract contract RequestContractTest {
     function assertStorage(uint256 slot, uint256 value, string memory err) internal view {
         require(load(slot) == value, err);
     }
+
+    // non-palindromic amount per record; all >> the 1 ETH minimum.
+    function amountFor(uint256 i) internal pure returns (uint64) {
+        return uint64(0x0102030405060700 + i);
+    }
+
+    // makeDeposit with every field distinct per record index.
+    function makeDistinctDeposit(uint256 i) internal pure returns (bytes memory) {
+        bytes32 wc_i = bytes32(
+            (uint256(0x03) << 248)
+                | uint256(uint160(0x1111111111111111111111111111111111111111) + uint160(i))
+        );
+        return abi.encodePacked(
+            pattern(uint8(i + 1), 48),
+            wc_i,
+            amountFor(i),
+            pattern(uint8(0xB0 + i), 96)
+        );
+    }
 }
 
 /// @notice Tests for the builder deposit request contract (request type 0x03).
@@ -247,9 +266,11 @@ contract BuilderDepositTest is RequestContractTest {
     }
 
     function testQueueCapFifoAndReset() public {
+        bytes[] memory inputs = new bytes[](max_per_block + 1);
         // Enqueue one more deposit than the per-block cap.
         for (uint256 i = 0; i < max_per_block + 1; i++) {
-            addDeposit(makeDeposit(pattern(uint8(i + 1), 48), min_amount), 1 ether + 1);
+            inputs[i] = makeDistinctDeposit(i);
+            addDeposit(inputs[i], uint256(amountFor(i)) * 1 gwei + 1);
         }
         assertStorage(count_slot, max_per_block + 1, "unexpected request count");
 
@@ -257,11 +278,7 @@ contract BuilderDepositTest is RequestContractTest {
         bytes memory req = getRequests();
         assertEq(req.length, max_per_block * record_size, "expected capped read");
         for (uint256 i = 0; i < max_per_block; i++) {
-            assertEq(
-                slice(req, i * record_size, 48),
-                pattern(uint8(i + 1), 48),
-                "records not FIFO"
-            );
+            assertEq(expectedRecord(inputs[i]), slice(req, record_size * i, record_size), "record mismatch");
         }
         assertStorage(queue_head_slot, max_per_block, "unexpected head");
         assertStorage(queue_tail_slot, max_per_block + 1, "unexpected tail");
@@ -270,7 +287,7 @@ contract BuilderDepositTest is RequestContractTest {
         // Second read returns the remainder and resets the queue.
         req = getRequests();
         assertEq(req.length, record_size, "expected single remaining record");
-        assertEq(slice(req, 0, 48), pattern(uint8(max_per_block + 1), 48), "wrong remaining record");
+        assertEq(req, expectedRecord(inputs[max_per_block]), "wrong remaining record");
         assertStorage(queue_head_slot, 0, "head not reset");
         assertStorage(queue_tail_slot, 0, "tail not reset");
 
@@ -398,9 +415,17 @@ contract BuilderExitTest is RequestContractTest {
     }
 
     function testQueueCapAndFifo() public {
-        vm.deal(address(this), 1 ether);
+        // Distinct caller (source_address) and pubkey per record, so the full
+        // 68 bytes of every record are pinned per index.
+        bytes[] memory records = new bytes[](max_per_block + 1);
         for (uint256 i = 0; i < max_per_block + 1; i++) {
-            (bool ok,) = addr.call{value: 1}(pattern(uint8(i + 1), 48));
+            address caller = address(uint160(0xA000 + i));
+            bytes memory pubkey = pattern(uint8(i + 1), 48);
+            records[i] = abi.encodePacked(caller, pubkey);
+
+            vm.deal(caller, 1 ether);
+            vm.prank(caller);
+            (bool ok,) = addr.call{value: 1}(pubkey);
             require(ok, "exit failed");
         }
 
@@ -408,14 +433,15 @@ contract BuilderExitTest is RequestContractTest {
         assertEq(req.length, max_per_block * record_size, "expected capped read");
         for (uint256 i = 0; i < max_per_block; i++) {
             assertEq(
-                slice(req, i * record_size + 20, 48),
-                pattern(uint8(i + 1), 48),
-                "records not FIFO"
+                slice(req, i * record_size, record_size),
+                records[i],
+                "full record mismatch in capped drain"
             );
         }
 
         req = getRequests();
         assertEq(req.length, record_size, "expected single remaining record");
+        assertEq(req, records[max_per_block], "full record mismatch (remainder)");
         assertStorage(queue_head_slot, 0, "head not reset");
         assertStorage(queue_tail_slot, 0, "tail not reset");
     }
