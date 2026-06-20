@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Post-Quantum Keystore for Stateful Hash-Based Keys
 description: A keystore format for XMSS and other consumable signing keys, defining state authority, durability ordering, and safe import/export.
-author: Parthasarathy Ramanujam (@ch4r10t33r), Anshal Shukla (@anshalshukla), Gajinder Singh (@g11tech),  Guillaume Ballet (@gballet), Shariq Naiyer (@shariqnaiyer), Kolby Moroz Liebl (@KolbyML), Unnawut Leepaisalsuwanna (@unnawut), Tom Wambsgans (@tomWambsgans), Thomas Coratger (@tcoratger), Justin Drake (@JustinDrake)
+author: Anshal Shukla (@anshalshukla), Benedikt Wagner (@benedikt-wagner), Gajinder Singh (@g11tech), Guillaume Ballet (@gballet), Justin Drake (@JustinDrake), Kolby Moroz Liebl (@KolbyML), Parthasarathy Ramanujam (@ch4r10t33r), Shariq Naiyer (@shariqnaiyer), Thomas Coratger (@tcoratger), Tom Wambsgans (@tomWambsgans), Unnawut Leepaisalsuwanna (@unnawut)
 discussions-to: <URL of the Ethereum Magicians thread>
 status: Draft
 type: Standards Track
@@ -15,7 +15,7 @@ requires: 2334, 2335, 3076
 
 This standard defines a keystore format for **stateful hash-based signing keys**, specifically XMSS as used by the lean Ethereum consensus layer (hereafter `leanxmss`). It extends [EIP-2335](./eip-2335.md) so that the encrypted secret may be an XMSS seed and adds the machinery a *consumable* key requires: an explicit scheme-parameter block, a non-authoritative capacity snapshot, normative rules for where the authoritative signing state lives, a commit-before-sign durability requirement, reserved leaf ranges for concurrent signers, and import/export semantics that forbid silently resetting a key's signing position.
 
-The encryption upgrades (AES-256, AEAD) are minor. The substance of this EIP is **state management**, because an XMSS key is destroyed by leaf reuse and the existing keystore model assumes keys are immutable, freely copyable, and restore-safe — three assumptions that are unsafe for consumable keys.
+The encryption upgrades (AES-256, AEAD) are minor. The substance of this EIP is **state management**, because an XMSS key is destroyed by leaf reuse and the existing keystore model assumes keys are immutable, freely copyable, and restore-safe, three assumptions that are unsafe for consumable keys.
 
 ## Motivation
 
@@ -35,12 +35,12 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHOULD", "SHOULD NOT", and "MAY" 
 
 ### 1. Terminology
 
-- **Consumable key** — a signing key whose security depends on never reusing an index (e.g. XMSS, LMS). Contrast with *reusable* keys (ECDSA, BLS).
-- **Leaf index** — the position of the one-time key consumed by a signature.
-- **High-water mark** — the highest leaf index that has been (or is reserved as) consumed. Signing is permitted only strictly above it.
-- **Authoritative state** — the single source of truth for the high-water mark that a signer consults and advances. It is NOT the keystore file.
-- **Synchronized mode** — leaf index is a deterministic function of consensus position (`leaf = f(epoch)` or `f(slot)`); state authority is the slashing-protection database.
-- **Counter mode** — leaf index is a free-running counter not bound to consensus position (e.g. off-protocol signing); state authority is a dedicated atomically-updated store.
+- **Consumable key**: a signing key whose security depends on never reusing an index (e.g. XMSS, LMS). Contrast with *reusable* keys (ECDSA, BLS).
+- **Leaf index**: the position of the one-time key consumed by a signature.
+- **High-water mark**: the highest leaf index that has been (or is reserved as) consumed. Signing is permitted only strictly above it.
+- **Authoritative state**: the single source of truth for the high-water mark that a signer consults and advances. It is NOT the keystore file.
+- **Synchronized mode**: leaf index is a deterministic function of consensus position (`leaf = f(epoch)` or `f(slot)`); state authority is the slashing-protection database.
+- **Counter mode**: leaf index is a free-running counter not bound to consensus position (e.g. off-protocol signing); state authority is a dedicated atomically-updated store.
 
 ### 2. File format
 
@@ -63,20 +63,32 @@ These are precautionary against Grover and do not affect the consumable-key sema
 "scheme": {
   "name": "leanxmss",
   "params": {
-    "hash": "<hash identifier>",
-    "tree_height": 20,
+    "hash": "poseidon1-koalabear",
+    "tree_height": 32,
     "hypertree_layers": 1,
-    "winternitz_w": 16,
+    "encoding": "target_sum",
+    "winternitz_w": 8,
+    "dimension": 46,
+    "target_sum": 200,
     "index_mode": "synchronized",
     "activation_epoch": 0,
-    "lifetime_leaves": 1048576
+    "lifetime_leaves": 4294967296
   }
 }
 ```
 
 - `scheme.name` MUST identify the signature scheme. A reader that does not recognize `scheme.name` MUST refuse to use the keystore.
 - `scheme.params` MUST contain every parameter required to deterministically regenerate the public key and to verify a signature. These fields are **immutable**; a writer MUST NOT alter them after creation.
+- `hash` identifies the tweakable hash and its underlying field (e.g. `poseidon1-koalabear`).
+- `tree_height` is the height of the (single) Merkle tree; with `hypertree_layers` it determines `lifetime_leaves = 2^(tree_height × hypertree_layers)`.
+- `hypertree_layers` is the number of stacked Merkle trees. `leanxmss` is a single-tree Generalized XMSS, so this MUST be `1`.
+- `encoding` identifies the incomparable encoding. `leanxmss` uses `target_sum`.
+- `winternitz_w` is the base of each hash chain (`BASE` in leanSig).
+- `dimension` is the number of hash chains (the hypercube dimension). Together with `winternitz_w` and `target_sum` it fully specifies the target-sum encoding and is REQUIRED to regenerate the public key and verify a signature.
+- `target_sum` is the target sum of the target-sum encoding.
 - `index_mode` MUST be `synchronized` or `counter` per §1.
+
+The example values above are the recommended production parameter set for a 2^32 key lifetime, matching leanSig's `SIGAbortingTargetSumLifetime32Dim46Base8` instantiation (`LOG_LIFETIME = 32`, `DIMENSION = 46`, `BASE = 8`, `TARGET_SUM = 200`, Poseidon1 over KoalaBear).
 
 #### 2.4 New `state` snapshot object
 
@@ -85,7 +97,7 @@ These are precautionary against Grover and do not affect the consumable-key sema
   "authoritative": false,
   "authority": "slashing-protection",
   "reference": "<opaque locator, optional>",
-  "capacity": { "total": 1048576, "consumed": 12345, "remaining": 1036231 },
+  "capacity": { "total": 4294967296, "consumed": 12345, "remaining": 4294954951 },
   "high_water": 12345,
   "reserved_ranges": []
 }
@@ -111,7 +123,7 @@ For every signature, an implementation MUST, in order:
 
 1. Determine the candidate leaf index.
 2. Verify the index is strictly greater than the authoritative high-water mark (or, in synchronized mode, that the slot/epoch has not been signed).
-3. **Durably persist** the advanced high-water mark — written, flushed (`fsync` or platform equivalent), and committed via atomic rename or an equivalently atomic transaction — *before* step 5.
+3. **Durably persist** the advanced high-water mark, written, flushed (`fsync` or platform equivalent), and committed via atomic rename or an equivalently atomic transaction, *before* step 5.
 4. Compute the signature.
 5. Release the signature to the caller.
 
@@ -138,8 +150,8 @@ This is the recommended mechanism for the builder-bid exhaustion case, where a s
 
 This EIP distinguishes two operations that legacy tooling conflates:
 
-- **Recover** — reconstruct the key (regenerate the hypertree, derive the public key) from the encrypted seed. This is always safe and uses only the keystore file.
-- **Resume signing** — begin producing signatures. This requires the *latest authoritative state* and is unsafe from the keystore file alone.
+- **Recover**: reconstruct the key (regenerate the hypertree, derive the public key) from the encrypted seed. This is always safe and uses only the keystore file.
+- **Resume signing**: begin producing signatures. This requires the *latest authoritative state* and is unsafe from the keystore file alone.
 
 Therefore:
 
@@ -151,7 +163,7 @@ Therefore:
 
 **Why extend 2335 rather than define a new format.** The encryption envelope, KDF abstraction, and modular design of 2335 are sound and widely implemented; only the cipher strength and the assumption of a fixed-size reusable secret needed changing. Reusing the envelope preserves tooling and review surface.
 
-**Why couple to 3076 instead of a bespoke state mechanism.** In synchronized mode the slashing-protection invariant and the leaf-uniqueness invariant are identical. Defining a second, parallel state mechanism would create two sources of truth that can disagree — the worst outcome for a consumable key. Making the slashing DB authoritative gives the key a single, already-battle-tested guardrail.
+**Why couple to 3076 instead of a bespoke state mechanism.** In synchronized mode the slashing-protection invariant and the leaf-uniqueness invariant are identical. Defining a second, parallel state mechanism would create two sources of truth that can disagree, the worst outcome for a consumable key. Making the slashing DB authoritative gives the key a single, already-battle-tested guardrail.
 
 **Why a non-authoritative snapshot in the file.** Operators need to see capacity and remaining leaves without a separate tool, but a mutable field in a portable file is a reuse trap. Marking it `authoritative: false` keeps visibility while denying it any role at signing time.
 
