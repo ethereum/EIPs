@@ -1,0 +1,185 @@
+---
+eip: <to be assigned>
+title: Post-Quantum Keystore for Stateful Hash-Based Keys
+description: A keystore format for XMSS and other consumable signing keys, defining state authority, durability ordering, and safe import/export.
+author: Parthasarathy Ramanujam (@ch4r10t33r), Anshal Shukla (@anshalshukla), Gajinder Singh (@g11tech),  Guillaume Ballet (@gballet), Shariq Naiyer (@shariqnaiyer), Kolby Moroz Liebl (@KolbyML), Unnawut Leepaisalsuwanna (@unnawut), Tom Wambsgans (@tomWambsgans), Thomas Coratger (@tcoratger), Justin Drake (@JustinDrake)
+discussions-to: <URL of the Ethereum Magicians thread>
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-06-19
+requires: 2334, 2335, 3076
+---
+
+## Abstract
+
+This standard defines a keystore format for **stateful hash-based signing keys**, specifically XMSS as used by the lean Ethereum consensus layer (hereafter `leanxmss`). It extends [EIP-2335](./eip-2335.md) so that the encrypted secret may be an XMSS seed and adds the machinery a *consumable* key requires: an explicit scheme-parameter block, a non-authoritative capacity snapshot, normative rules for where the authoritative signing state lives, a commit-before-sign durability requirement, reserved leaf ranges for concurrent signers, and import/export semantics that forbid silently resetting a key's signing position.
+
+The encryption upgrades (AES-256, AEAD) are minor. The substance of this EIP is **state management**, because an XMSS key is destroyed by leaf reuse and the existing keystore model assumes keys are immutable, freely copyable, and restore-safe — three assumptions that are unsafe for consumable keys.
+
+## Motivation
+
+[EIP-2335](./eip-2335.md) stores a 32-byte BLS scalar. Lean Ethereum replaces BLS validator keys with XMSS for post-quantum security. An XMSS secret can also be reduced to a small seed, so the *container* needs only modest change. The danger is elsewhere.
+
+Each XMSS signature consumes a one-time WOTS+ leaf identified by an index that **MUST NOT** ever be reused. Reuse of a leaf across two distinct messages enables forgery and is therefore key-destroying. This single property breaks three behaviors that are safe today and that operators, wallets, and clients currently take for granted:
+
+1. **Immutability.** A 2335 keystore never changes after creation. An XMSS key advances state on every signature.
+2. **Free copying.** A BLS keystore may run on two machines harmlessly. Two copies of an XMSS key signing independently will reuse leaves.
+3. **Restore-safety.** Restoring a BLS keystore from any backup is safe. Restoring a *stale* XMSS state rolls back the high-water mark and invites reuse.
+
+Validators already solve an isomorphic problem for BLS: [EIP-3076](./eip-3076.md) slashing protection enforces "never sign two different messages for the same slot." For the synchronized XMSS variant, where one leaf is bound to one epoch/slot, *"never reuse a leaf" and "never double-sign a slot" are the same invariant*. This EIP makes that coupling normative rather than coincidental, and specifies the remaining cases (off-protocol signers such as builder-bid signing) that fall outside the slashing-protection database.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHOULD", "SHOULD NOT", and "MAY" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+### 1. Terminology
+
+- **Consumable key** — a signing key whose security depends on never reusing an index (e.g. XMSS, LMS). Contrast with *reusable* keys (ECDSA, BLS).
+- **Leaf index** — the position of the one-time key consumed by a signature.
+- **High-water mark** — the highest leaf index that has been (or is reserved as) consumed. Signing is permitted only strictly above it.
+- **Authoritative state** — the single source of truth for the high-water mark that a signer consults and advances. It is NOT the keystore file.
+- **Synchronized mode** — leaf index is a deterministic function of consensus position (`leaf = f(epoch)` or `f(slot)`); state authority is the slashing-protection database.
+- **Counter mode** — leaf index is a free-running counter not bound to consensus position (e.g. off-protocol signing); state authority is a dedicated atomically-updated store.
+
+### 2. File format
+
+This EIP defines keystore `version` **5**. A v5 keystore is a v4 keystore with the changes below.
+
+#### 2.1 Cipher and KDF
+
+- `crypto.cipher.function` MUST be an AEAD or 256-bit construction. `aes-256-gcm` is RECOMMENDED. `aes-128-ctr` MUST NOT be used in v5.
+- `crypto.kdf.function` MAY be `argon2id` in addition to the `scrypt` and `pbkdf2` of v4. Parameters MUST target current memory-hardness guidance.
+
+These are precautionary against Grover and do not affect the consumable-key semantics below.
+
+#### 2.2 Encrypted secret
+
+`crypto.cipher.message` is the encrypted XMSS **seed**, not an expanded private key. The seed length is defined by the scheme parameters. The keystore stores only material required to *recover* the key (see §6); it does not store live signing state.
+
+#### 2.3 New `scheme` object
+
+```json
+"scheme": {
+  "name": "leanxmss",
+  "params": {
+    "hash": "<hash identifier>",
+    "tree_height": 20,
+    "hypertree_layers": 1,
+    "winternitz_w": 16,
+    "index_mode": "synchronized",
+    "activation_epoch": 0,
+    "lifetime_leaves": 1048576
+  }
+}
+```
+
+- `scheme.name` MUST identify the signature scheme. A reader that does not recognize `scheme.name` MUST refuse to use the keystore.
+- `scheme.params` MUST contain every parameter required to deterministically regenerate the public key and to verify a signature. These fields are **immutable**; a writer MUST NOT alter them after creation.
+- `index_mode` MUST be `synchronized` or `counter` per §1.
+
+#### 2.4 New `state` snapshot object
+
+```json
+"state": {
+  "authoritative": false,
+  "authority": "slashing-protection",
+  "reference": "<opaque locator, optional>",
+  "capacity": { "total": 1048576, "consumed": 12345, "remaining": 1036231 },
+  "high_water": 12345,
+  "reserved_ranges": []
+}
+```
+
+- `state.authoritative` MUST be `false` in any keystore file. The file is a snapshot for operator visibility only and MUST NOT be consulted as the high-water mark at signing time.
+- `state.authority` MUST be one of `slashing-protection`, `external`, or `embedded` and MUST be consistent with `scheme.params.index_mode`:
+  - `synchronized` ⇒ `slashing-protection`.
+  - `counter` ⇒ `external` (a dedicated state store).
+  - `embedded` is RESERVED and SHOULD NOT be used for production validator keys; it exists only for self-contained single-signer tooling and, if used, the file ceases to be immutable.
+- `capacity` and `high_water` are informational. A consumer MUST treat the authoritative store, not these fields, as binding.
+
+### 3. State authority
+
+A signer MUST consult and advance a single authoritative state when producing a signature.
+
+- In **synchronized mode**, the authoritative state is the [EIP-3076](./eip-3076.md) slashing-protection database. The leaf consumed by a signature is `f(epoch)` (or `f(slot)`); refusing to double-sign a slot is exactly refusing to reuse a leaf. Implementations MUST bind the XMSS key and its slashing-protection history as an inseparable unit: any operation that moves, imports, or exports the key MUST move, import, or export the corresponding history atomically with it.
+- In **counter mode**, the authoritative state is a dedicated store keyed by the keystore `uuid`, holding the current counter. It MUST provide the same durability and atomicity guarantees as §4.
+
+### 4. Commit-before-sign ordering
+
+For every signature, an implementation MUST, in order:
+
+1. Determine the candidate leaf index.
+2. Verify the index is strictly greater than the authoritative high-water mark (or, in synchronized mode, that the slot/epoch has not been signed).
+3. **Durably persist** the advanced high-water mark — written, flushed (`fsync` or platform equivalent), and committed via atomic rename or an equivalently atomic transaction — *before* step 5.
+4. Compute the signature.
+5. Release the signature to the caller.
+
+Releasing a signature before the state advance is durable is a violation: a crash between release and persistence causes index reuse on restart. Step 3 MUST complete before step 5; steps 3 and 4 MAY be reordered relative to each other, but neither may precede step 2.
+
+### 5. Reserved leaf ranges
+
+To support concurrent or high-throughput signers (e.g. builder-bid signing) without serializing every signature on one lock, a keystore MAY partition its leaf space into disjoint **reserved ranges**:
+
+```json
+"reserved_ranges": [
+  { "id": "signer-a", "start": 0,       "end": 524287,  "high_water": 410022 },
+  { "id": "signer-b", "start": 524288,  "end": 1048575, "high_water": 524288 }
+]
+```
+
+- Ranges MUST be disjoint. A signer assigned a range MUST consume only indices within `[start, end]` and MUST maintain its own authoritative high-water mark for that range under the §4 ordering.
+- A range MUST NOT be assigned to more than one signer instance simultaneously.
+- Exhaustion of a range MUST cause the signer to refuse rather than wrap or borrow from another range.
+
+This is the recommended mechanism for the builder-bid exhaustion case, where a single global counter is too contended.
+
+### 6. Import, export, recover, resume
+
+This EIP distinguishes two operations that legacy tooling conflates:
+
+- **Recover** — reconstruct the key (regenerate the hypertree, derive the public key) from the encrypted seed. This is always safe and uses only the keystore file.
+- **Resume signing** — begin producing signatures. This requires the *latest authoritative state* and is unsafe from the keystore file alone.
+
+Therefore:
+
+- An implementation MUST NOT begin signing from a keystore that lacks authoritative state. "Import with empty/fresh state" MUST be a hard error for a consumable key, not a warning.
+- Export of a consumable key MUST include or reference its authoritative state. A bare keystore file MAY be exported for *recovery and verification only* and, if so, MUST be flagged such that no consumer will sign from it.
+- Restoring a keystore together with a *stale* state snapshot is the catastrophic case. Implementations MUST detect a regression of the high-water mark and refuse to sign until reconciled with the latest authoritative state.
+
+## Rationale
+
+**Why extend 2335 rather than define a new format.** The encryption envelope, KDF abstraction, and modular design of 2335 are sound and widely implemented; only the cipher strength and the assumption of a fixed-size reusable secret needed changing. Reusing the envelope preserves tooling and review surface.
+
+**Why couple to 3076 instead of a bespoke state mechanism.** In synchronized mode the slashing-protection invariant and the leaf-uniqueness invariant are identical. Defining a second, parallel state mechanism would create two sources of truth that can disagree — the worst outcome for a consumable key. Making the slashing DB authoritative gives the key a single, already-battle-tested guardrail.
+
+**Why a non-authoritative snapshot in the file.** Operators need to see capacity and remaining leaves without a separate tool, but a mutable field in a portable file is a reuse trap. Marking it `authoritative: false` keeps visibility while denying it any role at signing time.
+
+**Why commit-before-sign is normative, not advisory.** It is the single ordering rule that prevents crash-induced reuse. Everything else in the spec is bookkeeping around it.
+
+**Synchronized vs counter.** Synchronized keys map cleanly onto consensus duties and the slashing DB. Off-protocol duties (builder-bid signing being the motivating example) have no slot to key on and need a free counter and its own durable store. Both are specified so a single deployment can hold keys of each kind. *Open issue for discussion:* whether the lean profile mandates synchronized-only for protocol keys and confines counter mode to clearly-separated signing services.
+
+## Backwards Compatibility
+
+v5 is not backwards compatible with v4 consumers, which assume a reusable 32-byte secret and have no notion of state authority. v4 and v5 keystores are distinguished by the `version` field and the presence of the `scheme` object. A v5-aware client MUST refuse to operate on a consumable key as if it were a v4 reusable key. v4 BLS keystores remain valid under their own standard and are out of scope.
+
+## Security Considerations
+
+- **Leaf reuse is catastrophic and silent.** Unlike a slashing event, reuse may produce no immediate on-chain penalty while fully compromising the key. The §4 ordering and §6 import rules are the primary defenses and MUST NOT be relaxed for performance.
+- **Stale-restore is the dominant operational risk.** Backups protect the seed but not the state. Operators MUST be guided toward recover-then-reconcile, never restore-and-sign. Detection of high-water regression (§6) is REQUIRED.
+- **Cloning across hosts.** Running the same key on two hosts without disjoint reserved ranges guarantees reuse. Range assignment (§5) MUST be exclusive.
+- **State store integrity.** An attacker able to roll back the authoritative state can induce reuse. The state store SHOULD have integrity protection commensurate with the keystore itself.
+- **Encryption strength.** AES-256 and a memory-hard KDF mitigate Grover-accelerated password search; they do not and need not protect the signing scheme, which is post-quantum by construction.
+- **Capacity exhaustion as availability risk.** A key that exhausts its leaves can no longer sign. Capacity monitoring (§2.4) and conservative `lifetime_leaves` selection are operational requirements, not optional.
+
+## Test Cases
+
+To be added. At minimum: (1) round-trip encrypt/decrypt of a `leanxmss` seed; (2) refusal to sign on high-water regression; (3) crash-injection between signature computation and state persistence demonstrating no reuse on restart; (4) disjointness and exclusive-assignment checks for reserved ranges.
+
+## Reference Implementation
+
+To be added.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
