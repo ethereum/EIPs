@@ -3,9 +3,9 @@
 Reference implementation of the two proposed predeploys, plus a Foundry test
 suite.
 
-Both contracts are written in [geas](https://github.com/fjl/geas) and are
+Both contracts are written in geas and are
 line-level derivatives of the deployed EIP-7002 / EIP-7251 system contracts
-maintained in [`ethereum/sys-asm`](https://github.com/ethereum/sys-asm) (whose
+maintained in `ethereum/sys-asm` (whose
 source assembles byte-identically to the runtime code on mainnet). The
 dispatch, EIP-1559-style fee, queue, storage layout, system subroutine, and
 request logging carry over unchanged; the header of each `main.eas` enumerates
@@ -25,14 +25,9 @@ its full diff against the parent contract.
 
 ## Running the tests
 
-Prerequisites — [Foundry](https://getfoundry.sh) and the
-[geas](https://github.com/fjl/geas) assembler on `PATH` (no Python / `py_ecc`,
-since the contracts perform no on-chain BLS):
-
-```bash
-curl -L https://foundry.paradigm.xyz | bash && foundryup
-go install github.com/fjl/geas/cmd/geas@latest
-```
+Prerequisites — Foundry (`forge`) and the geas assembler on `PATH`, each
+installed from its upstream project (no Python / `py_ecc`, since the contracts
+perform no on-chain BLS).
 
 Run the test suite (the tests assemble `src/**/main.eas` through `geas` at
 run time, so changes to the sources are picked up automatically):
