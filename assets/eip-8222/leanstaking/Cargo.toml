@@ -1,0 +1,13 @@
+[package]
+name = "lean-staking"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+lean_compiler = { git = "https://github.com/leanEthereum/leanMultisig.git", rev = "a7e1806607476dec143b07d1909f255ced1b763b" }
+lean_prover = { git = "https://github.com/leanEthereum/leanMultisig.git", rev = "a7e1806607476dec143b07d1909f255ced1b763b" }
+lean_vm = { git = "https://github.com/leanEthereum/leanMultisig.git", rev = "a7e1806607476dec143b07d1909f255ced1b763b" }
+utils = { git = "https://github.com/leanEthereum/leanMultisig.git", rev = "a7e1806607476dec143b07d1909f255ced1b763b" }
+
+[[bin]]
+name = "lean-staking"

@@ -61,7 +61,7 @@ def recover_execution_signer(signature: ExecutionSignature, sig_hash: Hash32) ->
 
     return pubkey_to_address(public_key, signature[0])
 
-SECP256K1_ALGORITHM = ExecutionSignatureAlgorithm(0xFF)
+SECP256K1_ALGORITHM = ExecutionSignatureAlgorithm(0x00)
 SECP256K1_SIGNATURE_SIZE = 1 + 32 + 32 + 1
 
 def secp256k1_pack(r: uint256, s: uint256, y_parity: uint8) -> ExecutionSignature:
