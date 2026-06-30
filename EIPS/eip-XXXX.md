@@ -1,6 +1,6 @@
 ---
 eip: XXXX
-title: uFund: Fund Metadata and Lifecycle Interface
+title: uFund - Fund Metadata and Lifecycle Interface
 description: Read-heavy interface for tokenized fund NAV, lifecycle, distributions, fees, and optional attestations.
 author: Praveen Kumar (@praveensparkout)
 discussions-to: https://ethereum-magicians.org/t/erc-ufund-standardized-fund-metadata-lifecycle-interface/28660
