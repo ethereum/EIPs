@@ -216,7 +216,27 @@ Permitted Execution Client Specifications URLs must anchor to a specific commit,
 ^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
-The Ethereum Execution Client Specifications repository also contains the Ethereum Execution Specification Tests, under its `tests/` directory. Links to specific commits of those test files are permitted under the same rule.
+### Execution Specification Tests
+
+Links to the Ethereum Execution Specification Tests (EEST) may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+
+Permitted Execution Specification Tests URLs must anchor to a specific commit, and so must match one of these regular expressions:
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/(blob|tree)/[a-f0-9]{40}/.+$
+```
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/commit/[a-f0-9]{40}$
+```
 
 ### Consensus Layer Specifications
 
@@ -392,6 +412,24 @@ Permitted Yellow Paper URLs must anchor to a specific commit, and so must match 
 
 ```regex
 ^(https://github\.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/paper\.pdf)$
+```
+
+### Execution Client Specification Tests
+
+Links to the Ethereum Execution Client Specification Tests may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
+
+Permitted Execution Client Specification Tests URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ethereum/execution-spec-tests/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-spec-tests/tree/[0-9a-f]{40}/.*)$
 ```
 
 ### Digital Object Identifier System
