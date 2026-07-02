@@ -51,8 +51,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", (event) => {
-      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+      document
+        .querySelectorAll('[data-bs-toggle="tooltip"]')
+        .forEach((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
     });
   </script>
   <script type="text/javascript">
