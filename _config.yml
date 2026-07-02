@@ -67,7 +67,4 @@ exclude:
   - PULL_REQUEST_TEMPLATE.md
   - README.md
   
-include:
-  - LICENSE
-
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
