@@ -31,6 +31,11 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 * Prefer SVG, but PNG is acceptable.
 * If possible, use [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries/Using) (specifically prefers-color-scheme) to support dark mode. If not, provide light-mode compatible images.
 
+#### Smart Contract Code
+
+* The Specification section must be self-contained: do not import external libraries in smart contract code (for example, `import { IExampleToken } from "@example-library/interfaces/IExampleToken.sol";` in Solidity). Instead, define any interfaces, types, or constants the specification depends on inline. External projects may change in ways that are not backward-compatible, or cease to exist entirely, which would make the specification ambiguous or impossible to interpret.
+* External library imports are acceptable in the Reference Implementation section, as it is illustrative rather than normative. Where practical, identify the library and the version used, so the import remains resolvable for future readers.
+
 #### Other
 
 * **Monitor feedback regularly**: Respond to comments or PRs that relate to your EIP, especially specification clarifications or typo fixes.
