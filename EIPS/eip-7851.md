@@ -1,0 +1,109 @@
+---
+eip: 7851
+title: Code-Controlled EOA Delegation
+description: Allow EIP-7702 delegated EOAs to update delegation through code while permanently disabling residual ECDSA authority.
+author: Liyi Guo (@colinlyguo), Nicolas Consigny (@nconsigny)
+discussions-to: https://ethereum-magicians.org/t/eip-7851-code-controlled-eoa-delegation/22344
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-12-27
+requires: 7702
+---
+
+## Abstract
+
+This EIP extends [EIP-7702](./eip-7702.md) with an ECDSA-disabled delegation prefix `0xef0101` and a self-only opcode `SETSELFDELEGATE`. EIP-7702 bootstraps delegation by writing `0xef0100 || delegate_address` through the original EOA key. Delegated wallet code can then call `SETSELFDELEGATE` to write `0xef0101 || delegate_address`, permanently disabling residual ECDSA authority while preserving code-controlled delegate updates.
+
+## Motivation
+
+[EIP-7702](./eip-7702.md) bootstraps delegation with the original EOA key, but after control has moved into wallet code, users may operate the account through the wallet code itself. This EIP lets wallet code control the delegation lifecycle and burn residual ECDSA authority.
+
+## Specification
+
+`||` denotes byte concatenation.
+
+`0xef0100 || delegate_address` is an ECDSA-enabled delegation, and `0xef0101 || delegate_address` is an ECDSA-disabled delegation. ECDSA-disabled means the original ECDSA key can no longer authorize transactions or [EIP-7702](./eip-7702.md) delegation changes. It does not mean the delegate target is frozen forever: wallet code is capable of updating the delegate while staying ECDSA-disabled. The irreversible invariant is that once ECDSA authority is disabled, it can never be restored.
+
+### Parameters
+
+| Parameter | Value |
+| --- | --- |
+| `SETSELFDELEGATE_OPCODE` | `TBD` |
+| `SETSELFDELEGATE_GAS` | `9500` |
+
+### Delegated Code Execution
+
+Clients must treat `0xef0101 || delegate_address` identically to `0xef0100 || delegate_address` for delegated code execution.
+
+### SETSELFDELEGATE
+
+`SETSELFDELEGATE(delegate_address)` is self-only. Define `authority` as the current execution-context address. The opcode updates only `authority`.
+
+The opcode takes one stack item. The low 160 bits of the stack item are interpreted as `delegate_address`.
+
+Before execution:
+
+```text
+[..., delegate_address]
+```
+
+After execution:
+
+```text
+[..., success]
+```
+
+`success` is `1` on success and `0` when no state change is made.
+
+The opcode costs `SETSELFDELEGATE_GAS` for each execution attempt.
+
+If executed in a static context, `SETSELFDELEGATE` must cause an exceptional halt.
+
+State changes made by `SETSELFDELEGATE` follow normal EVM revert semantics. If the frame or transaction reverts, the delegation update reverts.
+
+The `code` checked by this opcode is the raw account code stored in state for `authority`, not the code obtained by following the delegation indicator for the current frame.
+
+Execution proceeds as follows:
+
+1. If `delegate_address == address(0)`, push `0` and make no state change.
+2. If `code` is exactly 23 bytes long and starts with either `0xef0100` or `0xef0101`, set `code(authority) = 0xef0101 || delegate_address` and push `1`.
+3. Otherwise, push `0` and make no state change.
+
+After a successful update, later code-executing operations targeting `authority` follow the updated delegation indicator to obtain the code to execute.
+
+More specifically, the effect is frame-local. Frames that have already obtained code continue executing that code. A re-entrant call to `authority` later in the same transaction is a later code-executing operation and therefore loads code through the updated delegation indicator.
+
+Calling `SETSELFDELEGATE` from an ECDSA-enabled delegation disables ECDSA authority and sets the delegate. Calling it from an ECDSA-disabled delegation redelegates while keeping ECDSA authority disabled.
+
+### Validation
+
+During [EIP-7702](./eip-7702.md) authorization processing, if `authority` currently has code that is exactly 23 bytes long and starts with `0xef0101`, any authorization signed by `authority` must be considered invalid and skipped.
+
+An ECDSA-authenticated transaction whose recovered sender has code that is exactly 23 bytes long and starts with `0xef0101` in the current state is invalid and must not be included in a block. Transaction pools must reject such transactions.
+
+## Rationale
+
+[EIP-7702](./eip-7702.md) bootstraps delegation with the original EOA key. After bootstrap, the account may be controlled through wallet code, passkeys, multisig, social recovery, or modules. The ECDSA-disabled lifecycle should therefore be available from the delegated account's execution path.
+
+`SETSELFDELEGATE` moves this decision into wallet code. The first successful call permanently disables residual ECDSA authority. Later calls may update the delegate, but ECDSA remains disabled.
+
+`SETSELFDELEGATE_GAS` is `9500`, equal to `PER_AUTH_BASE_COST` from [EIP-7702](./eip-7702.md) minus the `3000` gas attributed to recovering the authority address. The opcode writes one 23-byte delegation indicator for the current execution-context account after delegation has already resolved, and does not verify a signature, process an authorization tuple, increment the account nonce, or touch another account.
+
+## Backwards Compatibility
+
+Existing `0xef0100 || delegate_address` delegations are unchanged. Clients that implement this EIP must recognize `0xef0101 || delegate_address` as a delegation for execution and as an ECDSA-disabled authority for validation.
+
+## Security Considerations
+
+Entering ECDSA-disabled delegation is irreversible with respect to ECDSA authority. The original EOA key can never restore ECDSA authority after `0xef0101` is set.
+
+Wallet code can still update the delegate while remaining ECDSA-disabled. Wallets should expose `SETSELFDELEGATE` only after explicit user confirmation and treat it as the highest privilege.
+
+The execution load change is small. Execution paths that already resolve delegated code can reuse the existing delegation-code lookup. Transaction pools may need one additional account-code read for the sender to reject ECDSA-authenticated transactions from ECDSA-disabled authorities.
+
+This EIP only invalidates protocol-level ECDSA-authenticated transactions and [EIP-7702](./eip-7702.md) authorizations. Contracts that verify ECDSA signatures directly, such as token `permit` functions, will not automatically reject signatures from an ECDSA-disabled authority. For addressing the behavior of the `ecrecover` precompile with ECDSA-disabled authorities, see companion proposal [EIP-8151](./eip-8151.md).
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).

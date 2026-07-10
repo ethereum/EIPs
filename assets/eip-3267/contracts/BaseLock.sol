@@ -320,7 +320,7 @@ abstract contract BaseLock is
         return true;
     }
 
-    /// Are transfers of a conditinal token locked?
+    /// Are transfers of a conditional token locked?
     ///
     /// This is used to prevent its repeated withdrawal.
     /// @param _user Querying if locked for this user.

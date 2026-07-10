@@ -97,3 +97,70 @@ h1 a {
   }
 }
 
+// This will make ALL tables scrollable
+.page-content table {
+  display: inline-block;
+  width: auto !important;   /* shrink-to-fit its contents */
+  max-width: 100%; /* never exceed the width of its container */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// Fix text overflow in EIP content
+.home {
+  max-width: 100%;
+  overflow-x: hidden;
+  
+  // Target all content that could overflow
+  p, li, td, div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  
+  // Specifically handle URLs in links
+  a {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    display: inline-block;
+    max-width: 100%;
+  }
+  
+  // Handle code blocks that might contain long strings
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  
+  // Inline code should wrap
+  code {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+// Specifically target lists (where references usually are)
+.home ul, .home ol {
+  max-width: 100%;
+  padding-right: 20px; // Give some breathing room
+  
+  li {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    
+    // Extra aggressive breaking for URLs
+    a {
+      word-break: break-all;
+      hyphens: auto;
+    }
+  }
+}
+
+// makes an exception to code inside tables allowing them to expand the table's width since it has overflow scrolling
+.page-content table code {
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+}

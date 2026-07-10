@@ -1,0 +1,84 @@
+---
+eip: 8077
+title: eth/XX - announce transactions with nonce
+description: Adds source and nonce to transaction announcements
+author: Csaba Kiraly (@cskiraly)
+discussions-to: https://ethereum-magicians.org/t/eip-8077-eth-xx-add-nonce-and-source-to-transactions-announcement/26505
+status: Draft
+type: Standards Track
+category: Networking
+created: 2025-11-07
+requires: 7642
+---
+
+## Abstract
+
+This EIP improves mempool propagation, extending the devp2p 'eth' protocol's `NewPooledTransactionHashes` message to also announce each transaction's source address and nonce together with the already announced hash, type, and size.
+
+## Motivation
+
+Transactions are propagated in the Mempool using the devp2p protocol in two modalities. Eager push is only used for small transactions, and only towards a few nodes, while the rest of nodes receive only announcements. For large transactions and for type 3 transactions, only announcements are sent. This announcement is made using the `NewPooledTransactionHashes` message, which only contains the hash, the type and the size of each transaction. As it is now, the receiver of the announcement does not have enough information to make intelligent scheduling choices. This crates several issues:
+
+- the receiver of the announcement can only base its logic on the order of announcements, but if it schedules requests to different peers, it can easily end up pulling transactions that leave a nonce gap in it's own view of the mempool, making the pulled transaction non-includable,
+- filling existing gaps is hard, since in the absence of sender/nonce information it can only be done with trial and error, requesting more transactions of missing hashes,
+- to filter out old transaction announcements, the node has to keep a cache of all transaction hashes on chain, instead of simply checking the nonce against current chain state,
+- receivers have no way to selectively request transactions with specific source addresses, which would be important UX and L2s. 
+
+Moreover, as we are increasing the throughput of block building, it is more and more probable that we end up in a state where nodes can't fetch all transactions. This extension allows nodes to do selective fetching and gap filling while keeping a consistent state of their own view of the mempool without nonce gaps.
+
+## Specification
+
+### NewPooledTransactionHashes message changes
+
+Modify the NewPooledTransactionHashes (0x08) message as follows:
+
+(eth/69): [txtypes: B, [txsize₁: P, txsize₂: P, ...], [txhash₁: B_32, txhash₂: B_32, ...]]
+
+(eth/XX): [txtypes: B, [txsize₁: P, txsize₂: P, ...], [txhash₁: B_32, txhash₂: B_32, ...], [txsource₁: B_20, txsource₂: B_20, ...], [txnonce₁: P, txnonce₂: P, ...]]
+
+### Changes to message handling
+
+Changes on the sender side of `NewPooledTransactionHashes` messages are trivial. Only the transmitted data changes. Since the size of announcements is increased, implementations MAY revisit the condition (typically transaction size) to select between eager push and announcement.
+
+At the receiver side of `NewPooledTransactionHashes` messages the extra information can be used to improve scheduling choices, however these are not mandated by the protocol and thus we leave it to implementations.
+
+## Rationale
+
+To solve the transaction propagation issues mentioned in the Motivation section, nodes require more information about a transaction then its hash, size, and type. By adding the source and the nonce, the receiver has enough information to make better fetch decisions.
+
+### Overhead
+
+The modification adds a significant overhead to announcements by adding a B_20 and a variable size filed to the current B_32, size, and type fields. We think this overhead is worth
+the additional gain in protocol efficiency. Details TBD <-- TODO --> .
+
+### Alternatives
+
+While the modification is relatively straightforward, there are several design variants to
+consider. First of all, small transactions are mostly propagating by the push mechanism, while
+announcement based pull is only used as recovery. We could choose to avoid the extra announcement overhead for these, however it would mean that filling nonce gaps remains difficult, only possible by trial-and-error.
+
+Another possibility similar to the previous one is to restrict the mechanism to blob transactions only. We choose not to restrict it in the proposal for the same reasons as in the previous point.
+
+If the traffic overhead from notifications is a concern, it is also worth considering how many nodes should announcements be sent to. While this is not mandated by the protocol, a typical implementation is to send announcements to all neighbors (except the ones that already signaled having it, and the ones to which the message is pushed). Should nodes send announcements to all peers, or only part of their peer set (e.g. proportional, or to a fixed number of peers)? The protocol allows to only part, and in case of bandwidth constraints it seems better to send more metadata (addresses and nonces) to fewer peers.
+
+Currently, for any given transaction, nodes receive announcements from many peers. About half of their peers, on average. Having the whole metadata (txhash, type, size, source, nonce) in all these is highly redundant. We could remove some of this overhead, e.g. by having a probabilistic choice between a simple announcement and a detailed announcement. The gain however seems marginal compared to the added complexity.
+
+Sending the source and the nonce opens up the possibility of a design variant where the transaction identifier in the announcements is based on these values, and not on the txhash. More specifically, a transaction could be identified by the source, the nonce, and an extra version number signaling the RBF (replace-by-fee) version in the given source/nonce scope. This variant would require deeper changes since the RBF version would need to be signed.
+
+As an alternative to the above, fee values can be used as a proxy for the RBF version. Since the RBF requirement is anyway fee based, and the fee is already signed, adding the fee information to the announcement allows the receiver to compare different versions and pull the newer one. Moreover, having the fee information already in the announcement also allows nodes to anticipate their transaction ordering decisions and avoid pulling transactions that would be dropped, providing further traffic reduction.
+
+## Backwards Compatibility
+
+This EIP changes the eth protocol and requires rolling out a new version. Supporting multiple versions of a wire protocol is routine practice. Rolling out this new version does not break older clients, since they can keep using the previous protocol version.
+
+This EIP does not change consensus rules of the EVM and does not require a hard fork.
+
+## Security Considerations
+
+The announced source address and nonce cannot be verified by the recipient until the transaction is actually fetched (or received through eager push). Therefore, it should not be handled as trusted information. This does not compromise the security of the protocol.
+
+A mismatch between the announced <txhash,type,size,address,nonce> tuple and a received transaction should be handled as a protocol violation. More in detail, after the verification of the transaction hash, it becomes clear that the sender of the announcement was either malicious, or it sent an announcement without verifying its content. Thus, the sender of the offending announcement can be treated as a node that violated the protocol.
+
+## Copyright
+
+Copyright and related rights waived via CC0.
