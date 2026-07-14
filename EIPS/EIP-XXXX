@@ -1,5 +1,5 @@
 ---
-eip: XXXX
+eip: 8337
 title: Validated EVM Code
 description: Code prefixed with MAGIC bytes is proven at CREATE time to have fully static control flow and to never underflow stack.
 author: Greg Colvin (@gcolvin) <greg@colvin.org>, Martin Holst Swende (@holiman), Brooklyn Zelenka (@expede), John Max Skaller
@@ -29,7 +29,7 @@ Validation ends this: code that forgoes dynamic control flow is proven safe once
 
 ## Specification
 
-> *The key words MUST and MUST NOT in this Specification are to be interpreted as described in RFC 2119 and RFC 8174.*
+> *The key words MUST and MUST NOT in this Specification are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.html) and [RFC 8174](https://www.ietf.org/rfc/rfc8174.html).*
 
 ### `MAGIC (0xEF....)`
 
@@ -166,7 +166,7 @@ With no syntactic constraints and minimal semantic constraints, we maximize oppo
 
 By marking `MAGIC` contracts as *valid* we are promising that their control flow is static, and the many tools that traverse the control flow can know this without inspecting the code for themselves.  The intention is to end a vicious cycle: tools work around the EVM's dynamic control flow to recover subroutines, compilers work around it to implement them, and neither group is much aware of the other's needs — needless complexity and technical debt all around.  With this proposal it will at least and at last become possible to write static EVM code, and break the cycle.
 
-As a demonstration, `extract_cfg.py`, provided with the reference implementation, recovers the complete control-flow graph of validated code in a single linear pass.  It trusts validity and performs no checks of its own.
+As a demonstration, [`extract_cfg.py`](../assets/eip-8337/extract_cfg.py), provided with the reference implementation, recovers the complete control-flow graph of validated code in a single linear pass.  It trusts validity and performs no checks of its own.
 
 Validation also retires runtime work: for *valid* code, JUMPDEST analysis, the per-jump destination check, and the per-instruction underflow check are all unnecessary — each was proven at `CREATE` time.
 
