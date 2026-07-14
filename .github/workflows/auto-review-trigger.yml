@@ -1,59 +1,86 @@
 on:
-  pull_request_target:
   pull_request_review:
+    types: [submitted]
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
     inputs:
       pr_number:
         description: Pull Request Number
         type: string
         required: true
-  issue_comment:
-    types:
-      - created
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 name: Auto Review Bot Trigger
+
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   trigger:
     runs-on: ubuntu-latest
-    name: Trigger
     steps:
-      - name: Write PR Number - PR Target
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_target' && ((!endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')) || github.event.sender.login == 'renovate[bot]')
+      - name: Write PR Number
+        id: write_pr_number
         env:
-          PR_NUMBER: ${{ github.event.number }}
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          REVIEW_PR_NUMBER: ${{ github.event.pull_request.number }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_PR_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_IS_PR: ${{ github.event.issue.pull_request.url != '' }}
+          TARGET_PR_NUMBER: ${{ github.event.pull_request.number }}
+          DISPATCH_PR_NUMBER: ${{ inputs.pr_number }}
+        run: |
+          set -euo pipefail
 
-      - name: Write PR Number - PR Review
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_review' && !endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          created=false
 
-      - name: Write PR Number - Workflow Dispatch
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          PR_NUMBER: ${{ inputs.pr_number }}
+          if [[ "$EVENT_NAME" == "pull_request_review" ]]; then
+            if [[ "$ACTOR" != *"[bot]"* ]]; then
+              echo "$REVIEW_PR_NUMBER" > pr-number.txt
+              created=true
+            fi
+          elif [[ "$EVENT_NAME" == "issue_comment" ]]; then
+            if [[ "$ISSUE_IS_PR" == "true" ]] && [[ "$COMMENT_BODY" == *"@eth-bot rerun"* ]]; then
+              echo "$COMMENT_PR_NUMBER" > pr-number.txt
+              created=true
+            fi
+          elif [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            echo "$DISPATCH_PR_NUMBER" > pr-number.txt
+            created=true
+          elif [[ "$EVENT_NAME" == "pull_request_target" ]]; then
+            if [[ "$ACTOR" != *"[bot]"* ]]; then
+              echo "$TARGET_PR_NUMBER" > pr-number.txt
+              created=true
+            fi
+          fi
 
-      - name: Write PR Number - Comment Retrigger
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@eth-bot rerun')
-        env:
-          PR_NUMBER: ${{ github.event.issue.number }}
-      
+          echo "created=$created" >> "$GITHUB_OUTPUT"
+
       - name: Check File Existence
-        uses: andstor/file-existence-action@20b4d2e596410855db8f9ca21e96fbe18e12930b
-        id: check_pr_number_exists
-        with:
-          files: pr-number.txt
+        id: check_pr_number
+        run: |
+          if [[ -f pr-number.txt ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Save PR Number
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
-        if: steps.check_pr_number_exists.outputs.files_exists == 'true'
+        if: steps.check_pr_number.outputs.exists == 'true'
+        run: |
+          echo "PR number captured: $(cat pr-number.txt)"
+
+      - name: Upload PR Number Artifact
+        if: steps.check_pr_number.outputs.exists == 'true'
+        uses: actions/upload-artifact@v4
         with:
           name: pr-number
           path: pr-number.txt
+
+      - name: No-op when PR number absent
+        if: steps.check_pr_number.outputs.exists != 'true'
+        run: echo "No PR number generated for this event path; skipping artifact upload."
