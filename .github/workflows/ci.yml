@@ -48,6 +48,16 @@ jobs:
           path: ''
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
+      - name: Check doctor-sensitive changes
+        id: doctor_changes
+        run: |
+          if gh pr diff ${{ github.event.number }} --name-only | grep -Eq '^(Gemfile|Gemfile\.lock|_config\.yml|_data/|_includes/|_layouts/|config/|plugins/|_plugins/)'; then
+            echo "run_doctor=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_doctor=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Ruby
         uses: ruby/setup-ruby@fb404b9557c186e349162b0d8efb06e2bc36edea # v1.232.0
         with:
@@ -56,7 +66,9 @@ jobs:
           cache-version: 0 # Increment this number if you need to re-download cached gems
       - name: Build Website
         run: |
-          bundle exec jekyll doctor
+          if [[ "${{ steps.doctor_changes.outputs.run_doctor }}" == 'true' ]]; then
+            bundle exec jekyll doctor
+          fi
           bundle exec jekyll build
         env:
           JEKYLL_ENV: production
