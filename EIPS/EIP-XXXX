@@ -1,0 +1,574 @@
+---
+eip: XXXX
+title: Validated EVM Code
+description: Code prefixed with MAGIC bytes is proven at CREATE time to have fully static control flow and to never underflow stack.
+author: Greg Colvin (@gcolvin) <greg@colvin.org>, Martin Holst Swende (@holiman), Brooklyn Zelenka (@expede), John Max Skaller
+discussions-to: TBD
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-07-09
+requires: 3541, 7979
+---
+
+## Abstract
+
+Code can be prefixed with `MAGIC` bytes.  `MAGIC` code is validated at `CREATE` time to ensure that it cannot execute invalid instructions, jump to invalid locations, or underflow stack, that every return has a call to return from, and that within each subroutine the depth of the *data stack* at every instruction is the same on every execution.  Stack overflow remains checked at run time, as for all code today.
+
+The complete control flow of `MAGIC` code can be traversed in time and space linear in the size of the code, enabling tools for validation, automated proofs of correctness, and ahead-of-time and just-in-time compilers.
+
+Validation is optional: the instructions of [EIP-7979](./eip-7979.md) behave identically in validated and ordinary code.
+
+*Note: Significant assistance from Anthropic's Claude is acknowledged, primarily for the reference implementation and its tests.*
+
+## Motivation
+
+Dynamic jumps obscure the flow of control.  A destination is a runtime value, so analysis must assume that any jump can reach any `JUMPDEST`.  The possible control transfers therefore grow as jumps times destinations: quadratic in the size of the code.  For tools that run as code deploys or executes — validators, compilers to machine code — that is a denial-of-service vulnerability.  For tools that explore paths, such as formal analysis, the state space grows exponentially.
+
+Validation ends this: code that forgoes dynamic control flow is proven safe once, at `CREATE` time, and every downstream tool can rely on the proof.
+
+## Specification
+
+> *The key words MUST and MUST NOT in this Specification are to be interpreted as described in RFC 2119 and RFC 8174.*
+
+### `MAGIC (0xEF....)`
+
+After this EIP has been activated, code beginning with the `MAGIC` bytes MUST be a *valid* program.  Execution begins immediately after the `MAGIC` bytes.
+
+
+*Note: `MAGIC` values are still to be determined, but the `MAGIC` bytes will begin with 0xEF.*
+
+### Validity
+
+*Valid* code has fully static control flow: every transfer of control lands where the code says it does.  Validation does at `CREATE` time what JUMPDEST analysis does at run time, and proves more: the destination of every jump and call, that every return has a call to return from, that within each subroutine the depth of the *data stack* at every instruction is the same on every execution, and that no instruction can find fewer items than it removes.
+
+Execution is defined in the Yellow Paper as a sequence of changes to the EVM state.  Exceptional halting conditions are properties of the machine state, checked before each instruction executes: if executing would violate one, execution halts instead — as the Yellow Paper puts it (§9.4.2), "no instruction can, through its execution, cause an exceptional halt."  Proving that no reachable state violates a condition therefore proves that no execution can reach an exceptional halting state.  That is what validation does — once, at `CREATE` time.  The Yellow Paper defines six conditions:
+
+* State modification during a static call
+* Insufficient gas
+* More than 1024 stack items
+* Insufficient stack items
+* Invalid jump destination
+* Invalid instruction
+
+Validation proves the last three before the code ever runs: invalid instructions by Constraint 1, invalid jump destinations by Constraints 2 and 3, and insufficient stack items by Constraint 4.  The first three remain runtime matters: whether the call is static is not knowable from the code, neither is the gas, and with recursion the depth of the stacks depends on data — see "Why not prove overflow?" in the Rationale.
+
+Validation considers only the code's control flow and stack offsets, never its data and computations.  It follows both arms of every `JUMPI`, so it may traverse paths that data values would never let execute, and it rejects code with invalid paths even if they could never be taken.
+
+#### Definitions
+
+The constraints below are stated in terms of the following definitions.
+The first three are the machine state of EIP-7979.
+
+* ***data stack***: the EVM's stack of 256-bit words, at most 1024 deep.
+
+* ***return stack***: the stack of return addresses, pushed only by
+  `CALLSUB`, popped only by `RETURNSUB`, and not otherwise accessible
+  to EVM code.
+
+* ***PC***: the program counter — the position in the code, the index
+  of the next byte to execute.
+
+* ***instruction***: a byte of code that is not `PUSH` immediate data.
+
+* ***path***: a possible sequence of executed instructions, starting at
+  *PC* 0; validation follows both arms of every `JUMPI`, without regard
+  to data values.
+
+* ***reachable***: on some *path*.  Bytes on no path are data, and are
+  ignored.
+
+* ***frame***: the span of a path from a `CALLSUB` to the `RETURNSUB` that
+  pops the return address it pushed.  Frames nest; execution begins in an
+  implicit outermost frame.  A frame is one execution of a call, not the
+  code it runs: a subroutine called twice gives two frames, and, since a
+  jump to a `CALLDEST` pushes no return address, one frame may pass
+  through several subroutines.
+
+* ***entry***: a `CALLDEST`.  Every *frame* begun by a `CALLSUB` starts
+  at an entry; an entry may also be entered without a call — by falling
+  through, or by jump — so subroutines may have multiple entry points.
+
+* ***stack offset***: the depth of the *data stack*, minus its depth at
+  the most recent `CALLDEST` in the current *frame* — or at the start of
+  execution, if there is none.
+
+* ***net stack effect***: of an *entry*, the *stack offset* at the
+  `RETURNSUB` that closes a *frame* begun at that *entry*.  Items pushed
+  minus items popped: positive, negative, or zero.
+
+#### Constraints on *valid* code
+
+Code beginning with `MAGIC` MUST be *valid*.  Constraint 1 requires every
+instruction to be defined.  Constraints 2 and 3 prove the destinations of
+jumps and calls.  Constraint 4 keeps both stacks safe from underflow.
+Constraint 5 gives every instruction one *stack offset*, and makes a
+single linear traversal sufficient.
+
+1. Every reachable instruction MUST be a valid opcode:
+
+   * it MUST have been defined in the Yellow Paper or a deployed EIP,
+   * it MUST NOT have been deprecated by a subsequent deployed EIP, and
+   * the `INVALID` opcode is *valid*.
+
+2. Every reachable `JUMP` and `JUMPI` MUST be immediately preceded by a
+   `PUSH`, whose immediate value is the destination.  The destination MUST
+   be a `JUMPDEST` or a `CALLDEST` instruction — immediate data is not an
+   instruction.  A jump to a `CALLDEST` enters the subroutine.
+
+3. Every reachable `CALLSUB` MUST be immediately preceded by a `PUSH`, whose
+   immediate value is the destination.  The destination MUST be a `CALLDEST`
+   instruction.
+
+4. On every path: each instruction MUST find at least as many items on
+   the *data stack* as it removes, and each `RETURNSUB` MUST find a
+   return address on the *return stack*.
+
+5. *Stack offsets* MUST be path-independent:
+
+   * every path reaching an instruction MUST arrive with the same
+     *stack offset*, and
+   * every *frame* begun at a given *entry* MUST close with the same
+     *net stack effect*.
+
+A subroutine is
+validated once, in terms of *stack offsets*, no matter how many call sites
+invoke it at different absolute depths.  Each *entry*'s *net stack effect*
+is a constant, so the stack offset at every return point is static.  Loops
+must be stack-neutral per iteration — a backward branch arrives at the
+*stack offset* it left — so each instruction need be visited only once.
+
+#### Validation
+
+Constraints on `MAGIC` code MUST be validated at `CREATE` time, in time and space linear in the size of the code.  Validation MUST be run on the *output* of the initialization code *before* it is executed by the interpreter, and *failure of validation is an exceptional halting state*.
+
+Validity is defined against an instruction set, and instruction sets change.  Each fork that changes the instructions available MUST define validation over the full instruction set of that fork.  At `CREATE`, code beginning with `MAGIC` MUST have a header that identifies the validation rules in force, and MUST pass them; either failure is a validation failure.  Contracts created under earlier forks remain deployed, their headers naming the rules that admitted them; reaching an opcode deprecated by a later fork is an exceptional halting state.
+
+Validation is priced like the JUMPDEST analysis it extends.  `CREATE` MUST charge the creator `VALIDATION_BYTE_COST` gas for each byte of code.  `VALIDATION_BYTE_COST` is provisionally 64, sized to the measured worst case of native validation; the final value is deferred to the gas schedule of the adopting fork.  The basis is under "What does validation cost?" in the Rationale.
+
+The layout of the `MAGIC` header is explicitly deferred to a follow-on specification: other EIPs also need to carry information in the header, and the layouts will need to be reconciled.  Only the encoding is deferred: what the header identifies — the validation rules that admitted the code — is fixed above.
+
+***Clients MUST implement validation, natively or by any equivalent means.***  The requirement is modest — under 150 lines against the executable reference below, with shared test vectors.
+
+*Note: The JVM, Wasm, and .NET VMs enforce similar constraints for similar reasons.*
+
+### Semantics versus Syntax
+
+The above is a purely *semantic* specification, placing no constraints on the *syntax* of bytecode beyond being an array of opcodes and immediate data.  Subroutines here *are not* contiguous sequences of bytecode: they are subgraphs of the bytecode's full control-flow graph.  The EVM is a simple state machine, and the control-flow graph for a program represents every possible change of state.  Each instruction simply advances the machine one state, and the instructions and state have minimal syntactic structure.  We only promise that *valid* code will not, as it were, jam up the gears of the machine.
+
+Rather than enforce semantic constraints via syntax — as is done by higher-level languages — this proposal enforces them via validation: `MAGIC` code is proven *valid* at `CREATE` time.
+
+With no syntactic constraints and minimal semantic constraints, we maximize opportunities for optimizations, including call elimination, mutual recursion, state machines, multiple entry, shared epilogues, and other interprocedural optimizations.  Since we want to support online compilation of EVM code to native code, it is crucial that the EVM code be as well optimized as possible by high-level-language compilers — upfront and offline.
+
+## Rationale
+
+### Why validation?
+
+By marking `MAGIC` contracts as *valid* we are promising that their control flow is static, and the many tools that traverse the control flow can know this without inspecting the code for themselves.  The intention is to end a vicious cycle: tools work around the EVM's dynamic control flow to recover subroutines, compilers work around it to implement them, and neither group is much aware of the other's needs — needless complexity and technical debt all around.  With this proposal it will at least and at last become possible to write static EVM code, and break the cycle.
+
+As a demonstration, `extract_cfg.py`, provided with the reference implementation, recovers the complete control-flow graph of validated code in a single linear pass.  It trusts validity and performs no checks of its own.
+
+Validation also retires runtime work: for *valid* code, JUMPDEST analysis, the per-jump destination check, and the per-instruction underflow check are all unnecessary — each was proven at `CREATE` time.
+
+More important, validation makes translation legal: with every destination proven and every stack slot at one static offset, valid code can be translated — once, at deploy, in linear time — to forms a client executes far more cheaply.  Measured with the demonstration compiler and translators among the assets of [EIP-7979](./eip-7979.md), on kernels bracketing arithmetic-heavy and call-heavy code: a register intermediate code, interpreted, runs in 1.5x to 3.3x fewer machine instructions than interpreted bytecode; RISC-V machine code runs in 4.7x to 7x fewer, and 19x to 51x composed with 64-bit arithmetic instructions.  The same binaries executed in a 64-bit RISC-V zkVM reproduce these ratios exactly in prover steps.  Gas metering and the runtime checks this proposal cannot retire — stack overflow, return depth — are included in every measurement.
+
+### Why is validation optional?
+
+**Backwards compatibility**.  We obviously cannot require existing code to become valid, and in a large, open ecosystem we cannot force an adoption schedule.
+
+### What does validation cost?
+
+Little.  Measured natively (`cbench/`), ordinary code validates at 8–11 nanoseconds per byte.  The worst case is code built to pump demands around a recursive cycle — invalid code, paying to be refused — at a measured 541 nanoseconds per byte, bounded as "Why it is linear" argues.  `VALIDATION_BYTE_COST` at its provisional 64 covers the worst case with margin: about thirty percent on top of today's roughly 216 gas per byte of deployment, charged by `CREATE` and paid by the creator.  There is nothing for an attacker to buy — the worst case is the priced case.  A contract that fails validation consumes its gas, as reverting initialization code does.
+
+### Why not prove overflow?
+
+Because it cannot be done.  With recursion, the depth of the stacks depends on data, so no static proof exists.  Without recursion overflow can be proven — the accompanying `magic_validator.py` proves it — but then every safety claim carries the qualifier "in the absence of recursion", and this proposal prefers unqualified claims.  So overflow keeps the runtime check all code has today: a bounds comparison per push, in our estimate a small percent of an interpreter's time.  And nothing is lost to tools: with control flow static, anyone can compute a contract's stack growth offline, in linear time, and a client that wants to hoist even the overflow checks can do so per code hash, as JUMPDEST analysis is cached today, with no consensus needed.
+
+### Why are the arguments to `JUMP` and `JUMPI` restricted in `MAGIC` code?
+
+Constraint 2 requires that `JUMP` and `JUMPI` in `MAGIC` code be immediately preceded by a `PUSH` instruction, making their destinations compile-time constants.
+
+The destination may be a `JUMPDEST` or a `CALLDEST`.  A jump to a `CALLDEST` enters the subroutine without a call — call elimination, discussed in EIP-7979's Rationale.  Within a subroutine, jumps go to `JUMPDEST`s; between subroutines, control enters at an *entry*, by call or by jump.  Computed dispatch stays out: destinations remain compile-time constants, so the path explosions described below cannot occur.  Jumping into the middle of another subroutine remains invalid.  Making a point enterable costs one `CALLDEST` byte, and keeps every cross-subroutine transfer visible to one-pass analysis.
+
+### How can dynamic jumps explode control flow analysis?
+
+Recovering a program's control flow is a fundamental first step for many analyses.  When all jumps are static, the number of analysis steps is linear in the number of instructions: each jump has a fixed set of successors.  With dynamic jumps, every possible destination must be considered at every jump.  At worst, the number of possible control transfers — every jump to every `JUMPDEST` — grows as the square of the number of instructions, and symbolic execution of the paths through them grows exponentially.
+
+This behavior is not merely a theoretical concern.  For Ethereum, it represents a denial-of-service vulnerability for many tools — including bytecode validation and AOT or JIT compilation at runtime.  And even offline it renders many analyses impractical, intractable, or impossible.
+
+## Backwards Compatibility
+
+Validation is opt-in and changes no semantics.  Opcode behavior *is not* affected by whether the contract is `MAGIC`, so *valid* code executes identically in any contract.  Validation of `MAGIC` code is done before the interpreter runs, such that the interpreter never sees `MAGIC` code that is not *valid*.  Clients need not maintain two interpreters.
+
+## Test Cases
+
+*Note: the bytecode strings in these tests use placeholder opcode values
+`0xB0`=`CALLSUB`, `0xB1`=`CALLDEST`, `0xB2`=`RETURNSUB`, which are to be
+confirmed when final opcode assignments are made.*
+
+### Validation
+
+*The following bytecodes exercise the validator itself: the last column is
+the expected result of `validate()`.  They are run by `test_minimal.py`,
+which accompanies the reference implementation, with `STACK_LIMIT` reduced
+to 16 so that the overflow examples stay small; the algorithm is
+independent of the limit.*
+
+**The runtime test cases of EIP-7979**
+
+| Test                        | Bytecode                     | Valid |
+|-----------------------------|------------------------------|-------|
+| simple routine              | `0x6004B000B1B2`             | yes   |
+| two levels of subroutines   | `0x6004B000B16009B0B2B1B2`   | yes   |
+| destination outside code    | `0x60FFB000B1B2`             | no    |
+| bare `RETURNSUB`            | `0xB2`                       | no    |
+| subroutine at end of code   | `0x600556B1B25B6003B0`       | yes   |
+
+**Constraint 1: opcodes**
+
+| Test                              | Bytecode         | Valid |
+|-----------------------------------|------------------|-------|
+| lone `STOP`                       | `0x00`           | yes   |
+| undefined opcode                  | `0x21`           | no    |
+| `INVALID` is *valid*              | `0xFE`           | yes   |
+| undefined opcode at return point  | `0x6004B021B1B2` | no    |
+
+**Constraints 2 and 3: destinations**
+
+| Test                           | Bytecode         | Valid |
+|--------------------------------|------------------|-------|
+| `JUMP` into `PUSH` immediate   | `0x600156`       | no    |
+| `JUMP` to visited non-`JUMPDEST` | `0x5F5F01600256` | no    |
+| `JUMP` not preceded by `PUSH`  | `0x365B56`       | no    |
+| `PUSH0`-preceded `JUMP`        | `0x5B5F56`       | yes   |
+| `CALLSUB` to `JUMPDEST`        | `0x6004B0005B`   | no    |
+
+**Constraint 4: underflow and the return stack**
+
+| Test                                  | Bytecode                         | Valid |
+|---------------------------------------|----------------------------------|-------|
+| `ADD` on empty stack                  | `0x01`                           | no    |
+| `POP` on empty stack                  | `0x50`                           | no    |
+| subroutine consumes caller argument   | `0x6002600BB06003600BB000B18002B2` | yes |
+| subroutine underflows caller          | `0x6004B000B15050B2`             | no    |
+| fall into subroutine, then `RETURNSUB` | `0xB1B2`                        | no    |
+
+**Constraint 5: offsets and net effects**
+
+| Test                          | Bytecode                         | Valid |
+|-------------------------------|----------------------------------|-------|
+| `JUMPI` arms disagree at join | `0x366005575F5B00`               | no    |
+| `JUMPI` diamond, consistent   | `0x366006575F005B5F00`           | yes   |
+| two `RETURNSUB`s disagree     | `0x6004B000B136600A57B25B5FB2`   | no    |
+| two `RETURNSUB`s agree        | `0x6004B000B136600A57B25B5F50B2` | yes   |
+| stack-neutral loop            | `0x5B600056`                     | yes   |
+
+**Reuse and multiple entry points**
+
+| Test                       | Bytecode                           | Valid |
+|----------------------------|------------------------------------|-------|
+| called at two depths       | `0x6002600BB06003600BB000B18002B2` | yes   |
+| fall-through second entry  | `0x6008B05F600AB000B15FB150B2`     | yes   |
+
+**Recursion**
+
+| Test                         | Bytecode               | Valid |
+|------------------------------|------------------------|-------|
+| recursion, no base case      | `0x6004B000B16004B0B2` | yes   |
+| recursion eats caller stack  | `0x6004B000B1506004B0` | no    |
+
+**Jumps to a `CALLDEST` (call elimination)**
+
+| Test                          | Bytecode                         | Valid |
+|-------------------------------|----------------------------------|-------|
+| jump to a `CALLDEST`         | `0x6004B000B15F600956B150B2`     | yes   |
+| conditional jump to a `CALLDEST` | `0x6004B000B136600A57B2B1B2` | yes   |
+| jump to a `CALLDEST`, net effects disagree | `0x6004B000B15F36600B57B2B150B2` | no |
+| unframed jump to a called subroutine | `0x6006B0600656B1B2`      | no    |
+
+**Overflow is not validated**
+
+| Test                                  | Bytecode                             | Valid |
+|---------------------------------------|--------------------------------------|-------|
+| 17 pushes                             | 17 × `PUSH0`, `STOP`                 | yes   |
+| stack growth amplified by two calls   | `0x6007B06007B000B15F5F5F5F5F5F5F5F5FB2` | yes |
+| call chain, depth 17                  | `call_chain(17)` in the test file    | yes   |
+| growing recursion                     | `0x6004B000B15F6004B0`               | yes   |
+
+## Reference Implementation
+
+The reference implementation below is Python: executable and tested.  It validates EVM bytecode against the five constraints defined above, in time and space linear in the size of the code, in circa 175 lines — the `validate()` function itself is circa 135.
+
+It is embedded here so that this EIP reads as a single document, and provided as a separate file, `minimal_validator.py`, together with the test suite `test_minimal.py`, which runs all of the validation test cases above, the one-pass control-flow-graph extractor `extract_cfg.py`, and the C port that measures validation's native cost, in `cbench/`.  The opcode table it imports, and the validator that additionally proves overflow for non-recursive code, are in `magic_validator.py` — kept for comparison; see "Why not prove overflow?".
+
+### Algorithm
+
+#### The idea
+
+Every client already scans deployed code, before executing it, to tell
+instructions from `PUSH` immediate data: JUMPDEST analysis.  Validation
+extends that scan.  Instead of reading bytes in order, it traverses the
+code the way execution would: starting at *PC* 0, following every jump
+and call, except that where execution takes one arm of a `JUMPI`, the
+traversal takes both.  Bytes the traversal never reaches are data,
+just as unreachable bytes are today.
+
+The traversal visits every reachable instruction exactly once.  What makes
+once enough is measuring the *data stack* relative to the subroutine
+being traversed: at a `CALLDEST` the depth count resets to zero, and
+every check inside is phrased as an offset from that start.  A
+subroutine therefore looks the same from every one of its call sites,
+however deep their stacks, and checking it once covers them all.
+Constraint 5 is what makes one visit enough: every path to an
+instruction must arrive at the same offset, so a second arrival adds
+nothing new.  For the same reason a loop is traversed once, since its
+backward branch must arrive at the offset it left.
+
+The instruction after a `CALLSUB` is reached when the frame begun at
+the callee returns, at a depth that depends on what the callee did:
+the call-site offset plus the callee's *net stack effect*.  So a
+return point cannot be visited until its callee's net is known.
+Return points wait on a pending list until that net is first fixed —
+by a `RETURNSUB` reached from the callee's entry, in whatever
+subroutine it lies.  If a callee never returns, its return points are
+never visited.  That is correct: they are unreachable.
+
+#### The details
+
+Each step of the traversal visits one instruction, knowing five things: its
+position; the stack offset on arrival; which subroutine it is in —
+that is, which `CALLDEST` it was reached from, or top-level code; a
+framed flag, saying whether an unreturned `CALLSUB` is on the path;
+and the value of the immediately preceding `PUSH`, if any, since that
+is where `JUMP`, `JUMPI`, and `CALLSUB` destinations come from.
+
+The first visit to an instruction records the offset, the subroutine,
+and the framed flag; every later arrival must match all three, or the
+code is invalid.  Offsets must match by Constraint 5.  Subroutines
+must match because the *net stack effects* are kept per subroutine: if
+paths from two different `CALLDEST`s could rejoin, there would be no
+one subroutine to charge the instructions to.  And the framed flags
+must match because a `RETURNSUB` reached without a `CALLSUB` on the
+path would underflow the *return stack* — which is also why
+`RETURNSUB` requires the flag to be set at all.
+
+Destinations are checked in whichever order the traversal reaches them.  If
+the destination is already visited, its opcode is checked on the spot:
+a `JUMPDEST` or `CALLDEST` for jumps, a `CALLDEST` for calls.  If it
+is not yet visited, the requirement is recorded and checked when the
+traversal first arrives there.  A destination inside `PUSH` data can never
+satisfy either check, since the traversal never treats such bytes as
+instructions.
+
+A `CALLDEST` is always visited as the start of its own subroutine, at
+offset zero.  Reaching one some other way — by falling through, or by
+a jump — links the two subroutines: whatever the entered subroutine's
+*net stack effect* turns out to be, the enterer's is the offset at the
+entrance plus that, since from there on their fates are the same.
+
+The reference implementation below follows this section, and each
+check in it is annotated with the constraint it enforces.
+
+### Python
+
+```python
+"""Reference validator for EIP-7979 MAGIC code.
+
+Abridged: the complete file, minimal_validator.py, accompanies this
+EIP; it imports its opcode table from magic_validator.py.
+"""
+from collections import defaultdict, deque
+
+from magic_validator import opcode_info, push_value
+
+JUMP, JUMPI, JUMPDEST = 0x56, 0x57, 0x5B
+CALLSUB, CALLDEST, RETURNSUB = 0xB0, 0xB1, 0xB2
+PUSH0, PUSH32 = 0x5F, 0x7F
+
+STACK_LIMIT = 1024
+OUTER = None          # stands for the entry of top-level code
+LABEL = "label"       # destination must be a JUMPDEST or a CALLDEST
+ENTRY = "calldest"    # destination must be a CALLDEST
+
+
+def validate(code, stack_limit=STACK_LIMIT):
+    """True iff the code satisfies the five constraints of EIP-7979
+    validation: valid opcodes, proven destinations, framed returns,
+    no underflow, and one static stack offset per instruction."""
+    if len(code) == 0:
+        return False
+
+    visited = {}                  # pc -> (offset, entry, framed) at first visit
+    required = {}                 # pc -> LABEL or ENTRY, set by jumps and calls
+    net_effect = {}               # entry -> its *net stack effect*, once known
+    inputs = defaultdict(int)     # entry -> items it needs from its caller
+    # Two parent lists with different lifetimes.  parents is permanent
+    # and complete — every call and enter — for propagating demands in
+    # the combining.  enter_parents holds only arrivals whose entry's
+    # net is still unknown; each record is consumed exactly once, when
+    # that net is first set.
+    parents = defaultdict(list)   # child -> [(parent, offset)]
+    enter_parents = defaultdict(list)  # entry -> [(parent, offset)]
+    pending = defaultdict(list)   # entry -> return points waiting on its net
+    work_items = [(0, 0, OUTER, False, None)]
+
+    def resolve(entry, value):
+        """Record an entry's net: release the return points waiting on
+        it, and settle the entries that jump or fall into it, whose
+        nets follow from this one.  False on a conflict."""
+        settle = [(entry, value)]
+        while settle:
+            e, v = settle.pop()
+            if e in net_effect:
+                if net_effect[e] != v:
+                    return False  # Constraint 5: one net per entry
+                continue
+            net_effect[e] = v
+            for ret_pc, offset, caller, framed in pending.pop(e, ()):
+                work_items.append((ret_pc, offset + v, caller, framed, None))
+            for parent, d in enter_parents[e]:
+                settle.append((parent, d + v))
+        return True
+
+    while work_items:
+        pc, offset, entry, framed, push = work_items.pop()
+        if pc >= len(code):
+            continue                     # implicit STOP: a valid end
+        op = code[pc]
+        size, pops, pushes, term = opcode_info(op)
+        if size == 0:
+            return False                 # Constraint 1: not a valid opcode
+
+        # A CALLDEST is visited at offset 0, as its own entry; arriving
+        # any other way first records the link between the subroutines.
+        if op == CALLDEST and (entry != pc or offset != 0):
+            parents[pc].append((entry, offset))
+            if pc in net_effect:      # settled: the arriving net follows
+                if not resolve(entry, offset + net_effect[pc]):
+                    return False
+            else:                     # each record is walked exactly once
+                enter_parents[pc].append((entry, offset))
+            offset, entry = 0, pc
+
+        if pc in visited:
+            # Constraint 5: paths must agree.
+            if visited[pc] != (offset, entry, framed):
+                return False
+            continue
+        visited[pc] = (offset, entry, framed)
+
+        # Constraints 2 and 3: a required destination type, if any.
+        if required.get(pc) == LABEL and op not in (JUMPDEST, CALLDEST):
+            return False
+        if required.get(pc) == ENTRY and op != CALLDEST:
+            return False
+
+        # Constraint 4: items used from below the subroutine's start.
+        need = pops - offset
+        if need > inputs[entry]:
+            if need > stack_limit:
+                return False
+            inputs[entry] = need
+        offset += pushes - pops
+        nxt = pc + size
+
+        if op == CALLSUB:
+            if push is None:
+                return False             # Constraint 3: PUSH before CALLSUB
+            dest = push
+            if dest >= len(code):
+                return False
+            if dest in visited and code[dest] != CALLDEST:
+                return False
+            required[dest] = ENTRY       # a jump's LABEL upgrades to ENTRY
+            parents[dest].append((entry, offset))
+            work_items.append((dest, 0, dest, True, None))
+            if dest in net_effect:
+                # Return point: call-site offset plus the callee's net.
+                work_items.append((nxt, offset + net_effect[dest], entry, framed, None))
+            else:
+                pending[dest].append((nxt, offset, entry, framed))
+        elif op == RETURNSUB:
+            if not framed:
+                return False             # no CALLSUB to return from
+            if not resolve(entry, offset):
+                return False
+        elif op in (JUMP, JUMPI):
+            if push is None:
+                return False             # Constraint 2: PUSH before JUMP/JUMPI
+            dest = push
+            if dest >= len(code):
+                return False
+            if dest in visited and code[dest] not in (JUMPDEST, CALLDEST):
+                return False
+            required.setdefault(dest, LABEL)
+            work_items.append((dest, offset, entry, framed, None))
+            if op == JUMPI:              # and the fall-through arm
+                work_items.append((nxt, offset, entry, framed, None))
+        elif not term:                   # everything else falls through
+            value = push_value(code, pc) if PUSH0 <= op <= PUSH32 else None
+            work_items.append((nxt, offset, entry, framed, value))
+
+    # The combining: a subroutine's demand for caller items, less the
+    # depth already on the stack at the entrance, becomes its parent's
+    # demand.  Demands only rise and the limit caps them, so this ends.
+    queue = deque(e for e in inputs if inputs[e])
+    queued = set(queue)
+    while queue:
+        e = queue.popleft()
+        queued.discard(e)
+        for parent, d in parents[e]:
+            need = inputs[e] - d
+            if need > inputs[parent]:
+                if need > stack_limit:
+                    return False
+                inputs[parent] = need
+                if parent not in queued:
+                    queue.append(parent)
+                    queued.add(parent)
+
+    # Top-level code has no caller to take items from.
+    return inputs[OUTER] == 0
+```
+
+### Why it is linear
+
+Space first: every table is indexed by an instruction's position or by
+an *entry*, so space is O(n) for code of n bytes.
+
+The traversal does a constant amount of work per instruction.  Each
+first visit creates at most two further work items (`JUMPI`'s two
+arms, or `CALLSUB`'s callee and return point); an arrival at an
+already-visited instruction costs one comparison.  The deferred work
+is resolved exactly once: each pending return point is released at
+most once, by its callee's first `RETURNSUB`, and each *entry*'s *net
+stack effect* is set once, later settlements being single
+comparisons.  The traversal is therefore O(n).
+
+The combining repeats.  A demand pushed to a parent may raise the
+parent's demand and be pushed again; but demands are whole numbers,
+they only rise, and the stack limit caps them, so each link is used
+at most about 1024 times, and time is O(1024 * n) — still linear in
+the size of the code, because 1024 is the protocol's constant, not
+the adversary's choice.  Only code built to pump demands around a
+recursive cycle — invalid code, paying to be refused — approaches
+that bound; ordinary code settles in a round or two.
+
+Measured on a C port of the validator (`cbench/`), ordinary shapes —
+straight-line code, branch-dense code, subroutines, deep call chains
+— cost 8–11 nanoseconds per byte, and the demand pump 541.  The
+Python reference runs at 2–3 microseconds per byte on the same
+ordinary shapes.  "What does validation cost?" in the Rationale
+prices these numbers.
+
+## Security Considerations
+
+Validated contracts cannot execute invalid instructions, jump to invalid locations, or underflow stack, and their return addresses are isolated from the *data stack*, so code cannot corrupt its own control flow.  Stack overflow is checked at run time, as for all code today.
+
+Validation is consensus-critical, and this proposal asks every client to implement it.  The defenses are an executable specification, shared test vectors, and differential testing; the risks that remain are a divergence between implementations, and a fault in the specification itself admitting code that a later fork must deal with.  A remediation mechanism for the latter is deferred, like the header layout.  (Fork-driven changes to validity — see Validation — need no such mechanism: contracts validated under earlier forks simply remain deployed.)
+
+Validation is linear in the size of the code, its worst case measured and priced — see "What does validation cost?".  An attacker cannot impose more validation work on the network than they pay for.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
