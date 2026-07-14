@@ -19,7 +19,7 @@ The complete control flow of `MAGIC` code can be traversed in time and space lin
 
 Validation is optional: the instructions of [EIP-7979](./eip-7979.md) behave identically in validated and ordinary code.
 
-*Note: Significant assistance from Anthropic's Claude is acknowledged, primarily for the reference implementation and its tests.*
+*Note: Significant assistance from AI is acknowledged, primarily for the reference implementation and its tests.*
 
 ## Motivation
 
