@@ -1,5 +1,5 @@
 ---
-eip: XXXX
+eip: 8337
 title: Validated EVM Code
 description: Code prefixed with MAGIC bytes is proven at CREATE time to have fully static control flow and to never underflow stack.
 author: Greg Colvin (@gcolvin) <greg@colvin.org>, Martin Holst Swende (@holiman), Brooklyn Zelenka (@expede), John Max Skaller
