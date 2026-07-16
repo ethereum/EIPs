@@ -1,6 +1,6 @@
 # Compiling validated EVM code to RISC-V: the 3x2 measurement
 
-Two proposals, one experiment.  EIP-7979 validation proves every
+Two proposals, one experiment.  EIP-8337 validation proves every
 destination constant and every instruction at one static stack
 offset; that makes translation legal — to native code, or to a
 register intermediate code a client can interpret.  EVM64 adds
@@ -91,7 +91,7 @@ so the table measures pure execution — the component these proposals
 change; on many real transactions storage dominates.
 
 Not counted: validation and translation themselves.  Those are
-one-time deploy costs, measured in ../../eip-XXXX/cbench/.  The
+one-time deploy costs, measured in ../../eip-8337/cbench/.  The
 counts here are the recurring execution the network pays for.
 
 ## Files
