@@ -25,6 +25,7 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 * Use [example domains](https://en.wikipedia.org/wiki/Example.com) in examples, not real services.
 * It's "Ethereum", not "the Ethereum".
 * Unless you're writing a fork meta EIP, don't include fork activation criteria (eg. timestamp/epoch).
+* Include language versions (eg. `pragma solidity ^0.5.2;`) when writing code blocks or importing language terms/concepts.
 
 #### Diagrams
 
