@@ -33,7 +33,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      pages_enabled: ${{ steps.pages.outcome == 'success' }}
+      pages_enabled: ${{ steps.upload.outcome == 'success' }}
     steps:
       - name: Checkout EIPs
         uses: actions/checkout@v5
@@ -49,26 +49,21 @@ jobs:
           bundler-cache: false
       - name: Install Ruby dependencies
         run: bundle install --jobs 4 --retry 3
-      - name: Setup Pages
-        id: pages
-        continue-on-error: true
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
-        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path || '' }}"
+        run: bundle exec jekyll build
         env:
           JEKYLL_ENV: production
           JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifact
-        if: steps.pages.outcome == 'success'
+        id: upload
+        if: github.repository == 'ethereum/EIPs'
         # Automatically uploads an artifact from the './_site' directory by default
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
 
   # Deployment job
   deploy:
-    if: needs.build.outputs.pages_enabled == 'true'
+    if: github.repository == 'ethereum/EIPs' && needs.build.outputs.pages_enabled == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
