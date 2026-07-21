@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout EIPs
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7.0.1
         with:
           repository: ethereum/EIPs
           path: ''
@@ -80,7 +80,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@v7.0.1
 
       - name: Link Checker
         uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
@@ -96,7 +96,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@v7.0.1
 
       - name: Get Changed Files
         id: changed
@@ -128,7 +128,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@v7.0.1
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
@@ -144,7 +144,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@v7.0.1
 
       - name: Get Changed Files
         id: changed

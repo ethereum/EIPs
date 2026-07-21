@@ -36,7 +36,7 @@ jobs:
       pages_enabled: ${{ steps.upload.outcome == 'success' }}
     steps:
       - name: Checkout EIPs
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7.0.1
         with:
           repository: ethereum/EIPs
           path: ''
