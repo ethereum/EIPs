@@ -3,11 +3,9 @@ name: Merge ERCs
 runs:
   using: 'composite'
   steps:
-    - name: Checkout ERCs
-      uses: actions/checkout@v5
-      with:
-        repository: ethereum/ERCs
-        path: ERCs
+    - name: Fetch ERCs
+      shell: bash
+      run: git clone --depth 1 https://github.com/ethereum/ERCs.git ERCs
     - name: Merge Repos
       shell: bash
       run: |
