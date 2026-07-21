@@ -16,7 +16,7 @@ group :jekyll_plugins do
 end
 
 # jekyll-github-metadata uses Faraday v2 and warns unless retry middleware is installed.
-gem "faraday-retry", "~> 2.2"
+gem "faraday-retry", "~> 2.2", require: "faraday/retry"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
