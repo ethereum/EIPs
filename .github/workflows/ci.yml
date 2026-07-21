@@ -101,15 +101,19 @@ jobs:
         id: changed
         continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          changed_files=$(gh pr diff ${{ github.event.number }} --name-only | paste -sd, -)
+          if [ -n "$changed_files" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "CHANGED_FILES=$changed_files" >> $GITHUB_ENV
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outcome == 'success' && steps.changed.outputs.changed == 'true'
         with:
           check_filenames: true
           ignore_words_file: config/.codespell-whitelist
