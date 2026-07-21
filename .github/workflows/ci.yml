@@ -107,6 +107,7 @@ jobs:
             echo "CHANGED_FILES=$changed_files" >> $GITHUB_ENV
           else
             echo "changed=false" >> $GITHUB_OUTPUT
+            echo "CHANGED_FILES=" >> $GITHUB_ENV
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
