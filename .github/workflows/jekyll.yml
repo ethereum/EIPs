@@ -56,7 +56,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           status=$(curl -sS -o /tmp/pages.json -w "%{http_code}" \
-            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/pages")
 
