@@ -75,13 +75,13 @@ jobs:
           JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifact
         id: upload
-        if: steps.pages-check.outputs.enabled == 'true'
+        if: github.repository == 'ethereum/EIPs' && steps.pages-check.outputs.enabled == 'true'
         # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v5
 
   # Deployment job
   deploy:
-    if: needs.build.outputs.pages_enabled == 'true' && needs.build.outputs.artifact_uploaded == 'true'
+    if: github.repository == 'ethereum/EIPs' && needs.build.outputs.pages_enabled == 'true' && needs.build.outputs.artifact_uploaded == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
