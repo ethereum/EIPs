@@ -55,10 +55,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set +e
           status=$(curl -sS -o /tmp/pages.json -w "%{http_code}" \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/pages" || true)
+            "https://api.github.com/repos/${{ github.repository }}/pages")
+          curl_exit=$?
+          set -e
+
+          if [ "$curl_exit" -ne 0 ]; then
+            status="000"
+            echo "Pages site check failed (curl exit $curl_exit); skipping artifact upload and deploy."
+          fi
 
           if [ "$status" = "200" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
