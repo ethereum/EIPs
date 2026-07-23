@@ -1,25 +1,18 @@
 <style type="text/css">
-  .eiptable .title {
-    width: 67%;
-  }
-
-  .eiptable .author {
-    width: 33%;
-  }
+.eiptable .title { width: 67%; }
+.eiptable .author { width: 33%; }
 </style>
 {% for status in site.data.statuses %}
-  {% assign eips = include.eips|where:"status",status|sort:"eip" %}
-  {% assign count = eips|size %}
+  {% assign eips = include.eips | where:"status",status | sort:"eip" %}
+  {% assign count = eips | size %}
   {% if count > 0 %}
     <h2 id="{{status|slugify}}">{{status}}</h2>
     <table class="eiptable">
       <thead>
         {% if status == "Last Call" %}
-          <tr>
-          <th class="eipnum">Number</th><th class="date">Review ends</th><th class="title">Title</th><th class="author">Author</th></tr>
+          <tr><th class="eipnum">Number</th><th class="date">Review ends</th><th class="title">Title</th><th class="author">Author</th></tr>
         {% elsif status == "Withdrawn" %}
-        <tr>
-          <th class="eipnum">Number</th><th class="withdrawn-reason">Withdrawn Reason</th><th class="title">Title</th><th class="author">Author</th></tr>      
+          <tr><th class="eipnum">Number</th><th class="withdrawn-reason">Withdrawn Reason</th><th class="title">Title</th><th class="author">Author</th></tr>
         {% else %}
           <tr><th class="eipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
         {% endif %}
@@ -32,8 +25,8 @@
           {% elsif status == "Withdrawn" %}
             <td class="withdrawn-reason">{{ page.withdrawal-reason | xml_escape }}</td>
           {% endif %}
-          <td class="title">{{page.title|xml_escape}}</td>
-          <td class="author">{% include authorlist.html authors=page.author %}</td>
+          <td class="title">{% if page.title %}{{page.title|xml_escape}}{% else %}ERC-{{page.eip|xml_escape}}{% endif %}</td>
+          <td class="author">{% if page.author %}{% include authorlist.html authors=page.author %}{% else %}{{page.category|default:"—"|xml_escape}}{% endif %}</td>
         </tr>
       {% endfor %}
     </table>
