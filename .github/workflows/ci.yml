@@ -122,7 +122,7 @@ jobs:
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
-      - uses: ethereum/eipw-action@be3fa642ec311d0b8e1fdb811e5c9b4ada3d3d93
+      - uses: ethereum/eipw-action@b858a0f2687c12af12280aa934c3b842747414fd
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
