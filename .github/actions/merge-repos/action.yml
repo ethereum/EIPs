@@ -3,11 +3,9 @@ name: Merge ERCs
 runs:
   using: 'composite'
   steps:
-    - name: Checkout ERCs
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      with:
-        repository: ethereum/ERCs
-        path: ERCs
+    - name: Fetch ERCs
+      shell: bash
+      run: git clone --depth 1 https://github.com/ethereum/ERCs.git ERCs
     - name: Merge Repos
       shell: bash
       run: |
@@ -21,4 +19,7 @@ runs:
         cd $GITHUB_WORKSPACE/assets
         find . -depth -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
         cd $GITHUB_WORKSPACE
+        # ERC-7730 currently contains a literal "{{ ... }}" example that Liquid parses;
+        # wrap this single sentence in raw tags after merge so Jekyll does not warn.
+        perl -i -pe 's|To include literal curly braces in the intent text, escape them by doubling: `\{\{` for `\{` and `\}\}` for `\}`\.|{% raw %}To include literal curly braces in the intent text, escape them by doubling: `{{` for `{` and `}}` for `}`.{% endraw %}|g' "$GITHUB_WORKSPACE/EIPS/eip-7730.md" || true
         rm -rf ERCs
