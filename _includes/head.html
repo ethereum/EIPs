@@ -1,4 +1,15 @@
 <head>
+  <!-- Blocking theme script: runs before paint to prevent FOUC -->
+  <script>
+    (function() {
+      var theme = localStorage.getItem('eip-theme');
+      if (!theme) {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -42,6 +53,11 @@
       "@context": "https://schema.org"
     }
   </script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
   <link rel="icon" type="image/png" href="{{ '/assets/images/favicon.png' | relative_url }}" />
   {%- feed_meta -%}
@@ -93,6 +109,181 @@
           console.error("unable to render citation", e);
         }
       }
+    });
+  </script>
+  <!-- Scroll reveal, theme toggle, keyboard shortcuts, scroll-to-top (lightweight UX enhancements) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var r = document.querySelectorAll('.reveal');
+      r.forEach(function(e) { e.classList.add('js-reveal'); });
+      if (r.length && 'IntersectionObserver' in window) {
+        var o = new IntersectionObserver(function(e) {
+          e.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('is-visible'); o.unobserve(e.target); } });
+        }, { threshold: 0.08 });
+        r.forEach(function(e) { o.observe(e); });
+      } else {
+        r.forEach(function(e) { e.classList.add('is-visible'); });
+      }
+
+      // Sticky header shadow on scroll
+      var h = document.querySelector('.site-header');
+      if (h) {
+        window.addEventListener('scroll', function() {
+          h.classList.toggle('scrolled', window.scrollY > 10);
+        });
+      }
+
+      // Mobile nav toggle
+      var trigger = document.querySelector('.nav-trigger');
+      var hamburger = document.querySelector('.menu-icon');
+      if (trigger && hamburger) {
+        hamburger.addEventListener('click', function(e) {
+          e.preventDefault();
+          trigger.checked = !trigger.checked;
+        });
+        // Close mobile nav when a link is clicked
+        var navLinks = document.querySelectorAll('.trigger .page-link');
+        for (var nl = 0; nl < navLinks.length; nl++) {
+          navLinks[nl].addEventListener('click', function() {
+            trigger.checked = false;
+          });
+        }
+      }
+
+      // Theme toggle
+      var toggleBtn = document.querySelector('.eip-theme-toggle');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function(e) {
+          var html = document.documentElement;
+          var current = html.getAttribute('data-theme');
+          var next = current === 'dark' ? 'light' : 'dark';
+          html.setAttribute('data-theme', next);
+          localStorage.setItem('eip-theme', next);
+        });
+      }
+
+      // Back-to-top links next to headings on EIP detail pages
+      (function() {
+        var ct = document.querySelector('.eip-layout__content');
+        if (!ct) return;
+        var hds = ct.querySelectorAll('h2[id], h3[id]');
+        for (var i = 0; i < hds.length; i++) {
+          var lnk = document.createElement('a');
+          lnk.className = 'eip-back-to-top';
+          lnk.href = '#';
+          lnk.setAttribute('aria-label', 'Back to top');
+          lnk.innerHTML = '&nbsp;\u2191 back to top';
+          hds[i].appendChild(lnk);
+        }
+        // Bind click via delegation so links work after creation
+        ct.addEventListener('click', function(e) {
+          var t = e.target;
+          if (t.classList && t.classList.contains('eip-back-to-top')) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      })();
+
+      // Sticky TOC active heading tracking (EIP detail pages only)
+      (function() {
+        var stickyToc = document.getElementById('eip-sticky-toc');
+        if (!stickyToc) return;
+
+        // Gather all h2 and h3 elements with IDs in the main content area
+        var content = document.querySelector('.eip-layout__content');
+        if (!content) return;
+
+        var headings = content.querySelectorAll('h2[id], h3[id]');
+        if (!headings.length) return;
+
+        var tocLinks = stickyToc.querySelectorAll('a[href^="#"]');
+        if (!tocLinks.length) return;
+
+        var tocLinkMap = {};
+        for (var tl = 0; tl < tocLinks.length; tl++) {
+          var href = tocLinks[tl].getAttribute('href');
+          if (href) tocLinkMap[href.replace('#', '')] = tocLinks[tl];
+        }
+
+        function updateActiveToc() {
+          var currentId = '';
+          var scrollTop = window.scrollY + 120;
+
+          for (var h = 0; h < headings.length; h++) {
+            if (headings[h].offsetTop <= scrollTop) {
+              currentId = headings[h].getAttribute('id');
+            }
+          }
+
+          for (var t = 0; t < tocLinks.length; t++) {
+            tocLinks[t].classList.remove('eip-toc--active');
+          }
+
+          if (currentId && tocLinkMap[currentId]) {
+            tocLinkMap[currentId].classList.add('eip-toc--active');
+          }
+        }
+
+        // Throttled scroll listener
+        var tocThrottle = null;
+        window.addEventListener('scroll', function() {
+          if (tocThrottle) return;
+          tocThrottle = setTimeout(function() {
+            updateActiveToc();
+            tocThrottle = null;
+          }, 80);
+        });
+
+        updateActiveToc();
+      })();
+
+      // Keyboard shortcut: Cmd+K / Ctrl+K / / to focus search
+      (function() {
+        function getSearchInput() {
+          return document.getElementById('eip-search-input') || document.getElementById('eip-search-page-input');
+        }
+        document.addEventListener('keydown', function(e) {
+          // '/' — but not when typing in an input/textarea
+          if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+            var tag = e.target.tagName;
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !e.target.isContentEditable) {
+              e.preventDefault();
+              var si = getSearchInput();
+              if (si) { si.focus(); si.select(); }
+            }
+          }
+          // Cmd+K or Ctrl+K
+          if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            var si = getSearchInput();
+            if (si) { si.focus(); si.select(); }
+          }
+        });
+      })();
+
+      // Scroll-to-top button (create element + attach behavior)
+      (function() {
+        var btn = document.createElement('button');
+        btn.className = 'eip-scroll-top';
+        btn.setAttribute('aria-label', 'Scroll to top');
+        btn.setAttribute('type', 'button');
+        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>';
+        document.body.appendChild(btn);
+
+        var throttleTimer = null;
+        window.addEventListener('scroll', function() {
+          if (throttleTimer) return;
+          throttleTimer = setTimeout(function() {
+            btn.classList.toggle('eip-scroll-top--visible', window.scrollY > 300);
+            throttleTimer = null;
+          }, 100);
+        });
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      })();
     });
   </script>
 </head>
