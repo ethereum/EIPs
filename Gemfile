@@ -22,6 +22,7 @@ gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem "wdm", "~> 0.1.1" if Gem.win_platform?
 
 gem "html-proofer", '>=5.0.7'
+gem "faraday-retry"
 
 gem "eip_validator", ">=0.8.2"
 

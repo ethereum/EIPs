@@ -9,16 +9,22 @@ name: Post CI
 
 # This is adapted from https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run (2022-07-17)
 
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
 jobs:
   on-failure:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch PR Data
-        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
+        uses: actions/download-artifact@v4
         with:
           name: pr_number
-          workflow: ci.yml
-          run_id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: .
 
       - name: Save PR Data
         id: save-pr-data
