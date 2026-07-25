@@ -1,1 +1,3 @@
 * @eth-bot
+.github/CODEOWNERS @g11tech @jochem-brouwer @lightclient @SamWilsn @xinbenlv
+.github/workflows/ @g11tech @jochem-brouwer @lightclient @SamWilsn @xinbenlv
