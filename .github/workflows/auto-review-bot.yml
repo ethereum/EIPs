@@ -13,13 +13,20 @@ jobs:
     name: Run
     steps:
       - name: Fetch PR Number
+        env:
+          GH_TOKEN: ${{ github.token }}
         id: fetch-pr-number
-        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
-        continue-on-error: true
-        with:
-          name: pr-number
-          workflow: auto-review-trigger.yml
-          run_id: ${{ github.event.workflow_run.id }}
+        run: |
+          artifact_id="$(gh api repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts --jq '.artifacts[] | select(.name == "pr-number") | .id' | head -n 1)"
+
+          if [ -z "$artifact_id" ]; then
+            echo "pr-number artifact not found for workflow run ${{ github.event.workflow_run.id }}"
+            exit 0
+          fi
+
+          gh api repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip > pr-number.zip
+          unzip -o pr-number.zip
+          rm -f pr-number.zip
 
       - name: Check PR Number file
         id: check-pr-number
