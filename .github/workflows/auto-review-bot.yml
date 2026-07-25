@@ -12,18 +12,31 @@ jobs:
     name: Run
     steps:
       - name: Fetch PR Number
+        id: fetch-pr-number
         uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
         with:
           name: pr-number
           workflow: auto-review-trigger.yml
           run_id: ${{ github.event.workflow_run.id }}
+          if_no_artifact_found: warn
+
+      - name: Check PR Number
+        id: check-pr-number
+        run: |
+          if [ ! -f pr-number.txt ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "found=true" >> "$GITHUB_OUTPUT"
 
       - name: Save PR Number
         id: save-pr-number
-        run: echo "pr=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+        if: steps.check-pr-number.outputs.found == 'true'
+        run: echo "pr=$(cat pr-number.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Auto Review Bot
         id: auto-review-bot
+        if: steps.check-pr-number.outputs.found == 'true'
         uses: ethereum/eip-review-bot@dist
         continue-on-error: true
         with:
