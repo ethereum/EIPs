@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch PR Data
-        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
+        uses: dawidd6/action-download-artifact@3fcb8809b6de9185645975f955db1f16f7142945
         with:
           name: pr_number
-          workflow: ci.yml
+          workflow: Continuous Integration
           run_id: ${{ github.event.workflow_run.id }}
 
       - name: Save PR Data
