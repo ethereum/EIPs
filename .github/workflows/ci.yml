@@ -107,7 +107,22 @@ jobs:
             echo "HTMLProofer scope: full site (no specific rendered pages detected)"
           else
             sort -u "$scope_file" -o "$scope_file"
-            echo "HTMLProofer scope: targeted pages"
+            existing_scope_file="/tmp/htmlproofer_paths_existing.txt"
+            : > "$existing_scope_file"
+
+            while IFS= read -r rendered_path; do
+              if [[ -f "$rendered_path" ]]; then
+                echo "$rendered_path" >> "$existing_scope_file"
+              fi
+            done < "$scope_file"
+
+            if [[ ! -s "$existing_scope_file" ]]; then
+              echo "./_site" > "$scope_file"
+              echo "HTMLProofer scope: full site (targeted outputs not present)"
+            else
+              mv "$existing_scope_file" "$scope_file"
+              echo "HTMLProofer scope: targeted pages"
+            fi
           fi
 
           cat "$scope_file"
