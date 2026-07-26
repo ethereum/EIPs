@@ -84,8 +84,25 @@ jobs:
             exit 0
           fi
 
+          has_site_changes="false"
+          requires_full_site="false"
+
+          for path in "${changed_paths[@]}"; do
+            case "$path" in
+              assets/*|_includes/*|_layouts/*|_data/*|_config.yml|index.html|all.html|core.html|erc.html|informational.html|interface.html|meta.html|networking.html)
+                has_site_changes="true"
+                requires_full_site="true"
+                ;;
+              EIPS/eip-*.md|ERCS/erc-*.md)
+                has_site_changes="true"
+                ;;
+              *)
+                ;;
+            esac
+          done
+
           # Fast path: if this PR does not affect site content, skip build/proofer entirely.
-          if ! printf '%s\n' "${changed_paths[@]}" | grep -Eq '^(EIPS/eip-[0-9]+\.md$|ERCS/erc-[0-9]+\.md$|assets/|_includes/|_layouts/|_data/|_config\.yml|index\.html$|all\.html$|core\.html$|erc\.html$|informational\.html$|interface\.html$|meta\.html$|networking\.html$)'; then
+          if [[ "$has_site_changes" != "true" ]]; then
             skip_build="true"
             echo "skip_build=$skip_build" >> "$GITHUB_OUTPUT"
             echo "HTMLProofer scope: skipped (no site-affecting files changed)"
@@ -93,7 +110,7 @@ jobs:
           fi
 
           # If site-wide templates, config, or assets changed, keep full-site validation.
-          if printf '%s\n' "${changed_paths[@]}" | grep -Eq '^(assets/|_includes/|_layouts/|_data/|_config\.yml|index\.html$|all\.html$|core\.html$|erc\.html$|informational\.html$|interface\.html$|meta\.html$|networking\.html$)'; then
+          if [[ "$requires_full_site" == "true" ]]; then
             echo "./_site" > "$scope_file"
             echo "skip_build=$skip_build" >> "$GITHUB_OUTPUT"
             echo "HTMLProofer scope: full site (site-wide files changed)"
