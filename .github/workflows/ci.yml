@@ -36,6 +36,12 @@ jobs:
           name: pr_number
           path: pr/
 
+      - name: Upload PR Number (legacy name)
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: pr-number
+          path: pr/
+
   htmlproofer:
     name: HTMLProofer
     runs-on: ubuntu-24.04
