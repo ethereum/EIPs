@@ -52,22 +52,21 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1' # Not needed with a .ruby-version file
-          bundler-cache: false
-      - name: Install Ruby dependencies
-        run: bundle install --jobs 4 --retry 3
-      - name: Build with Jekyll
-        run: bundle exec jekyll build
-        env:
-          JEKYLL_ENV: production
-          JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          bundler-cache: true
 
       - name: Build Website
         run: |
           bundle exec jekyll doctor
-          bundle exec jekyll build
+          bundle exec jekyll build --trace
         env:
           JEKYLL_ENV: production
           JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize Pages-prefixed asset paths for HTMLProofer
+        run: |
+          set -euo pipefail
+          mkdir -p ./_site/pages/ethereum/EIPs
+          ln -sfn ../../../assets ./_site/pages/ethereum/EIPs/assets
 
       - name: HTML Proofer
         run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
