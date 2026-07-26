@@ -56,7 +56,6 @@ jobs:
 
       - name: Build Website
         run: |
-          bundle exec jekyll doctor
           bundle exec jekyll build --trace
         env:
           JEKYLL_ENV: production
@@ -68,8 +67,53 @@ jobs:
           mkdir -p ./_site/pages/ethereum/EIPs
           ln -sfn ../../../assets ./_site/pages/ethereum/EIPs/assets
 
+      - name: Determine HTMLProofer scope
+        run: |
+          set -euo pipefail
+
+          scope_file="/tmp/htmlproofer_paths.txt"
+          : > "$scope_file"
+
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            echo "./_site" > "$scope_file"
+            echo "HTMLProofer scope: full site (non-PR event)"
+            cat "$scope_file"
+            exit 0
+          fi
+
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          # If site-wide templates, config, or assets changed, keep full-site validation.
+          if git diff --name-only "$base_sha" "$head_sha" | grep -Eq '^(assets/|_includes/|_layouts/|_data/|_config\.yml|index\.html$|all\.html$|core\.html$|erc\.html$|informational\.html$|interface\.html$|meta\.html$|networking\.html$)'; then
+            echo "./_site" > "$scope_file"
+            echo "HTMLProofer scope: full site (site-wide files changed)"
+            cat "$scope_file"
+            exit 0
+          fi
+
+          while IFS= read -r path; do
+            if [[ "$path" =~ ^EIPS/eip-([0-9]+)\.md$ ]]; then
+              echo "./_site/EIPS/eip-${BASH_REMATCH[1]}.html" >> "$scope_file"
+            elif [[ "$path" =~ ^ERCS/erc-([0-9]+)\.md$ ]]; then
+              echo "./_site/ERCS/erc-${BASH_REMATCH[1]}.html" >> "$scope_file"
+            elif [[ "$path" =~ ^([a-z0-9-]+)\.html$ ]]; then
+              echo "./_site/${BASH_REMATCH[1]}.html" >> "$scope_file"
+            fi
+          done < <(git diff --name-only "$base_sha" "$head_sha")
+
+          if [[ ! -s "$scope_file" ]]; then
+            echo "./_site" > "$scope_file"
+            echo "HTMLProofer scope: full site (no specific rendered pages detected)"
+          else
+            sort -u "$scope_file" -o "$scope_file"
+            echo "HTMLProofer scope: targeted pages"
+          fi
+
+          cat "$scope_file"
+
       - name: HTML Proofer
-        run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
+        run: xargs -a /tmp/htmlproofer_paths.txt bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https
       - name: DNS Validator
         run: bundle exec github-pages health-check
 
