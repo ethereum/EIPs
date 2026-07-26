@@ -84,15 +84,23 @@ jobs:
           base_sha="${{ github.event.pull_request.base.sha }}"
           head_sha="${{ github.event.pull_request.head.sha }}"
 
+          mapfile -t changed_paths < <(git diff --name-only "$base_sha" "$head_sha" || true)
+          if [[ ${#changed_paths[@]} -eq 0 ]]; then
+            echo "./_site" > "$scope_file"
+            echo "HTMLProofer scope: full site (unable to compute changed files)"
+            cat "$scope_file"
+            exit 0
+          fi
+
           # If site-wide templates, config, or assets changed, keep full-site validation.
-          if git diff --name-only "$base_sha" "$head_sha" | grep -Eq '^(assets/|_includes/|_layouts/|_data/|_config\.yml|index\.html$|all\.html$|core\.html$|erc\.html$|informational\.html$|interface\.html$|meta\.html$|networking\.html$)'; then
+          if printf '%s\n' "${changed_paths[@]}" | grep -Eq '^(assets/|_includes/|_layouts/|_data/|_config\.yml|index\.html$|all\.html$|core\.html$|erc\.html$|informational\.html$|interface\.html$|meta\.html$|networking\.html$)'; then
             echo "./_site" > "$scope_file"
             echo "HTMLProofer scope: full site (site-wide files changed)"
             cat "$scope_file"
             exit 0
           fi
 
-          while IFS= read -r path; do
+          for path in "${changed_paths[@]}"; do
             if [[ "$path" =~ ^EIPS/eip-([0-9]+)\.md$ ]]; then
               echo "./_site/EIPS/eip-${BASH_REMATCH[1]}.html" >> "$scope_file"
             elif [[ "$path" =~ ^ERCS/erc-([0-9]+)\.md$ ]]; then
@@ -100,7 +108,7 @@ jobs:
             elif [[ "$path" =~ ^([a-z0-9-]+)\.html$ ]]; then
               echo "./_site/${BASH_REMATCH[1]}.html" >> "$scope_file"
             fi
-          done < <(git diff --name-only "$base_sha" "$head_sha")
+          done
 
           if [[ ! -s "$scope_file" ]]; then
             echo "./_site" > "$scope_file"
