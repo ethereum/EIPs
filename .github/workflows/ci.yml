@@ -39,7 +39,6 @@ jobs:
   htmlproofer:
     name: HTMLProofer
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
 
     steps:
       - name: Checkout EIPs
@@ -55,18 +54,29 @@ jobs:
           ruby-version: '3.1' # Not needed with a .ruby-version file
           bundler-cache: true
 
+      - name: Build Website
+        run: |
+          bundle exec jekyll build --quiet
+        env:
+          JEKYLL_ENV: production
+          JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize Pages-prefixed asset paths for HTMLProofer
+        run: |
+          set -euo pipefail
+
+          mkdir -p ./_site/pages/ethereum/EIPs
+          ln -sfn ../../../assets ./_site/pages/ethereum/EIPs/assets
+
       - name: Determine HTMLProofer scope
-        id: scope
         run: |
           set -euo pipefail
 
           scope_file="/tmp/htmlproofer_paths.txt"
           : > "$scope_file"
-          skip_build="false"
 
           if [[ "${{ github.event_name }}" != "pull_request" ]]; then
             echo "./_site" > "$scope_file"
-            echo "skip_build=$skip_build" >> "$GITHUB_OUTPUT"
             echo "HTMLProofer scope: full site (non-PR event)"
             cat "$scope_file"
             exit 0
@@ -78,41 +88,14 @@ jobs:
           mapfile -t changed_paths < <(git diff --name-only "$base_sha" "$head_sha" || true)
           if [[ ${#changed_paths[@]} -eq 0 ]]; then
             echo "./_site" > "$scope_file"
-            echo "skip_build=$skip_build" >> "$GITHUB_OUTPUT"
             echo "HTMLProofer scope: full site (unable to compute changed files)"
             cat "$scope_file"
             exit 0
           fi
 
-          has_site_changes="false"
-          requires_full_site="false"
-
-          for path in "${changed_paths[@]}"; do
-            case "$path" in
-              assets/*|_includes/*|_layouts/*|_data/*|_config.yml|index.html|all.html|core.html|erc.html|informational.html|interface.html|meta.html|networking.html)
-                has_site_changes="true"
-                requires_full_site="true"
-                ;;
-              EIPS/eip-*.md|ERCS/erc-*.md)
-                has_site_changes="true"
-                ;;
-              *)
-                ;;
-            esac
-          done
-
-          # Fast path: if this PR does not affect site content, skip build/proofer entirely.
-          if [[ "$has_site_changes" != "true" ]]; then
-            skip_build="true"
-            echo "skip_build=$skip_build" >> "$GITHUB_OUTPUT"
-            echo "HTMLProofer scope: skipped (no site-affecting files changed)"
-            exit 0
-          fi
-
           # If site-wide templates, config, or assets changed, keep full-site validation.
-          if [[ "$requires_full_site" == "true" ]]; then
+          if printf '%s\n' "${changed_paths[@]}" | grep -Eq '^(assets/|_includes/|_layouts/|_data/|_config\.yml|index\.html$|all\.html$|core\.html$|erc\.html$|informational\.html$|interface\.html$|meta\.html$|networking\.html$)'; then
             echo "./_site" > "$scope_file"
-            echo "skip_build=$skip_build" >> "$GITHUB_OUTPUT"
             echo "HTMLProofer scope: full site (site-wide files changed)"
             cat "$scope_file"
             exit 0
@@ -136,26 +119,9 @@ jobs:
             echo "HTMLProofer scope: targeted pages"
           fi
 
-          echo "skip_build=$skip_build" >> "$GITHUB_OUTPUT"
           cat "$scope_file"
 
-      - name: Build Website
-        if: steps.scope.outputs.skip_build != 'true'
-        run: |
-          bundle exec jekyll build --quiet
-        env:
-          JEKYLL_ENV: production
-          JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Normalize Pages-prefixed asset paths for HTMLProofer
-        if: steps.scope.outputs.skip_build != 'true'
-        run: |
-          set -euo pipefail
-          mkdir -p ./_site/pages/ethereum/EIPs
-          ln -sfn ../../../assets ./_site/pages/ethereum/EIPs/assets
-
       - name: Finalize HTMLProofer scope
-        if: steps.scope.outputs.skip_build != 'true'
         run: |
           set -euo pipefail
 
@@ -189,15 +155,9 @@ jobs:
           fi
 
       - name: HTML Proofer
-        if: steps.scope.outputs.skip_build != 'true'
         run: xargs -a /tmp/htmlproofer_paths.txt bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https
 
-      - name: Skip HTML Proofer
-        if: steps.scope.outputs.skip_build == 'true'
-        run: echo "Skipping HTMLProofer: no site-affecting files changed in this PR."
-
       - name: DNS Validator
-        if: steps.scope.outputs.skip_build != 'true'
         run: bundle exec github-pages health-check
 
   link-check:
