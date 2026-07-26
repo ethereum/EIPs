@@ -161,7 +161,17 @@ jobs:
           fi
 
       - name: HTML Proofer
-        run: xargs -a /tmp/htmlproofer_paths.txt bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https
+        run: |
+          xargs -a /tmp/htmlproofer_paths.txt bundle exec htmlproofer \
+            --allow-missing-href \
+            --disable-external \
+            --assume-extension '.html' \
+            --log-level=:info \
+            --cache='{"timeframe":{"external":"6w"}}' \
+            --checks 'Links,Images,Scripts,OpenGraph' \
+            --no-check-sri \
+            --ignore-empty-alt \
+            --no-enforce_https
 
       - name: DNS Validator
         run: bundle exec github-pages health-check
