@@ -29,3 +29,8 @@ gem "html-proofer", '>=5.0.7'
 gem "eip_validator", ">=0.8.2"
 
 gem "webrick", "~> 1.8" # needed for macOS builds
+
+# Ruby 3.4 unbundles these stdlib components into separate gems.
+gem "csv", "~> 3.3"
+gem "base64", "~> 0.3"
+gem "bigdecimal", "~> 4.1"
