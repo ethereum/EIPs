@@ -1,4 +1,5 @@
 name: Merge ERCs
+description: Merge upstream ERC repository content into the EIPs workspace
 
 runs:
   using: 'composite'
