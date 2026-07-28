@@ -26,9 +26,9 @@ jobs:
           MERGE_SHA: ${{ github.sha }}
         run: |
           mkdir -p ./pr
-          echo $PR_NUMBER > ./pr/pr_number
-          echo $PR_SHA > ./pr/pr_sha
-          echo $MERGE_SHA > ./pr/merge_sha
+          printf '%s\n' "$PR_NUMBER" > ./pr/pr_number
+          printf '%s\n' "$PR_SHA" > ./pr/pr_sha
+          printf '%s\n' "$MERGE_SHA" > ./pr/merge_sha
 
       - name: Upload PR Number
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
@@ -204,13 +204,13 @@ jobs:
         id: changed
         continue-on-error: true
         run: |
-          changed_files=$(gh pr diff ${{ github.event.number }} --name-only | paste -sd, -)
+          changed_files=$(gh pr diff "${{ github.event.number }}" --name-only | paste -sd, -)
           if [ -n "$changed_files" ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "CHANGED_FILES=$changed_files" >> $GITHUB_ENV
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "CHANGED_FILES=$changed_files" >> "$GITHUB_ENV"
           else
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "CHANGED_FILES=" >> $GITHUB_ENV
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "CHANGED_FILES=" >> "$GITHUB_ENV"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -222,7 +222,7 @@ jobs:
           check_filenames: true
           ignore_words_file: config/.codespell-whitelist
           path: ${{ env.CHANGED_FILES }}
-          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+          skip: '.git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css'
 
   eipw-validator:
     name: EIP Walidator
@@ -252,9 +252,11 @@ jobs:
         id: changed
         continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          {
+            printf 'CHANGED_FILES<<EOF\n'
+            gh pr diff "${{ github.event.number }}" --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md'
+            printf 'EOF\n'
+          } >> "$GITHUB_ENV"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
