@@ -216,6 +216,24 @@ Permitted Execution Client Specifications URLs must anchor to a specific commit,
 ^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
+### Ethereum System Contract Implementations
+
+Links to the Ethereum System Contract Implementations repository may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum System Contract Implementations](https://github.com/ethereum/sys-asm/blob/83f9801245ff56878a450b5625801101b9a225a1/README.md)
+```
+
+Which renders to:
+
+[Ethereum System Contract Implementations](https://github.com/ethereum/sys-asm/blob/83f9801245ff56878a450b5625801101b9a225a1/README.md)
+
+Permitted URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ethereum/sys-asm/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/sys-asm/tree/[0-9a-f]{40}/.*)$
+```
+
 ### Execution Specification Tests
 
 Links to the Ethereum Execution Specification Tests (EEST) may be included using normal markdown syntax, such as:
