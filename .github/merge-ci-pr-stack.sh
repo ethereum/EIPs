@@ -20,7 +20,7 @@ Usage: .github/merge-ci-pr-stack.sh [options]
 Coordinate the workflow-maintenance PR stack for ethereum/EIPs:
 1. Request human editor reviews on PR 12017 and enable auto-merge.
 2. Optionally wait for PR 12017 to merge.
-3. Refresh PR 12018's branch on origin/master.
+3. Refresh PR 12018's branch on the repository default branch.
 4. Request human editor reviews on PR 12018 and enable auto-merge.
 5. Optionally wait for PR 12018 to merge.
 6. Close PRs 12016, 11923, and 11983 as superseded once PR 12018 is merged.
@@ -171,6 +171,10 @@ check_repo_access() {
       return 0
       ;;
     *)
+      if [[ "$dry_run" == true && "$check_access_only" != true ]]; then
+        log "read-only permission ($permission); continuing because --dry-run was requested"
+        return 0
+      fi
       die "insufficient GitHub permission ($permission) for reviewer/comment/close actions on $repo"
       ;;
   esac
