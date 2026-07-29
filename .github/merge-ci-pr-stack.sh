@@ -11,6 +11,7 @@ dry_run=false
 wait_for_merge=false
 refresh_final_branch=true
 default_branch=""
+check_access_only=false
 
 usage() {
   cat <<'EOF'
@@ -30,6 +31,7 @@ Options:
   --no-refresh           Skip rebasing the PR 12018 branch on origin/master.
   --repo <owner/name>    Override the target repository. Default: ethereum/EIPs
   --base-branch <name>   Override the branch used for refresh/rebase.
+  --check-access         Only validate GitHub access/permissions and exit.
   --help                 Show this message.
 EOF
 }
@@ -92,6 +94,9 @@ parse_args() {
         usage
         exit 0
         ;;
+      --check-access)
+        check_access_only=true
+        ;;
       *)
         die "unknown argument: $1"
         ;;
@@ -108,6 +113,67 @@ ensure_repo_root() {
 
 gh_auth_info() {
   gh auth status >/dev/null 2>&1 || die "gh is not authenticated"
+}
+
+repo_owner() {
+  printf '%s' "${repo%%/*}"
+}
+
+repo_name() {
+  printf '%s' "${repo##*/}"
+}
+
+run_gh() {
+  local output
+
+  if [[ "$dry_run" == true ]]; then
+    printf '[dry-run] '
+    printf '%q ' "$@"
+    printf '\n'
+    return 0
+  fi
+
+  if ! output="$($@ 2>&1)"; then
+    if printf '%s' "$output" | grep -q "Resource not accessible by integration"; then
+      die "GitHub token cannot modify $repo (resource not accessible by integration). Use a maintainer-authenticated gh session or PAT with repo/PR write permissions."
+    fi
+    printf '%s\n' "$output" >&2
+    return 1
+  fi
+
+  if [[ -n "$output" ]]; then
+    printf '%s\n' "$output"
+  fi
+}
+
+check_repo_access() {
+  local permission
+  local owner
+  local name
+
+  owner="$(repo_owner)"
+  name="$(repo_name)"
+
+  permission="$(gh api graphql \
+    -f query='query($owner:String!, $name:String!){ repository(owner:$owner,name:$name){ viewerPermission }}' \
+    -f owner="$owner" \
+    -f name="$name" \
+    --jq '.data.repository.viewerPermission' 2>/dev/null || true)"
+
+  if [[ -z "$permission" || "$permission" == "null" ]]; then
+    log "unable to determine viewerPermission for $repo; continuing with runtime checks"
+    return 0
+  fi
+
+  log "viewerPermission on $repo: $permission"
+  case "$permission" in
+    ADMIN|MAINTAIN|WRITE)
+      return 0
+      ;;
+    *)
+      die "insufficient GitHub permission ($permission) for reviewer/comment/close actions on $repo"
+      ;;
+  esac
 }
 
 resolve_default_branch() {
@@ -156,7 +222,7 @@ request_reviewers() {
   done
 
   log "requesting human reviewers on PR $pr"
-  if ! run gh pr edit "$pr" --repo "$repo" --remove-reviewer eth-bot "${args[@]}"; then
+  if ! run_gh gh pr edit "$pr" --repo "$repo" --remove-reviewer eth-bot "${args[@]}"; then
     die "failed to request reviewers on PR $pr (likely missing maintainer permissions on $repo)"
   fi
 }
@@ -165,7 +231,7 @@ enable_auto_merge() {
   local pr="$1"
 
   log "enabling auto-merge on PR $pr"
-  if ! run gh pr merge "$pr" --repo "$repo" --merge --auto; then
+  if ! run_gh gh pr merge "$pr" --repo "$repo" --merge --auto; then
     die "failed to enable auto-merge on PR $pr (branch protection/permissions may block this)"
   fi
 }
@@ -239,7 +305,7 @@ close_superseded_prs() {
     fi
 
     log "closing superseded PR $pr"
-    if ! run gh pr close "$pr" --repo "$repo" --comment "Superseded by #$gate_pr and #$final_pr. The reviewer-routing fix landed in #$gate_pr, and the consolidated CI/workflow changes landed in #$final_pr."; then
+    if ! run_gh gh pr close "$pr" --repo "$repo" --comment "Superseded by #$gate_pr and #$final_pr. The reviewer-routing fix landed in #$gate_pr, and the consolidated CI/workflow changes landed in #$final_pr."; then
       die "failed to close superseded PR $pr (missing permissions on $repo)"
     fi
   done
@@ -269,8 +335,14 @@ main() {
   parse_args "$@"
   require_tools
   gh_auth_info
+  check_repo_access
   resolve_default_branch
   ensure_repo_root
+
+  if [[ "$check_access_only" == true ]]; then
+    log "access check passed for $repo"
+    return 0
+  fi
 
   log "mode: $([[ "$dry_run" == true ]] && echo dry-run || echo live), base branch: $default_branch"
   print_pr_summary "$gate_pr"
