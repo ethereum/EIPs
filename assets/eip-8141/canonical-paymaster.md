@@ -302,5 +302,4 @@ f_rot:
 0xda42f0d11838c4c0c3129b8b8e93e9718127ad6b315e517e1088125707c4d45c
 ```
 
-The annotated assembly, the bytecode, and the hash are reproducible byte-for-byte
-from the reference assembler (two-pass label resolution, self-contained keccak-256).
+All artifacts here are reproducible from the reference assembler.
