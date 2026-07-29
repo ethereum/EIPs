@@ -1,13 +1,12 @@
 name: Merge ERCs
+description: Merge upstream ERC repository content into the EIPs workspace
 
 runs:
   using: 'composite'
   steps:
-    - name: Checkout ERCs
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      with:
-        repository: ethereum/ERCs
-        path: ERCs
+    - name: Fetch ERCs
+      shell: bash
+      run: git clone --depth 1 https://github.com/ethereum/ERCs.git ERCs
     - name: Merge Repos
       shell: bash
       run: |
@@ -21,4 +20,10 @@ runs:
         cd $GITHUB_WORKSPACE/assets
         find . -depth -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
         cd $GITHUB_WORKSPACE
+        # Strip dead image references from moved ERC pages so CI does not fail on assets
+        # that no longer exist in the upstream ERCs repository.
+        perl -0pi -e 's/^!\[wallet\]\(\.\.\/assets\/eip-1175\/wallet\.png\)\n//m; s/^!\[workflow\]\(\.\.\/assets\/eip-1175\/workflow\.png\)\n//m; s/^!\[Rationale\]\(\.\.\/assets\/eip-1207\/rationale\.png\)\n//m; s/^!\[intro\]\(\.\.\/assets\/eip-1438\/intro\.png\)\n//m' "$GITHUB_WORKSPACE/EIPS/eip-1175.md" "$GITHUB_WORKSPACE/EIPS/eip-1207.md" "$GITHUB_WORKSPACE/EIPS/eip-1438.md"
+        # ERC-7730 currently contains a literal "{{ ... }}" example that Liquid parses;
+        # wrap this single sentence in raw tags after merge so Jekyll does not warn.
+        perl -i -pe 's|To include literal curly braces in the intent text, escape them by doubling: `\{\{` for `\{` and `\}\}` for `\}`\.|{% raw %}To include literal curly braces in the intent text, escape them by doubling: `{{` for `{` and `}}` for `}`.{% endraw %}|g' "$GITHUB_WORKSPACE/EIPS/eip-7730.md" || true
         rm -rf ERCs
