@@ -10,6 +10,7 @@ reviewers=(g11tech jochem-brouwer lightclient SamWilsn xinbenlv)
 dry_run=false
 wait_for_merge=false
 refresh_final_branch=true
+default_branch=""
 
 usage() {
   cat <<'EOF'
@@ -28,6 +29,7 @@ Options:
   --wait                 Wait for each auto-merge step to complete.
   --no-refresh           Skip rebasing the PR 12018 branch on origin/master.
   --repo <owner/name>    Override the target repository. Default: ethereum/EIPs
+  --base-branch <name>   Override the branch used for refresh/rebase.
   --help                 Show this message.
 EOF
 }
@@ -81,6 +83,11 @@ parse_args() {
         repo="$2"
         shift
         ;;
+      --base-branch)
+        [[ $# -ge 2 ]] || die "--base-branch requires a value"
+        default_branch="$2"
+        shift
+        ;;
       --help)
         usage
         exit 0
@@ -103,6 +110,15 @@ gh_auth_info() {
   gh auth status >/dev/null 2>&1 || die "gh is not authenticated"
 }
 
+resolve_default_branch() {
+  if [[ -n "$default_branch" ]]; then
+    return 0
+  fi
+
+  default_branch="$(gh repo view "$repo" --json defaultBranchRef --jq '.defaultBranchRef.name')"
+  [[ -n "$default_branch" ]] || die "unable to resolve default branch for $repo"
+}
+
 pr_json() {
   gh pr view "$1" --repo "$repo" --json state,mergedAt,headRefName,reviewDecision,reviewRequests,title,isDraft
 }
@@ -113,6 +129,10 @@ pr_state() {
 
 pr_is_merged() {
   [[ "$(pr_state "$1")" == "MERGED" ]]
+}
+
+pr_is_closed_unmerged() {
+  [[ "$(pr_state "$1")" == "CLOSED" ]]
 }
 
 pr_head_ref() {
@@ -136,14 +156,18 @@ request_reviewers() {
   done
 
   log "requesting human reviewers on PR $pr"
-  run gh pr edit "$pr" --repo "$repo" --remove-reviewer eth-bot "${args[@]}"
+  if ! run gh pr edit "$pr" --repo "$repo" --remove-reviewer eth-bot "${args[@]}"; then
+    die "failed to request reviewers on PR $pr (likely missing maintainer permissions on $repo)"
+  fi
 }
 
 enable_auto_merge() {
   local pr="$1"
 
   log "enabling auto-merge on PR $pr"
-  run gh pr merge "$pr" --repo "$repo" --merge --auto
+  if ! run gh pr merge "$pr" --repo "$repo" --merge --auto; then
+    die "failed to enable auto-merge on PR $pr (branch protection/permissions may block this)"
+  fi
 }
 
 wait_until_merged() {
@@ -191,7 +215,7 @@ refresh_branch() {
     run git checkout -b "$branch" "origin/$branch"
   fi
 
-  run git rebase origin/master
+  run git rebase "origin/$default_branch"
   run git push --force-with-lease origin "$branch"
 }
 
@@ -209,8 +233,15 @@ close_superseded_prs() {
       continue
     fi
 
+    if pr_is_closed_unmerged "$pr"; then
+      log "PR $pr is already closed; skipping close"
+      continue
+    fi
+
     log "closing superseded PR $pr"
-    run gh pr close "$pr" --repo "$repo" --comment "Superseded by #$gate_pr and #$final_pr. The reviewer-routing fix landed in #$gate_pr, and the consolidated CI/workflow changes landed in #$final_pr."
+    if ! run gh pr close "$pr" --repo "$repo" --comment "Superseded by #$gate_pr and #$final_pr. The reviewer-routing fix landed in #$gate_pr, and the consolidated CI/workflow changes landed in #$final_pr."; then
+      die "failed to close superseded PR $pr (missing permissions on $repo)"
+    fi
   done
 }
 
@@ -220,6 +251,10 @@ merge_pr_in_order() {
   if pr_is_merged "$pr"; then
     log "PR $pr is already merged"
     return 0
+  fi
+
+  if pr_is_closed_unmerged "$pr"; then
+    die "PR $pr is closed and unmerged; cannot continue this merge sequence"
   fi
 
   request_reviewers "$pr"
@@ -234,9 +269,10 @@ main() {
   parse_args "$@"
   require_tools
   gh_auth_info
+  resolve_default_branch
   ensure_repo_root
 
-  log "mode: $([[ "$dry_run" == true ]] && echo dry-run || echo live)"
+  log "mode: $([[ "$dry_run" == true ]] && echo dry-run || echo live), base branch: $default_branch"
   print_pr_summary "$gate_pr"
   print_pr_summary "$final_pr"
 
