@@ -302,4 +302,4 @@ f_rot:
 0xda42f0d11838c4c0c3129b8b8e93e9718127ad6b315e517e1088125707c4d45c
 ```
 
-All artifacts here are reproducible from the reference assembler.
+The annotated listing above is the reproducible source for both the runtime bytecode and this code hash: it assembles byte-for-byte to them.
