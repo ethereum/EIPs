@@ -940,32 +940,10 @@ exactly = "Copyright and related rights waived via [CC0](../LICENSE.md)."
 [lints.markdown-spell]
 kind = "markdown-spell"
 personal_dictionary = """
-BAL
-CPSB
-Create2Deployer
-CreateX
 GiB
 Glamsterdam
-ImmutableCreate2Factory
-Linearize
 MiB
-Mispricing
-NA
-NNLS
 Perfnet
-codeless
-deduplicated
-deployers
-equilibrates
-grinded
-misprices
-mispricing
-parallelizable
-prefunded
-presigned
-runtimes
-unchunked
-unpriced
 """
 
 [lints.markdown-heading-first]
