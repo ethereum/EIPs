@@ -1,0 +1,162 @@
+---
+eip: 8298
+title: SETCODEFROM Code Reuse Instruction
+description: Adds an instruction that sets an account's code hash from an existing deployed contract.
+author: Liyi Guo (@colinlyguo), Ben Adams (@benaadams), Carlos Perez (@CPerezz), Nicolas Consigny (@nconsigny)
+discussions-to: https://ethereum-magicians.org/t/eip-8298-setcodefrom-code-reuse-instruction/28779
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-06-11
+requires: 2200, 2929, 3607, 7702
+---
+
+## Abstract
+
+This EIP introduces `SETCODEFROM`, a runtime-only EVM instruction that sets the current account's code hash to the code hash of a source account with existing deployed code. The new code is visible to later code execution.
+
+## Motivation
+
+This EIP has two primary use cases.
+
+First, it improves code reuse and deployment economics. Deploying many contracts with identical runtime code is expensive, especially when contract deployment is repriced more closely to state growth, for example under [EIP-8037](./eip-8037.md). A factory can deploy a minimal initializer runtime, call it to initialize per-instance storage, then have it adopt shared deployed code without paying code-deposit gas for identical runtime code. Existing contracts can also adopt a new shared implementation through their own upgrade logic.
+
+Second, it provides an account migration path for disabling ECDSA-based EOA transaction authority. Migration code can store account-specific wallet state, including post-quantum (PQ) wallet state, then adopt regular wallet code. After that update, account control is through the installed wallet code rather than ECDSA transaction origination. This is because the account now has regular deployed code, not an [EIP-7702](./eip-7702.md) delegation indicator, so ECDSA-authenticated transactions remain invalid under [EIP-3607](./eip-3607.md). [EIP-7702](./eip-7702.md) authorization processing can no longer redelegate the account because the authority code check only accepts empty code or an existing delegation indicator. The account can still upgrade through upgrade logic in the installed code, for example by calling `SETCODEFROM` again or by using other methods. Protocol-level ECDSA transaction origination remains permanently disabled.
+
+`SETCODEFROM` provides the code-adoption step for both cases after any per-instance state has been initialized.
+
+## Specification
+
+### Parameters
+
+The opcode and gas parameters are defined as follows:
+
+| Parameter                     | Value                                                   |
+| ----------------------------- | ------------------------------------------------------- |
+| `SETCODEFROM_OPCODE`          | `TBD`                                                   |
+| `SETCODEFROM_BASE_GAS`        | `3000`                                                  |
+| `SOURCE_ACCOUNT_ACCESS_COST`  | warm/cold account access cost                           |
+| `SETCODEFROM_GAS`             | `SETCODEFROM_BASE_GAS + SOURCE_ACCOUNT_ACCESS_COST`     |
+
+### `SETCODEFROM`
+
+`SETCODEFROM(source)` takes one stack item. The low 160 bits of the stack item are interpreted as `source`.
+
+Before execution:
+
+```text
+[..., source]
+```
+
+After execution:
+
+```text
+[..., success]
+```
+
+`success` is `1` if the code update succeeds, and `0` if no code update is made.
+
+The instruction is address-based: its input is `source` address, not a raw code hash. It reads `source.codeHash` from a live account in consensus state.
+
+For this instruction, the current account is the current execution-environment address, meaning the account returned by `ADDRESS` and whose storage is affected by `SSTORE`. If the executing code was loaded from another account, including through [EIP-7702](./eip-7702.md) delegated execution, `SETCODEFROM` updates the execution-environment account, not the code source account.
+
+A source account is valid for `SETCODEFROM` if all of the following are true:
+
+- The source account is not a precompile.
+- `source.codeHash != EMPTYCODEHASH`, where `EMPTYCODEHASH = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470`.
+- `source.code` is valid regular deployed code under the active fork, e.g. it does not start with `0xEF`, which is reserved by [EIP-3541](./eip-3541.md) and used by [EIP-7702](./eip-7702.md) delegation indicators.
+
+If initcode executes `SETCODEFROM`, whether in a contract-creation transaction or during `CREATE`/`CREATE2`, execution causes an exceptional halt.
+
+If executed in a static context, `SETCODEFROM` causes an exceptional halt.
+
+If `source` is not a valid source account, `SETCODEFROM` pushes `0` and makes no state change.
+
+If `source` is a valid source account, `SETCODEFROM` sets the current account's `codeHash` to `source.codeHash` and pushes `1`.
+
+State changes made by `SETCODEFROM` follow normal EVM revert semantics. If the frame or transaction reverts, the code update reverts.
+
+### Deployed Code Execution
+
+When `SETCODEFROM` succeeds while executing deployed code, it updates the code hash of the current execution-context account.
+
+The current execution frame continues running the code that was already loaded for that frame. The updated code hash is used by later code executing operations, including later calls to the same account in the same transaction, subject to normal revert semantics.
+
+### ECDSA Transaction Origination
+
+After `SETCODEFROM` installs regular deployed code on an account, the account is controlled through that code. The account has nonempty regular code, so an ECDSA-authenticated transaction whose recovered sender is that account is invalid under [EIP-3607](./eip-3607.md). It also disables [EIP-7702](./eip-7702.md) redelegation, because EIP-7702 authorization processing accepts only empty code or an existing valid delegation indicator for the authority account.
+
+### Gas Costs
+
+`SETCODEFROM` charges `SETCODEFROM_GAS` for each execution attempt, where `SETCODEFROM_GAS = SETCODEFROM_BASE_GAS + SOURCE_ACCOUNT_ACCESS_COST`.
+
+`SETCODEFROM_BASE_GAS` is the fixed cost to update the current execution-context account's code hash. To compute a fair cost for this operation, the authors review its impact on the system:
+
+- carrying the `source` address = `0`, charged by ordinary calldata or deployed-code costs
+- reading `source` = included in `SOURCE_ACCOUNT_ACCESS_COST`
+- source-validity checks after `source` account access = `100`, matching `WARM_STORAGE_READ_COST`
+- updating the current account's code hash = `2900`, matching a warm nonzero-to-nonzero `SSTORE` update under [EIP-2200](./eip-2200.md) and [EIP-2929](./eip-2929.md)
+- storing source bytecode = `0`, because the code already exists
+
+Although the code hash is an account field rather than a storage slot, a warm nonzero-to-nonzero `SSTORE` update is the closest current-schedule proxy for updating one already-loaded 32-byte value with revert semantics. These fixed components sum to `3000`, so `SETCODEFROM_BASE_GAS` is set to `3000`. This fixed charge is not affected by source code size because no new bytecode is stored.
+
+The source account access follows the active warm/cold account access rules. Under [EIP-2929](./eip-2929.md), if `source` is cold, charge `COLD_ACCOUNT_ACCESS_COST`. Otherwise, charge `WARM_STORAGE_READ_COST`.
+
+Under the current [EIP-2929](./eip-2929.md) source-access constants, `SETCODEFROM_GAS` is `5600` gas for a cold source and `3100` gas for a warm source.
+
+## Rationale
+
+Using an address rather than a raw code hash avoids depending on client-local code database contents, which may differ across nodes. A newly synced node may have a smaller local code database than a long-running node because it may not keep historical or unreferenced bytecode entries. For this reason, this EIP makes `SETCODEFROM` copy the code hash from a live source account, so the adopted code hash is confirmed by current consensus state.
+
+The instruction is self-only during deployed-code execution to keep authority local to the account whose code is executing. It does not allow the executing code to update any other account's code hash.
+
+Keeping `SETCODEFROM` runtime-only preserves a simple creation invariant: contract creation installs exactly the bytes returned by initcode. This avoids a second code-installation path during construction and the resulting interactions with `RETURN` output, code-deposit gas and validation, and creation failure handling.
+
+Per-instance initialization can still be atomic in the factory path. A factory deploys an account with a minimal initializer runtime, calls that account to write per-instance storage and execute `SETCODEFROM`, and can require the call to succeed. The only non-atomic path is direct contract creation with a nil `to` field, which requires a second transaction to call the initializer, but this path is expected to be uncommon for the intended use cases.
+
+For example, the instruction can be used in the following patterns.
+
+An account migration function can store account-specific wallet state, then adopt a shared wallet implementation:
+
+```
+SSTORE(pq_pubkey_slot, userPubkey)
+SSTORE(recovery_slot, recoveryConfig)
+if SETCODEFROM(PQ_WALLET_TEMPLATE) == 0: REVERT()
+STOP
+```
+
+An [ERC-20](./eip-20.md) clone factory can deploy a tiny initializer with `CREATE2`, then call it to initialize token metadata and ownership before adopting a shared token implementation:
+
+```
+SSTORE(name_slot, "MyToken")
+SSTORE(symbol_slot, "MYT")
+SSTORE(owner_slot, msg.sender)
+if SETCODEFROM(ERC20_TEMPLATE) == 0: REVERT()
+STOP
+```
+
+## Backwards Compatibility
+
+This EIP requires a hard fork to implement because it introduces a new instruction which did not exist previously. As a result, already deployed contracts using this instruction could change their behavior after this EIP.
+
+## Test Cases
+
+<!-- TODO -->
+
+## Security Considerations
+
+`SETCODEFROM` can change the code used by later executions of an account. Contracts that expose this instruction must restrict access to trusted control paths, because a successful call can permanently change account behavior if the transaction does not revert.
+
+`SETCODEFROM` changes account-code identity semantics. Code executing with an account's authority can replace the code identity visible to later execution and code-inspection with regular code from another account. This also departs from [EIP-7702](./eip-7702.md)'s conservative codehash-introspection design by introducing a related codehash-presentation risk through explicit code adoption, rather than through `EXTCODEHASH` following delegation.
+
+Unlike [EIP-6913](./eip-6913.md), which forbids code replacement when the executing code differs from the account code, this EIP allows delegated execution to update the caller's account code. This preserves existing proxy upgrade patterns, which already rely on delegated code running with the caller's authority. Wallets must treat any such module as upgrade-authorized code, restrict delegatecall targets accordingly, and require explicit authorization before execution.
+
+The source restriction requires valid regular deployed code under the active fork, e.g. code that does not use the `0xEF` prefix reserved by [EIP-3541](./eip-3541.md) and used by [EIP-7702](./eip-7702.md) delegation indicators. It also excludes empty code and precompiles. This prevents `SETCODEFROM` from bypassing deployed-code validity rules or treating precompile behavior as deployed code.
+
+Protocol-level ECDSA transaction origination is disabled once the account has regular deployed code, meaning code that is not an [EIP-7702](./eip-7702.md) delegation indicator. Contracts that verify ECDSA signatures directly through `ecRecover` may still recover that address. This affects signature-based authorization such as `permit`. A companion `ecRecover` change, such as [EIP-8151](./eip-8151.md), can reject recovered addresses whose account code is regular deployed code rather than an [EIP-7702](./eip-7702.md) delegation indicator, and return 32 zero bytes.
+
+Because the current frame keeps executing already-loaded code, implementations must clearly separate the executing code for the current frame from the account code visible to later calls. Re-entrant calls after a successful `SETCODEFROM` observe the updated code.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
