@@ -966,23 +966,6 @@ presigned
 runtimes
 unchunked
 unpriced
-100M
-100k
-150M
-200M
-21k
-24kB
-250M
-2x
-300M
-30M
-3x
-5M
-5x
-60M
-64ths
-7x
-8x
 """
 
 [lints.markdown-heading-first]
