@@ -3,7 +3,7 @@ eip: plain-ml-dsa
 title: Precompiles for ML-DSA verification
 description: Three precompiles verifying ML-DSA signatures from a concatenated public key, signature, and trailing message
 author: Danno Ferrin (@shemnon)
-discussions-to: https://ethereum-magicians.org/t/precompiles-for-ml-dsa-verification/00000
+discussions-to: https://ethereum-magicians.org/t/eip-precompiles-for-ml-dsa-verification/29211
 status: Draft
 type: Standards Track
 category: Core
