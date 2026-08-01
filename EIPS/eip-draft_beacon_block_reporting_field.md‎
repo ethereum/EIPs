@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: 8359
 title: Beacon Block Reporting Field
 description: Adds a beacon block body field for validator client and setup reporting.
 author: hanniabu (@hanniabu),  Luca Winter (@eth2353), Paul Harris (@rolfyone)
