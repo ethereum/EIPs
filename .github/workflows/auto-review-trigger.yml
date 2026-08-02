@@ -27,6 +27,17 @@ jobs:
           pr_number="${{ github.event_name == 'pull_request_target' && github.event.number || github.event_name == 'pull_request_review' && github.event.pull_request.number || github.event_name == 'workflow_dispatch' && inputs.pr_number || github.event_name == 'issue_comment' && github.event.issue.number || '' }}"
           echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
 
+      - name: Save PR Number Artifact Payload
+        if: ${{ steps.pr-number.outputs.pr_number != '' }}
+        run: echo "${{ steps.pr-number.outputs.pr_number }}" > pr-number.txt
+
+      - name: Upload PR Number Artifact
+        if: ${{ steps.pr-number.outputs.pr_number != '' }}
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: pr-number
+          path: pr-number.txt
+
       - name: Auto Review Bot
         uses: ethereum/eip-review-bot@dist
         continue-on-error: true
