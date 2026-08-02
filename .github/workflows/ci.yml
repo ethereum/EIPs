@@ -76,11 +76,13 @@ jobs:
           ln -sfn ../../../assets ./_site/pages/ethereum/EIPs/assets
 
       - name: Determine HTMLProofer scope
+        id: htmlproofer-scope
         run: |
           set -euo pipefail
 
           scope_file="/tmp/htmlproofer_paths.txt"
           : > "$scope_file"
+          echo "run=true" >> "$GITHUB_OUTPUT"
 
           if [[ "${{ github.event_name }}" != "pull_request" ]]; then
             echo "./_site" > "$scope_file"
@@ -119,8 +121,8 @@ jobs:
           done
 
           if [[ ! -s "$scope_file" ]]; then
-            echo "./_site" > "$scope_file"
-            echo "HTMLProofer scope: full site (no specific rendered pages detected)"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "HTMLProofer scope: skipped (no rendered pages affected)"
           else
             sort -u "$scope_file" -o "$scope_file"
             echo "HTMLProofer scope: targeted pages"
@@ -129,6 +131,7 @@ jobs:
           cat "$scope_file"
 
       - name: Finalize HTMLProofer scope
+        if: steps.htmlproofer-scope.outputs.run == 'true'
         run: |
           set -euo pipefail
 
@@ -162,6 +165,7 @@ jobs:
           fi
 
       - name: HTML Proofer
+        if: steps.htmlproofer-scope.outputs.run == 'true'
         run: |
           xargs -a /tmp/htmlproofer_paths.txt bundle exec htmlproofer \
             --allow-missing-href \
@@ -175,6 +179,7 @@ jobs:
             --no-enforce_https
 
       - name: DNS Validator
+        if: steps.htmlproofer-scope.outputs.run == 'true'
         run: bundle exec github-pages health-check
 
   link-check:
