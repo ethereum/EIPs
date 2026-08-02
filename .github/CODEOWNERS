@@ -1,1 +1,4 @@
 * @eth-bot
+
+# Route workflow changes to human editors for review.
+.github/workflows/** @lightclient @SamWilsn @xinbenlv @g11tech @jochem-brouwer
