@@ -525,6 +525,28 @@ Permitted Execution API Specification URLs must anchor to a specific commit, and
 ^(https://github.com/ethereum/execution-apis/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-apis/tree/[0-9a-f]{40}/.*)$
 ```
 
+### System Contracts
+
+Links to the Ethereum system contracts may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum System Contracts](https://github.com/ethereum/sys-asm/blob/3bba94c696bc46beeecef05db6c2df0f18b4b239/README.md)
+```
+
+Which renders to:
+
+[Ethereum System Contracts](https://github.com/ethereum/sys-asm/blob/3bba94c696bc46beeecef05db6c2df0f18b4b239/README.md)
+
+Permitted System Contracts URLs must anchor to a specific commit, and so must match one of these regular expressions:
+
+```regex
+^https://(www\.)?github\.com/ethereum/sys-asm/(blob|tree)/[a-f0-9]{40}/.+$
+```
+
+```regex
+^https://(www\.)?github\.com/ethereum/sys-asm/commit/[a-f0-9]{40}$
+```
+
 ## Linking to other EIPs
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP as `./eip-1.md`.
