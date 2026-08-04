@@ -12,7 +12,7 @@ requires: 8141, 8288
 
 ## Abstract
 
-This EIP defines a mempool-layer admission class for [EIP-8141](./eip-8141.md) frame transactions. A transaction MAY be gossiped together with a succinct STARK — an *admission proof* — that proves its validation prefix, executed against a recent state root `S`, satisfies the EIP-8141 trace rules and terminates with `APPROVE` and payer `P`. A node MAY admit such a transaction by verifying the proof instead of simulating the prefix, and proof-carrying transactions are relaxed from the `MAX_VERIFY_GAS` prefix bound. The proof is in the [EIP-8288](./eip-8288.md) enshrined proof format and is verified with the same ingress machinery. This is pure networking policy: no consensus change, no new transaction type, no change to the EIP-8288 enshrined circuit. The proof is transport metadata only — it never appears in a block, receipt, or on-chain state, and is discarded after inclusion.
+This EIP defines a mempool-layer admission class for [EIP-8141](./eip-8141.md) frame transactions. A transaction MAY be gossiped together with a succinct STARK — an *admission proof* — that proves its validation prefix, executed with every state read resolved per a declared assumption vector `A`, satisfies the EIP-8141 trace rules and terminates with `APPROVE` and payer `P`. A node MAY admit such a transaction by verifying the proof instead of simulating the prefix, and proof-carrying transactions are relaxed from the `MAX_VERIFY_GAS` prefix bound. The proof is in the [EIP-8288](./eip-8288.md) enshrined proof format and is verified with the same ingress machinery. This is pure networking policy: no consensus change, no new transaction type, no change to the EIP-8288 enshrined circuit. The proof is transport metadata only — it never appears in a block, receipt, or on-chain state, and is discarded after inclusion.
 
 Like the EIP-8141 mempool rules and [ERC-7562](./eip-7562.md), the rules in this document govern public-mempool propagation, **not** block validity. A block containing a transaction admitted under this policy is valid or invalid on ordinary protocol rules alone.
 
@@ -35,7 +35,7 @@ This document uses, without restating, terms from its dependencies: from EIP-814
 | Parameter | Description | Suggested value |
 | --- | --- | --- |
 | `PREFIX_VK` | Verification key of the prefix-semantics circuit | A defined constant of the enshrined-system release; versioned per fork |
-| `MAX_PROOF_STATE_AGE` | Maximum age, in blocks, of the state root `S` a proof may target | `~32` |
+| `MAX_ASSUMPTION_COUNT` | Per-transaction cap on the number of assumption entries in `A`; revalidation is linear in it | `~32` |
 | `MAX_ADMISSION_PROOF_SIZE` | Per-proof transport size cap | Order 256 KiB; expected to fall as proof systems improve |
 
 Values are RECOMMENDED defaults; clients SHOULD ship identical defaults (see Security Considerations, *denial of service*).
@@ -44,9 +44,9 @@ Values are RECOMMENDED defaults; clients SHOULD ship identical defaults (see Sec
 
 The admission proof is a proof in the EIP-8288 enshrined proof format, under the verification key `PREFIX_VK`, of the statement:
 
-> Executing the validation prefix of transaction `T` (identified by `sig_hash(T)`) against state root `S`, under the EIP-8141 trace rules, and assuming the transaction's declared dependency/signature list `D` is valid, terminates with `APPROVE` and payer `P`, subject to the declared validity conditions `C`.
+> Executing the validation prefix of transaction `T` (identified by `sig_hash(T)`), under the EIP-8141 trace rules, with every state read resolved per the declared assumption vector `A`, and assuming the declared dependency/signature list `D` is valid, terminates with `APPROVE` and payer `P`, subject to the declared validity conditions `C`.
 
-Public inputs are `(sig_hash(T), S, H(D), P, C)`. The prover MUST also commit — as a public input or committed access list — to the sender-local state the prefix reads (nonce, code hash, listed storage keys); nodes delta-check that commitment on revalidation.
+Public inputs are `(sig_hash(T), H(A), H(D), P, C)`. The assumption vector `A` supersedes any access-list commitment: it declares every state read the prefix makes — including the canonical-paymaster accounting reads — as typed entries `(address, key-or-balance, type, value)` with `type ∈ {EQ, GEQ}`. The circuit performs no state-tree access; it evaluates the prefix against `A` and exposes `H(A)`, and nodes check `A` against live local state natively (at admission and on every revalidation). Where the prefix's dependence on a read is monotone — balance and prefund checks are `≥` comparisons — the circuit MUST record a `GEQ` threshold ("approves for all values ≥ `value`"), never the observed exact value; `EQ` is for exact dependencies such as a code hash or a non-monotonic storage branch, which correctly break on any change.
 
 ### Dependencies are assumptions, not sub-proofs
 
@@ -59,13 +59,12 @@ On receiving a proof-carrying frame transaction, a node MUST, in order:
 1. Run stateless checks first — intrinsic validity and signature-list well-formedness. If any fail, reject.
 2. Verify the admission proof against `PREFIX_VK`. If verification fails, reject and attribute the failure to the forwarding peer.
 3. Verify the declared list `D` (which MUST match `H(D)`) through the EIP-8288 ingress pipeline — discharging the proof's assumption that `D` is valid.
-4. Check that `S` is canonical and no older than `MAX_PROOF_STATE_AGE`.
-5. Check that every declared condition in `C` currently holds.
-6. Check that the sender-local state committed by the proof (step *Statement*) is unchanged since `S`.
+4. Check that every declared condition in `C` currently holds.
+5. Check the declared vector `A` (carried with the transaction, which MUST match `H(A)`) against current head state — `EQ` entries by equality, `GEQ` entries by threshold (`current ≥ value`).
 
 If all pass, the node MAY admit the transaction **without simulating the prefix**, and MUST otherwise treat it as an ordinary frame transaction for propagation and pool management.
 
-A proof relaxes only the *cost* of admission: all other EIP-8141 rules are unchanged — in particular, prefix reads MUST remain sender-local and MUST NOT depend on shared mutable state — so a proof never alters what a transaction's validity depends on, only how cheaply it can be checked.
+A proof relaxes only the *cost* of admission: all other EIP-8141 rules are unchanged — in particular, prefix reads MUST remain sender-local plus the canonical-paymaster accounting, and MUST NOT depend on other shared mutable state — so a proof never alters what a transaction's validity depends on, only how cheaply it can be checked.
 
 ### Relaxations granted to proof-carrying transactions
 
@@ -74,14 +73,11 @@ A proof relaxes only the *cost* of admission: all other EIP-8141 rules are uncha
 
 ### Revalidation and staleness
 
-On each new block, for a pooled proof-carrying transaction a node MUST re-check only:
+On each new block, for a pooled proof-carrying transaction a node MUST re-check the declared conditions `C` and every entry of the assumption vector `A` against head state. This is no EVM execution and no re-verification of the proof — its verdict, verified once at admission, is a cached fact about a pure function. A surviving `GEQ` entry costs one read and one compare; this is the steady state.
 
-- the declared conditions `C`, and
-- the committed sender-local reads against the new head state — a cheap delta check, with no EVM execution.
+A pooled proof does not go stale merely because unrelated state advances: an `EQ` entry changes only when the accounts it names act, and a `GEQ` entry tolerates arbitrary change while its threshold holds. In particular the EIP-8141 paymaster trigger — which flags a paymaster's pending transactions on a balance change — reduces here to re-checking that paymaster's single `GEQ` entry, so a shared paymaster whose balance churns every block no longer forces per-block re-proving.
 
-A pooled proof does not go stale merely because the global state root advances each block: prefix reads are sender-local, so only a change to the account's *own* declared reads invalidates it — which, as for an ordinary transaction today, happens only when that account itself sends another transaction. `MAX_PROOF_STATE_AGE` therefore bounds proving latency, not per-block staleness: the proof must target a root recent enough to still be inside the window when it arrives.
-
-If either check fails, the node MUST evict the transaction. The submitter may then re-prove against a fresh root, or fall back to simulated admission if the prefix fits within `MAX_VERIFY_GAS`. Simulated admission remains the default class; this policy is strictly additive.
+On a failed `GEQ` entry a node MAY *park* the transaction rather than evict it: re-checking stays a read, and a topped-up paymaster resurrects the parked set with no re-submission. A failed `EQ` entry invalidates the proof — the node MUST evict, and only the submitter can re-prove (or fall back to simulated admission if the prefix fits within `MAX_VERIFY_GAS`). Simulated admission remains the default class; this policy is strictly additive.
 
 ### Transport
 
@@ -93,13 +89,15 @@ A devp2p extension carries the admission proof alongside the transaction envelop
 
 ## Rationale
 
-**On EIP-8288.** EIP-8288 is not a strict dependency; the mechanism is logically independent of signature aggregation, and reuses 8288's proof format and ingress-verification machinery by design. Verification is the binding cost — every node runs it on every proof, against one cryptographic stack to audit and version — whereas proving runs once, off-chain, for an opt-in transaction; a purpose-built system would prove the prefix's heavier workload (EVM execution, keccak/MPT state access) more cheaply, but only by adding a second network-wide verifier, the wrong trade for a networking-layer feature. Deployment is thus expected alongside or after EIP-8288, though earlier client-level implementation is possible.
+**On EIP-8288.** EIP-8288 is not a strict dependency; the mechanism is logically independent of signature aggregation, and reuses 8288's proof format and ingress-verification machinery by design. Verification is the binding cost — every node runs it on every proof, against one cryptographic stack to audit and version — whereas proving runs once, off-chain, for an opt-in transaction; a purpose-built system would prove the prefix's heavier workload (EVM execution) more cheaply, but only by adding a second network-wide verifier, the wrong trade for a networking-layer feature. Deployment is thus expected alongside or after EIP-8288, though earlier client-level implementation is possible.
 
-**Mempool-only; the proof never lands on-chain.** At inclusion the chain executes the prefix authoritatively, so an on-chain proof would be calldata spent predicting something the block does anyway. The statement is deliberately scoped as conditional on `S`, so an attested claim can never contradict actual execution — it asserts a fact about state `S`, not about the block.
+**Mempool-only; the proof never lands on-chain.** At inclusion the chain executes the prefix authoritatively, so an on-chain proof would be calldata spent predicting something the block does anyway. The statement is deliberately conditional — on the assumption vector `A` and dependency list `D` — so an attested claim can never contradict actual execution: it asserts a fact about a pure function of declared inputs, not about the block.
 
 **The enshrined 8288 circuit is untouched.** `PREFIX_VK` is a distinct circuit that only targets the shared proving backend; admission proofs are mempool-only and need no consensus support, so the EIP adds nothing to the scarce budget of consensus-circuit complexity.
 
 **Dependencies are assumed, not proven.** Verifying them inside the prefix circuit would duplicate what the 8288 ingress pipeline already does and risk divergence between the two verifiers.
+
+**Assumptions, not a state root.** Resolving every read through the typed vector `A`, rather than anchoring the proof to a state root, removes all state-tree access from the circuit: in-circuit keccak/MPT proving — the costliest component — is gone by construction, and the mechanism no longer waits on a hash-friendly state-tree migration. It also makes revalidation, not admission, the operation the mechanism lives on. A proof-heavy prefix (say an in-EVM zk-proof verification) that today is re-simulated per pending withdrawal per block on paymaster-balance churn becomes, under `GEQ` thresholds, one read and one compare per withdrawal per block, with the proof never re-run — the 8141 paymaster trigger is not skipped, its handler just changes class, from `O(prefix gas)` execution to `O(|A|)` reads. This recurring saving dominates the one-time admission saving by orders of magnitude.
 
 ## Backwards Compatibility
 
@@ -109,7 +107,7 @@ Fully additive. This EIP introduces no new transaction type, no new opcodes, and
 
 **Inherited proof-system assumptions.** Admission soundness rests entirely on the EIP-8288 proof system and on `PREFIX_VK`. Both MUST track enshrined-system upgrades across forks, and `PREFIX_VK` MUST be versioned so nodes reject proofs made for a superseded circuit.
 
-**Denial of service.** Proof verification is cheap but nonzero and runs before forwarding. Nodes MUST run stateless checks first, MUST enforce `MAX_ADMISSION_PROOF_SIZE` to reject oversized proofs before parsing, and SHOULD rate-limit proof-carrying transactions per peer; an invalid proof is attributable to the peer that forwarded it. Because these are advisory rules, clients SHOULD ship identical parameter defaults; if client policies diverge, gossip for proof-carrying transactions will fragment.
+**Denial of service.** Proof verification is cheap but nonzero and runs before forwarding. Nodes MUST run stateless checks first, MUST enforce `MAX_ADMISSION_PROOF_SIZE` to reject oversized proofs before parsing, and SHOULD rate-limit proof-carrying transactions per peer; an invalid proof is attributable to the peer that forwarded it. Per-block revalidation is `O(|A|)` reads per pooled transaction, bounded by `MAX_ASSUMPTION_COUNT`. Because these are advisory rules, clients SHOULD ship identical parameter defaults; if client policies diverge, gossip for proof-carrying transactions will fragment.
 
 ## Copyright
 
