@@ -1,5 +1,5 @@
 ---
-title: SSZ compact multiproofs
+title: SSZ Compact Multiproofs
 description: A request-friendly Merkle multiproof format using a proof descriptor bitlist
 author: Zsolt Felföldi (@zsfelfoldi), Cayman (@wemeetagain), Lodekeeper (@lodekeeper)
 discussions-to: <URL>
@@ -30,9 +30,9 @@ This format is a building block for protocols and APIs that serve dynamically-ch
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-This specification extends the [SSZ Merkle proof specification](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/merkle-proofs.md) and reuses its definitions of `GeneralizedIndex` and `get_helper_indices`. The `hash` function is SHA-256, as defined in the [consensus specifications](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/specs/phase0/beacon-chain.md).
+This specification extends the [Simple Serialize (SSZ) Merkle proof specification](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/ssz/merkle-proofs.md) and reuses its definitions of `GeneralizedIndex` and `get_helper_indices`. The `hash` function is SHA-256, as defined in the [consensus specifications](https://github.com/ethereum/consensus-specs/blob/b5c3b619887c7850a8c1d3540b471092be73ad84/specs/phase0/beacon-chain.md#hash).
 
-### Proof descriptor
+### Proof Descriptor
 
 A multiproof is a set of `N` tree nodes — requested nodes and helper nodes, treated uniformly — such that no node is a descendant of another and, together, the nodes merkleize to the root of the tree.
 
@@ -53,7 +53,7 @@ A serialized descriptor is valid if and only if:
 
 Implementations MUST reject invalid descriptors. These rules also make the encoding canonical: every valid descriptor has exactly one serialization, so a given proof shape is not byte-malleable.
 
-### Proof node ordering
+### Proof Node Ordering
 
 The `N` proof nodes are serialized in the order the traversal above visits them: depth-first, left to right. Equivalently, they are ordered lexicographically by the binary representations of their generalized indices.
 
@@ -80,7 +80,7 @@ A multiproof for generalized index 42 consists of proof nodes at generalized ind
 
 The descriptor bitlist is `00100101111` and serializes, with five padding bits, to `0x25e0`.
 
-### Computing a proof descriptor
+### Computing a Proof Descriptor
 
 The set of proof node indices for a set of requested generalized indices is the union of the requested indices and their helper indices, sorted in traversal order. The requested indices MUST NOT contain an index that is an ancestor of another requested index: a proof node set contains no descendant pairs, and an ancestor's value is computed anyway while verifying its descendant's proof.
 
@@ -106,7 +106,7 @@ def compute_proof_descriptor(indices: Sequence[GeneralizedIndex]) -> bytes:
     return int(bitstring, 2).to_bytes(len(bitstring) // 8, byteorder='big')
 ```
 
-### Validating a descriptor
+### Validating a Descriptor
 
 The following function validates a serialized descriptor and returns its bits, up to and including the final `1` bit. Each `assert` identifies a condition under which the descriptor MUST be rejected:
 
@@ -130,7 +130,7 @@ def compute_bits_from_proof_descriptor(descriptor: bytes) -> Sequence[bool]:
     return bits
 ```
 
-### Root calculation and verification
+### Root Calculation and Verification
 
 The root of a compact multiproof is calculated by replaying the descriptor traversal, consuming one descriptor bit per visited node and one proof node per `1` bit. A verifier MUST derive the descriptor from the generalized indices it intends to verify, or check a supplied descriptor for equality against one so derived (see Security Considerations):
 
@@ -166,15 +166,15 @@ def verify_compact_merkle_multiproof(nodes: Sequence[Bytes32],
 
 ## Rationale
 
-### Why encode the proof shape instead of a list of indices?
+### Shape Encoding vs Index Lists
 
 A list of generalized indices and a shape encoding carry the same information. For all but the sparsest proofs the shape encoding is cheaper to transmit — about two bits per proof node, helpers included, versus two to eight bytes per requested index — and it is strictly cheaper to serve: the descriptor bits are consumed in the same order as a depth-first tree traversal, so a proof server needs no index arithmetic, helper index computation, or traversal planning. The canonical node ordering also removes any ambiguity in proof node serialization.
 
-### Why are requested nodes and helper nodes not distinguished?
+### Uniform Node Encoding
 
 The party that constructs a descriptor derives it from the generalized indices it wants proven, so it already knows which proof nodes it requested and which are helpers. Encoding the distinction would add complexity and bits without adding information for either party.
 
-### Why not an SSZ `Bitlist`?
+### Relation to SSZ `Bitlist`
 
 SSZ `Bitlist[N]` serialization packs bits least-significant first and appends a sentinel `1` bit to delimit the list length. The descriptor is already self-delimiting, so a sentinel is redundant, and the most-significant-first packing keeps the serialized bytes readable in traversal order. This encoding is also byte-compatible with existing implementations of this format.
 
@@ -184,7 +184,7 @@ The descriptor encodes the shape of an arbitrary binary tree, so the format appl
 
 ## Backwards Compatibility
 
-This EIP defines a new proof format and modifies no existing data structure, serialization, or proof format.
+This EIP defines a new proof format and modifies no existing data structure, serialization, or proof format. Existing producers and consumers of generalized-index multiproofs are unaffected.
 
 ## Test Cases
 
@@ -208,15 +208,15 @@ Invalid descriptors, which fail the validity rules in the Specification:
 
 ## Reference Implementation
 
-The Python functions in the Specification section are the reference implementation. Independent implementations of this format exist in the ChainSafe `ssz` TypeScript library (`computeDescriptor` and the compact multiproof functions) and in an unmerged go-ethereum beacon light client prototype by Zsolt Felföldi (`CompactProofFormat`).
+The Python functions in the Specification section are the reference implementation. They are directly executable when combined with the helper functions of the SSZ Merkle proof specification.
 
 ## Security Considerations
 
-### Resource exhaustion
+### Resource Exhaustion
 
 The descriptor length bounds all resources needed to process a proof: a descriptor of `2 * N - 1` bits describes exactly `N` proof nodes and `N - 1` internal hashing steps. Implementations are expected to validate a descriptor (including the balance condition) before allocating proof-sized buffers or performing hashing, to check that the number of supplied proof nodes equals the number of `1` bits (as the reference functions do), and to enforce context-appropriate limits on descriptor length. Naive recursive implementations can be driven to a recursion depth of `N` — linear in the descriptor length — by a chain-shaped descriptor; an iterative traversal, or a recursion bound set to the maximum plausible tree depth of the context, avoids this.
 
-### The descriptor does not prove tree structure
+### The Descriptor Does Not Prove Tree Structure
 
 A `1` bit terminates the traversal at a node without revealing whether that node is a leaf or the root of an unexplored subtree. A verifier is expected to derive the descriptor from the generalized indices it intends to verify — or check a supplied descriptor for equality against one so derived — rather than trusting a peer-supplied descriptor as a statement about the structure or contents of the tree. In particular, matching a known root only proves that the supplied nodes occupy the tree positions described by the descriptor; it proves nothing about which positions the consumer *should* have queried.
 
