@@ -1,5 +1,4 @@
 ---
-eip: 99999
 title: Tapered Issuance Burn
 description: Burn a fraction of validator rewards that rises with the staking ratio, removing the issuance incentive to stake more than 50% of all ETH
 author: pintail (@pintail-xyz), Jérôme de Tychey (@jdetychey), dapplion (@dapplion), pa7x1 (@pa7x1), Ladislaus von Daniels (@ladidan), Justin Drake (@justindrake)
@@ -139,10 +138,6 @@ def get_base_reward_factor(epoch: Epoch) -> Uint64:
     remaining = Uint64(TRANSITION_DURATION_EPOCHS - elapsed)
     boost = Uint64(TRANSITION_BASE_REWARD_FACTOR - BASE_REWARD_FACTOR)
     duration = Uint64(TRANSITION_DURATION_EPOCHS)
-    # Rounded to nearest rather than down: truncation would bias the whole
-    # transition below the intended line by half a factor point on average,
-    # and would hold the starting value for a single epoch while giving the
-    # final value a full step.
     return BASE_REWARD_FACTOR + (boost * remaining + duration // 2) // duration
 ```
 
@@ -292,7 +287,7 @@ Expressed as a function of the staking ratio $f = D/S$ (with $S$ the total ETH s
 
 The goal is to subtract from the yield a term that is zero at $f = 0$ and grows linearly to cancel the yield entirely at a saturation ratio $f_\text{sat}$, so that the net yield reaches zero there. Writing the result piecewise, $\tilde y(f) = y(f) - \frac{f}{f_\text{sat}}\,y(f_\text{sat})$ for $f \le f_\text{sat}$, and $\tilde y(f) = 0$ for $f > f_\text{sat}$.
 
-![Consensus layer net yield under the current curve and under the tapered issuance burn](../assets/eip-99999/yield-curve.svg)
+![Consensus layer net yield under the current curve and under the tapered issuance burn](../assets/eip-draft_tapered_issuance_burn/yield-curve.svg)
 
 Consensus layer net yield under the current curve and under the tapered issuance burn in its permanent (post-transition) state, both with `BASE_REWARD_FACTOR` at today's value of 64. Under the tapered curve the burn cancels a performing validator's issuance at the 50% saturation ratio.
 
@@ -300,7 +295,7 @@ Writing $\tilde y(f) = (1 - b(f))\,y(f)$ and solving for the burn fraction $b(f)
 
 The exponent of $3/2$ rather than $1$ follows from the reward curve's $f^{-1/2}$ shape: the *absolute* deduction needed is linear in $f$, but expressed as a fraction of a reward that itself scales as $f^{-1/2}$, it picks up an extra half power. With $f_\text{sat} = 50\%$, the resulting issuance curve is $\tilde i(f) = f\,\tilde y(f)$ for $f \le f_\text{sat}$ and zero above it. It no longer rises monotonically with $f$: it rises, peaks at $f^* = 2^{-7/3} \approx 19.8\%$, and is fully cancelled by the burn at $f_\text{sat}$.
 
-![Annual ETH issuance under the current curve and under the tapered issuance burn](../assets/eip-99999/issuance-curve.svg)
+![Annual ETH issuance under the current curve and under the tapered issuance burn](../assets/eip-draft_tapered_issuance_burn/issuance-curve.svg)
 
 Annual ETH issuance under the current curve and under the tapered issuance burn in its permanent (post-transition) state, both with `BASE_REWARD_FACTOR` at today's value of 64. The tapered curve peaks at $f^* = 2^{-7/3} \approx 19.8\%$ and is fully cancelled by the burn at $f = 1/2$.
 
@@ -310,7 +305,7 @@ An operator's income from consensus issuance is its share of the stake multiplie
 
 The tapered burn changes this. Issuance now peaks at a staking ratio of roughly 20% and declines beyond it, so an operator that keeps growing is claiming a larger share of a shrinking pot, and past some point the second effect dominates the first. The point at which an operator's income reduces from increased scale comes sooner the larger the operator already is. An operator holding half the stake finds that growth stops paying once about 31% of the ETH supply is staked. Every operator has such a point somewhere below the 50% saturation staking ratio, but the smaller it is, the closer that point sits to saturation.
 
-![The staking ratio beyond which an operator's income falls as it adds stake](../assets/eip-99999/operator-threshold.svg)
+![The staking ratio beyond which an operator's income falls as it adds stake](../assets/eip-draft_tapered_issuance_burn/operator-threshold.svg)
 
 The staking ratio beyond which an operator's income from consensus issuance falls as it adds stake, plotted against the share of total stake it already holds, with other operators' stake held fixed. Under the current curve no such point exists at any operator size or staking ratio.
 
@@ -322,7 +317,7 @@ Imposed in full at the fork, the burn would cut the net yield at today's staking
 
 The 18-month figure is measured from activation, but the window for participants to adjust is longer. A hard fork is generally *scheduled for inclusion* (SFI) six months or more before it goes live, and this proposal is fully specified and predictable from that moment. Adding that lead time gives ecosystem participants on the order of two years, from the change becoming certain to yields reaching their permanent level, in which to respond.
 
-![Net yield and annual issuance as the tapered issuance burn phases in over the transition](../assets/eip-99999/transition.gif)
+![Net yield and annual issuance as the tapered issuance burn phases in over the transition](../assets/eip-draft_tapered_issuance_burn/transition.gif)
 
 Net yield (left) and annual issuance (right) as the tapered issuance burn phases in, driven together by a single control. The animation sweeps the 18-month transition: at month 0 the effective base reward factor is 128, so net yield starts close to today's; by month 18 it has decayed to 64 and both curves reach their permanent shape. Throughout, the burn cancels a performing validator's issuance at the 50% saturation ratio, whatever the effective base reward factor.
 
