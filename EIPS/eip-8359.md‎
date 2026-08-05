@@ -93,7 +93,7 @@ byte 1 [2:0] = threshold
 
 The `setup` value identifies the validator setup type and supports up to 32 setup options.
 
-The `threshold` value identifies the M value in an M-of-N agreement threshold used by a multi-node validator setup before signing or publishing the validator duty. Values `1` through `6` encode explicit M values, while `0` represents undefined and `7` represents other thresholds.
+The `threshold` value identifies the `M` value in an `M`-of-`N` agreement threshold used by a multi-node validator setup before signing or publishing the validator duty. Values `1` through `6` encode explicit `M` values, while `0` represents undefined and `7` represents other thresholds.
 
 For simple single-node setups where no multi-node threshold applies, `threshold` SHOULD be set to `1`.
 
