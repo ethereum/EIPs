@@ -23,13 +23,13 @@ Existing approaches have important shortcomings:
 * **Fingerprinting:** Attempts to infer client usage from block proposal behavior, but this can become inaccurate after client behavior changes or protocol upgrades.
 * **Network Crawling:** Measures reachable nodes rather than validator nodes, and can be affected by peer selection bias.
 * **Relay Data:** Depends on relay participation, which ePBS removes (would also need to convince them to share the data to be aggregated and there's incentive to underreport more profitable clients).
-* **Graffiti Watermark:** Uses proposal graffiti field to report CL/EL client but implementation isn’t standardized, relies on there being enough room if a custom graffiti is set, doesn’t account for multinode/DVT setups, and can't be extended to additional reporting.
+* **Graffiti Watermark:** Uses proposal graffiti field to report CL/EL client but implementation isn't standardized, relies on there being enough room if a custom graffiti is set, doesn't account for multinode/DVT setups, and can't be extended to additional reporting.
 
 This EIP creates a dedicated, standardized, compact field for client reporting. The field is optional for validators to populate and may be disabled by node operators. The resulting data improves visibility into validator setups and network exposure to correlated client bugs.
 
 ## Specification
 
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHOULD”, “SHOULD NOT”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHOULD", "SHOULD NOT", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 ### Beacon block body change
 
@@ -347,7 +347,7 @@ This EIP is therefore not suitable for rewards, penalties, fork-choice weighting
 
 ### Stale data
 
-Because this field is reported only when a validator proposes a block, aggregate data updates slowly. A validator’s reported client setup may become stale if the operator changes clients before the validator proposes again.
+Because this field is reported only when a validator proposes a block, aggregate data updates slowly. A validator's reported client setup may become stale if the operator changes clients before the validator proposes again.
 
 Consumers of this data SHOULD treat reports as time-dependent observations and SHOULD account for validator proposal frequency when estimating network-wide client distribution.
 
