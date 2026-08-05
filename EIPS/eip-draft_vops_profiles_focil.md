@@ -2,10 +2,10 @@
 title: VOPS Profiles for FOCIL Eligibility
 description: Describes VOPS profiles that a future FOCIL extension could use to determine which transactions receive inclusion enforcement.
 author: Thomas Thiery (@soispoke)
-discussions-to: https://ethereum-magicians.org/t/focil-native-account-abstraction/27999
+discussions-to:
 status: Draft
 type: Informational
-created: 2026-05-15
+created: 2026-08-05
 requires: 1559, 2718, 2930, 3607, 4844, 7702, 7732, 7805, 7928, 8141, 8250, 8272
 ---
 
