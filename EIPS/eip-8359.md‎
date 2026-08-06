@@ -128,7 +128,7 @@ The numerical values used for setup types, threshold types, consensus-layer clie
 
 The following registry values are proposed for version `0x01`.
 
-These registries are expected to reside in the [consensus specifications](https://github.com/ethereum/consensus-specs) and be maintained alongside other consensus-layer constants.
+These registries are expected to reside in the consensus specifications and be maintained alongside other consensus-layer constants.
 
 #### Setup registry
 
