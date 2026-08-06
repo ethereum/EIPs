@@ -38,9 +38,9 @@ Regarding column topics [EIP-7594](./eip-7594.md) already mandates the following
 
 This is extended to allow cell-level operation towards peers that support it using the following rules:
 
-- Prior to reconstructing, a node MAY also use the Gossipsub “fanout” mechanism to request relevant cells from other peers across column subnets it is not subscribed to.
+- Prior to reconstructing, a node MAY also use advertisements received as part of the Gossipsub “fanout” mechanism to collect relevant cells from other peers across column subnets it is not subscribed to.
 
-- After reconstruction, a node SHOULD use the Gossipsub “fanout” mechanism to provide cells from the reconstructed blob to peers across column subnets it is not subscribed to. A node MAY choose to only advertise to a random subset of these columns rather than all columns. This allows the node to provide another path for cell dissemination to the network. A node MAY choose to delay these fanout messages for a bit, in order to conserve bandwidth by not competing with other nodes who are subscribed to the column topic, and can provide the cell instead.
+- After reconstruction, a node SHOULD use the Gossipsub “fanout” mechanism to provide cells from the reconstructed blob to peers across column subnets it is not subscribed to. A node MAY choose to only advertise to a random subset of these columns rather than all columns. This allows the node to provide another path for cell dissemination to the network. A node MAY choose to delay these fanout messages in order to conserve bandwidth by not competing with other nodes who are subscribed to the column topic, and can provide the cell instead.
 
 ### Row topics
 
@@ -83,7 +83,7 @@ Finally, it does not directly help L2 nodes retrieve individual blobs (although 
 
 ### Possible extension to retrieve individual blobs
 
-With the introduction of PeerDAS, L2 nodes have the problem that retrieving a specific blob from a CL client requires it to either be a supernode, or to download it on request through columns. By introducing row topics with allocation rooted in the nodeID, it is easier for nodes to identify which node they can download the relevant blob from.
+With the introduction of PeerDAS, L2 nodes have the problem that retrieving a specific blob from a CL client requires them to either be a supernode, or to download it on request through columns. By introducing row topics with allocation rooted in the nodeID, it is easier for nodes to identify which node they can download the relevant blob from. We reserve this for further consideration.
 
 ### Design decisions
 
