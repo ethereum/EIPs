@@ -1,13 +1,13 @@
 ---
-title: RowDAS - Distributed Blobspace Reconstruction
+title: "RowDAS: Distributed Blobspace Reconstruction"
 description: Distribute reconstruction load in the network through row-level cell messaging.
 author: Csaba Kiraly (@cskiraly), TBD (@tbd)
 discussions-to: URL
 status: Draft
 type: Standards Track
-category: Networking # Only required for Standards Track. Otherwise, remove this field.
+category: Networking
 created: 2026-08-05
-requires: 7594, 8136 # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+requires: 7594, 8136
 ---
 
 ## Abstract
@@ -23,6 +23,8 @@ Moreover, supernodes execute largely redundant work: each one of them reconstruc
 This EIP introduces distributed blobspace reconstruction, where different nodes prioritize the reconstruction of different parts of the blobspace, leading to a faster, less-cpu intensive, and more resilient construct.
 
 ## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 
 The EIP introduces new GossipSub topics, changes to the rules of reconstruction, and a few minor changes to how current column topics operate.
 
@@ -46,7 +48,7 @@ Similar to column subnets, we introduce new row subnets: `data_row_{subnet_id}`.
 - We make the number of subnet_ids equal to maximum blob count. However, to distribute load evenly in the network, we introduce a mapping function that rotates which blob goes to which subnet_id in which slot (exact permutation function TBD).
 - Nodes subscribe to a single row subnet, derived with a pseudo-random function from their node ID similar to how it is done for custody columns, however, there is no custody requirement.
 
-A peer MAY limit the number of cells it serves a peer on the row subnet to just the majority of cells, as the rest can be reconstructed.
+A peer MAY limit the number of cells it serves a peer on the row subnet to just the the half of all the cells, as the rest can be reconstructed.
 
 As a node receives cells from any source (either from row-subnets, column-subnets, or getBlobs), it SHOULD send updated bitmap states to its peers. A node MAY choose to debounce these updates.
 
@@ -63,7 +65,7 @@ Similar to PeerDAS, a supernode (in this context any node with 64 or more column
 
 Row topics were part of the DAS discussion from the early days, well before PeerDAS was designed. [FullDAS](https://ethresear.ch/t/fulldas-towards-massive-scalability-with-32mb-blocks-and-beyond/19529) introduced cell-level messaging over both column and row topics, with cross-seeding and in-network reconstruction. It also introduced bitmap representations of IHAVE messages, but without the exact protocol details.
 
-The [Gossipsub Partial Message Extension](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/partial-messages.md) introduced the mapping of bitmap-based partial message representations into GossipSub, opening the way to use them on columns in [EIP-8136](https://eips.ethereum.org/EIPS/eip-8136).
+The [Gossipsub Partial Message Extension](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/partial-messages.md) introduced the mapping of bitmap-based partial message representations into GossipSub, opening the way to use them on columns in [EIP-8136](./eip-8136.md).
 
 Until now, while we have developed the tools to implement better schemes, we remained with the original simplified PeerDAS construct. At the same time, blob count scaling made the CPU and bandwidth requirement of supernodes more of a point of contention. Reliance on supernodes, while abundant on current mainnet, is also a point of concentration leading to a protocol with less resilience than desirable.
 
