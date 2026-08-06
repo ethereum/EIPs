@@ -12,7 +12,7 @@ requires: 7594, 8136
 
 ## Abstract
 
-PeerDAS requires supernodes to provide reconstruction, and this puts a high burden on supernodes that scales linearly with blob count. RowDAS enables distributed blobspace reconstruction using partial message based row topics, allowing all nodes to contribute to reconstruction, while significantly reducing the load on supernodes, leading to a more efficient and more resilient DAS construct.
+PeerDAS requires supernodes to provide reconstruction, and this puts a high burden on supernodes that scales linearly with blob count. RowDAS enables distributed blobspace reconstruction using partial-message-based row topics, allowing all nodes to contribute to reconstruction, while significantly reducing the load on supernodes, leading to a more efficient and more resilient DAS construct.
 
 <!-- Note: author list will be extended after receiving confirmation for co-authors. -->
 
@@ -107,8 +107,8 @@ Row topics are limited to peers that have libp2p gossipsub implementations suppo
 
 The EIP changes DAS networking, but it does not change the custody allocation and the probabilistic guarantees of PeerDAS.
 
-New gossipsub topics might introduce new attack vectors. Since row distribution is a new additional recovery path, and the old paths are mainly intact, it is not expected that this adversely affects the system, except for a relatively small traffic overhead of bitmap based signaling.
-An exception to this is the two phase reconstruction process. Here the 2nd phase, the full reconstruction is explicitly delayed. This delay is, however, something implementations already practice, and it is a one-time (instead of hop-by-hop) delay.
+New gossipsub topics might introduce new attack vectors. Since row distribution is a new additional recovery path, and the old paths are mainly intact, it is not expected that this adversely affects the system, except for a relatively small traffic overhead of bitmap-based signaling.
+An exception to this is the two-phase reconstruction process. Here the 2nd phase, the full reconstruction, is explicitly delayed. This delay is, however, something implementations already practice, and it is a one-time (instead of hop-by-hop) delay.
 
 Since row topic count is bound to the maximum blob count, changes at BPO fork boundaries should be handled. Details to be defined.
 
