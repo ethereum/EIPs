@@ -12,7 +12,7 @@ requires: 7594, 8136 # Only required when you reference an EIP in the `Specifica
 
 ## Abstract
 
-PeerDAS requires supernodes to provide reconstruction, and at the same time it puts a high burden on supernodes that scales linearly with blobcount. RowDAS enables distributed blobspace reconstruction using partial message based row topics, allowing all nodes to contribute to reconstruction, while significantly reducing the load on supernodes, leading to a more efficient and more resilient DAS construct.
+PeerDAS requires supernodes to provide reconstruction, and this puts a high burden on supernodes that scales linearly with blob count. RowDAS enables distributed blobspace reconstruction using partial message based row topics, allowing all nodes to contribute to reconstruction, while significantly reducing the load on supernodes, leading to a more efficient and more resilient DAS construct.
 
 ## Motivation
 
@@ -40,7 +40,7 @@ This is extended to allow cell-level operation towards peers that support it usi
 
 ### Row topics
 
-Similar to column subnets, we introduce new row subnets: `data_row_{subnet_id}`. These resemble, but not to be confused with the deprecated `blob_sidecar_{subnet_id}` topics. Their properties:
+Similar to column subnets, we introduce new row subnets: `data_row_{subnet_id}`. These resemble, but are not to be confused with, the deprecated `blob_sidecar_{subnet_id}` topics. Their properties:
 
 - A row subnet MUST use Cell-Level Deltas without eager push. Like for Cell-Level Deltas in column subnets, the GroupID for a message in the row subnet is the block root. Since cells might arrive from three different sources (getBlobs, columns, rows) a node MAY choose to delay the request of cells from rows.
 - We make the number of subnet_ids equal to maximum blob count. However, to distribute load evenly in the network, we introduce a mapping function that rotates which blob goes to which subnet_id in which slot (exact permutation function TBD).
@@ -56,7 +56,7 @@ A node, even if not a supernode, SHOULD collect at least 64 cells on its designa
 
 Similar to PeerDAS, a supernode (in this context any node with 64 or more column subscriptions) MUST contribute to reconstruction. However, reconstruction becomes a two phase process:
 
-- 1st phase: a supernode MUST reconstruct its designated row subnet, and it MUST send updated bitmap states to its peers. A small random delay before reconstruction is allowed to desyncronise nodes in the network and reduce overall load.
+- 1st phase: a supernode MUST reconstruct its designated row subnet, and it MUST send updated bitmap states to its peers. A small random delay before reconstruction is allowed to desynchronise nodes in the network and reduce overall load.
 - 2nd phase: after a slightly longer delay, during which cells are collected from getBlobs, columns, and rows, a supernode SHOULD do a second reconstruction phase, reconstructing all missing rows, and sharing the results as defined above.
 
 ## Rationale
@@ -65,9 +65,9 @@ Row topics were part of the DAS discussion from the early days, well before Peer
 
 The [Gossipsub Partial Message Extension](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/partial-messages.md) introduced the mapping of bitmap-based partial message representations into GossipSub, opening the way to use them on columns in [EIP-8136](https://eips.ethereum.org/EIPS/eip-8136).
 
-Until now, while we have developed the tools to implement better schemes, we remained with the original simplified PeerDAS construct. At the same time, blob count scaling made the CPU and bandwidth requirement of supernodes more of a point of contention. Reliance on supernodes, while abundant on current mainnet, is also a point of concentration leading to a protocol with less resilience then desirable.
+Until now, while we have developed the tools to implement better schemes, we remained with the original simplified PeerDAS construct. At the same time, blob count scaling made the CPU and bandwidth requirement of supernodes more of a point of contention. Reliance on supernodes, while abundant on current mainnet, is also a point of concentration leading to a protocol with less resilience than desirable.
 
-This EIP corrects some of these shortcomings, making sure supernodes are not doing (as much) useless work, and reconstruction is possible (althong not yet mandated) even without supernodes.
+This EIP corrects some of these shortcomings, making sure supernodes are not doing (as much) useless work, and reconstruction is possible (although not yet mandated) even without supernodes.
 
 ### What it is not
 
@@ -79,7 +79,7 @@ Finally, it does not directly help L2 nodes retrieve individual blobs (although 
 
 ### Possible extension to retrieve individual blobs
 
-With the introduction of PeerDAS, L2 nodes have the problem that retrieving a specific blob from a CL client requires it to either be a supernode, or to download it on request through columns. By interoding row topics with allocation rooted in the nodeID, it is easier for nodes to indetify which node they can download the relevant blob from.
+With the introduction of PeerDAS, L2 nodes have the problem that retrieving a specific blob from a CL client requires it to either be a supernode, or to download it on request through columns. By introducing row topics with allocation rooted in the nodeID, it is easier for nodes to identify which node they can download the relevant blob from.
 
 
 ### Design decisions
@@ -94,7 +94,7 @@ While mandated reconstruction would be desirable from the perspective of not rel
 
 - why only a single row, and why is it not dependent on custody?
 
-the current mainnet has approx. 12K nodes of which 3K are supernodes. The latter is much more than what we expected initially. With current and planned blob counts, even a single row creates abundant overlap.
+The current mainnet has approx. 12K nodes of which 3K are supernodes. The latter is much more than what we expected initially. With current and planned blob counts, even a single row creates abundant overlap.
 
 ## Backwards Compatibility
 
