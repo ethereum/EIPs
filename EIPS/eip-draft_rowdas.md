@@ -1,7 +1,7 @@
 ---
 title: "RowDAS: Distributed Blobspace Reconstruction"
 description: Distribute reconstruction load in the network through row-level cell messaging.
-author: Csaba Kiraly (@cskiraly), TBD (@tbd)
+author: Csaba Kiraly (@cskiraly)
 discussions-to: URL
 status: Draft
 type: Standards Track
@@ -13,6 +13,8 @@ requires: 7594, 8136
 ## Abstract
 
 PeerDAS requires supernodes to provide reconstruction, and this puts a high burden on supernodes that scales linearly with blob count. RowDAS enables distributed blobspace reconstruction using partial message based row topics, allowing all nodes to contribute to reconstruction, while significantly reducing the load on supernodes, leading to a more efficient and more resilient DAS construct.
+
+<!-- Note: author list will be extended after receiving confirmation for co-authors. -->
 
 ## Motivation
 
