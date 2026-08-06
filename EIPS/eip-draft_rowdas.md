@@ -2,7 +2,7 @@
 title: "RowDAS: Distributed Blobspace Reconstruction"
 description: Distribute reconstruction load in the network through row-level cell messaging.
 author: Csaba Kiraly (@cskiraly)
-discussions-to: URL
+discussions-to: https://ethereum-magicians.org/t/eip-rowdas-distributed-blobspace-reconstruction/29320
 status: Draft
 type: Standards Track
 category: Networking
