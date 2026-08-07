@@ -90,7 +90,7 @@ A proportional burn has these properties:
 
 - The burn increases when the selected builder bid increases.
 - A high-value block creates a high burn.
-- The protocol reduces proposer income from visible builder bids by a known fraction.
+- The protocol removes a known fraction of each visible builder bid before the proposer payment.
 - The protocol does not need a new recipient set.
 - The protocol does not need a redistribution mechanism.
 - The burn reduces ETH supply.
@@ -606,6 +606,8 @@ This definition keeps the burn fraction easy to understand.
 
 At a one-third burn rate, the protocol destroys about one third of the builder's declared gross expenditure. The remaining amount is proposer compensation.
 
+The burn is not a charge on proposer revenue. The protocol removes the burn from the builder's gross bid. The proposer revenue is only the net amount `P = G - B`.
+
 An alternative definition could make `gross_value` equal only to proposer compensation. The burn would then be an extra cost on top of `gross_value`.
 
 That alternative changes the meaning of the rate constant. It also makes historical backcasts and payment-avoidance calculations use a different parameter.
@@ -699,7 +701,7 @@ Therefore, self-build has no burn under this EIP.
 
 The exemption also keeps local building as a fallback against builder concentration.
 
-Local building is often most competitive in low-value slots. A tax on external builder payments can increase local building in this part of the distribution.
+Local building is often most competitive in low-value slots. The burn on external builder payments can increase local building in this part of the distribution.
 
 However, a large staking operator can also own or control a specialized builder. Such an operator can use self-build to avoid the burn on high-value slots.
 
@@ -804,7 +806,7 @@ Also:
 q(0.40) / q(1/3) > 0.8333
 ```
 
-A higher rate is counterproductive if it causes enough gross value to leave the taxable bid path.
+A higher rate is counterproductive if it causes enough gross value to leave the bid path where the burn applies.
 
 For an expenditure-inclusive bid, the extra gross expenditure that is required to give a fixed proposer payment is:
 
@@ -852,7 +854,7 @@ The mechanism must also keep enough value in protocol-visible external bidding t
 
 This EIP changes consensus and requires a hard fork.
 
-It changes the SSZ semantics and field name of `ExecutionPayloadBid.value` to `gross_value`.
+It changes the SSZ semantics and field name of `ExecutionPayloadBid.value` to `gross_value`. The field keeps its position and its type. The container layout does not change.
 
 It changes the builder pending-payment state object.
 
@@ -864,15 +866,13 @@ Consensus clients, validator clients, builders, relays, and APIs must use the ne
 
 The public bid path keeps the same trust model. Public bids still have `execution_payment == 0`. Public bids are fully collateralized. Public bids use one scalar value for ordering.
 
-If the final EIP-7732 container cannot replace `value`, an implementation-compatible fallback may keep `value` and add `gross_value`.
+If the final EIP-7732 container keeps the field name `value`, an implementation-compatible fallback reuses the existing field in place.
 
-In that fallback, consensus must enforce this identity:
+In this fallback, consensus reads `value` as `gross_value`. The field keeps its position and its type. The fallback does not add a field. The fallback does not change the container layout.
 
-```text
-value + execution_payment + burn_amount == gross_value
-```
+Consensus then derives `burn_amount` and `trustless_payment` from `value` and `execution_payment`. This derivation is the same as the Specification derivation for `gross_value`.
 
-The preferred design derives the trustless proposer payment and does not keep a redundant supplied `value` field.
+The fallback does not add a redundant field.
 
 ## Test Cases
 
@@ -1190,7 +1190,7 @@ This EIP does not make undeclared value observable.
 
 This EIP does not claim to burn undeclared value.
 
-A higher burn fraction gives a stronger incentive to use an untaxed payment path.
+A higher burn fraction gives a stronger incentive to use a payment path where the burn does not apply.
 
 For this reason, mainnet activation should use measurements or simulations of value-weighted payment retention for candidate rates.
 
@@ -1213,7 +1213,7 @@ First, most slots have modest builder payments. A fraction of a small payment is
 
 Second, the large and rare opportunities occur in unpredictable slots. A builder cannot move a high-value opportunity to a chosen proposer. A proposer cannot choose to receive one. A single high-value opportunity occurs in one slot. That slot has one fixed proposer. To evade the burn on this tail, an actor needs one of two things. The first is a standing side channel with a large share of proposers. The second is a builder and a large staker under one control that self-builds these slots. In a competitive builder market, the proposer for the slot selects the best public bid, and the burn applies.
 
-A higher rate would increase the reward for evasion in every block. A higher rate would lower the value at which a side channel or a cartel becomes worthwhile. A higher rate would move more value out of the taxable bid path. The `q(t)` analysis in the Rationale describes this effect.
+A higher rate would increase the reward for evasion in every block. A higher rate would lower the value at which a side channel or a cartel becomes worthwhile. A higher rate would move more value out of the bid path where the burn applies. The `q(t)` analysis in the Rationale describes this effect.
 
 A moderate rate keeps the public bid path the lowest-cost path for most blocks. A moderate rate still burns a meaningful share of the visible high-value tail that lands on proposers outside a cartel.
 
