@@ -1194,6 +1194,31 @@ A higher burn fraction gives a stronger incentive to use an untaxed payment path
 
 For this reason, mainnet activation should use measurements or simulations of value-weighted payment retention for candidate rates.
 
+### Collusion and evasion economics
+
+This EIP does not prevent collusion.
+
+Two evasion paths remain open:
+
+- A group of builders can agree to declare a low `gross_value`. They can settle the rest through another channel.
+- A builder and a proposer can agree to declare a low `gross_value`. They can move the rest through a side payment.
+
+Each path can reduce the declared burn to near zero for the affected bids. The protocol cannot burn value that does not appear in a signed bid. The "Undeclared proposer compensation" and "Self-build avoidance and vertical integration" subsections describe this same limit.
+
+The partial burn fraction is a deliberate response to this limit. The rate does not try to capture all execution value. The rate stays below the value at which evasion is worthwhile in the common case.
+
+Two properties support a moderate rate.
+
+First, most slots have modest builder payments. A fraction of a small payment is a small amount. The fixed cost and the counterparty risk of a side channel are larger than this burn. The fixed cost and the counterparty risk of a sustained cartel are also larger than this burn. For most blocks and most proposers, honest declaration through the public bid path costs less than evasion.
+
+Second, the large and rare opportunities occur in unpredictable slots. A builder cannot move a high-value opportunity to a chosen proposer. A proposer cannot choose to receive one. A single high-value opportunity occurs in one slot. That slot has one fixed proposer. To evade the burn on this tail, an actor needs one of two things. The first is a standing side channel with a large share of proposers. The second is a builder and a large staker under one control that self-builds these slots. In a competitive builder market, the proposer for the slot selects the best public bid, and the burn applies.
+
+A higher rate would increase the reward for evasion in every block. A higher rate would lower the value at which a side channel or a cartel becomes worthwhile. A higher rate would move more value out of the taxable bid path. The `q(t)` analysis in the Rationale describes this effect.
+
+A moderate rate keeps the public bid path the lowest-cost path for most blocks. A moderate rate still burns a meaningful share of the visible high-value tail that lands on proposers outside a cartel.
+
+This reasoning reduces the incentive to evade. It does not remove the evasion paths. A sustained builder cartel is a residual risk. A vertically integrated large staker is also a residual risk. Evaluation must measure declared payment retention and high-value self-build concentration. The "Rate evaluation metrics" subsection lists these measurements.
+
 ### Trusted payment default
 
 `execution_payment` remains trusted.
