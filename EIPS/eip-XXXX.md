@@ -703,9 +703,7 @@ The exemption also keeps local building as a fallback against builder concentrat
 
 Local building is often most competitive in low-value slots. The burn on external builder payments can increase local building in this part of the distribution.
 
-However, a large staking operator can also own or control a specialized builder. Such an operator can use self-build to avoid the burn on high-value slots.
-
-The Security Considerations section describes this risk.
+A large staking operator can also own a builder and use self-build to avoid the burn on high-value slots. The "Self-build avoidance and vertical integration" subsection describes this risk.
 
 ### Why there is no attester burn floor
 
@@ -1143,38 +1141,7 @@ A test must fail if the implementation can queue `V` without also applying `B`.
 
 A complete reference implementation requires a consensus-spec change against the final post-EIP-7732 fork specification.
 
-The minimum changes are:
-
-1. Replace `ExecutionPayloadBid.value` with `gross_value`.
-2. Add deterministic helper functions for burn and payment components.
-3. Replace `BuilderPendingPayment` with `BuilderPendingSettlement`.
-4. Count burn in pending builder liability.
-5. Reserve `G - E` when consensus accepts a selected external bid.
-6. Apply `B` and `V` together in the normal settlement path.
-7. Apply `B` and `V` together in the quorum settlement path.
-8. Apply the same burn in the late-parent direct-payment path.
-9. Accumulate payment-quorum weight for burn-only consensus liabilities.
-10. Keep `execution_payment == 0` for public gossip.
-11. Rank public bids by `gross_value`.
-12. Require `gross_value == 0` and `execution_payment == 0` for self-builds.
-13. Preserve pending settlement liabilities across all builder-balance deductions.
-14. Calculate the burn without intermediate integer overflow.
-
-The following helper shows the core accounting:
-
-```python
-def compute_builder_bid_accounting(bid: ExecutionPayloadBid) -> tuple[Gwei, Gwei, Gwei]:
-    burn = Gwei(
-        bid.gross_value
-        * BUILDER_PAYMENT_BURN_NUMERATOR
-        // BUILDER_PAYMENT_BURN_DENOMINATOR
-    )
-    proposer_amount = Gwei(bid.gross_value - burn)
-    assert bid.execution_payment <= proposer_amount
-    trustless = Gwei(proposer_amount - bid.execution_payment)
-    consensus_liability = Gwei(burn + trustless)
-    return burn, trustless, consensus_liability
-```
+The Specification section is the normative source for an implementation. It defines the modified `ExecutionPayloadBid`, the `BuilderPendingSettlement` state object, the burn and payment helpers, and the settlement, liability, and gossip rules.
 
 ## Security Considerations
 
@@ -1343,27 +1310,11 @@ Implementations must not allow intermediate overflow in the burn calculation. Th
 
 All implementations must calculate the same integer result.
 
-### Burn observability
-
-The burn is a consensus-layer balance reduction. It is not an execution-layer transfer.
-
-Supply tools and economic monitors still need a simple way to audit each burn.
-
-Canonical data must make each burn derivable.
-
-Clients should expose `gross_value`, burn, trusted payment, trustless payment, and settlement status through stable inspection surfaces.
-
 ### No new attester pricing duty
-
-This EIP does not add a local burn floor.
-
-This EIP does not add MEV-price attestations.
-
-This EIP does not add a burn rule to fork choice.
 
 An implementation must not reject an otherwise valid block because the node saw a higher builder bid locally.
 
-This requirement prevents consensus behavior from depending on local message history.
+This requirement prevents consensus behavior from depending on local message history. The "Why there is no attester burn floor" subsection explains why the burn does not use local bid observations.
 
 ## Copyright
 
