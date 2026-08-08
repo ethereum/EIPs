@@ -39,6 +39,8 @@ All pull requests in this repository must pass automated checks before they can 
 [^1]: https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-review-bot.yml
 [^2]: https://github.com/ethereum/EIPs/blob/master/.github/workflows/ci.yml
 
+For CI workflow design goals, invariants, failure-mode handling, and compatibility cleanup policy, see [.github/CI_WORKFLOW_INVARIANTS.md](.github/CI_WORKFLOW_INVARIANTS.md).
+
 It is possible to run the EIP validator locally:
 
 Make sure to add cargo's `bin` directory to your environment (typically `$HOME/.cargo/bin` in your `PATH` environment variable)
