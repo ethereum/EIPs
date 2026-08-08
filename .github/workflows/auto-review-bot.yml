@@ -6,24 +6,43 @@ on:
       - completed
 
 name: Auto Review Bot
+
 jobs:
   auto-review-bot:
+    # Only proceed when upstream trigger workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     name: Run
     steps:
       - name: Fetch PR Number
-        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
+        uses: dawidd6/action-download-artifact@3fcb8809b6de9185645975f955db1f16f7142945
         with:
           name: pr-number
-          workflow: auto-review-trigger.yml
+          # Match by workflow name (same value used in `on.workflow_run.workflows`)
+          workflow: Auto Review Bot Trigger
           run_id: ${{ github.event.workflow_run.id }}
+          # Missing artifact means there is nothing to review, so skip cleanly.
+          if_no_artifact_found: ignore
+
+      - name: Validate PR Number artifact
+        id: validate-pr
+        run: |
+          if [ ! -f pr-number.txt ]; then
+            echo "No pr-number artifact found; skipping auto review."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "skip=false" >> "$GITHUB_OUTPUT"
 
       - name: Save PR Number
         id: save-pr-number
-        run: echo "pr=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+        if: ${{ steps.validate-pr.outputs.skip != 'true' }}
+        run: echo "pr=$(cat pr-number.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Auto Review Bot
         id: auto-review-bot
+        if: ${{ steps.validate-pr.outputs.skip != 'true' && steps.save-pr-number.outputs.pr != '' }}
         uses: ethereum/eip-review-bot@dist
         continue-on-error: true
         with:

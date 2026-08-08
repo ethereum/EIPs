@@ -16,6 +16,8 @@ GEM
       console (~> 1.10)
       io-event (~> 1.1)
       timers (~> 4.1)
+    base64 (0.3.0)
+    bigdecimal (4.1.2)
     coffee-script (2.4.1)
       coffee-script-source
       execjs
@@ -25,6 +27,7 @@ GEM
     concurrent-ruby (1.2.2)
     console (1.16.2)
       fiber-local
+    csv (3.3.5)
     dnsruby (1.70.0)
       simpleidn (~> 0.2.1)
     eip_validator (0.8.2)
@@ -41,6 +44,8 @@ GEM
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     ffi (1.15.5)
     fiber-local (1.0.0)
     forwardable-extended (2.6.0)
@@ -294,7 +299,11 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  base64 (~> 0.3)
+  bigdecimal (~> 4.1)
+  csv (~> 3.3)
   eip_validator (>= 0.8.2)
+  faraday-retry (~> 2.2)
   github-pages (= 228)
   html-proofer (>= 5.0.7)
   minima (~> 2.0)

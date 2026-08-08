@@ -15,6 +15,9 @@ group :jekyll_plugins do
   gem "github-pages", "228"
 end
 
+# jekyll-github-metadata uses Faraday v2 and warns unless retry middleware is installed.
+gem "faraday-retry", "~> 2.2", require: "faraday/retry"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
@@ -26,3 +29,8 @@ gem "html-proofer", '>=5.0.7'
 gem "eip_validator", ">=0.8.2"
 
 gem "webrick", "~> 1.8" # needed for macOS builds
+
+# Ruby 3.4 unbundles these stdlib components into separate gems.
+gem "csv", "~> 3.3"
+gem "base64", "~> 0.3"
+gem "bigdecimal", "~> 4.1"
