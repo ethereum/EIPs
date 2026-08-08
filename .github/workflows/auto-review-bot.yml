@@ -6,23 +6,52 @@ on:
       - completed
 
 name: Auto Review Bot
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
 jobs:
   auto-review-bot:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     name: Run
     steps:
       - name: Fetch PR Number
-        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
+        id: fetch-pr-number
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: pr-number
-          workflow: auto-review-trigger.yml
-          run_id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: .
+
+      - name: Check PR file existence
+        id: check_pr_number
+        run: |
+          if [[ -f pr-number.txt ]]; then
+            echo "pr_path=pr-number.txt" >> "$GITHUB_OUTPUT"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          elif [[ -f pr-number/pr-number.txt ]]; then
+            echo "pr_path=pr-number/pr-number.txt" >> "$GITHUB_OUTPUT"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Save PR Number
+        if: steps.check_pr_number.outputs.exists == 'true'
         id: save-pr-number
-        run: echo "pr=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+        run: echo "pr=$(cat \"${{ steps.check_pr_number.outputs.pr_path }}\")" >> "$GITHUB_OUTPUT"
+
+      - name: No-op when artifact missing
+        if: steps.check_pr_number.outputs.exists != 'true'
+        run: echo "No pr-number artifact for this trigger path; exiting successfully."
 
       - name: Auto Review Bot
+        if: steps.check_pr_number.outputs.exists == 'true'
         id: auto-review-bot
         uses: ethereum/eip-review-bot@dist
         continue-on-error: true
