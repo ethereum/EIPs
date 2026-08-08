@@ -215,9 +215,23 @@ jobs:
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
-          changed_files=$(gh pr diff "${{ github.event.number }}" --name-only | paste -sd, -)
+          set -euo pipefail
+
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          if ! git cat-file -e "$base_sha^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$base_sha"
+          fi
+
+          if changed_paths=$(git diff --name-only "$base_sha" "$head_sha"); then
+            changed_files=$(printf '%s\n' "$changed_paths" | sed '/^$/d' | paste -sd, -)
+          else
+            # Fall back to a full scan when diff resolution fails.
+            changed_files="."
+          fi
+
           if [ -n "$changed_files" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "CHANGED_FILES=$changed_files" >> "$GITHUB_ENV"
@@ -225,8 +239,6 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "CHANGED_FILES=" >> "$GITHUB_ENV"
           fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
@@ -238,7 +250,7 @@ jobs:
           skip: '.git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css'
 
   eipw-validator:
-    name: EIP Walidator
+    name: EIP Validator
     runs-on: ubuntu-latest
 
     steps:
@@ -269,19 +281,43 @@ jobs:
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
+          set -euo pipefail
+
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          if ! git cat-file -e "$base_sha^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$base_sha"
+          fi
+
+          if ! changed_paths=$(git diff --name-only "$base_sha" "$head_sha"); then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            {
+              printf 'CHANGED_FILES<<EOF\n'
+              printf '**/*.md\n'
+              printf 'EOF\n'
+            } >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          markdown_paths=$(printf '%s\n' "$changed_paths" | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' || true)
+
+          if [ -n "$markdown_paths" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
           {
             printf 'CHANGED_FILES<<EOF\n'
-            gh pr diff "${{ github.event.number }}" --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md'
+            printf '%s\n' "$markdown_paths"
             printf 'EOF\n'
           } >> "$GITHUB_ENV"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lint
         uses: DavidAnson/markdownlint-cli2-action@f5cf187ef11bd3a68a127321b794aa252ff23019
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.changed == 'true'
         with:
           command: config
           globs: |
