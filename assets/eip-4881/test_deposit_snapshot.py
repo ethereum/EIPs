@@ -150,11 +150,11 @@ def test_snapshot_cases():
 def test_empty_tree_snapshot():
     with pytest.raises(AssertionError):
         # can't get snapshot from tree that hasn't been finalized
-        snapshot = DepositTree.new().get_snapshot()
+        DepositTree.new().get_snapshot()
 
 def test_invalid_snapshot():
     with pytest.raises(AssertionError):
         # invalid snapshot (deposit root doesn't match)
         invalid_snapshot = DepositTreeSnapshot([], zerohashes[0], 0, zerohashes[0], 0)
-        tree = DepositTree.from_snapshot(invalid_snapshot)
+        DepositTree.from_snapshot(invalid_snapshot)
 
