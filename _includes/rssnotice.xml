@@ -1,0 +1,11 @@
+    <item>
+      <title>EIP/ERC Website Migration</title>
+      <category>News</category>
+      <comments>https://ethereum-magicians.org/t/eip-erc-website-migration-jekyll-zola/27375</comments>
+      <description>
+          We are planning to migrate the EIP &amp;amp; ERC websites to a new rendering system in early &lt;time datetime=&quot;2026-02&quot;&gt;February 2026&lt;/time&gt;. Please read our &lt;a href=&quot;https://github.com/eips-wg/preprocessor/blob/master/MIGRATION.md&quot;&gt;migration guide&lt;/a&gt; for more details. Leave any questions/comments on the &lt;a href=&quot;https://ethereum-magicians.org/t/eip-erc-website-migration-jekyll-zola/27375&quot;&gt;discussion thread&lt;/a&gt;.
+      </description>
+      <pubDate>Fri, 02 Jan 2026 14:48:00 -0500</pubDate>
+      <link>https://github.com/eips-wg/preprocessor/blob/master/MIGRATION.md</link>
+      <guid isPermaLink="true">https://github.com/eips-wg/preprocessor/blob/master/MIGRATION.md</guid>
+    </item>
