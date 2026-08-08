@@ -11,7 +11,8 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Keep expensive jobs running on metadata-only events; only supersede runs on new commits.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' }}
 
 jobs:
   save-pr:
@@ -26,14 +27,20 @@ jobs:
           MERGE_SHA: ${{ github.sha }}
         run: |
           mkdir -p ./pr
-          echo $PR_NUMBER > ./pr/pr_number
-          echo $PR_SHA > ./pr/pr_sha
-          echo $MERGE_SHA > ./pr/merge_sha
+          printf '%s\n' "$PR_NUMBER" > ./pr/pr_number
+          printf '%s\n' "$PR_SHA" > ./pr/pr_sha
+          printf '%s\n' "$MERGE_SHA" > ./pr/merge_sha
 
       - name: Upload PR Number
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: pr_number
+          path: pr/
+
+      - name: Upload PR Number (legacy name)
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: pr-number
           path: pr/
 
   htmlproofer:
@@ -42,31 +49,137 @@ jobs:
 
     steps:
       - name: Checkout EIPs
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@v7.0.1
         with:
           repository: ethereum/EIPs
           path: ''
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
       - name: Setup Ruby
-        uses: ruby/setup-ruby@fb404b9557c186e349162b0d8efb06e2bc36edea # v1.232.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 0 # Increment this number if you need to re-download cached gems
-      - name: Build with Jekyll
-        run: bundle exec jekyll build
-        env:
-          JEKYLL_ENV: production
+          bundler-cache: true
 
       - name: Build Website
         run: |
-          bundle exec jekyll doctor
-          bundle exec jekyll build
+          bundle exec jekyll build --quiet
+        env:
+          JEKYLL_ENV: production
+          JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize Pages-prefixed asset paths for HTMLProofer
+        run: |
+          set -euo pipefail
+
+          mkdir -p ./_site/pages/ethereum/EIPs
+          ln -sfn ../../../assets ./_site/pages/ethereum/EIPs/assets
+
+      - name: Determine HTMLProofer scope
+        id: htmlproofer-scope
+        run: |
+          set -euo pipefail
+
+          scope_file="/tmp/htmlproofer_paths.txt"
+          : > "$scope_file"
+          echo "run=true" >> "$GITHUB_OUTPUT"
+
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            echo "./_site" > "$scope_file"
+            echo "HTMLProofer scope: full site (non-PR event)"
+            cat "$scope_file"
+            exit 0
+          fi
+
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          mapfile -t changed_paths < <(git diff --name-only "$base_sha" "$head_sha" || true)
+          if [[ ${#changed_paths[@]} -eq 0 ]]; then
+            echo "./_site" > "$scope_file"
+            echo "HTMLProofer scope: full site (unable to compute changed files)"
+            cat "$scope_file"
+            exit 0
+          fi
+
+          # If site-wide templates, config, or assets changed, keep full-site validation.
+          if printf '%s\n' "${changed_paths[@]}" | grep -Eq '^(assets/|_includes/|_layouts/|_data/|_config\.yml|index\.html$|all\.html$|core\.html$|erc\.html$|informational\.html$|interface\.html$|meta\.html$|networking\.html$)'; then
+            echo "./_site" > "$scope_file"
+            echo "HTMLProofer scope: full site (site-wide files changed)"
+            cat "$scope_file"
+            exit 0
+          fi
+
+          for path in "${changed_paths[@]}"; do
+            if [[ "$path" =~ ^EIPS/eip-([0-9]+)\.md$ ]]; then
+              echo "./_site/EIPS/eip-${BASH_REMATCH[1]}.html" >> "$scope_file"
+            elif [[ "$path" =~ ^ERCS/erc-([0-9]+)\.md$ ]]; then
+              echo "./_site/ERCS/erc-${BASH_REMATCH[1]}.html" >> "$scope_file"
+            elif [[ "$path" =~ ^([a-z0-9-]+)\.html$ ]]; then
+              echo "./_site/${BASH_REMATCH[1]}.html" >> "$scope_file"
+            fi
+          done
+
+          if [[ ! -s "$scope_file" ]]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "HTMLProofer scope: skipped (no rendered pages affected)"
+          else
+            sort -u "$scope_file" -o "$scope_file"
+            echo "HTMLProofer scope: targeted pages"
+          fi
+
+          cat "$scope_file"
+
+      - name: Finalize HTMLProofer scope
+        if: steps.htmlproofer-scope.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+
+          scope_file="/tmp/htmlproofer_paths.txt"
+          if [[ ! -s "$scope_file" ]]; then
+            echo "./_site" > "$scope_file"
+            echo "HTMLProofer scope: full site (empty scope after build)"
+            exit 0
+          fi
+
+          if grep -qx './_site' "$scope_file"; then
+            echo "HTMLProofer scope: full site"
+            exit 0
+          fi
+
+          existing_scope_file="/tmp/htmlproofer_paths_existing.txt"
+          : > "$existing_scope_file"
+          while IFS= read -r rendered_path; do
+            if [[ -f "$rendered_path" ]]; then
+              echo "$rendered_path" >> "$existing_scope_file"
+            fi
+          done < "$scope_file"
+
+          if [[ ! -s "$existing_scope_file" ]]; then
+            echo "./_site" > "$scope_file"
+            echo "HTMLProofer scope: full site (targeted outputs not present)"
+          else
+            mv "$existing_scope_file" "$scope_file"
+            echo "HTMLProofer scope: targeted pages"
+            cat "$scope_file"
+          fi
 
       - name: HTML Proofer
-        run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
+        if: steps.htmlproofer-scope.outputs.run == 'true'
+        run: |
+          xargs -a /tmp/htmlproofer_paths.txt bundle exec htmlproofer \
+            --allow-missing-href \
+            --disable-external \
+            --assume-extension '.html' \
+            --log-level=:info \
+            --cache='{"timeframe":{"external":"6w"}}' \
+            --checks 'Links,Images,Scripts,OpenGraph' \
+            --no-check-sri \
+            --ignore-empty-alt \
+            --no-enforce_https
+
       - name: DNS Validator
+        if: steps.htmlproofer-scope.outputs.run == 'true'
         run: bundle exec github-pages health-check
 
   link-check:
@@ -75,15 +188,15 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@v7.0.1
 
       - name: Link Checker
         uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
         with:
           config-file: config/mlc_config.json
-          use-quiet-mode: no
-          use-verbose-mode: yes
-          check-modified-files-only: yes
+          use-quiet-mode: 'no'
+          use-verbose-mode: 'yes'
+          check-modified-files-only: 'yes'
 
   codespell:
     name: CodeSpell
@@ -91,26 +204,31 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@v7.0.1
 
       - name: Get Changed Files
         id: changed
         continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          changed_files=$(gh pr diff "${{ github.event.number }}" --name-only | paste -sd, -)
+          if [ -n "$changed_files" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "CHANGED_FILES=$changed_files" >> "$GITHUB_ENV"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "CHANGED_FILES=" >> "$GITHUB_ENV"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outcome == 'success' && steps.changed.outputs.changed == 'true'
         with:
           check_filenames: true
           ignore_words_file: config/.codespell-whitelist
           path: ${{ env.CHANGED_FILES }}
-          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+          skip: '.git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css'
 
   eipw-validator:
     name: EIP Walidator
@@ -118,7 +236,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@v7.0.1
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
@@ -134,15 +252,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@v7.0.1
 
       - name: Get Changed Files
         id: changed
         continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          {
+            printf 'CHANGED_FILES<<EOF\n'
+            gh pr diff "${{ github.event.number }}" --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md'
+            printf 'EOF\n'
+          } >> "$GITHUB_ENV"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

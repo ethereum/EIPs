@@ -6,23 +6,44 @@ on:
       - completed
 
 name: Auto Review Bot
+
 jobs:
   auto-review-bot:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      (
+        github.event.workflow_run.event == 'pull_request_target' ||
+        github.event.workflow_run.event == 'pull_request_review' ||
+        github.event.workflow_run.event == 'workflow_dispatch' ||
+        github.event.workflow_run.event == 'issue_comment'
+      )
     runs-on: ubuntu-latest
-    name: Run
     steps:
       - name: Fetch PR Number
+        id: fetch-pr
+        continue-on-error: true
         uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
         with:
           name: pr-number
           workflow: auto-review-trigger.yml
           run_id: ${{ github.event.workflow_run.id }}
 
+      - name: Check PR Number file
+        id: pr-file
+        run: |
+          if [ -f pr-number.txt ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Save PR Number
+        if: steps.pr-file.outputs.exists == 'true'
         id: save-pr-number
-        run: echo "pr=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+        run: echo "pr=$(cat pr-number.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Auto Review Bot
+        if: steps.pr-file.outputs.exists == 'true'
         id: auto-review-bot
         uses: ethereum/eip-review-bot@dist
         continue-on-error: true
