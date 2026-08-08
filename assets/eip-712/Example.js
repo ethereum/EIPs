@@ -57,11 +57,9 @@ function dependencies(primaryType, found = []) {
     }
     found.push(primaryType);
     for (let field of types[primaryType]) {
-        for (let dep of dependencies(field.type, found)) {
-            if (!found.includes(dep)) {
-                found.push(dep);
-            }
-        }
+        // `dependencies` mutates `found` in-place, so iterating and re-pushing
+        // the returned array is redundant.
+        dependencies(field.type, found);
     }
     return found;
 }
