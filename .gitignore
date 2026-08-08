@@ -3,6 +3,7 @@ _site
 .sass-cache
 .jekyll-metadata
 vendor
+.bundle
 
 # Editor files
 .gitpod.yml

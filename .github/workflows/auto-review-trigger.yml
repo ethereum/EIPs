@@ -21,39 +21,72 @@ jobs:
     runs-on: ubuntu-latest
     name: Trigger
     steps:
-      - name: Write PR Number - PR Target
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_target' && ((!endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')) || github.event.sender.login == 'renovate[bot]')
+      - name: Resolve PR Number
+        id: pr-number
         env:
-          PR_NUMBER: ${{ github.event.number }}
+          EVENT_NAME: ${{ github.event_name }}
+          SENDER_LOGIN: ${{ github.event.sender.login }}
+          EVENT_NUMBER: ${{ github.event.number }}
+          REVIEW_PR_NUMBER: ${{ github.event.pull_request.number || '' }}
+          DISPATCH_PR_NUMBER: ${{ inputs.pr_number || '' }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || '' }}
+          ISSUE_HAS_PR: ${{ github.event.issue.pull_request && 'true' || 'false' }}
+          COMMENT_BODY: ${{ github.event.comment.body || '' }}
+        run: |
+          set -euo pipefail
 
-      - name: Write PR Number - PR Review
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_review' && !endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          event_name="${EVENT_NAME}"
+          sender_login="${SENDER_LOGIN}"
+          pr_number=""
 
-      - name: Write PR Number - Workflow Dispatch
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          PR_NUMBER: ${{ inputs.pr_number }}
+          is_bot_sender=false
+          if [[ "$sender_login" == *"-bot" || "$sender_login" == *"[bot]" ]]; then
+            is_bot_sender=true
+          fi
 
-      - name: Write PR Number - Comment Retrigger
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@eth-bot rerun')
-        env:
-          PR_NUMBER: ${{ github.event.issue.number }}
-      
-      - name: Check File Existence
-        uses: andstor/file-existence-action@20b4d2e596410855db8f9ca21e96fbe18e12930b
-        id: check_pr_number_exists
-        with:
-          files: pr-number.txt
+          case "$event_name" in
+            pull_request_target)
+              if [[ "$is_bot_sender" == false || "$sender_login" == "renovate[bot]" ]]; then
+                pr_number="${EVENT_NUMBER}"
+              fi
+              ;;
+            pull_request_review)
+              if [[ "$is_bot_sender" == false ]]; then
+                pr_number="${REVIEW_PR_NUMBER}"
+              fi
+              ;;
+            workflow_dispatch)
+              pr_number="${DISPATCH_PR_NUMBER}"
+              ;;
+            issue_comment)
+              if [[ "${ISSUE_HAS_PR}" == "true" && "${COMMENT_BODY}" == *"@eth-bot rerun"* ]]; then
+                pr_number="${ISSUE_NUMBER}"
+              fi
+              ;;
+          esac
 
-      - name: Save PR Number
+          echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
+
+      - name: Validate and Save PR Number Artifact Payload
+        if: ${{ steps.pr-number.outputs.pr_number != '' }}
+        run: |
+          set -euo pipefail
+          pr_number='${{ steps.pr-number.outputs.pr_number }}'
+          [[ "$pr_number" =~ ^[0-9]+$ ]] || { echo "Invalid PR number: $pr_number" >&2; exit 1; }
+          printf '%s\n' "$pr_number" > pr-number.txt
+
+      - name: Upload PR Number Artifact
+        if: ${{ steps.pr-number.outputs.pr_number != '' }}
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
-        if: steps.check_pr_number_exists.outputs.files_exists == 'true'
         with:
           name: pr-number
           path: pr-number.txt
+
+      - name: Auto Review Bot
+        uses: ethereum/eip-review-bot@dist
+        continue-on-error: true
+        if: ${{ steps.pr-number.outputs.pr_number != '' }}
+        with:
+          token: ${{ secrets.TOKEN }}
+          config: config/eip-editors.yml
+          pr_number: ${{ steps.pr-number.outputs.pr_number }}

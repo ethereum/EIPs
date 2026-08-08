@@ -11,7 +11,7 @@ on:
   push:
     branches: ["master"]
   schedule:
-    - cron: "*/15 * * * *" # Every 15 minutes
+    - cron: "0 * * * *" # Every hour
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -32,34 +32,37 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    outputs:
+      artifact_uploaded: ${{ steps.upload.outcome == 'success' }}
     steps:
       - name: Checkout EIPs
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ethereum/EIPs
-          path: ''
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
       - name: Setup Ruby
-        uses: ruby/setup-ruby@f26937343756480a8cb3ae1f623b9c8d89ed6984 # v1.196.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 0 # Increment this number if you need to re-download cached gems
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v5
+          bundler-cache: true
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
-        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        run: bundle exec jekyll build
         env:
           JEKYLL_ENV: production
+          JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifact
-        # Automatically uploads an artifact from the './_site' directory by default
-        uses: actions/upload-pages-artifact@v3
+        id: upload
+        if: github.repository == 'ethereum/EIPs'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./_site
 
   # Deployment job
   deploy:
+    if: github.repository == 'ethereum/EIPs' && needs.build.outputs.artifact_uploaded == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -68,4 +71,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

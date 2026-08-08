@@ -123,6 +123,16 @@ To clarify the merge blocker if needed, add applicable labels.
 Your contributions help maintain the integrity and accessibility of Ethereum’s open-source governance process.  
 Together, we make the protocol and its documentation stronger, clearer, and more collaborative.
 
+## Merge Blockers and Escalation
+
+If a pull request is CI-green but not merging:
+
+* Verify all required checks are completed successfully.
+* Confirm author acknowledgment where required (especially for non-author content changes).
+* Check whether labels indicate pending process consensus (for example `e-consensus`).
+* For workflow changes in `.github/workflows/**`, request review from workflow CODEOWNERS.
+* If all requirements appear satisfied but merge remains blocked, ask an EIP editor or maintainer to merge manually or enable auto-merge.
+
 ## References
 
 * [EIP-1: EIP Purpose and Guidelines](https://eips.ethereum.org/EIPS/eip-1) 
