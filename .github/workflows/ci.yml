@@ -34,13 +34,14 @@ jobs:
       - name: Upload PR Number
         uses: actions/upload-artifact@c6a366c94c3e0affe28c06c8df20a878f24da3cf # v3.2.2
         with:
-          name: pr_number
+          name: pr-number
           path: pr/
 
       - name: Upload PR Number (legacy name)
+        continue-on-error: true
         uses: actions/upload-artifact@c6a366c94c3e0affe28c06c8df20a878f24da3cf # v3.2.2
         with:
-          name: pr-number
+          name: pr_number
           path: pr/
 
   htmlproofer:

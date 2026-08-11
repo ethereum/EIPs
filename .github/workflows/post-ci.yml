@@ -18,7 +18,7 @@ jobs:
         uses: actions/download-artifact@v5
         continue-on-error: true
         with:
-          name: pr_number
+          name: pr-number
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
           path: ./
@@ -29,7 +29,7 @@ jobs:
         uses: actions/download-artifact@v5
         continue-on-error: true
         with:
-          name: pr-number
+          name: pr_number
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
           path: ./
