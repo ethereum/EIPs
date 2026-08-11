@@ -17,17 +17,22 @@ REPO="${2:-ethereum/EIPs}"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-if gh run download "$RUN_ID" --repo "$REPO" -n pr-number -D "$TMP_DIR" >/dev/null 2>&1; then
-  if [[ -f "$TMP_DIR/pr-number.txt" ]]; then
-    tr -d '\n' < "$TMP_DIR/pr-number.txt"
+for artifact_name in pr-number pr_number; do
+  if ! gh run download "$RUN_ID" --repo "$REPO" -n "$artifact_name" -D "$TMP_DIR" >/dev/null 2>&1; then
+    continue
+  fi
+
+  pr_number_file="$(find "$TMP_DIR" -type f \( -name 'pr-number.txt' -o -name 'pr_number.txt' \) -print -quit)"
+  if [[ -n "$pr_number_file" ]]; then
+    tr -d '\n' < "$pr_number_file"
     echo
     exit 0
   fi
 
   echo "error: artifact downloaded but pr-number.txt is missing" >&2
   exit 1
-fi
+done
 
 echo "error: pr-number artifact not found for run $RUN_ID in $REPO" >&2
-echo "hint: ensure auto-review-trigger uploaded artifact name 'pr-number'" >&2
+echo "hint: ensure auto-review-trigger uploaded artifact name 'pr-number' or 'pr_number'" >&2
 exit 1

@@ -7,6 +7,10 @@ on:
 
 name: Auto Review Bot
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   auto-review-bot:
     if: >
@@ -19,35 +23,33 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch PR Number
-        id: fetch-pr
-        continue-on-error: true
-        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
+      - name: Checkout EIP Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          name: pr-number
-          workflow: auto-review-trigger.yml
-          run_id: ${{ github.event.workflow_run.id }}
+          repository: ${{ github.repository }}
+          ref: ${{ github.event.workflow_run.head_sha }}
 
-      - name: Check PR Number file
-        id: pr-file
+      - name: Fetch PR Number
+        id: fetch-pr-number
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ -f pr-number.txt ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
+          set -euo pipefail
+
+          if ! pr_number="$(.github/fetch-pr-number-from-run.sh "${{ github.event.workflow_run.id }}" "${{ github.repository }}")"; then
             echo "exists=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-      - name: Save PR Number
-        if: steps.pr-file.outputs.exists == 'true'
-        id: save-pr-number
-        run: echo "pr=$(cat pr-number.txt)" >> "$GITHUB_OUTPUT"
+          echo "exists=true" >> "$GITHUB_OUTPUT"
+          echo "pr=$pr_number" >> "$GITHUB_OUTPUT"
 
       - name: Auto Review Bot
-        if: steps.pr-file.outputs.exists == 'true'
+        if: steps.fetch-pr-number.outputs.exists == 'true'
         id: auto-review-bot
         uses: ethereum/eip-review-bot@dist
         continue-on-error: true
         with:
           token: ${{ secrets.TOKEN }}
           config: config/eip-editors.yml
-          pr_number: ${{ steps.save-pr-number.outputs.pr }}
+          pr_number: ${{ steps.fetch-pr-number.outputs.pr }}

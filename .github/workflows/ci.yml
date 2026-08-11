@@ -32,13 +32,13 @@ jobs:
           printf '%s\n' "$MERGE_SHA" > ./pr/merge_sha
 
       - name: Upload PR Number
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        uses: actions/upload-artifact@c6a366c94c3e0affe28c06c8df20a878f24da3cf # v3.2.2
         with:
           name: pr_number
           path: pr/
 
       - name: Upload PR Number (legacy name)
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        uses: actions/upload-artifact@c6a366c94c3e0affe28c06c8df20a878f24da3cf # v3.2.2
         with:
           name: pr-number
           path: pr/
@@ -94,6 +94,10 @@ jobs:
 
           base_sha="${{ github.event.pull_request.base.sha }}"
           head_sha="${{ github.event.pull_request.head.sha }}"
+
+          if ! git cat-file -e "$base_sha^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$base_sha"
+          fi
 
           mapfile -t changed_paths < <(git diff --name-only "$base_sha" "$head_sha" || true)
           if [[ ${#changed_paths[@]} -eq 0 ]]; then
@@ -263,12 +267,63 @@ jobs:
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
-      - uses: ethereum/eipw-action@b858a0f2687c12af12280aa934c3b842747414fd
-        id: eipw
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          unchecked: 1, 5069, 5757
-          options-file: config/eipw.toml
+      - name: Install eipw
+        run: cargo install eipw --locked
+
+      - name: Run eipw
+        run: |
+          set -euo pipefail
+
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          if ! git cat-file -e "$base_sha^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$base_sha"
+          fi
+
+          path_to_number() {
+            local input="$1"
+            local base stem dir_name rest
+
+            base="$(basename "$input")"
+            stem="${base%.md}"
+
+            if [[ "$base" == "index.md" ]]; then
+              dir_name="$(basename "$(dirname "$input")")"
+              rest="$dir_name"
+            elif [[ "$stem" == *-* ]]; then
+              rest="${stem##*-}"
+            else
+              rest="$stem"
+            fi
+
+            [[ "$rest" =~ ^[0-9]+$ ]] || return 1
+            printf '%s\n' "$rest"
+          }
+
+          mapfile -t changed_paths < <(git diff --name-only --diff-filter=d "$base_sha" "$head_sha" || true)
+
+          files=()
+          for file_path in "${changed_paths[@]}"; do
+            [[ "$file_path" == EIPS/** ]] || continue
+
+            eip_number="$(path_to_number "$file_path")" || continue
+            case "$eip_number" in
+              1|5069|5757)
+                continue
+                ;;
+            esac
+
+            [[ -f "$file_path" ]] || continue
+            files+=("$file_path")
+          done
+
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo "::notice::no files to check"
+            exit 0
+          fi
+
+          eipw --config ./config/eipw.toml "${files[@]}"
 
   markdownlint:
     name: Markdown Linter
@@ -317,10 +372,8 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Lint
-        uses: DavidAnson/markdownlint-cli2-action@f5cf187ef11bd3a68a127321b794aa252ff23019
+        uses: DavidAnson/markdownlint-cli2-action@5b7c9f74fec47e6b15667b2cc23c63dff11e449e # v9.0.0
         if: steps.changed.outputs.changed == 'true'
         with:
-          command: config
-          globs: |
-            config/.markdownlint.yaml
-            ${{ env.CHANGED_FILES }}
+          config: config/.markdownlint.yaml
+          globs: ${{ env.CHANGED_FILES }}
