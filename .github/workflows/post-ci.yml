@@ -18,13 +18,24 @@ jobs:
         uses: actions/download-artifact@v5
         continue-on-error: true
         with:
+          name: prnumber
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: ./
+
+      - name: Fetch PR Data (hyphen legacy name)
+        if: ${{ steps.fetch-pr-data.outcome != 'success' }}
+        id: fetch-pr-data-hyphen-legacy
+        uses: actions/download-artifact@v5
+        continue-on-error: true
+        with:
           name: pr-number
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
           path: ./
 
       - name: Fetch PR Data (legacy name)
-        if: ${{ steps.fetch-pr-data.outcome != 'success' }}
+        if: ${{ steps.fetch-pr-data.outcome != 'success' && steps.fetch-pr-data-hyphen-legacy.outcome != 'success' }}
         id: fetch-pr-data-legacy
         uses: actions/download-artifact@v5
         continue-on-error: true
