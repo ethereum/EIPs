@@ -377,5 +377,7 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@5b7c9f74fec47e6b15667b2cc23c63dff11e449e # v9.0.0
         if: steps.changed.outputs.changed == 'true'
         with:
-          config: config/.markdownlint.yaml
-          globs: ${{ env.CHANGED_FILES }}
+          command: config
+          globs: |
+            config/.markdownlint.yaml
+            ${{ env.CHANGED_FILES }}
