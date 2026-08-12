@@ -173,7 +173,7 @@ jobs:
       - name: HTML Proofer
         if: steps.htmlproofer-scope.outputs.run == 'true'
         run: |
-          xargs -a /tmp/htmlproofer_paths.txt bundle exec htmlproofer \
+          xargs -a /tmp/htmlproofer_paths.txt -n 1 bundle exec htmlproofer \
             --root-dir ./_site \
             --allow-missing-href \
             --disable-external \
