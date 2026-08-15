@@ -55,12 +55,7 @@ jobs:
           ruby-version: '3.1' # Not needed with a .ruby-version file
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
-      - name: Build with Jekyll
-        run: bundle exec jekyll build --baseurl ""
-        env:
-          JEKYLL_ENV: production
-
-      - name: Determine HTMLProofer scope
+      - name: Determine Jekyll and HTMLProofer scope
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -70,18 +65,51 @@ jobs:
           mapfile -t changed_files < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
           if printf '%s\n' "${changed_files[@]}" | grep -Eq '^(_config\.yml|_data/|_includes/|_layouts/|assets/|[^/]+\.html$)'; then
             echo ./_site > /tmp/htmlproofer-paths
+            echo JEKYLL_CONFIG=_config.yml >> "$GITHUB_ENV"
           else
             printf '%s\n' "${changed_files[@]}" \
-              | sed -nE 's|^EIPS/eip-([0-9]+)\.md$|./_site/EIPS/eip-\1.html|p' \
-              | sort -u > /tmp/htmlproofer-paths
+              | { grep -E '^EIPS/eip-[0-9]+\.md$' || true; } \
+              | while IFS= read -r source; do [[ -f "$source" ]] && echo "$source"; done \
+              | sort -u > /tmp/jekyll-sources
 
-            if [[ ! -s /tmp/htmlproofer-paths ]]; then
+            if [[ ! -s /tmp/jekyll-sources ]]; then
               echo ./_site > /tmp/htmlproofer-paths
+              echo JEKYLL_CONFIG=_config.yml >> "$GITHUB_ENV"
+            else
+              sed -E 's|^EIPS/(eip-[0-9]+)\.md$|./_site/EIPS/\1.html|' \
+                /tmp/jekyll-sources > /tmp/htmlproofer-paths
+
+              while IFS= read -r source; do
+                { grep -Eo '(\./|/EIPS/)?eip-[0-9]+(\.md)?' "$source" || true; } \
+                  | sed -E 's|.*eip-([0-9]+).*|EIPS/eip-\1.md|'
+                { grep -E '^requires:' "$source" || true; } \
+                  | { grep -Eo '[0-9]+' || true; } \
+                  | sed -E 's|^|EIPS/eip-|; s|$|.md|'
+              done < /tmp/jekyll-sources > /tmp/jekyll-dependencies
+              cat /tmp/jekyll-dependencies \
+                | while IFS= read -r source; do [[ -f "$source" ]] && echo "$source"; done \
+                >> /tmp/jekyll-sources
+
+              sort -u /tmp/jekyll-sources -o /tmp/jekyll-sources
+              find EIPS -maxdepth 1 -name 'eip-*.md' -print \
+                | sort \
+                | { grep -vxF -f /tmp/jekyll-sources || true; } \
+                > /tmp/jekyll-exclude
+              ruby -ryaml -e '
+                base = YAML.safe_load(File.read("_config.yml"), aliases: true)
+                puts({"exclude" => Array(base["exclude"]) + ARGF.each_line(chomp: true).to_a}.to_yaml)
+              ' /tmp/jekyll-exclude > /tmp/jekyll-ci.yml
+              echo JEKYLL_CONFIG=_config.yml,/tmp/jekyll-ci.yml >> "$GITHUB_ENV"
             fi
           fi
 
           echo "HTMLProofer paths:"
           cat /tmp/htmlproofer-paths
+
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --config "$JEKYLL_CONFIG" --baseurl ""
+        env:
+          JEKYLL_ENV: production
 
       - name: HTML Proofer
         run: xargs bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https --root-dir ./_site < /tmp/htmlproofer-paths
