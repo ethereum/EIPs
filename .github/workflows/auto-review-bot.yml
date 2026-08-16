@@ -13,23 +13,40 @@ jobs:
     steps:
       - name: Fetch PR Number
         id: fetch-pr-number
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        continue-on-error: true
-        with:
-          name: pr_number
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          run-id: ${{ github.event.workflow_run.id }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          artifact_id="$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts" \
+            --jq '.artifacts[] | select(.name == "pr_number" or .name == "pr-number") | .id' \
+            | head -n 1)"
+
+          if [[ -z "$artifact_id" ]]; then
+            echo "PR number artifact not found for workflow run ${{ github.event.workflow_run.id }}"
+            exit 0
+          fi
+
+          gh api "repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip" > pr-number.zip
+          unzip -o pr-number.zip
+          rm -f pr-number.zip
+
+      - name: Check PR Number file
+        id: check-pr-number
+        run: |
+          if [[ -f pr-number.txt ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Save PR Number
         id: save-pr-number
-        if: ${{ steps.fetch-pr-number.outcome == 'success' }}
+        if: ${{ steps.check-pr-number.outputs.exists == 'true' }}
         run: echo "pr=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
 
       - name: Auto Review Bot
         id: auto-review-bot
         uses: ethereum/eip-review-bot@dist
-        if: ${{ steps.fetch-pr-number.outcome == 'success' }}
+        if: ${{ steps.check-pr-number.outputs.exists == 'true' }}
         continue-on-error: true
         with:
           token: ${{ secrets.TOKEN }}
