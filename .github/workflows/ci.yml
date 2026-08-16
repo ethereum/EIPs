@@ -64,7 +64,7 @@ jobs:
 
           mapfile -t changed_files < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
           if printf '%s\n' "${changed_files[@]}" | grep -Eq '^(_config\.yml|_data/|_includes/|_layouts/|assets/|[^/]+\.html$)'; then
-            echo ./_site > /tmp/htmlproofer-paths
+            echo ./_site > /tmp/htmlproofer_paths.txt
             echo JEKYLL_CONFIG=_config.yml >> "$GITHUB_ENV"
           else
             printf '%s\n' "${changed_files[@]}" \
@@ -73,11 +73,11 @@ jobs:
               | sort -u > /tmp/jekyll-sources
 
             if [[ ! -s /tmp/jekyll-sources ]]; then
-              echo ./_site > /tmp/htmlproofer-paths
+              echo ./_site > /tmp/htmlproofer_paths.txt
               echo JEKYLL_CONFIG=_config.yml >> "$GITHUB_ENV"
             else
               sed -E 's|^EIPS/(eip-[0-9]+)\.md$|./_site/EIPS/\1.html|' \
-                /tmp/jekyll-sources > /tmp/htmlproofer-paths
+                /tmp/jekyll-sources > /tmp/htmlproofer_paths.txt
 
               while IFS= read -r source; do
                 { grep -Eo '(\./|/EIPS/)?eip-[0-9]+(\.md)?' "$source" || true; } \
@@ -103,30 +103,26 @@ jobs:
             fi
           fi
 
+          tr ',' '\n' < /tmp/htmlproofer_paths.txt \
+            | sed -E 's/^[[:space:]]+|[[:space:]]+$//g' \
+            | sed '/^$/d' > /tmp/htmlproofer_paths.normalized
+          mv /tmp/htmlproofer_paths.normalized /tmp/htmlproofer_paths.txt
+
           echo "HTMLProofer paths:"
-          cat /tmp/htmlproofer-paths
+          cat /tmp/htmlproofer_paths.txt
 
       - name: Build with Jekyll
         run: bundle exec jekyll build --config "$JEKYLL_CONFIG" --baseurl ""
         env:
           JEKYLL_ENV: production
 
+      - name: Jekyll Doctor
+        run: bundle exec jekyll doctor --config "$JEKYLL_CONFIG"
+        env:
+          JEKYLL_ENV: production
+
       - name: HTML Proofer
-        run: |
-          tr ',' '\n' < /tmp/htmlproofer-paths \
-            | sed -E 's/^[[:space:]]+|[[:space:]]+$//g' \
-            | sed '/^$/d' \
-            | xargs -r -n 1 bundle exec htmlproofer \
-                --allow-missing-href \
-                --disable-external \
-                --assume-extension '.html' \
-                --log-level=:info \
-                --cache='{"timeframe":{"external":"6w"}}' \
-                --checks 'Links,Images,Scripts,OpenGraph' \
-                --no-check-sri \
-                --ignore-empty-alt \
-                --no-enforce_https \
-                --root-dir ./_site
+        run: xargs -a /tmp/htmlproofer_paths.txt -r -n 1 bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https --root-dir ./_site
       - name: DNS Validator
         run: bundle exec github-pages health-check
 

@@ -10,6 +10,9 @@ jobs:
   auto-review-bot:
     runs-on: ubuntu-latest
     name: Run
+    permissions:
+      actions: read
+      contents: read
     steps:
       - name: Fetch PR Number
         id: fetch-pr-number

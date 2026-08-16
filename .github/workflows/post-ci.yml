@@ -12,6 +12,11 @@ name: Post CI
 jobs:
   on-failure:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+      pull-requests: write
     steps:
       - name: Fetch PR Data
         id: fetch-pr-data
