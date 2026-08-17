@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: Interface
 created: 2026-08-17
-requires: 5792, 7677, 8141
+requires: 8141
 ---
 
 ## Abstract
@@ -18,15 +18,15 @@ The interface separates paymaster-controlled transaction data from gas estimatio
 
 ## Motivation
 
-Paymasters are normally exposed to wallets through a web service rather than by requiring the wallet to understand a particular paymaster contract. Existing ERC-4337 deployments commonly use a two-stage flow: the paymaster first returns stub data suitable for gas estimation, and later returns final authorization data once gas and fee fields are fixed. [ERC-7677](./eip-7677.md) standardizes this pattern for `UserOperation`s.
+Paymasters are normally exposed to wallets through a web service rather than by requiring the wallet to understand a particular paymaster contract. Existing [ERC-4337](./eip-4337.md) paymaster deployments commonly use a two-stage flow: the paymaster first returns data suitable for gas estimation, and later returns final authorization data once gas and fee fields are fixed.
 
-Frame transactions make the payer and payment approval part of the transaction execution model, but they do not remove the need for a wallet-to-paymaster service boundary. In particular:
+Frame transactions make payment approval part of the transaction execution model, but they do not remove the need for a wallet-to-paymaster service boundary. In particular:
 
 1. The application may choose who sponsors a transaction, while the wallet constructs and submits the transaction.
 2. Paymaster-controlled frames and authorization data contribute to intrinsic gas and can affect validation execution cost.
 3. EIP-8141 requires independent execution and state gas limits for each frame, while existing `eth_estimateGas` returns only a single scalar gas estimate.
 4. A paymaster should authorize the transaction only after the frames, gas limits, and fee fields it is paying for are fixed.
-5. Gas estimation should remain owned by the wallet and its selected node or bundling infrastructure rather than by the paymaster service. Different paymaster services otherwise produce incompatible estimates for the same transaction.
+5. Gas estimation should remain owned by the wallet and its selected node rather than by the paymaster service. Otherwise each paymaster provider can produce different gas values for the same transaction.
 
 Without a standard interface, each paymaster provider would need a provider-specific transaction construction and estimation API. This EIP defines a minimal common flow while leaving sponsorship policy, billing, quotas, and application-specific context to the service provider.
 
@@ -49,7 +49,7 @@ A **paymaster-controlled signature** is an EIP-8141 signature entry whose bytes 
 
 The wallet MUST retain ownership of the outer transaction fields and sender-controlled frames. A paymaster service MUST NOT be allowed to replace the complete transaction object.
 
-The wallet constructs a frame transaction in the following logical order:
+The wallet constructs a sponsored frame transaction in the following logical order:
 
 ```text
 [ sender validation ] [ payFrame ] [ sender execution ] [ postOpFrames ]
@@ -66,8 +66,7 @@ The normal flow is:
 ```text
  Application              Wallet             Paymaster Service             Node
      |                       |                       |                       |
-     | wallet_sendCalls      |                       |                       |
-     | + paymasterService    |                       |                       |
+     | sponsored call       |                       |                       |
      |---------------------->|                       |                       |
      |                       |                       |                       |
      |                       | pm_getFramePaymasterStubData                 |
@@ -77,18 +76,18 @@ The normal flow is:
      |                       |  postOp stubs                                 |
      |                       |  signature stubs                              |
      |                       |                       |                       |
-     |                       | assemble complete unsigned FrameTx            |
+     |                       | assemble unsigned FrameTx                     |
      |                       |---------------------------------------------->|
-     |                       |      eth_estimateFrameTransactionGas          |
+     |                       |   eth_estimateFrameTransactionGas             |
      |                       |<----------------------------------------------|
-     |                       |      per-frame execution/state limits         |
+     |                       |   per-frame execution/state limits            |
      |                       |                       |                       |
      |                       | fix frame limits and fee fields               |
      |                       |                       |                       |
      |                       | pm_getFramePaymasterData                      |
      |                       |---------------------->|                       |
      |                       |<----------------------|                       |
-     |                       |  final paymaster-controlled data              |
+     |                       |  final paymaster authorization                |
      |                       |                       |                       |
      |                       | obtain sender signatures                      |
      |                       | submit FrameTx                                |
@@ -97,9 +96,9 @@ The normal flow is:
 
 If `pm_getFramePaymasterStubData` returns `isFinal: true`, the wallet MAY skip `pm_getFramePaymasterData`.
 
-### Frame object
+### RPC transaction object
 
-RPC methods in this EIP encode an EIP-8141 frame as:
+RPC methods in this EIP encode EIP-8141 frames and signatures as follows:
 
 ```typescript
 type Frame = {
@@ -113,24 +112,32 @@ type Frame = {
   value: `0x${string}`;
   data: `0x${string}`;
 };
-```
 
-A stub frame MAY use zero gas limits. The wallet replaces those limits with estimates before finalization.
-
-### Signature object
-
-RPC methods in this EIP encode an EIP-8141 signature entry as:
-
-```typescript
 type FrameSignature = {
   scheme: `0x${string}`;
   signer: `0x${string}`;
   msg: `0x${string}`;
   signature: `0x${string}`;
 };
+
+type FrameTransaction = {
+  chainId: `0x${string}`;
+  nonce: `0x${string}`;
+  sender: `0x${string}`;
+  frames: Frame[];
+  signatures: FrameSignature[];
+  fees: {
+    maxPriorityFeePerGas: `0x${string}`;
+    maxFeePerGas: `0x${string}`;
+    maxFeePerBlobGas: `0x${string}`;
+  };
+  blobVersionedHashes: `0x${string}`[];
+};
 ```
 
-Paymaster-controlled signature entries returned by the stub method MUST have the same `scheme`, `signer`, and `msg` values that will be used in the final transaction. The final method MAY replace only the `signature` bytes of such entries.
+A stub frame MAY use zero gas limits. The wallet replaces those limits with estimates before finalization.
+
+Paymaster-controlled signature entries returned by the stub method MUST have the same `scheme`, `signer`, and `msg` values that will be used in the final transaction. The final method MAY replace only their `signature` bytes.
 
 ### `pm_getFramePaymasterStubData`
 
@@ -140,19 +147,7 @@ Returns the paymaster-controlled transaction components required to construct an
 
 ```typescript
 type GetFramePaymasterStubDataParams = [
-  {
-    chainId: `0x${string}`;
-    nonce: `0x${string}`;
-    sender: `0x${string}`;
-    frames: Frame[];
-    signatures: FrameSignature[];
-    fees: {
-      maxPriorityFeePerGas: `0x${string}`;
-      maxFeePerGas: `0x${string}`;
-      maxFeePerBlobGas: `0x${string}`;
-    };
-    blobVersionedHashes: `0x${string}`[];
-  },
+  FrameTransaction,
   Record<string, unknown>
 ];
 ```
@@ -182,9 +177,9 @@ type GetFramePaymasterStubDataResult = {
 
 The service SHOULD validate sponsorship policy during this call and SHOULD reject requests it will not sponsor before the wallet performs gas estimation.
 
-The stub response MUST be gas-safe. For every paymaster-controlled field changed by the final response, the stub MUST provide a representation whose intrinsic calldata gas cost is greater than or equal to the corresponding final representation. The service MUST also ensure that execution of the final paymaster-controlled validation data does not require larger frame gas limits than the stub path unless the service explicitly returns replacement limits and the wallet performs gas estimation again.
+The stub response MUST be gas-safe. For every paymaster-controlled field changed by the final response, the stub MUST provide a representation whose intrinsic calldata gas cost is greater than or equal to the corresponding final representation. The service MUST also ensure that execution of the final paymaster-controlled validation data does not require larger frame gas limits than the stub path unless the wallet performs gas estimation again.
 
-A service that can return final authorization before gas and fee fields are fixed MAY return `isFinal: true` only if that authorization remains valid for the final transaction constructed by the wallet.
+A service MAY return `isFinal: true` only if no paymaster-controlled field that affects the authorization will change after gas and fee fields are finalized.
 
 ### `eth_estimateFrameTransactionGas`
 
@@ -195,21 +190,7 @@ This method estimates frame limits for a complete unsigned frame transaction con
 #### Parameters
 
 ```typescript
-type EstimateFrameTransactionGasParams = [
-  {
-    chainId: `0x${string}`;
-    nonce: `0x${string}`;
-    sender: `0x${string}`;
-    frames: Frame[];
-    signatures: FrameSignature[];
-    fees: {
-      maxPriorityFeePerGas: `0x${string}`;
-      maxFeePerGas: `0x${string}`;
-      maxFeePerBlobGas: `0x${string}`;
-    };
-    blobVersionedHashes: `0x${string}`[];
-  }
-];
+type EstimateFrameTransactionGasParams = [FrameTransaction];
 ```
 
 For estimation, signature stubs stand in for signatures that cannot exist until the final transaction fields are fixed. The node MUST account for the intrinsic gas implied by the signature scheme and encoded stub bytes. It MAY skip cryptographic verification of stub signatures, but MUST otherwise execute or directly evaluate the same validation and frame paths needed to obtain safe frame limits.
@@ -238,19 +219,7 @@ Finalizes paymaster-controlled data after frame limits and fee fields have been 
 
 ```typescript
 type GetFramePaymasterDataParams = [
-  {
-    chainId: `0x${string}`;
-    nonce: `0x${string}`;
-    sender: `0x${string}`;
-    frames: Frame[];
-    signatures: FrameSignature[];
-    fees: {
-      maxPriorityFeePerGas: `0x${string}`;
-      maxFeePerGas: `0x${string}`;
-      maxFeePerBlobGas: `0x${string}`;
-    };
-    blobVersionedHashes: `0x${string}`[];
-  },
+  FrameTransaction,
   Record<string, unknown>
 ];
 ```
@@ -261,7 +230,7 @@ The transaction MUST contain the paymaster-controlled stub components returned b
 
 ```typescript
 type GetFramePaymasterDataResult = {
-  payFrameData: `0x${string}`;
+  payFrameData?: `0x${string}`;
   postOpFrameData?: `0x${string}`[];
   signatures?: Array<{
     index: `0x${string}`;
@@ -272,7 +241,7 @@ type GetFramePaymasterDataResult = {
 
 The final method deliberately returns only fields that the paymaster is allowed to finalize.
 
-`payFrameData` replaces only the `data` field of the stub `payFrame`.
+If `payFrameData` is returned, it replaces only the `data` field of the stub `payFrame`.
 
 If `postOpFrameData` is returned, its length MUST equal the number of stub `postOpFrames`, and each value replaces only the corresponding frame's `data` field.
 
@@ -289,28 +258,15 @@ The wallet MUST reject a response that attempts to change any other transaction 
 
 The final data MUST satisfy the gas-safety conditions promised by the stub response. Otherwise the wallet MUST perform gas estimation again before submitting the transaction.
 
-### Paymaster service capability
-
-Wallets and applications MAY reuse the `paymasterService` capability defined by [ERC-7677](./eip-7677.md):
-
-```typescript
-type PaymasterCapabilityParams = {
-  url: string;
-  context: Record<string, unknown>;
-};
-```
-
-When a wallet selects EIP-8141 transaction construction for a request carrying this capability, it calls the frame transaction methods defined in this EIP instead of the ERC-4337 `UserOperation` methods defined by ERC-7677.
-
-A wallet advertising this behavior SHOULD expose a transaction-type-specific capability so that applications can distinguish ERC-4337 paymaster support from frame transaction paymaster support.
-
 ## Rationale
 
 ### Why keep a two-stage paymaster flow
 
 Frame transactions make payment approval native to the transaction model, but a remote paymaster still needs to inspect the transaction before agreeing to pay for it. At the same time, the wallet cannot know final per-frame gas limits until paymaster-controlled validation data is present.
 
-A single `sponsor` RPC that both estimates gas and returns authorization makes the paymaster service responsible for gas estimation. Existing ERC-4337 deployments have shown that this couples wallets to provider-specific estimators and can produce incompatible or insufficient estimates. ERC-7677 separates these responsibilities with stub and final calls. This EIP keeps the same boundary while adapting it to frame transactions.
+A single sponsorship RPC that both estimates gas and returns authorization makes the paymaster service responsible for gas estimation. Existing ERC-4337 paymaster flows have shown why these responsibilities are better separated: the wallet chooses the node and submission path, while the paymaster decides whether it will pay for a transaction with those final limits and fees.
+
+The stub -> estimate -> final split preserves that separation for frame transactions.
 
 ### Why the paymaster returns frames instead of opaque data
 
@@ -318,21 +274,21 @@ EIP-8141 does not have a `paymasterAndData` field. Payment approval is represent
 
 ### Why the final response is intentionally narrow
 
-The payer's authorization is normally the last external authorization needed before sender signing and submission. Allowing the final paymaster call to replace a complete transaction would let a sponsor mutate user intent after gas estimation. The final method therefore permits replacement only of byte fields explicitly reserved for paymaster authorization.
+The payer's authorization is normally the last external authorization needed before sender signing and submission. Allowing the final paymaster call to replace a complete transaction would let a sponsor mutate user intent after gas estimation.
 
-This also makes it possible for the wallet to show the user and other signers a stable transaction structure before final paymaster authorization is obtained.
+The final method therefore permits replacement only of byte fields explicitly reserved for paymaster authorization. All frame structure, limits, fees, sender-controlled calldata, and signature metadata remain fixed.
 
 ### Why a new gas estimation RPC is needed
 
 EIP-8141 gives every frame two independent gas limits. Existing `eth_estimateGas` returns one scalar and cannot tell a wallet how to distribute that estimate across frames or between execution and state gas.
 
-`eth_estimateFrameTransactionGas` returns exactly the limits that must be encoded into the frame transaction and keeps estimation on the node side, where the wallet has chosen its submission infrastructure.
+`eth_estimateFrameTransactionGas` returns exactly the limits that must be encoded into the frame transaction and keeps estimation on the node side.
 
 ### Why stub data must be gas-safe
 
 Paymaster authorization bytes can change intrinsic calldata cost, and the authorization path can affect verification execution cost. If a cheap stub is replaced after estimation by more expensive final data, the completed transaction may be underfunded even though estimation succeeded.
 
-A gas-safe stub gives the wallet an upper-bound representation for paymaster-controlled data. This is the frame transaction equivalent of the stub-data requirement used by ERC-7677.
+A gas-safe stub gives the wallet an upper-bound representation for paymaster-controlled data before final authorization is available.
 
 ### Why sponsorship policy is not standardized
 
@@ -358,9 +314,9 @@ A malicious or incorrect paymaster can return final data whose intrinsic or exec
 
 ### Service authentication and API keys
 
-Applications commonly authenticate to paymaster services with credentials that should not be exposed to wallets. Applications MAY proxy the paymaster service through their own backend, as with ERC-7677 deployments.
+Applications commonly authenticate to paymaster services with credentials that should not be exposed to wallets. Applications MAY proxy the paymaster service through their own backend.
 
-### Quote and authorization expiry
+### Authorization expiry
 
 Paymaster services SHOULD bind final authorization to the complete finalized transaction and SHOULD use EIP-8141 expiry mechanisms when authorization is time-limited. Wallets MUST NOT reuse final paymaster data for a materially different transaction.
 
