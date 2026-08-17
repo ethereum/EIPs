@@ -46,6 +46,7 @@ jobs:
         with:
           repository: ethereum/EIPs
           path: ''
+          fetch-depth: 0
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
       - name: Setup Ruby
@@ -54,18 +55,74 @@ jobs:
           ruby-version: '3.1' # Not needed with a .ruby-version file
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
+      - name: Determine Jekyll and HTMLProofer scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          mapfile -t changed_files < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          if printf '%s\n' "${changed_files[@]}" | grep -Eq '^(_config\.yml|_data/|_includes/|_layouts/|assets/|[^/]+\.html$)'; then
+            echo ./_site > /tmp/htmlproofer_paths.txt
+            echo JEKYLL_CONFIG=_config.yml >> "$GITHUB_ENV"
+          else
+            printf '%s\n' "${changed_files[@]}" \
+              | { grep -E '^EIPS/eip-[0-9]+\.md$' || true; } \
+              | while IFS= read -r source; do [[ -f "$source" ]] && echo "$source"; done \
+              | sort -u > /tmp/jekyll-sources
+
+            if [[ ! -s /tmp/jekyll-sources ]]; then
+              echo ./_site > /tmp/htmlproofer_paths.txt
+              echo JEKYLL_CONFIG=_config.yml >> "$GITHUB_ENV"
+            else
+              sed -E 's|^EIPS/(eip-[0-9]+)\.md$|./_site/EIPS/\1.html|' \
+                /tmp/jekyll-sources > /tmp/htmlproofer_paths.txt
+
+              while IFS= read -r source; do
+                { grep -Eo '(\./|/EIPS/)?eip-[0-9]+(\.md)?' "$source" || true; } \
+                  | sed -E 's|.*eip-([0-9]+).*|EIPS/eip-\1.md|'
+                { grep -E '^requires:' "$source" || true; } \
+                  | { grep -Eo '[0-9]+' || true; } \
+                  | sed -E 's|^|EIPS/eip-|; s|$|.md|'
+              done < /tmp/jekyll-sources > /tmp/jekyll-dependencies
+              cat /tmp/jekyll-dependencies \
+                | while IFS= read -r source; do [[ -f "$source" ]] && echo "$source"; done \
+                >> /tmp/jekyll-sources
+
+              sort -u /tmp/jekyll-sources -o /tmp/jekyll-sources
+              find EIPS -maxdepth 1 -name 'eip-*.md' -print \
+                | sort \
+                | { grep -vxF -f /tmp/jekyll-sources || true; } \
+                > /tmp/jekyll-exclude
+              ruby -ryaml -e '
+                base = YAML.safe_load(File.read("_config.yml"), aliases: true)
+                puts({"exclude" => Array(base["exclude"]) + ARGF.each_line(chomp: true).to_a}.to_yaml)
+              ' /tmp/jekyll-exclude > /tmp/jekyll-ci.yml
+              echo JEKYLL_CONFIG=_config.yml,/tmp/jekyll-ci.yml >> "$GITHUB_ENV"
+            fi
+          fi
+
+          tr ',' '\n' < /tmp/htmlproofer_paths.txt \
+            | sed -E 's/^[[:space:]]+|[[:space:]]+$//g' \
+            | sed '/^$/d' > /tmp/htmlproofer_paths.normalized
+          mv /tmp/htmlproofer_paths.normalized /tmp/htmlproofer_paths.txt
+
+          echo "HTMLProofer paths:"
+          cat /tmp/htmlproofer_paths.txt
+
       - name: Build with Jekyll
-        run: bundle exec jekyll build
+        run: bundle exec jekyll build --config "$JEKYLL_CONFIG" --baseurl ""
         env:
           JEKYLL_ENV: production
 
-      - name: Build Website
-        run: |
-          bundle exec jekyll doctor
-          bundle exec jekyll build
+      - name: Jekyll Doctor
+        run: bundle exec jekyll doctor --config "$JEKYLL_CONFIG"
+        env:
+          JEKYLL_ENV: production
 
       - name: HTML Proofer
-        run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
+        run: xargs -a /tmp/htmlproofer_paths.txt -r -n 1 bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https --root-dir ./_site
       - name: DNS Validator
         run: bundle exec github-pages health-check
 
@@ -122,7 +179,7 @@ jobs:
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
-      - uses: ethereum/eipw-action@b858a0f2687c12af12280aa934c3b842747414fd
+      - uses: ethereum/eipw-action@be3fa642ec311d0b8e1fdb811e5c9b4ada3d3d93
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
