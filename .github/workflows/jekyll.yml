@@ -43,7 +43,8 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
-          ruby-version: '3.1' # Not needed with a .ruby-version file
+          # 3.4 unbundles csv/base64/bigdecimal/logger/ostruct/mutex_m/drb/abbrev, which jekyll 3.9 (github-pages 228) needs.
+          ruby-version: '3.3'
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
       - name: Setup Pages

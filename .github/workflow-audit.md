@@ -11,13 +11,28 @@ so any of them can break without warning.
 
 ---
 
-## 1. Change applied in this audit
+## 1. Changes applied
+
+All recommendations below have been implemented. Summary of the diff:
+
+| File | Change |
+| --- | --- |
+| `auto-review-bot.yml` | download-artifact → v23; pinned `eip-review-bot@dist` to a SHA; added `permissions` |
+| `auto-review-trigger.yml` | upload-artifact → v7.0.1; added `permissions` |
+| `auto-stagnate-bot.yml` | checkout → v7.0.1; setup-node → v7.0.0; `node-version` 14 → 20; added `permissions` |
+| `ci.yml` | unified checkout → v7.0.1 (×5); upload-artifact → v7.0.1; setup-ruby → v1.321.0; markdownlint-cli2 → v24.2.0; added `permissions`; hardened both heredocs; removed duplicate Jekyll build |
+| `jekyll-label-bot.yml` | added `permissions` |
+| `jekyll.yml` | checkout → v7.0.1; setup-ruby → v1.321.0; SHA-pinned + bumped the three Pages actions |
+| `post-ci.yml` | download-artifact → v23 + `if_no_artifact_found: ignore` + gating; replaced both `node12` label actions with `gh` CLI; sticky-comment → v3.0.5; added `permissions` and `concurrency` |
+| `stale.yml` | actions/stale → v11.0.0 |
+| `actions/merge-repos/action.yml` | checkout → v7.0.1 |
+
+Every workflow file re-validated as parseable YAML after the changes.
+
+### Root cause of the original failure
 
 `dawidd6/action-download-artifact` was pinned to `246dbf43…` = **v2.27.0 (2023-04-14, `using: node16`)**.
-It is now pinned to `57aa996fc1713cc1579039614f4645a7f4841fd4` = **v23 (`using: node24`)** in both consumers:
-
-- `.github/workflows/auto-review-bot.yml`
-- `.github/workflows/post-ci.yml`
+It is now `57aa996fc1713cc1579039614f4645a7f4841fd4` = **v23 (`using: node24`)**.
 
 Besides the runtime fix, v23 also sets the `found_artifact` output to `false` on the
 not-found path. v2.27.0 returned early without setting it, so `if_no_artifact_found: ignore`
@@ -27,142 +42,191 @@ left the output empty rather than `false`.
 
 ## 2. Runtime inventory
 
-Every action pinned across the repository, with the JS runtime it declares.
+Every action pinned across the repository, with the JS runtime it declares, before and
+after this audit.
 
-### Blocking — `node12` (runtime fully removed)
+### Resolved: `node12` (runtime fully removed)
 
-| Action | Pin | Pin date | Used by |
-| --- | --- | --- | --- |
-| `marocchino/sticky-pull-request-comment` | `39c5b5d` | 2021-10-20 | `post-ci.yml` |
-| `actions-ecosystem/action-add-labels` | `288072f` | 2021-10-09 | `post-ci.yml` |
-| `actions-ecosystem/action-remove-labels` | `d051625` | 2022-09-16 | `post-ci.yml` |
-
-All three are >3 years behind their own upstream releases.
-
-### High — `node16`
-
-| Action | Pin | Pin date | Used by |
-| --- | --- | --- | --- |
-| `actions/checkout` (v3.5.2) | `47fbe2d` | 2023-04-14 | `ci.yml` (×3), `auto-stagnate-bot.yml` |
-| `actions/setup-node` | `d98fa11` | 2023-04-11 | `auto-stagnate-bot.yml` |
-| `actions/stale` | `03af7c3` | 2023-04-12 | `stale.yml` |
-| `DavidAnson/markdownlint-cli2-action` | `f5cf187` | 2023-04-10 | `ci.yml` |
-| `Pandapip1/jekyll-label-action` | `4b7cce7` | 2024-07-09 | `jekyll-label-bot.yml` |
-
-### Medium — `node20`
-
-| Action | Pin | Pin date | Used by |
-| --- | --- | --- | --- |
-| `actions/checkout` (v4.2.2) | `11bd719` | 2024-10-23 | `ci.yml`, `jekyll.yml`, `merge-repos` |
-| `actions/upload-artifact` (v4.6.0) | `65c4c4a` | 2025-01-09 | `ci.yml`, `auto-review-trigger.yml` |
-| `ruby/setup-ruby` (v1.232.0) | `fb404b9` | 2025-04-16 | `ci.yml` |
-| `ruby/setup-ruby` (v1.196.0) | `f269373` | 2024-10-07 | `jekyll.yml` |
-| `ethereum/eipw-action` | `b858a0f` | 2026-07-10 | `ci.yml` |
-| `actions/configure-pages` | `@v5` (floating) | — | `jekyll.yml` |
-| `actions/deploy-pages` | `@v4` (floating) | — | `jekyll.yml` |
-
-### Not runtime-affected
-
-| Action | Type | Note |
+| Action | Old pin (date) | Resolution |
 | --- | --- | --- |
-| `dawidd6/action-download-artifact` | `node24` | fixed in this audit |
+| `marocchino/sticky-pull-request-comment` | `39c5b5d` (2021-10-20) | → `5770ad5` v3.0.5 (`node24`) |
+| `actions-ecosystem/action-add-labels` | `288072f` (2021-10-09) | replaced with `gh pr edit --add-label` |
+| `actions-ecosystem/action-remove-labels` | `d051625` (2022-09-16) | replaced with `gh pr edit --remove-label` |
+
+The `actions-ecosystem/*` pair has no `node24` release upstream, so bumping was not an
+option; both were replaced with `gh` CLI steps using the job's `github.token`.
+
+### Resolved: `node16`
+
+| Action | Old pin (date) | Resolution |
+| --- | --- | --- |
+| `actions/checkout` (v3.5.2) | `47fbe2d` (2023-04-14) | → `3d3c42e` v7.0.1 (`node24`) |
+| `actions/setup-node` | `d98fa11` (2023-04-11) | → `8207627` v7.0.0 (`node24`) |
+| `actions/stale` | `03af7c3` (2023-04-12) | → `4391f3d` v11.0.0 (`node24`) |
+| `DavidAnson/markdownlint-cli2-action` | `f5cf187` (2023-04-10) | → `21c1be1` v24.2.0 (`node24`) |
+| `dawidd6/action-download-artifact` (v2.27.0) | `246dbf4` (2023-04-14) | → `57aa996` v23 (`node24`) |
+
+### Resolved: `node20`
+
+| Action | Old pin (date) | Resolution |
+| --- | --- | --- |
+| `actions/checkout` (v4.2.2) | `11bd719` (2024-10-23) | → `3d3c42e` v7.0.1 (`node24`) |
+| `actions/upload-artifact` (v4.6.0) | `65c4c4a` (2025-01-09) | → `043fb46` v7.0.1 (`node24`) |
+| `ruby/setup-ruby` (v1.232.0 / v1.196.0) | `fb404b9` / `f269373` | → `95ef2b0` v1.321.0 (`node24`), unified |
+| `actions/configure-pages` | `@v5` (floating) | → `45bfe01` v6.0.0 (`node24`) |
+| `actions/deploy-pages` | `@v4` (floating) | → `cd2ce8f` v5.0.0 (`node24`) |
+| `actions/upload-pages-artifact` | `@v3` (floating) | → `fc324d3` v5.0.0 (composite) |
+
+### Remaining (third-party, no newer release available)
+
+| Action | Runtime | Note |
+| --- | --- | --- |
+| `Pandapip1/jekyll-label-action` | `node16` | latest tag is v0.0.4; pin left as-is |
+| `ethereum/eipw-action` | `node20` | pinned 2026-07; needs an upstream node24 build |
 | `gaurav-nelson/github-action-markdown-link-check` | `docker` | upstream repo is **archived** |
 | `codespell-project/actions-codespell` | `docker` | fine |
 | `ethereum/EIP-Bot` | `composite` | runs `yarn install && yarn build` under the job's Node |
-| `actions/upload-pages-artifact` | `composite` | fine |
-| `.github/actions/merge-repos` | `composite` | wraps `checkout` v4.2.2 |
 
-### Upgrade targets (all `node24`, latest releases as of audit date)
+Migration caveats accepted:
 
-```text
-actions/checkout                        3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-actions/upload-artifact                 043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-actions/setup-node                      820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-actions/stale                           4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11.0.0
-DavidAnson/markdownlint-cli2-action     21c1be1b93ad9ed58fa840aacc3f279cde2a72ff # v24.2.0
-marocchino/sticky-pull-request-comment  5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
-dawidd6/action-download-artifact        57aa996fc1713cc1579039614f4645a7f4841fd4 # v23  (applied)
-```
-
-Migration caveats:
-
-- `upload-artifact` v4 → v7 and `checkout` v3 → v7 are major bumps. v4+ artifacts are
+- `upload-artifact` v4 → v7 and `checkout` v3/v4 → v7 are major bumps. v4+ artifacts are
   immutable, so a re-run that re-uploads the same artifact name now fails instead of
   overwriting.
-- `actions-ecosystem/*` have no `node24` release; they need replacing (e.g. an inline
-  `gh issue edit --add-label` / `--remove-label` step) rather than bumping.
+- `ruby-version` moved `'3.1'` (EOL) → `'3.3'`. See §5 for why 3.4 is not viable.
+- `auto-stagnate-bot.yml` now requests Node 20 instead of Node 14 for the `EIP-Bot`
+  composite build; that build has not been exercised against a modern Node.
 
 ---
 
 ## 3. Non-runtime findings
 
-### 3.1 Node 14 requested on a Node-14-EOL runner — `auto-stagnate-bot.yml`
+### 3.1 Node 14 requested on a Node-14-EOL runner — `auto-stagnate-bot.yml` — RESOLVED
 
-`.github/workflows/auto-stagnate-bot.yml` pins `node-version: '14'`. Node 14 went EOL in
-April 2023 and is no longer in the `ubuntu-latest` (24.04) tool cache, so `setup-node`
-must download it from the Node dist archive on every run. Combined with the `node16`
-`setup-node` pin, this job is the most fragile in the repo.
+`node-version` was pinned to `'14'`. Node 14 went EOL in April 2023 and is no longer in
+the `ubuntu-latest` (24.04) tool cache, so `setup-node` had to download it from the Node
+dist archive on every run. Now `'20'`, with `setup-node` on v7.0.0.
 
-### 3.2 `post-ci.yml` has the same artifact bug that was just fixed in `auto-review-bot.yml`
+### 3.2 `post-ci.yml` had the same artifact bug as `auto-review-bot.yml` — RESOLVED
 
-`.github/workflows/post-ci.yml` downloads `pr_number` with the default
-`if_no_artifact_found: fail` and no `found_artifact` gate. `ci.yml` sets
-`cancel-in-progress: true`, so a rapid second push cancels the `save-pr` job while the
-`workflow_run` event still fires — producing the identical `Error: no artifacts found`.
+It downloaded `pr_number` with the default `if_no_artifact_found: fail` and no
+`found_artifact` gate. `ci.yml` sets `cancel-in-progress: true`, so a rapid second push
+cancels the `save-pr` job while the `workflow_run` event still fires — producing the
+identical `Error: no artifacts found`.
 
-The following `Save PR Data` step then `cat`s three files with no existence check, so a
-partial artifact yields empty outputs that are passed straight to the label actions as
-`number:`.
+Now gated on `found_artifact == 'true'`, with the `Save PR Data` step checking that all
+three files are non-empty and that `pr_number` is numeric before emitting outputs. Each
+downstream step additionally requires `pr_number != ''`, so a partial artifact degrades to
+a warning instead of passing empty values to the label steps.
 
-### 3.3 Unpinned mutable ref carrying a PAT
+### 3.3 Unpinned mutable ref carrying a PAT — RESOLVED
 
-`.github/workflows/auto-review-bot.yml` uses `ethereum/eip-review-bot@dist`. `dist` is a
-branch, not a tag or SHA. That step receives `secrets.TOKEN` (a write-scoped PAT — the
-default `GITHUB_TOKEN` would not be stored as a secret). Anyone who can push to that
-branch obtains the PAT. Every other action in the repository is SHA-pinned; this is the
-single exception.
+`auto-review-bot.yml` used `ethereum/eip-review-bot@dist`. `dist` is a branch, not a tag or
+SHA, and that step receives `secrets.TOKEN` (a write-scoped PAT — the default
+`GITHUB_TOKEN` would not be stored as a secret). Anyone able to push to that branch could
+obtain the PAT. Now pinned to `bbc63d4bd02da30703f166f15283ae2eed05916b`.
 
-### 3.4 No `permissions:` blocks
+Note: that action itself still declares `using: node16` upstream; pinning fixes the supply
+chain exposure but the runtime warning persists until upstream rebuilds.
 
-None of the 8 workflows declare `permissions:`, so every job inherits the repository
-default token scope. `ci.yml` runs on `pull_request` and executes `bundle install` against
-a PR-controlled `Gemfile.lock` plus `jekyll build` over PR-authored content. Adding
-`permissions: contents: read` at the top of `ci.yml` and `jekyll.yml` is low-risk
-hardening.
+### 3.4 No `permissions:` blocks — RESOLVED
 
-### 3.5 Heredoc injection surface in `ci.yml`
+Only `jekyll.yml` and `stale.yml` declared `permissions:`; the other six inherited the
+repository default token scope. Least-privilege blocks added:
 
-`ci.yml` builds `$GITHUB_ENV` entries with a fixed `EOF` heredoc delimiter fed from
-`gh pr diff --name-only` (the `codespell` and `markdownlint` jobs). A PR that adds a file
-whose name is exactly `EOF` closes the block early and lets the author inject arbitrary
-environment variables into the job. Use `$GITHUB_OUTPUT` with a random delimiter, or write
-the list to a file instead.
+| Workflow | Permissions |
+| --- | --- |
+| `ci.yml` | `contents: read`, `pull-requests: read` (needs `gh pr diff`) |
+| `post-ci.yml` | `contents: read`, `pull-requests: write` (comments + labels) |
+| `jekyll-label-bot.yml` | `contents: read`, `pull-requests: write` |
+| `auto-review-bot.yml`, `auto-review-trigger.yml`, `auto-stagnate-bot.yml` | `contents: read` |
 
-### 3.6 Archived dependency
+### 3.5 Heredoc injection surface in `ci.yml` — RESOLVED
+
+The `codespell` and `markdownlint` jobs built `$GITHUB_ENV` entries with a fixed `EOF`
+heredoc delimiter fed from `gh pr diff --name-only`. A PR adding a file named exactly `EOF`
+would close the block early and inject arbitrary environment variables into the job. Both
+steps now use a random delimiter (`EOF_$(openssl rand -hex 16)`) and pass the PR number
+via `env:` rather than interpolating `${{ }}` directly into shell.
+
+### 3.6 Archived dependency — OPEN
 
 `gaurav-nelson/github-action-markdown-link-check` is archived (read-only) upstream. It is
-SHA-pinned so it will not change, but it will never be fixed. Candidate replacements:
-`lycheeverse/lychee-action`, `umbrelladocs/action-linkspector`.
+SHA-pinned so it will not change, but it will never be fixed. Evaluated and deferred —
+see §4.2.
 
-### 3.7 Consistency nits
+### 3.7 Consistency nits — RESOLVED
 
-- `ci.yml` uses **two different `checkout` pins** in one file: v4.2.2 at the `htmlproofer`
-  job, v3.5.2 at `link-check` / `codespell` / `eipw-validator` / `markdownlint`.
-- `ruby/setup-ruby` is split across versions: v1.232.0 in `ci.yml`, v1.196.0 in `jekyll.yml`.
-- `jekyll.yml` uses floating major tags (`@v5`, `@v3`, `@v4`) for the Pages actions while
-  every other action in the repo is SHA-pinned.
-- The `htmlproofer` job builds Jekyll twice: `Build with Jekyll` runs `jekyll build`, then
-  `Build Website` runs `jekyll doctor` + `jekyll build` again.
-- `post-ci.yml` declares no `concurrency` group, so rapid pushes can race two comment and
-  label updates against the same PR.
+- `ci.yml` used **two different `checkout` pins** in one file (v4.2.2 at `htmlproofer`,
+  v3.5.2 elsewhere). All five call sites plus `merge-repos` now use one v7.0.1 pin.
+- `ruby/setup-ruby` was split across v1.232.0 (`ci.yml`) and v1.196.0 (`jekyll.yml`); both
+  now on v1.321.0.
+- `jekyll.yml` used floating major tags for the three Pages actions; all now SHA-pinned,
+  matching the rest of the repo.
+- The `htmlproofer` job built Jekyll twice (`Build with Jekyll` ran `jekyll build`, then
+  `Build Website` ran `jekyll doctor` + `jekyll build` again). Collapsed into one step that
+  keeps `JEKYLL_ENV: production`.
+- `post-ci.yml` had no `concurrency` group, so rapid pushes could race two comment and
+  label updates. Now grouped on `github.event.workflow_run.id`.
 
 ---
 
-## 4. Recommended order of work
+## 4. Follow-ups
 
-1. Add `if_no_artifact_found: ignore` + `found_artifact` gate to `post-ci.yml` (§3.2).
-2. Replace the three `node12` actions in `post-ci.yml` (§2).
-3. SHA-pin `ethereum/eip-review-bot@dist` (§3.3).
-4. Bump the `node16` actions and fix `node-version: '14'` (§2, §3.1).
-5. Unify the duplicate `checkout` / `setup-ruby` pins (§3.7).
-6. Add `permissions:` blocks (§3.4) and fix the heredoc delimiters (§3.5).
+### 4.1 Third-party actions still on old runtimes — BLOCKED UPSTREAM
+
+Checked every branch of each repo; none publishes a `node24` build, so these cannot be
+fixed from this repository:
+
+| Action | Runtime | Branches checked |
+| --- | --- | --- |
+| `ethereum/eipw-action` | `node20` | `master`, `dist`, `develop` |
+| `ethereum/eip-review-bot` | `node16` | `main`, `dist`, `eips-wg-dist` |
+| `Pandapip1/jekyll-label-action` | `node16` | `main`, `dist` |
+
+These need upstream releases. `eip-review-bot` is at least SHA-pinned now (§3.3).
+
+### 4.2 Archived link checker — NOT SWAPPED, DELIBERATELY
+
+`gaurav-nelson/github-action-markdown-link-check` is archived but functional and
+SHA-pinned. A replacement was evaluated (`lychee` 0.24.2, run locally against the real
+corpus) and **not** adopted, because a drop-in swap is flaky:
+
+- `EIPS/eip-1.md`: 49 links, 0 errors — clean.
+- First 12 EIPs: 3 errors + 1 timeout, all false positives — `medium.com` returns `403`
+  to datacenter IPs, and `pdaian.com` timed out.
+
+Adopting it therefore requires an exclusion list and retry/timeout tuning first. Shipping
+it untuned would fail CI on unrelated PRs. Candidates remain `lycheeverse/lychee-action`
+(`e747777` v2.9.0) and `umbrelladocs/action-linkspector` (`568ec8d` v1.5.5).
+
+### 4.3 Watch the first run after merge
+
+`checkout` v3→v7 and `upload-artifact` v4→v7 are major bumps, and the `EIP-Bot` composite
+has not previously run under Node 20.
+
+---
+
+## 5. Ruby version: why 3.3, not 3.4
+
+`ruby-version` was `'3.1'`, EOL since March 2025. Testing against the repo's actual
+`Gemfile.lock` on Ruby 3.4.7:
+
+```
+bundle install                  # succeeds, nokogiri 1.14.3 builds fine
+bundle exec jekyll build        # LoadError: cannot load such file -- csv
+```
+
+Ruby 3.4 moved a set of stdlib libraries from default gems to bundled gems. Working
+through them one at a time, jekyll 3.9.3 (via `github-pages 228`) needs all of:
+
+```
+csv  base64  bigdecimal  logger  ostruct  mutex_m  drb  abbrev
+```
+
+Adding those eight to the `Gemfile` does make Ruby 3.4 work (verified: `jekyll 3.9.3 OK on
+ruby 3.4.7`), but it diverges the `Gemfile` from the `github-pages` gem set that GitHub
+Pages itself runs, and affects every contributor's local setup.
+
+All eight are still *default* gems in Ruby 3.3, so `'3.3'` needs no `Gemfile` change and is
+supported until March 2027. That is the change applied. Moving to 3.4+ later means adding
+those gems, or upgrading off `github-pages 228` / jekyll 3.9.
