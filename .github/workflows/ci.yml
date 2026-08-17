@@ -13,6 +13,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   save-pr:
     name: Save PR Number
@@ -31,7 +35,7 @@ jobs:
           echo $MERGE_SHA > ./pr/merge_sha
 
       - name: Upload PR Number
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pr_number
           path: pr/
@@ -42,19 +46,19 @@ jobs:
 
     steps:
       - name: Checkout EIPs
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ethereum/EIPs
           path: ''
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
       - name: Setup Ruby
-        uses: ruby/setup-ruby@fb404b9557c186e349162b0d8efb06e2bc36edea # v1.232.0
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
           ruby-version: '3.1' # Not needed with a .ruby-version file
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
-      - name: Build with Jekyll
+      - name: Build Website
         run: |
           bundle exec jekyll doctor
           bundle exec jekyll build
@@ -71,7 +75,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Link Checker
         uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
@@ -87,17 +91,22 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Get Changed Files
         id: changed
         continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          set -euo pipefail
+          delimiter="EOF_$(openssl rand -hex 16)"
+          {
+            echo "CHANGED_FILES<<$delimiter"
+            gh pr diff "$PR_NUMBER" --name-only | sed -e 's|$|,|'
+            echo "$delimiter"
+          } >> "$GITHUB_ENV"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
@@ -114,7 +123,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
@@ -130,20 +139,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Get Changed Files
         id: changed
         continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          set -euo pipefail
+          delimiter="EOF_$(openssl rand -hex 16)"
+          {
+            echo "CHANGED_FILES<<$delimiter"
+            gh pr diff "$PR_NUMBER" --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md'
+            echo "$delimiter"
+          } >> "$GITHUB_ENV"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Lint
-        uses: DavidAnson/markdownlint-cli2-action@f5cf187ef11bd3a68a127321b794aa252ff23019
+        uses: DavidAnson/markdownlint-cli2-action@21c1be1b93ad9ed58fa840aacc3f279cde2a72ff # v24.2.0
         if: steps.changed.outcome == 'success'
         with:
           command: config

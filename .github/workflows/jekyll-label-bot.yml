@@ -8,6 +8,11 @@ concurrency:
   cancel-in-progress: true
 
 name: Jekyll Label Bot
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   jekyll-label-action:
     name: Label

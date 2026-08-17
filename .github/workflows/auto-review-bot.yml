@@ -6,6 +6,10 @@ on:
       - completed
 
 name: Auto Review Bot
+
+permissions:
+  contents: read
+
 jobs:
   auto-review-bot:
     runs-on: ubuntu-latest
@@ -30,7 +34,7 @@ jobs:
       - name: Auto Review Bot
         id: auto-review-bot
         if: steps.save-pr-number.outputs.pr != ''
-        uses: ethereum/eip-review-bot@dist
+        uses: ethereum/eip-review-bot@bbc63d4bd02da30703f166f15283ae2eed05916b # dist
         continue-on-error: true
         with:
           token: ${{ secrets.TOKEN }}
