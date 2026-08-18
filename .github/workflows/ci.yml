@@ -30,9 +30,9 @@ jobs:
           MERGE_SHA: ${{ github.sha }}
         run: |
           mkdir -p ./pr
-          echo $PR_NUMBER > ./pr/pr_number
-          echo $PR_SHA > ./pr/pr_sha
-          echo $MERGE_SHA > ./pr/merge_sha
+          echo "$PR_NUMBER" > ./pr/pr_number
+          echo "$PR_SHA" > ./pr/pr_sha
+          echo "$MERGE_SHA" > ./pr/merge_sha
 
       - name: Upload PR Number
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -224,7 +224,7 @@ jobs:
       - name: Install lychee
         if: steps.changed.outcome == 'success'
         env:
-          LYCHEE_VERSION: v0.24.2
+          LYCHEE_VERSION: lychee-v0.24.2
         run: |
           set -euo pipefail
           curl -fsSL -o lychee.tar.gz \
