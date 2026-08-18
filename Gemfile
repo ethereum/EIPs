@@ -26,3 +26,6 @@ gem "html-proofer", '>=5.0.7'
 gem "eip_validator", ">=0.8.2"
 
 gem "webrick", "~> 1.8" # needed for macOS builds
+
+# jekyll 3.9.3 (pinned by github-pages 228) breaks on logger >= 1.6, which ships with Ruby 3.3+
+gem "logger", "~> 1.5.3"

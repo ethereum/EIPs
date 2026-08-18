@@ -230,6 +230,7 @@ GEM
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    logger (1.5.3)
     mercenary (0.3.6)
     minima (2.5.1)
       jekyll (>= 3.5, < 5.0)
@@ -297,6 +298,7 @@ DEPENDENCIES
   eip_validator (>= 0.8.2)
   github-pages (= 228)
   html-proofer (>= 5.0.7)
+  logger (~> 1.5.3)
   minima (~> 2.0)
   tzinfo-data
   webrick (~> 1.8)
