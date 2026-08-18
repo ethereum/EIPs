@@ -67,6 +67,7 @@ exclude:
   - ISSUE_TEMPLATE.md
   - PULL_REQUEST_TEMPLATE.md
   - README.md
+  - tests
   
 include:
   - LICENSE

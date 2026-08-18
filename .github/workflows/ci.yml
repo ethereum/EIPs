@@ -78,13 +78,31 @@ jobs:
       - name: Checkout EIP Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Get Changed Files
+        id: changed
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          # tests/ is skipped: its fixtures contain deliberately broken links.
+          gh pr diff "$PR_NUMBER" --name-only \
+            | grep -E '\.md$' \
+            | grep -v '^tests/' \
+            | while read -r f; do [ -f "$f" ] && printf '%s\n' "$f"; done > changed-md.txt
+          test -s changed-md.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+
       - name: Link Checker
-        uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
+        if: steps.changed.outcome == 'success'
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
-          config-file: config/mlc_config.json
-          use-quiet-mode: no
-          use-verbose-mode: yes
-          check-modified-files-only: yes
+          lycheeVersion: v0.24.2
+          args: --config config/lychee.toml --files-from changed-md.txt --root-dir "$GITHUB_WORKSPACE" --no-progress --verbose
+          # Raises the github.com rate limit; see config/lychee.toml.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # A changed file that legitimately contains no links must not fail CI.
+          failIfEmpty: false
 
   codespell:
     name: CodeSpell
@@ -165,3 +183,55 @@ jobs:
           globs: |
             config/.markdownlint.yaml
             ${{ env.CHANGED_FILES }}
+
+  actionlint:
+    name: Workflow Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install actionlint
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+        run: |
+          set -euo pipefail
+          curl -fsSL -o actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          tar xzf actionlint.tar.gz actionlint
+
+      - name: Test Workflow Invariants
+        run: ACTIONLINT="$PWD/actionlint" tests/workflows/run.sh
+
+  link-check-config:
+    name: Link Check Config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check If Config Changed
+        id: changed
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          gh pr diff "$PR_NUMBER" --name-only \
+            | grep -E '^(config/lychee\.toml|tests/link-check/)'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+
+      - name: Install lychee
+        if: steps.changed.outcome == 'success'
+        env:
+          LYCHEE_VERSION: v0.24.2
+        run: |
+          set -euo pipefail
+          curl -fsSL -o lychee.tar.gz \
+            "https://github.com/lycheeverse/lychee/releases/download/${LYCHEE_VERSION}/lychee-x86_64-unknown-linux-gnu.tar.gz"
+          tar xzf lychee.tar.gz --strip-components=1 lychee-x86_64-unknown-linux-gnu/lychee
+
+      - name: Test Link Checker Config
+        if: steps.changed.outcome == 'success'
+        run: LYCHEE="$PWD/lychee" tests/link-check/run.sh
+

@@ -1,4 +1,5 @@
 name: Merge ERCs
+description: Checks out ethereum/ERCs and merges its ERCs, EIPS and assets into this checkout, renaming erc-* to eip-*.
 
 runs:
   using: 'composite'
