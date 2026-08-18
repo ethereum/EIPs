@@ -68,7 +68,8 @@ jobs:
       - name: HTML Proofer
         run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
       - name: DNS Validator
-        run: bundle exec github-pages health-check
+        # github-pages 228's CLI calls File.exists?, which was removed in Ruby 3.2
+        run: bundle exec ruby -e 'File.singleton_class.alias_method(:exists?, :exist?) unless File.respond_to?(:exists?); load Gem.bin_path("github-pages", "github-pages")' health-check
 
   link-check:
     name: Link Check
