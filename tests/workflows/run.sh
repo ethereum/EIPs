@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# Tests the invariants established by the GitHub Actions audit
-# (see .github/workflow-audit.md).
+# Tests the invariants established by the GitHub Actions audit.
 #
 # These are cheap, offline structural checks. They exist because every issue
 # asserted below was a real defect found in this repository, and each would
