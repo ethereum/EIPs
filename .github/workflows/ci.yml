@@ -81,21 +81,26 @@ jobs:
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
           set -euo pipefail
+          # A failed `gh pr diff` must fail the job. Skipping is only correct when
+          # the PR genuinely changed no relevant file.
+          gh pr diff "$PR_NUMBER" --name-only > all-changed.txt
           # tests/ is skipped: its fixtures contain deliberately broken links.
-          gh pr diff "$PR_NUMBER" --name-only \
-            | grep -E '\.md$' \
+          grep -E '\.md$' all-changed.txt \
             | grep -v '^tests/' \
-            | while read -r f; do [ -f "$f" ] && printf '%s\n' "$f"; done > changed-md.txt
-          test -s changed-md.txt
+            | while read -r f; do [ -f "$f" ] && printf '%s\n' "$f"; done > changed-md.txt || true
+          if [ -s changed-md.txt ]; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
 
       - name: Link Checker
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           lycheeVersion: v0.24.2
@@ -115,22 +120,28 @@ jobs:
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
           set -euo pipefail
+          # A failed `gh pr diff` must fail the job, not silently skip CodeSpell.
+          gh pr diff "$PR_NUMBER" --name-only > all-changed.txt
           delimiter="EOF_$(openssl rand -hex 16)"
           {
             echo "CHANGED_FILES<<$delimiter"
-            gh pr diff "$PR_NUMBER" --name-only | sed -e 's|$|,|'
+            sed -e 's|$|,|' all-changed.txt
             echo "$delimiter"
           } >> "$GITHUB_ENV"
+          if [ -s all-changed.txt ]; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         with:
           check_filenames: true
           ignore_words_file: config/.codespell-whitelist
@@ -163,26 +174,31 @@ jobs:
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
           set -euo pipefail
+          # A failed `gh pr diff` must fail the job, not silently skip the linter.
+          gh pr diff "$PR_NUMBER" --name-only > all-changed.txt
           delimiter="EOF_$(openssl rand -hex 16)"
           # grep may legitimately match nothing (no changed markdown files); capture it
           # first so the heredoc below always gets closed, even under set -e.
-          changed="$(gh pr diff "$PR_NUMBER" --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' || true)"
+          changed="$(grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' all-changed.txt || true)"
           {
             echo "CHANGED_FILES<<$delimiter"
             printf '%s\n' "$changed"
             echo "$delimiter"
           } >> "$GITHUB_ENV"
-          test -n "$changed"
+          if [ -n "$changed" ]; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
 
       - name: Lint
         uses: DavidAnson/markdownlint-cli2-action@21c1be1b93ad9ed58fa840aacc3f279cde2a72ff # v24.2.0
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         with:
           command: config
           globs: |
@@ -217,17 +233,21 @@ jobs:
 
       - name: Check If Config Changed
         id: changed
-        continue-on-error: true
         run: |
           set -euo pipefail
-          gh pr diff "$PR_NUMBER" --name-only \
-            | grep -E '^(config/lychee\.toml|tests/link-check/)'
+          # A failed `gh pr diff` must fail the job, not silently skip the test.
+          gh pr diff "$PR_NUMBER" --name-only > all-changed.txt
+          if grep -qE '^(config/lychee\.toml|tests/link-check/)' all-changed.txt; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
 
       - name: Install lychee
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         env:
           LYCHEE_VERSION: lychee-v0.24.2
         run: |
@@ -237,6 +257,6 @@ jobs:
           tar xzf lychee.tar.gz --strip-components=1 lychee-x86_64-unknown-linux-gnu/lychee
 
       - name: Test Link Checker Config
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         run: LYCHEE="$PWD/lychee" tests/link-check/run.sh
 

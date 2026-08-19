@@ -135,6 +135,23 @@ while read -r f; do
 done < <(grep -rl 'action-download-artifact' "$workflow_dir" || true)
 echo
 
+# --- 5b. A skipped check must mean "nothing to check" ------------------------
+# Gating a check on `steps.<id>.outcome` of a continue-on-error discovery step
+# conflates "no relevant files changed" with "gh pr diff failed", so a transient
+# API error silently disables the check while CI still reports success.
+echo "quality gates fail loudly"
+if grep -q 'steps\.[a-z_-]*\.outcome' "$workflow_dir/ci.yml"; then
+  fail "ci.yml gates a check on a step outcome instead of an explicit output"
+else
+  pass "ci.yml gates checks on explicit outputs, not step outcome"
+fi
+if grep -q 'continue-on-error' "$workflow_dir/ci.yml"; then
+  fail "ci.yml uses continue-on-error, which can mask a failed check"
+else
+  pass "ci.yml has no continue-on-error"
+fi
+echo
+
 # --- 6. No action declares a removed Node runtime ----------------------------
 # node12 and node16 are past end of life; GitHub force-runs them on Node 24.
 echo "local action runtimes"
