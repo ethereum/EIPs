@@ -1,0 +1,27 @@
+on:
+  workflow_run:
+    workflows:
+      - Artifact Handoff Integration Producer
+    types:
+      - completed
+
+name: Artifact Handoff Integration Consumer
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  consume:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download handoff artifact
+        uses: dawidd6/action-download-artifact@57aa996fc1713cc1579039614f4645a7f4841fd4 # v23
+        with:
+          name: artifact-handoff-integration
+          workflow: artifact-handoff-integration-producer.yml
+          run_id: ${{ github.event.workflow_run.id }}
+
+      - name: Verify handoff marker
+        run: test "$(cat artifact-handoff.txt)" = artifact-handoff-ok
