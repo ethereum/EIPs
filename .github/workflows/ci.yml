@@ -206,6 +206,16 @@ jobs:
             config/.markdownlint.yaml
             ${{ env.CHANGED_FILES }}
 
+  eip-metadata:
+    name: EIP Metadata Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Report metadata issues
+        run: python3 tests/eip-metadata/check.py EIPS/eip-*.md
+
   actionlint:
     name: Workflow Linter
     runs-on: ubuntu-latest
