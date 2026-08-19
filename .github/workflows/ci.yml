@@ -55,7 +55,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
-          # 3.4 unbundles csv/base64/bigdecimal/logger/ostruct/mutex_m/drb/abbrev, which jekyll 3.9 (github-pages 228) needs.
+          # 3.4 unbundles csv/base64/bigdecimal/logger/ostruct/mutex_m/drb/abbrev, which jekyll 3.10 (github-pages 232) needs.
           ruby-version: '3.3'
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
@@ -68,7 +68,7 @@ jobs:
       - name: HTML Proofer
         run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
       - name: DNS Validator
-        # github-pages 228's CLI calls File.exists?, which was removed in Ruby 3.2
+        # github-pages 232's CLI calls File.exists?, which was removed in Ruby 3.2
         run: bundle exec ruby -e 'File.singleton_class.alias_method(:exists?, :exist?) unless File.respond_to?(:exists?); load Gem.bin_path("github-pages", "github-pages")' health-check
 
   link-check:

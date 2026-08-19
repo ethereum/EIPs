@@ -1,9 +1,9 @@
-# Fixtures for the link-checker configuration test.
-#
-# `tests/link-check/run.sh` runs lychee over these files using the real
-# `config/lychee.toml` and asserts the outcome. They are deliberately excluded
-# from the site build and from the link-check CI job, which only ever inspects
-# files changed by a pull request.
+# Fixtures for the link-checker configuration test
+
+`tests/link-check/run.sh` runs lychee over these files using the real
+`config/lychee.toml` and asserts the outcome. They are deliberately excluded
+from the site build and from the link-check CI job, which only ever inspects
+files changed by a pull request.
 
 ## Must PASS
 
