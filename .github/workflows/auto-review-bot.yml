@@ -29,7 +29,7 @@ jobs:
         if: steps.fetch-pr-number.outputs.found_artifact == 'true'
         run: |
           test -f pr-number.txt
-          echo "pr=$(cat pr-number.txt)" >> "$GITHUB_OUTPUT"
+          echo "pr=$(<pr-number.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Auto Review Bot
         id: auto-review-bot

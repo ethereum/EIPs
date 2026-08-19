@@ -167,11 +167,15 @@ jobs:
         run: |
           set -euo pipefail
           delimiter="EOF_$(openssl rand -hex 16)"
+          # grep may legitimately match nothing (no changed markdown files); capture it
+          # first so the heredoc below always gets closed, even under set -e.
+          changed="$(gh pr diff "$PR_NUMBER" --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' || true)"
           {
             echo "CHANGED_FILES<<$delimiter"
-            gh pr diff "$PR_NUMBER" --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md'
+            printf '%s\n' "$changed"
             echo "$delimiter"
           } >> "$GITHUB_ENV"
+          test -n "$changed"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
