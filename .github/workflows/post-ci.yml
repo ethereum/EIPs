@@ -10,6 +10,7 @@ name: Post CI
 permissions:
   contents: read
   pull-requests: write
+  actions: read # required to download the artifact from the triggering run
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.workflow_run.id }}

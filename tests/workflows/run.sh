@@ -125,6 +125,14 @@ while read -r f; do
   else
     fail "$(basename "$f") downloads an artifact without if_no_artifact_found: ignore"
   fi
+  # Reading artifacts from the triggering run goes through the Actions API. A
+  # workflow that declares permissions but omits actions: read gets a 403 that
+  # if_no_artifact_found: ignore then silently swallows.
+  if grep -q '^permissions:' "$f" && ! grep -q '^[[:space:]]*actions:[[:space:]]*read' "$f"; then
+    fail "$(basename "$f") downloads a cross-run artifact without actions: read"
+  else
+    pass "$(basename "$f") grants actions: read for the cross-run download"
+  fi
 done < <(grep -rl 'action-download-artifact' "$workflow_dir" || true)
 echo
 

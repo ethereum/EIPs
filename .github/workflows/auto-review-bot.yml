@@ -9,6 +9,7 @@ name: Auto Review Bot
 
 permissions:
   contents: read
+  actions: read # required to download the artifact from the triggering run
 
 jobs:
   auto-review-bot:
