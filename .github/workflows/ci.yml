@@ -158,6 +158,7 @@ jobs:
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
+      # Track upstream Node 24 support; ethereum/eipw-action currently uses Node 20.
       - uses: ethereum/eipw-action@b858a0f2687c12af12280aa934c3b842747414fd
         id: eipw
         with:
@@ -259,4 +260,3 @@ jobs:
       - name: Test Link Checker Config
         if: steps.changed.outputs.has_files == 'true'
         run: LYCHEE="$PWD/lychee" tests/link-check/run.sh
-
