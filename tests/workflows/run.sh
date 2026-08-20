@@ -34,9 +34,7 @@ for f in "${workflows[@]}" "${action_files[@]}"; do
   if python3 -c "import yaml,sys; yaml.safe_load(open(sys.argv[1]))" "$f" 2> /dev/null; then
     pass "$f parses"
   else
-    fail "$f is not valid YAML"
-  fi
-done
+    fail "$f is not valid YA
 echo
 
 # --- 2. Third-party actions are pinned to a full SHA -------------------------
