@@ -16,6 +16,7 @@ jobs:
     steps:
       - name: Fetch PR Number
         id: fetch-pr-number
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

@@ -63,6 +63,12 @@ else
   fail "Fetch PR Number does not exit 0 on a missing artifact"
 fi
 
+if [[ -n "$fetch_step" ]] && grep -q '"continue-on-error":true' <<< "$fetch_step"; then
+  pass "Fetch PR Number does not fail the job on a gh api error"
+else
+  fail "Fetch PR Number can still fail the job on a gh api error (missing continue-on-error)"
+fi
+
 bot_step="$(step_named "$arb_job" "Auto Review Bot")"
 if [[ -n "$bot_step" ]] && grep -q "check-pr-number.outputs.exists == 'true'" <<< "$bot_step"; then
   pass "Auto Review Bot step is gated on the PR number actually being found"
