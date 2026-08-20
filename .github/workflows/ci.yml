@@ -36,6 +36,17 @@ jobs:
           name: pr_number
           path: pr/
 
+  workflow-tests:
+    name: Workflow Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+
+      - name: Run Workflow Tests
+        run: tests/workflows/run.sh
+
   htmlproofer:
     name: HTMLProofer
     runs-on: ubuntu-24.04
