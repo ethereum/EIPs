@@ -38,6 +38,36 @@ step_named() {
   ' "$2" <<< "$1"
 }
 
+step_run_script() {
+  # step_run_script <step.json> -- prints the step's `run:` text, with the two
+  # ${{ }} expressions it references replaced by dummy values so it can be
+  # executed standalone.
+  ruby -rjson -e 'print JSON.parse(STDIN.read)["run"]' <<< "$1" \
+    | sed -e 's/\${{ *github\.repository *}}/octocat\/example/g' \
+          -e 's/\${{ *github\.event\.workflow_run\.id *}}/123/g'
+}
+
+# exec_with_gh_stub <run-script> <gh-stub-body> -- runs the extracted script
+# under the same shell options GitHub Actions uses (bash -eo pipefail), with
+# `gh` replaced by a stub, and returns its exit code without aborting this
+# test suite.
+exec_with_gh_stub() {
+  local workdir mock_bin exit_code
+  workdir="$(mktemp -d)"
+  mock_bin="$workdir/bin"
+  mkdir -p "$mock_bin"
+  printf '#!/usr/bin/env bash\n%s\n' "$2" > "$mock_bin/gh"
+  chmod +x "$mock_bin/gh"
+  printf '%s\n' "$1" > "$workdir/script.sh"
+  if (cd "$workdir" && PATH="$mock_bin:$PATH" bash -eo pipefail script.sh) > /dev/null 2>&1; then
+    exit_code=0
+  else
+    exit_code=$?
+  fi
+  rm -rf "$workdir"
+  return "$exit_code"
+}
+
 job_json() {
   # job_json <workflow.json> <job-key> -- prints the job object as JSON
   ruby -rjson -e '
@@ -67,6 +97,23 @@ if [[ -n "$fetch_step" ]] && grep -q '"continue-on-error":true' <<< "$fetch_step
   pass "Fetch PR Number does not fail the job on a gh api error"
 else
   fail "Fetch PR Number can still fail the job on a gh api error (missing continue-on-error)"
+fi
+
+# Execute the real run: script (not a paraphrase of it) to confirm continue-on-error
+# is load-bearing: a gh failure unrelated to a missing artifact still makes the
+# script itself exit non-zero, so without continue-on-error the job would fail.
+fetch_script="$(step_run_script "$fetch_step")"
+
+if exec_with_gh_stub "$fetch_script" 'exit 1'; then
+  fail "Fetch PR Number script unexpectedly survives a gh api error on its own"
+else
+  pass "gh api error makes the script exit non-zero, confirming continue-on-error is necessary"
+fi
+
+if exec_with_gh_stub "$fetch_script" 'echo -n'; then
+  pass "Fetch PR Number script exits 0 when gh reports no matching artifact"
+else
+  fail "Fetch PR Number script does not exit 0 when gh reports no matching artifact"
 fi
 
 bot_step="$(step_named "$arb_job" "Auto Review Bot")"
