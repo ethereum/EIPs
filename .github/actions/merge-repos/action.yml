@@ -1,4 +1,5 @@
 name: Merge ERCs
+description: Checks out ethereum/ERCs alongside this repo and merges its EIPS/ERCS/assets into this checkout.
 
 runs:
   using: 'composite'

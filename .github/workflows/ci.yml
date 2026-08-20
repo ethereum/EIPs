@@ -197,6 +197,20 @@ jobs:
           unchecked: 1, 5069, 5757
           options-file: config/eipw.toml
 
+  actionlint:
+    name: Action Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+
+      - name: Download actionlint
+        id: actionlint
+        run: bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/914e7df21a07ef503a81201c76d2b11c789d3fca/scripts/download-actionlint.bash) 1.7.12
+
+      - name: Check workflow files
+        run: ${{ steps.actionlint.outputs.executable }} -color
+
   markdownlint:
     name: Markdown Linter
     runs-on: ubuntu-latest
