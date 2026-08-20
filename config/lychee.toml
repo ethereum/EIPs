@@ -16,8 +16,10 @@ timeout = 30
 
 # --- Acceptance --------------------------------------------------------------
 # 429 is inherited from mlc_config.json's aliveStatusCodes: being rate limited
-# still proves the URL resolves, so it must not fail the build.
-accept = ["200..=206", "429"]
+# still proves the URL resolves, so it must not fail the build. 3xx covers
+# hosts (e.g. rfc-editor.org) that redirect to a canonical URL for the same
+# resource rather than erroring.
+accept = ["200..=206", "3xx", "429"]
 
 # --- Exclusions --------------------------------------------------------------
 # Every entry below was observed failing on a 60-file sample of EIPS/*.md while
