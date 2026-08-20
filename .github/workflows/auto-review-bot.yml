@@ -45,7 +45,7 @@ jobs:
       - name: Save PR Number
         id: save-pr-number
         if: ${{ steps.check-pr-number.outputs.exists == 'true' }}
-        run: echo "pr=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+        run: echo "pr=$(cat pr-number.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Auto Review Bot
         id: auto-review-bot
