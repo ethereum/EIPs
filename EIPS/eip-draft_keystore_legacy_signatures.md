@@ -117,16 +117,16 @@ Then authenticate exactly as EIP-8130's configured-actor path, with `sender = ac
 ### Scope
 
 These transaction types always self-pay and always consume the account's EVM nonce. After
-authentication, require EIP-8130 `Scopes.isOperator` **and** `SELF_PAYER`:
+authentication, require:
 
 ```
-isOperator(scope) && (scope == 0x00 || (scope & SELF_PAYER) != 0)
+scope == 0x00 || ((scope & SENDER) != 0 && (scope & SELF_PAYER) != 0 && (scope & POLICY) == 0)
 ```
 
-`isOperator` is admin, or `SENDER` without `POLICY` (the same predicate EIP-8130 uses for operational
-ERC-1271). Explicitly: `scope == 0x00`, or `(scope & SENDER) != 0` and `(scope & POLICY) == 0`. A
-`POLICY` actor MUST NOT originate these types; gated initiation stays on the EIP-8130 AA path, where
-the protocol can enforce `call.to == manager`. Admin (`scope == 0x00`) already satisfies `SELF_PAYER`.
+That is **admin**, or **`SENDER` and `SELF_PAYER` without `POLICY`**. `POLICY` actors MUST NOT
+originate these types; gated initiation stays on the EIP-8130 AA path, where the protocol can enforce
+`call.to == manager`. This is not `Scopes.isOperator` alone (`isOperator` is admin or `SENDER`
+without `POLICY`, and does not require `SELF_PAYER`).
 
 `NONCE` is not consulted: it gates EIP-8130 2D nonce keys, not the EVM nonce these types use.
 `SPONSOR_PAYER` is not consulted: these types have no payer field.
@@ -237,10 +237,9 @@ account with `DEFAULT_EOA_REVOKED`.
 encoding of total length 65 is invalid as that path (and would ecrecover garbage). Authenticators
 MUST NOT emit 25-byte `data` without padding.
 
-**Scope.** Require `Scopes.isOperator` and `SELF_PAYER`. Admin always passes. A restricted actor needs
-`SENDER | SELF_PAYER` with `POLICY` unset. `POLICY` keys cannot originate these types (no `tx.to`
-gate here; they stay on the AA path). A `SENDER` actor without `SELF_PAYER` cannot self-pay an
-EIP-8130 AA transaction and MUST NOT self-pay a type-2 transaction either.
+**Scope.** Require admin, or `SENDER | SELF_PAYER` with `POLICY` unset. A `SENDER` actor without
+`SELF_PAYER` cannot self-pay an EIP-8130 AA transaction and MUST NOT self-pay a type-2 transaction
+either. `POLICY` keys cannot originate these types (no `tx.to` gate here; they stay on the AA path).
 
 **Inner 7702 auths.** Leaving `authorization_list` on secp256k1 means a revoked default EOA can still
 *receive* 7702 delegations signed by its historical k1 key if those tuples are accepted as ECDSA
