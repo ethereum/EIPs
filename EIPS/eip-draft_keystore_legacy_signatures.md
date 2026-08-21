@@ -20,10 +20,6 @@ AA transactions. Any other signature is `account || authenticator || data` and i
 that account's Keystore actors. Old wallets keep working until the default EOA is revoked; after that
 those types can be post-quantum, and aggregatable if the authenticator allows it.
 
-EIP-8130 does not carry blob fields. Blob transactions remain a dedicated type
-([EIP-4844](./eip-4844.md)); chains that do not want blobs simply do not use that type. This EIP does
-not fold blobs into 8130 or into this signature rule.
-
 ## Motivation
 
 EIP-8130 makes accounts crypto-agile: actors point at authenticators, and a post-quantum authenticator
@@ -38,10 +34,8 @@ default-EOA path so unmodified wallets continue to work for accounts that have n
 Configured-actor signatures use the same authenticator interface as EIP-8130, so a PQ (or
 aggregatable) authenticator that is valid on the AA path is valid on these types too.
 
-Blob data stays on its own specialized transaction type. 8130 does not grow blob fields, and this EIP
-does not rewrite [EIP-4844](./eip-4844.md). Chains that do not care about blobs never implement that
-type. A chain that wants Keystore-authenticated blob originators does that on the blob type, in a
-companion EIP — not by jamming blobs into 8130 or into this document.
+A chain that wants blobs uses that specialized transaction type. The 8130 transaction type stays
+separate from that use case.
 
 ## Specification
 
