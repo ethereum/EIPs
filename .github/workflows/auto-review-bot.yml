@@ -9,6 +9,7 @@ name: Auto Review Bot
 jobs:
   auto-review-bot:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     name: Run
     permissions:
       actions: read
@@ -16,22 +17,13 @@ jobs:
     steps:
       - name: Fetch PR Number
         id: fetch-pr-number
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          artifact_id="$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts" \
-            --jq '.artifacts[] | select(.name == "pr_number" or .name == "pr-number") | .id' \
-            | head -n 1)"
-
-          if [[ -z "$artifact_id" ]]; then
-            echo "PR number artifact not found for workflow run ${{ github.event.workflow_run.id }}"
-            exit 0
-          fi
-
-          gh api "repos/${{ github.repository }}/actions/artifacts/$artifact_id/zip" > pr-number.zip
-          unzip -o pr-number.zip
-          rm -f pr-number.zip
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: pr-number
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+          if-no-artifact-found: ignore
 
       - name: Check PR Number file
         id: check-pr-number
@@ -49,9 +41,8 @@ jobs:
 
       - name: Auto Review Bot
         id: auto-review-bot
-        uses: ethereum/eip-review-bot@dist
+        uses: ethereum/eip-review-bot@5836f86feabefae5640ea1380d08eb2725d4d163 # dist
         if: ${{ steps.check-pr-number.outputs.exists == 'true' }}
-        continue-on-error: true
         with:
           token: ${{ secrets.TOKEN }}
           config: config/eip-editors.yml

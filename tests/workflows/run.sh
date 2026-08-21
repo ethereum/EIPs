@@ -3,10 +3,8 @@
 # Tests the artifact-fetch resilience of auto-review-bot.yml and post-ci.yml.
 #
 # Both workflows consume a PR-number artifact that is legitimately absent for
-# some trigger events. Before the fix, a missing artifact made the whole job
-# fail (dawidd6/action-download-artifact defaults to if_no_artifact_found:
-# fail). These tests pin the static shape of the fix so a future edit can't
-# silently reintroduce a hard failure on a missing artifact.
+# some trigger events. These tests pin the static shape of the fix so a future
+# edit cannot silently reintroduce a hard failure on a missing artifact.
 #
 # Usage:
 #   tests/workflows/run.sh
@@ -38,36 +36,6 @@ step_named() {
   ' "$2" <<< "$1"
 }
 
-step_run_script() {
-  # step_run_script <step.json> -- prints the step's `run:` text, with the two
-  # ${{ }} expressions it references replaced by dummy values so it can be
-  # executed standalone.
-  ruby -rjson -e 'print JSON.parse(STDIN.read)["run"]' <<< "$1" \
-    | sed -e 's/\${{ *github\.repository *}}/octocat\/example/g' \
-          -e 's/\${{ *github\.event\.workflow_run\.id *}}/123/g'
-}
-
-# exec_with_gh_stub <run-script> <gh-stub-body> -- runs the extracted script
-# under the same shell options GitHub Actions uses (bash -eo pipefail), with
-# `gh` replaced by a stub, and returns its exit code without aborting this
-# test suite.
-exec_with_gh_stub() {
-  local workdir mock_bin exit_code
-  workdir="$(mktemp -d)"
-  mock_bin="$workdir/bin"
-  mkdir -p "$mock_bin"
-  printf '#!/usr/bin/env bash\n%s\n' "$2" > "$mock_bin/gh"
-  chmod +x "$mock_bin/gh"
-  printf '%s\n' "$1" > "$workdir/script.sh"
-  if (cd "$workdir" && PATH="$mock_bin:$PATH" bash -eo pipefail script.sh) > /dev/null 2>&1; then
-    exit_code=0
-  else
-    exit_code=$?
-  fi
-  rm -rf "$workdir"
-  return "$exit_code"
-}
-
 job_json() {
   # job_json <workflow.json> <job-key> -- prints the job object as JSON
   ruby -rjson -e '
@@ -87,33 +55,19 @@ else
 fi
 
 fetch_step="$(step_named "$arb_job" "Fetch PR Number")"
-if [[ -n "$fetch_step" ]] && grep -q 'exit 0' <<< "$fetch_step"; then
-  pass "Fetch PR Number exits 0 when the artifact is absent"
+if [[ -n "$fetch_step" ]] \
+  && grep -q 'actions/download-artifact' <<< "$fetch_step" \
+  && grep -q '"name":"pr-number"' <<< "$fetch_step" \
+  && grep -q '"if-no-artifact-found":"ignore"' <<< "$fetch_step"; then
+  pass "Fetch PR Number uses the trigger artifact and ignores absence"
 else
-  fail "Fetch PR Number does not exit 0 on a missing artifact"
+  fail "Fetch PR Number does not match the trigger artifact or ignore absence"
 fi
 
-if [[ -n "$fetch_step" ]] && grep -q '"continue-on-error":true' <<< "$fetch_step"; then
-  pass "Fetch PR Number does not fail the job on a gh api error"
+if [[ -n "$fetch_step" ]] && ! grep -q '"continue-on-error":true' <<< "$fetch_step"; then
+  pass "Fetch PR Number still fails on an unexpected download error"
 else
-  fail "Fetch PR Number can still fail the job on a gh api error (missing continue-on-error)"
-fi
-
-# Execute the real run: script (not a paraphrase of it) to confirm continue-on-error
-# is load-bearing: a gh failure unrelated to a missing artifact still makes the
-# script itself exit non-zero, so without continue-on-error the job would fail.
-fetch_script="$(step_run_script "$fetch_step")"
-
-if exec_with_gh_stub "$fetch_script" 'exit 1'; then
-  fail "Fetch PR Number script unexpectedly survives a gh api error on its own"
-else
-  pass "gh api error makes the script exit non-zero, confirming continue-on-error is necessary"
-fi
-
-if exec_with_gh_stub "$fetch_script" 'echo -n'; then
-  pass "Fetch PR Number script exits 0 when gh reports no matching artifact"
-else
-  fail "Fetch PR Number script does not exit 0 when gh reports no matching artifact"
+  fail "Fetch PR Number masks unexpected download errors"
 fi
 
 bot_step="$(step_named "$arb_job" "Auto Review Bot")"
@@ -121,6 +75,12 @@ if [[ -n "$bot_step" ]] && grep -q "check-pr-number.outputs.exists == 'true'" <<
   pass "Auto Review Bot step is gated on the PR number actually being found"
 else
   fail "Auto Review Bot step is not gated on artifact presence"
+fi
+
+if [[ -n "$bot_step" ]] && ! grep -q '"continue-on-error":true' <<< "$bot_step"; then
+  pass "Auto Review Bot failures are not masked"
+else
+  fail "Auto Review Bot can still fail silently"
 fi
 echo
 
@@ -141,16 +101,16 @@ fi
 fetch_step="$(step_named "$post_job" "Fetch PR Data")"
 if [[ -n "$fetch_step" ]] \
   && grep -q 'actions/download-artifact' <<< "$fetch_step" \
-  && ! grep -q 'dawidd6/action-download-artifact' <<< "$fetch_step" \
-  && grep -q '"continue-on-error":true' <<< "$fetch_step"; then
-  pass "Fetch PR Data uses actions/download-artifact with continue-on-error"
+  && ! grep -q '"continue-on-error":true' <<< "$fetch_step" \
+  && grep -q '"if-no-artifact-found":"ignore"' <<< "$fetch_step"; then
+  pass "Fetch PR Data ignores a legitimately absent artifact without masking errors"
 else
-  fail "Fetch PR Data does not use a non-failing artifact download"
+  fail "Fetch PR Data does not distinguish missing artifacts from download errors"
 fi
 
 for step_name in "Add Comment" "Add Waiting Label" "Remove Waiting Label"; do
   step="$(step_named "$post_job" "$step_name")"
-  if [[ -n "$step" ]] && grep -q "fetch-pr-data.outcome == 'success'" <<< "$step"; then
+  if [[ -n "$step" ]] && grep -q "check-pr-data.outputs.exists == 'true'" <<< "$step"; then
     pass "$step_name is gated on the artifact fetch having succeeded"
   else
     fail "$step_name is not gated on the artifact fetch having succeeded"

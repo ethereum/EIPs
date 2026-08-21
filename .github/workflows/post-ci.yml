@@ -21,16 +21,25 @@ jobs:
       - name: Fetch PR Data
         id: fetch-pr-data
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        continue-on-error: true
         with:
           name: pr_number
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           run-id: ${{ github.event.workflow_run.id }}
+          if-no-artifact-found: ignore
+
+      - name: Check PR Data
+        id: check-pr-data
+        run: |
+          if [[ -f pr_number && -f pr_sha && -f merge_sha ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Save PR Data
         id: save-pr-data
-        if: ${{ steps.fetch-pr-data.outcome == 'success' }}
+        if: ${{ steps.check-pr-data.outputs.exists == 'true' }}
         run: |
           echo "pr_number=$(cat pr_number)" >> "$GITHUB_OUTPUT"
           echo "pr_sha=$(cat pr_sha)" >> "$GITHUB_OUTPUT"
@@ -38,7 +47,7 @@ jobs:
 
       - name: Add Comment
         uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
-        if: ${{ steps.fetch-pr-data.outcome == 'success' && github.event.workflow_run.conclusion == 'failure' }}
+        if: ${{ steps.check-pr-data.outputs.exists == 'true' && github.event.workflow_run.conclusion == 'failure' }}
         with:
           number: ${{ steps.save-pr-data.outputs.pr_number }}
           recreate: true
@@ -48,7 +57,7 @@ jobs:
 
       - name: Add Waiting Label
         uses: actions-ecosystem/action-add-labels@288072f1a3b596f4350fe135bcfe381a23abadef
-        if: ${{ steps.fetch-pr-data.outcome == 'success' && github.event.workflow_run.conclusion == 'failure' }}
+        if: ${{ steps.check-pr-data.outputs.exists == 'true' && github.event.workflow_run.conclusion == 'failure' }}
         with:
           labels: w-ci
           number: ${{ steps.save-pr-data.outputs.pr_number }}
@@ -57,7 +66,7 @@ jobs:
 
       - name: Remove Waiting Label
         uses: actions-ecosystem/action-remove-labels@d05162525702062b6bdef750ed8594fc024b3ed7
-        if: ${{ steps.fetch-pr-data.outcome == 'success' && github.event.workflow_run.conclusion != 'failure' }}
+        if: ${{ steps.check-pr-data.outputs.exists == 'true' && github.event.workflow_run.conclusion != 'failure' }}
         with:
           labels: w-ci
           number: ${{ steps.save-pr-data.outputs.pr_number }}

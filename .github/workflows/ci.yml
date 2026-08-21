@@ -13,10 +13,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  actions: write
+  contents: read
+  pull-requests: read
+
 jobs:
   save-pr:
     name: Save PR Number
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Save PR number
@@ -39,24 +45,24 @@ jobs:
   workflow-checks:
     name: Workflow Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
 
       - name: Run Workflow Tests
-        run: tests/workflows/run.sh
-
-      - name: Download actionlint
-        id: actionlint
-        run: bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/914e7df21a07ef503a81201c76d2b11c789d3fca/scripts/download-actionlint.bash) 1.7.12
+        run: ./scripts/verify
 
       - name: Check workflow files
-        run: ${{ steps.actionlint.outputs.executable }} -color
+        run: tests/workflows/actionlint.sh -color
 
   htmlproofer:
     name: HTMLProofer
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     steps:
       - name: Checkout EIPs
@@ -65,6 +71,7 @@ jobs:
           repository: ethereum/EIPs
           path: ''
           fetch-depth: 0
+          persist-credentials: false
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
       - name: Setup Ruby
@@ -147,10 +154,13 @@ jobs:
   link-check:
     name: Link Check
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
 
       - name: Link Checker
         uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
@@ -163,24 +173,36 @@ jobs:
   codespell:
     name: CodeSpell
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          set -euo pipefail
+          changed_files="$(gh pr diff "$PR_NUMBER" --name-only)"
+          {
+            echo 'CHANGED_FILES<<EOF'
+            printf '%s\n' "$changed_files"
+            echo EOF
+          } >> "$GITHUB_ENV"
+          if [[ -n "$changed_files" ]]; then
+            echo 'has_files=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'has_files=false' >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         with:
           check_filenames: true
           ignore_words_file: config/.codespell-whitelist
@@ -190,10 +212,13 @@ jobs:
   eipw-validator:
     name: EIP Walidator
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
@@ -207,23 +232,36 @@ jobs:
   markdownlint:
     name: Markdown Linter
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          set -euo pipefail
+          changed_files="$(gh pr diff "$PR_NUMBER" --name-only)"
+          markdown_files="$(printf '%s\n' "$changed_files" | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' || true)"
+          {
+            echo 'CHANGED_FILES<<EOF'
+            printf '%s\n' "$markdown_files"
+            echo EOF
+          } >> "$GITHUB_ENV"
+          if [[ -n "$markdown_files" ]]; then
+            echo 'has_files=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'has_files=false' >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Lint
         uses: DavidAnson/markdownlint-cli2-action@f5cf187ef11bd3a68a127321b794aa252ff23019
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         with:
           command: config
           globs: |

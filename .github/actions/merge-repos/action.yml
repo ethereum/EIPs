@@ -9,6 +9,7 @@ runs:
       with:
         repository: ethereum/ERCs
         path: ERCs
+        persist-credentials: false
     - name: Merge Repos
       shell: bash
       run: |
