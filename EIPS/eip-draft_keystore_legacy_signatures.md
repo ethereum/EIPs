@@ -164,6 +164,12 @@ Keystore-checked. Inner authorization tuples remain secp256k1, so that 7702 dele
 to non-8130 chains. PQ-capable delegation on 8130 chains uses EIP-8130 `account_changes`, not this
 list.
 
+**Out of scope: `ecrecover`.** The secp256k1 recovery precompile is unchanged. It remains a pure
+function of `(hash, v, r, s)` and MUST NOT consult the Keystore. In-contract signature checks that
+need Keystore authority use EIP-8130 `validateSignature` / account `isValidSignature` (and, if
+enshrined, the native `validateSignature` precompile EIP-8130 already sketches). A companion EIP MAY
+expose that precompile; this EIP MUST NOT retarget `ecrecover`.
+
 ### Gas
 
 Authentication is metered as EIP-8130 `sender_auth_cost` (canonical authenticators: the enshrined
@@ -195,9 +201,13 @@ account address is prepended. The rest of authentication — canonical set, `act
 expiry, adoption-profile acceptance — is identical, including aggregation wherever the authenticator
 already allows it on the AA path.
 
-**Why not fold this into EIP-8130.** Optional chain behavior: an 8130 chain can ship AA without
-changing legacy types, then activate this EIP to retire k1 on those types. The AA envelope is
-unchanged.
+**Why not `ecrecover` here.** Transaction origin and in-EVM recovery are different layers.
+`ecrecover` is a pure cryptographic primitive with a fixed `(hash, v, r, s)` ABI: it cannot carry
+`authenticator || data`, so it cannot authenticate a PQ actor no matter what Keystore rule is bolted
+on. Existing bytecode also uses it for keys that are not accounts (ephemeral signing keys, not 8130
+actors). Tying it to `DEFAULT_EOA_REVOKED` would mix "whose secp256k1 key" with "does this account
+still speak k1." EIP-8130 already specifies the replacement: `validateSignature`, optionally as a
+native precompile. That is a separate EIP.
 
 **PQ deprecation path.** Authorize a PQ actor (8130 AA tx or a Keystore call signed with the still-live
 default EOA). Start originating 1559/7702 transactions with `account || pq_authenticator || data`.
@@ -216,6 +226,7 @@ Pre-fork blocks are unchanged. After activation:
   for those accounts — that is the deprecation.
 - EIP-8130 AA transactions are unaffected (and still carry no blob fields).
 - [EIP-4844](./eip-4844.md) type `0x03` is unaffected.
+- The `ecrecover` precompile is unaffected.
 - Non-8130 chains are unaffected.
 
 ## Security Considerations
@@ -240,6 +251,12 @@ authority. This EIP does not close that; 8130 chains that need PQ delegation alr
 **Authenticator acceptance.** The same EIP-8130 adoption-profile rules apply. A canonical-only chain
 MUST NOT accept a non-canonical authenticator on a type-2 transaction any more than on an AA
 transaction.
+
+**In-contract `ecrecover`.** This EIP closes k1 as *transaction origin* for the covered types. It
+does not close k1 as *in-EVM recovery*: a revoked default EOA can still satisfy `ecrecover` in
+Permit, Permit2, and similar callers. That is intentional and residual. Callers that mean "does this
+account authorize this hash" MUST use EIP-8130 `validateSignature` / ERC-1271. Enshrining that as a
+precompile is a companion EIP.
 
 **Replay.** Signing hashes and EVM nonces are unchanged. A signature valid for type 2 is not valid for
 type 4; a Keystore-authorized actor cannot replay across types. Chain id remains in `H`.
