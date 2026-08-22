@@ -9,5 +9,9 @@ vendor
 .DS_Store
 /.idea
 
+# Generated Python artifacts
+__pycache__/
+*.py[cod]
+
 # Secrets
 .vercel

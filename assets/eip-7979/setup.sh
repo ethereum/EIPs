@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Non-root RISC-V toolchain: cross gcc + qemu-user extracted from
 # Ubuntu 22.04 debs into /tmp/rv.  Needs only network and /tmp.
 set -e

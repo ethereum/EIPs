@@ -1,0 +1,20 @@
+on:
+  workflow_dispatch:
+
+name: Artifact Handoff Integration Producer
+
+permissions:
+  contents: read
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write handoff marker
+        run: printf '%s\n' artifact-handoff-ok > artifact-handoff.txt
+
+      - name: Upload handoff artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: artifact-handoff-integration
+          path: artifact-handoff.txt

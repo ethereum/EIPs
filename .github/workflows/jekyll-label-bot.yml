@@ -8,13 +8,18 @@ concurrency:
   cancel-in-progress: true
 
 name: Jekyll Label Bot
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   jekyll-label-action:
     name: Label
     runs-on: ubuntu-latest
     
     steps:
-      - uses: Pandapip1/jekyll-label-action@4b7cce7588a8686f5146a8e12aab7269042057ce
+      - uses: Pandapip1/jekyll-label-action@d2b09baa85e7be91239e0d1d1e830a1d58e7140b # v0.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-path: config/.jekyll-labels.yml

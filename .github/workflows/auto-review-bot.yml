@@ -6,25 +6,36 @@ on:
       - completed
 
 name: Auto Review Bot
+
+permissions:
+  contents: read
+  actions: read # required to download the artifact from the triggering run
+
 jobs:
   auto-review-bot:
     runs-on: ubuntu-latest
     name: Run
     steps:
       - name: Fetch PR Number
-        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
+        id: fetch-pr-number
+        uses: dawidd6/action-download-artifact@57aa996fc1713cc1579039614f4645a7f4841fd4 # v23
         with:
           name: pr-number
           workflow: auto-review-trigger.yml
           run_id: ${{ github.event.workflow_run.id }}
+          if_no_artifact_found: ignore
 
       - name: Save PR Number
         id: save-pr-number
-        run: echo "pr=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+        if: steps.fetch-pr-number.outputs.found_artifact == 'true'
+        run: |
+          test -f pr-number.txt
+          echo "pr=$(<pr-number.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Auto Review Bot
         id: auto-review-bot
-        uses: ethereum/eip-review-bot@dist
+        if: steps.save-pr-number.outputs.pr != ''
+        uses: ethereum/eip-review-bot@bbc63d4bd02da30703f166f15283ae2eed05916b # dist
         continue-on-error: true
         with:
           token: ${{ secrets.TOKEN }}
