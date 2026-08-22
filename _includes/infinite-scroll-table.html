@@ -1,0 +1,169 @@
+<script>
+(function() {
+  'use strict';
+
+  var container = document.getElementById('eip-listing-container');
+  if (!container) return;
+
+  var sentinel = document.getElementById('eip-load-more-sentinel');
+  if (!sentinel) return;
+
+  // Collect all section data
+  var sections = [];
+  var headers = container.querySelectorAll('h2');
+  for (var i = 0; i < headers.length; i++) {
+    var h2 = headers[i];
+    var table = h2.nextElementSibling;
+    if (table && table.tagName === 'TABLE' && table.classList.contains('eiptable')) {
+      var rows = [];
+      var allTrs = table.querySelectorAll('tr');
+      for (var j = 0; j < allTrs.length; j++) {
+        // Skip the header row
+        if (allTrs[j].parentNode.tagName === 'THEAD') continue;
+        if (allTrs[j].closest('thead')) continue;
+        rows.push(allTrs[j]);
+      }
+      sections.push({ header: h2, table: table, rows: rows });
+    }
+  }
+
+  // Flatten all rows into a single array
+  var allRows = [];
+  for (var s = 0; s < sections.length; s++) {
+    for (var r = 0; r < sections[s].rows.length; r++) {
+      allRows.push({ sectionIndex: s, row: sections[s].rows[r] });
+    }
+  }
+
+  var totalCount = allRows.length;
+  if (totalCount === 0) {
+    sentinel.style.display = 'none';
+    return;
+  }
+
+  // Config
+  var batchSize = 25;
+  var shownCount = 0;
+  var isLoading = false;
+  var allLoaded = false;
+
+  // Build sentinel HTML
+  var counterEl = document.createElement('span');
+  counterEl.className = 'eip-load-more__counter';
+
+  var loadBtn = document.createElement('button');
+  loadBtn.className = 'eip-load-more__btn';
+  loadBtn.textContent = 'Load more';
+  loadBtn.style.display = 'none';
+
+  var loaderEl = document.createElement('span');
+  loaderEl.className = 'eip-load-more__loader';
+  loaderEl.innerHTML = '<span class="eip-load-more__spinner"></span> Loading more EIPs...';
+  loaderEl.style.display = 'none';
+
+  var doneEl = document.createElement('span');
+  doneEl.className = 'eip-load-more__done';
+  doneEl.innerHTML = '&#10003; All ' + totalCount + ' EIPs loaded';
+  doneEl.style.display = 'none';
+
+  // Clear sentinel and add children
+  sentinel.innerHTML = '';
+  sentinel.appendChild(counterEl);
+  sentinel.appendChild(loadBtn);
+  sentinel.appendChild(loaderEl);
+  sentinel.appendChild(doneEl);
+
+  // Update counter text
+  function updateCounter() {
+    counterEl.textContent = 'Showing ' + Math.min(shownCount, totalCount) + ' of ' + totalCount;
+  }
+
+  // Show/hide section headers based on visible rows
+  function updateSectionHeaders() {
+    for (var s = 0; s < sections.length; s++) {
+      var anyVisible = false;
+      for (var r = 0; r < sections[s].rows.length; r++) {
+        if (!sections[s].rows[r].classList.contains('eip-tr-hidden')) {
+          anyVisible = true;
+          break;
+        }
+      }
+      sections[s].header.style.display = anyVisible ? '' : 'none';
+    }
+  }
+
+  // Show next batch
+  function loadNextBatch() {
+    if (isLoading || allLoaded) return;
+    isLoading = true;
+
+    loadBtn.style.display = 'none';
+    loaderEl.style.display = '';
+
+    // Simulate slight delay for smoothness
+    setTimeout(function() {
+      var loaded = 0;
+      for (var i = shownCount; i < totalCount && loaded < batchSize; i++) {
+        allRows[i].row.classList.remove('eip-tr-hidden');
+        loaded++;
+        shownCount++;
+      }
+
+      updateCounter();
+      updateSectionHeaders();
+
+      isLoading = false;
+      loaderEl.style.display = 'none';
+
+      if (shownCount >= totalCount) {
+        allLoaded = true;
+        doneEl.style.display = '';
+        loadBtn.style.display = 'none';
+        if (observer) observer.disconnect();
+      } else {
+        loadBtn.style.display = '';
+        loadBtn.textContent = 'Load more (' + (totalCount - shownCount) + ' more)';
+      }
+    }, 80);
+  }
+
+  // Show initial batch
+  function init() {
+    // Hide all rows first
+    for (var i = 0; i < totalCount; i++) {
+      allRows[i].row.classList.add('eip-tr-hidden');
+    }
+
+    shownCount = 0;
+    loadNextBatch();
+  }
+
+  // IntersectionObserver on sentinel
+  var observer = null;
+  if ('IntersectionObserver' in window) {
+    observer = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        loadNextBatch();
+      }
+    }, { rootMargin: '200px' });
+    observer.observe(sentinel);
+  }
+
+  // Load more button click
+  loadBtn.addEventListener('click', loadNextBatch);
+
+  // Scroll fallback
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(function() {
+      var rect = sentinel.getBoundingClientRect();
+      if (rect.top < window.innerHeight + 300) {
+        loadNextBatch();
+      }
+    }, 150);
+  }, { passive: true });
+
+  init();
+})();
+</script>
