@@ -1,0 +1,57 @@
+# Link checker configuration, consumed by the "Link Check" job in
+# .github/workflows/ci.yml. Replaces config/mlc_config.json, whose action
+# (gaurav-nelson/github-action-markdown-link-check) is archived upstream.
+
+# --- Rate limiting -----------------------------------------------------------
+# The EIP corpus is heavily skewed toward a handful of hosts, so per-host limits
+# matter more than the global cap. Without them a PR touching several EIPs can
+# fire dozens of near-simultaneous requests at one domain and get throttled,
+# which shows up as a spurious CI failure.
+max_concurrency = 32
+host_concurrency = 4
+host_request_interval = "250ms"
+max_retries = 3
+retry_wait_time = 5
+timeout = 30
+
+# --- Acceptance --------------------------------------------------------------
+# 429 is inherited from mlc_config.json's aliveStatusCodes: being rate limited
+# still proves the URL resolves, so it must not fail the build. 300..=308
+# covers hosts (e.g. rfc-editor.org) that redirect to a canonical URL for the
+# same resource rather than erroring.
+accept = ["200..=206", "300..=308", "429"]
+
+# --- Exclusions --------------------------------------------------------------
+# Every entry below was observed failing on a 60-file sample of EIPS/*.md while
+# being reachable from a browser. These are bot-blocks and dead hosts, not
+# broken links, so failing CI on them would be a false positive.
+exclude = [
+    # Inherited from mlc_config.json's ignorePatterns.
+    "csl-json",
+
+    # Return 403 to datacenter IPs regardless of whether the link is valid.
+    "^https?://(www\\.)?medium\\.com",
+    "^https?://(www\\.)?khronos\\.org",
+    "^https?://registry\\.khronos\\.org",
+    "^https?://(www\\.)?npmjs\\.com",
+
+    # Unreliable host; times out intermittently.
+    "^https?://(www\\.)?pdaian\\.com",
+]
+
+# --- Per-host overrides ------------------------------------------------------
+# TOML tables must follow every top-level key, so this section stays last.
+# github.com and the Ethereum domains dominate the corpus; keep them gentler
+# than the global default. github.com additionally receives an API token in CI
+# (see the Link Check job), which raises its rate limit substantially.
+[hosts."github.com"]
+concurrency = 2
+request_interval = "500ms"
+
+[hosts."ethereum.org"]
+concurrency = 2
+request_interval = "500ms"
+
+[hosts."eips.ethereum.org"]
+concurrency = 2
+request_interval = "500ms"
