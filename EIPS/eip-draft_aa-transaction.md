@@ -1,0 +1,1061 @@
+---
+title: Account Abstraction Transaction
+description: Add a native account abstraction transaction using the EIP-8130 keystore authority layer
+author: Chris Hunter (@chunter-cb) <chris.hunter@coinbase.com>
+discussions-to: https://ethereum-magicians.org/t/eip-8130-account-abstraction-by-account-configurations/25952
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-08-27
+requires: 155, 170, 712, 1271, 1559, 2028, 2718, 2929, 4337, 6780, 7702, 7708, 7819, 8130
+---
+
+## Abstract
+
+This proposal extends the [EIP-8130](./eip-8130.md) keystore authority layer with a new [EIP-2718](./eip-2718.md) transaction type that provides custom authentication, call batching, and gas sponsorship. It also adds policy actors, keyed and nonce-free transaction modes, and account locking. Transactions declare which authenticator to use, enabling nodes to filter transactions without executing arbitrary wallet code. No EVM changes are required.
+
+## Motivation
+
+Account abstraction proposals that delegate validation to wallet code force nodes to simulate arbitrary EVM before accepting a transaction. This requires full state access, tracing infrastructure, and reputation systems to bound the cost of invalid submissions.
+
+[EIP-8130](./eip-8130.md) separates authentication from account logic through a portable keystore of actors and authenticators. This proposal uses that authority layer for a native transaction. Each transaction explicitly declares its authenticator, a contract that takes a hash and signature data and returns the authenticated actor. This makes validation predictable: wallets know the rules, and nodes can see exactly what computation a transaction requires before executing it. Instead of simulating arbitrary code, nodes filter on authenticator identity, accepting transactions whose authenticator belongs to a small, standard canonical set and rejecting the rest.
+
+New signature algorithms are introduced through authenticator contracts and standardized through the canonical authenticator set.
+
+The EIP-8130 keystore preserves cross-chain account authority while this proposal supplies a native transaction path and optional higher-level controls.
+
+## Specification
+
+### Overview
+
+An account manages its base authentication configuration through the [EIP-8130](./eip-8130.md) Keystore. This proposal extends that authority model with policy actors, unsequenced configuration changes, and account locking, then uses it to authorize a native transaction type.
+
+A new [EIP-2718](./eip-2718.md) transaction type (`AA_TX_TYPE`) names the authenticator that authenticates it. Because the authenticator is declared explicitly, a node can tell exactly what computation a transaction requires, and reject unknown authenticators before executing any code. Validation reads the account's configuration, runs the named authenticator, and checks the resolved actor's permissions; execution then dispatches the transaction's calls.
+
+The AA transaction type is not required for EIP-8130 accounts to work. On chains that do not support this transaction type, accounts use an alternative transport mechanism such as [ERC-4337](./eip-4337.md). See [Portability](#portability).
+
+This EIP specifies the AA transaction type, node validation and execution rules, intrinsic gas, canonical authenticator treatment, and extensions to the EIP-8130 Keystore. EIP-8130 remains authoritative for the base actor layout, authentication primitive, configuration-change channels, and address derivation. Where this document extends those structures, implementations MUST preserve all base behavior.
+
+The specification is organized around four pieces:
+
+- **Actors and Authenticators**: the authentication and authorization model (see [Authenticators](#authenticators)).
+- **Keystore Extensions**: policy actors, unsequenced changes, and account locking (see [Keystore Extensions](#keystore-extensions)).
+- **AA Transaction Type**: the wire format, signature payloads, and gas accounting (see [AA Transaction Type](#aa-transaction-type)).
+- **Account Changes**: how accounts are created and how actors are added, revoked, or delegated (see [Account Changes](#account-changes)).
+
+#### Account Types
+
+This proposal supports all account types, existing and newly created.
+
+| Account Type | How It Works | Key Recovery |
+|--------------|--------------|--------------|
+| **EOAs** | EOAs send AA transactions using their existing secp256k1 key via native ecrecover. If the account has no code, the protocol auto-delegates to `DEFAULT_ACCOUNT_ADDRESS` (see [Block Execution](#block-execution)). Accounts MAY override with a delegation entry in `account_changes` or a standard [EIP-7702](./eip-7702.md) transaction | Wallet-defined; EOA recoverable via standard transactions |
+| **Existing Smart Contracts** | Already-deployed accounts (e.g., [ERC-4337](./eip-4337.md) wallets) register actors via `importAccount()` on the Keystore contract | Wallet-defined |
+| **New Accounts (No EOA)** | Created via a create entry in `account_changes` with CREATE2 address derivation; runtime bytecode placed at address, actors + authenticators configured, `calls` handles initialization | Wallet-defined |
+
+### Adoption Profiles
+
+The AA transaction is specified once but adopted under one of two **profiles**. A chain MUST declare which profile it activates; the profile fixes the parameters this specification otherwise leaves open: the [intrinsic-gas schedule](#intrinsic-gas), how the enshrined [canonical authenticator set](#canonical-authenticator-set) evolves, and whether the AA transaction path accepts authenticators outside that set. The **canonical set is accepted on the transaction path under both profiles**, always at a constant enshrined validation cost, so a wallet targeting the canonical set behaves identically everywhere; the profiles differ only in what else is allowed and how it changes, never in transaction semantics.
+
+**L1 profile (normative schedule, permissive acceptance).** For a base layer, where the gas schedule *is* the specification and consensus validity MUST NOT depend on any out-of-band configuration. Under this profile:
+
+- The [intrinsic-gas schedule](#intrinsic-gas) is **normative**. The component values in this document are protocol constants, identical for every node, and MAY change only through a hard fork. A node MUST NOT adopt a different schedule.
+- Canonical authenticators are **enshrined on the validation path** with a constant validation cost (their fixed `sender_auth_cost` / `payer_auth_cost` component values); no EVM runs to authenticate a canonical actor, and the enshrined set changes only through a hard fork.
+- Authenticator acceptance is **permissive**: the AA transaction path accepts **any** authenticator whose `STATICCALL` returns within `MAX_AUTHENTICATION_GAS`, canonical or not (see [Authenticators](#authenticators)). No allowlist is maintained; a base layer can afford this bounded, single-call validation.
+
+Under the L1 profile, two independent implementations that agree on this document produce identical block validity.
+
+**L2 profile (configurable schedule, canonical-only path).** For an L2 or any high-throughput EVM that wants to track a local cost model, move faster than L1 governance, and keep the transaction path to fixed-cost validation. Under this profile a chain MAY:
+
+- adopt a different [intrinsic-gas schedule](#intrinsic-gas) (for example to mirror a future EVM repricing), provided it is fixed under that chain's consensus and identical across its nodes;
+- extend the enshrined constant-cost canonical set it accepts through the [companion ERC](#canonical-authenticator-set) process and node configuration.
+
+Authenticator acceptance is **canonical-only**: the AA transaction path accepts only the enshrined canonical set (fixed validation cost, no arbitrary `STATICCALL` on the hot path). Non-canonical authenticators remain registrable and usable through the EVM (config-change calls, recovery flows, [ERC-4337](./eip-4337.md)), just not on the AA transaction path. An L2-profile chain is still internally consistent; wallets that need cross-chain portability SHOULD rely only on the canonical set and the recommended schedule.
+
+The gas-schedule policy and the acceptance policy are independent choices; the two profiles name the common pairings, and a chain MAY combine them differently. What is universal is the **canonical set**: every compliant chain accepts it on the AA transaction path at a constant enshrined cost, so a wallet can rely on canonical authenticators working everywhere. Additional authenticators may be registered on any chain (for example, recovery flows), but are usable on the AA transaction path only where a chain's policy is permissive; otherwise they are reached through the EVM.
+
+Throughout this specification, "recommended" values and schedules mean **required under the L1 profile** and **default-but-overridable under the L2 profile**; the normative *structure* (the gas-formula components, the authenticator interface, the canonical set) holds under both.
+
+### Authenticators
+
+Each actor is associated with an authenticator as specified by EIP-8130. The authenticator *authenticates* the actor by returning the actor's `actorId`; scope and the policy extension then *authorize* what that authenticated actor may do. After authentication, the protocol validates the returned `actorId` against `actor_config` and checks its scope against the authorization context.
+
+Canonical authenticators are **enshrined on the validation path** with a constant validation cost under both [adoption profiles](#adoption-profiles) (their fixed `sender_auth_cost` / `payer_auth_cost` component values); no EVM is executed to authenticate them, and they are accepted on the AA transaction path on every compliant chain. When a canonical authenticator is enshrined, its execution MUST produce results identical to the corresponding authenticator contract.
+
+Whether an authenticator **outside the canonical set** is accepted on the AA transaction path is the chain's acceptance policy (see [Adoption Profiles](#adoption-profiles)): a **permissive** chain (typically L1) authenticates it with a single `STATICCALL`, metered as ordinary EVM execution and bounded by `MAX_AUTHENTICATION_GAS`; a **canonical-only** chain (typically a high-throughput L2) does not accept it on the transaction path at all.
+
+Any contract implementing `IAuthenticator` can be permissionlessly deployed and registered as an actor's authenticator on any chain. Registration always makes the authenticator usable within EVM execution; it becomes usable on the AA transaction path only on chains whose acceptance policy is permissive.
+
+#### Canonical Authenticator Set
+
+This specification defines a canonical authenticator set which is the set of signature algorithms that compliant nodes MUST accept. The initial canonical set includes:
+
+| Name | Algorithm | Authenticator | `actorId` Derivation |
+|------|-----------|----------|----------------------|
+| k1 | secp256k1 | `K1_AUTHENTICATOR` (native sentinel) | `bytes32(uint256(uint160(recovered_address)))` (the address right-aligned into a 32-byte word: low 20 bytes, high 12 bytes zero) |
+| p256 | P-256 | Onchain contract | `keccak256(abi.encodePacked(x, y))` |
+| passkey | WebAuthn / FIDO2 | Onchain contract | `keccak256(abi.encodePacked(x, y))` |
+| delegate | Signature delegation | Onchain contract | `bytes32(uint256(uint160(delegated_address)))` (address right-aligned, high 12 bytes zero): signatures from `delegated_address` are valid for the registering account (see [Delegate Authenticator](#delegate-authenticator)) |
+
+The canonical authenticator set and corresponding contract addresses are deployed at deterministic CREATE2 addresses across chains and catalogued in a companion ERC (number TBD). These are the authenticators enshrined on the validation path with a constant validation cost. How the enshrined set evolves depends on the chain's [adoption profile](#adoption-profiles). Under the **L1 profile** the enshrined set is fixed by the protocol and changes only through a hard fork. Under the **L2 profile** the set MAY be extended as new algorithms are adopted (e.g., post-quantum) through the companion ERC process and node configuration.
+
+The set is expected to grow over time to enshrine new canonical authenticators as signature algorithms mature. This does not disturb existing accounts. Actors reference their authenticator by address in `actor_config`, so an account stays bound to its keystore and its current actors while remaining free to adopt any newly canonical scheme: it simply authorizes a new actor pointing at the new authenticator, with no migration, redeployment, or address change. Accounts are therefore crypto-agile by construction, able to add, rotate to, or retire authenticators as the canonical set expands, without ever being locked to the algorithms enshrined at deployment time.
+
+Nodes MUST accept all canonical authenticators on the AA transaction path; this is the universal baseline wallets can rely on everywhere. Whether an authenticator **outside** the canonical set is accepted on the transaction path is the chain's acceptance policy (see [Adoption Profiles](#adoption-profiles)): a **permissive** chain authenticates it with a single `STATICCALL` bounded by `MAX_AUTHENTICATION_GAS`, while a **canonical-only** chain does not accept it on the transaction path, so it must be reached through the EVM (config-change calls, [ERC-4337](./eip-4337.md), direct Keystore). Wallets that need cross-chain portability SHOULD rely only on the canonical set.
+
+#### Delegate Authenticator
+
+The delegate authenticator lets one account act on behalf of another: account **A** registers a delegate actor with `actorId = bytes32(uint256(uint160(B)))`, after which any key that can authenticate as account **B** may authenticate as **A**, bounded by the scope **A** grants that actor. Delegation MUST NOT chain, and the nested authenticator MUST be canonical, keeping total validation work bounded.
+
+### Keystore Extensions
+
+EIP-8130 defines actor authorization, account creation and import, change sequencing, expiry, and the `authenticateActor` primitive. This section defines only the additional Keystore behavior required by the AA transaction: policy state, unsequenced changes, and account locking.
+
+#### Storage Layout
+
+EIP-8130 defines the single-slot `actor_config` representation. When `scope` includes `POLICY` (`0x02`), this proposal adds a signed policy commitment and manager address in separate `policy_commitment` and `policy_manager` slots. Revoking an actor MUST delete both extension slots in addition to the base `actor_config` slot.
+
+When `scope & POLICY != 0`, the actor's policy is held in two additional slots:
+
+```
+policy_commitment(account, actorId) → bytes32   // set when POLICY is set
+policy_manager(account, actorId)    → address   // set when POLICY is set
+```
+
+These slots are read only during execution (see [Actor Policies](#actor-policies)); validity is decided by the single `actor_config` SLOAD giving cheap, predictable validation and invalidation.
+
+#### Actor Scope
+
+EIP-8130 defines `scope` as a fail-closed `uint16` grants bitmask and reserves bits 1 and 2. This proposal assigns those bits as follows:
+
+| Bit | Value | Name | Context |
+|-----|-------|------|---------|
+| 1 | `0x02` | POLICY | Gated initiation: `sender_auth`; may originate transactions only to the actor's `policy_manager` (see [Actor Policies](#actor-policies)) |
+| 2 | `0x04` | NONCE | Permits a restricted actor to use sequenced `nonce_key`s for sender-context transactions (see [Actor Nonce Scope](#actor-nonce-scope)) |
+
+The EIP-8130 meanings of `SENDER`, `SELF_PAYER`, `SPONSOR_PAYER`, and admin (`scope == 0x00`) remain unchanged.
+
+**Initiation grants.** `SENDER` and `POLICY` compose: `SENDER` allows initiation to any `call.to`, `POLICY` allows gated initiation to the actor's `policy_manager`. An actor may hold either or both; whenever `POLICY` is set the call is gated to the `manager` regardless of `SENDER`, so the gate always binds a policy-bearing actor. When both are set, `SENDER` conveys no additional authority; wallets SHOULD NOT set `SENDER | POLICY`. `POLICY | SELF_PAYER` and `POLICY | NONCE` compose likewise. `POLICY | SPONSOR_PAYER` also composes: the actor's initiation is gated to its `manager`, but its sponsor authority is **not** gated and it may underwrite third-party gas off its policy gate. `authorizeActor` stores any scope combination verbatim; combination semantics are checked at the point of use.
+
+Scope authorization is applied only after an authenticator authenticates the signature and returns an `actorId`: the protocol loads that actor's `scope` and checks it against the context being authorized. For `sender_auth`, require `scope == 0x00 || (scope & SENDER) != 0 || (scope & POLICY) != 0`; when `POLICY` is set the actor is gated to its `manager` regardless of `SENDER` (see [Actor Policies](#actor-policies)). For self-pay (payer account == sender account) require SELF_PAYER on the actor that authorizes payment, and for sponsorship (payer account ≠ sender) require SPONSOR_PAYER on the `payer_auth`-resolved actor (the respective bit, or unrestricted). For 2D nonce usage require NONCE and for config change `auth` require admin (`scope == 0x00`).
+
+See [Validation](#validation) for the full flow.
+
+#### Unsequenced Change Mode
+
+EIP-8130 defines the local epoch and sequence word. This proposal reserves `UNSEQUENCED` (`uint32.max`) as an extension sentinel in the low half of that word. A local batch whose low half equals `UNSEQUENCED` consumes no counter and remains replayable until the epoch changes.
+
+- `IncrementLocalEpoch` invalidates every unsequenced batch signed at the prior epoch without revoking live actors.
+- An unsequenced batch MAY carry any otherwise valid change. Ordering between unsequenced batches is undefined.
+- A wallet durably retires an unsequenced authorization by incrementing the local epoch, typically in the same reducing batch as `RevokeActor` or `AuthorizeActor`.
+
+This is what makes the unsequenced/JIT mode (`UNSEQUENCED`) safe to hand out: an unsequenced batch is intentionally replayable within its epoch, and the account durably retires it by bumping the epoch — typically batching the reducing `RevokeActor`/`AuthorizeActor` with `IncrementLocalEpoch` in one signed batch. See [Why Unsequenced Changes?](#why-unsequenced-changes).
+
+#### Actor Policies
+
+Actor policies gate a key to a single `manager` contract that enforces application-defined authority on the account's behalf, for example a session key limited to a spend cap or a small set of targets (see [Why Actor Policies?](#why-actor-policies)).
+
+`POLICY` selects whether an actor is gated; gating is determined by the scope bit alone. `SetActorPolicy(actorId, manager, commitment)` writes the manager and commitment verbatim to `policy_manager` and `policy_commitment`; neither field needs to be nonzero. A zero commitment is a valid "no parameters" value. A zero manager gates the key to `address(0)`, leaving no productive call target. Removing `POLICY` from the actor's scope clears both slots. Policy vocabulary lives in the commitment and manager logic.
+
+| `POLICY` | Gate: `call.to` MUST equal | Extension state |
+|----------------|----------------------------|-----------------|
+| unset | (no gate) | Policy slots are cleared |
+| set | The actor's `manager` (`address(0)` = no productive target) | `manager` and `commitment` set by `SetActorPolicy` |
+
+A policy-bearing actor may call exactly one target: its configured `manager`. The contract at that target reads the actor's `commitment` (via [`getPolicy`](#ikeystore)), validates presented parameters against it, enforces *what* the call may do, and carries out the approved action. The protocol's only responsibility is the single-target gate.
+
+A key that should be enforced by the account's own code rather than a separate contract sets `manager = account`. Because protocol dispatch originates the call from the account itself (`msg.sender == account`), this is only meaningful with policy-aware wallet code; code that implicitly trusts self-calls (e.g. a standard `executeBatch`) turns such a key into an unrestricted one (see [Security Considerations](#security-considerations)).
+
+**Scope.** `POLICY` is the gated initiation grant. How it composes with `SENDER` is defined in [Actor Scope](#actor-scope). It MAY combine with `SELF_PAYER` so a session key can self-pay gas (bounded by balance and `expiry`). It MAY also combine with `NONCE` so a policy key can use a sequenced `nonce_key`.
+
+**Reference flow** (non-normative). One construction of a session-key policy:
+
+1. **Authorize.** The account authorizes the key with `POLICY`, the `manager`, and a `commitment`. The key's call authority is only the gate to its `manager`.
+2. **Use (each call).** The protocol gate routes the key's call to the `manager`; the manager enforces installed `params` and drives the account by checking the policy commitment.
+3. **Retire.** `revokeActor` zeroes the commitment or `expiry` rejects further authentication.
+
+**Example** (non-normative). A subscription session key limited to **5 USDC per 30-day period** with a two-target allowlist. Authorized with `POLICY`. Over-budget transfers, wrong targets, expiry, or revoke all fail.
+
+**The commitment is signed, opaque, and protocol-stored.** One signature fully describes the key's manager and policy and travels with the portable actor-change path.
+
+**Enforcement.** The gate is applied during [Call Execution](#call-execution). Validity does not read `policy_commitment` or `policy_manager`.
+
+**Lifecycle.** Policy state is keyed by `(account, actorId)`; clearing on revocation and target-held parameters are covered under [Policy State on Revocation](#security-considerations).
+
+#### 2D Nonce Storage
+
+Nonce state is managed by a precompile at `NONCE_MANAGER_ADDRESS`. The protocol reads and increments nonce slots directly during AA transaction processing; the precompile exposes a read-only `getNonce()` interface to the EVM.
+
+The transaction carries two nonce fields: `nonce_key` (`uint256`) selects the nonce channel, and `nonce_sequence` (`uint64`) is the expected sequence number within that channel.
+
+| `nonce_key` Range | Name | Description |
+|-------------------|------|-------------|
+| `0` | Standard | Sequential ordering, mempool default |
+| `1` through `NONCE_KEY_MAX - 1` | User-defined | Parallel transaction channels defined by wallets |
+| `NONCE_KEY_MAX` | Nonce-free | No nonce state read or incremented |
+
+##### Actor Nonce Scope
+
+`NONCE` (`0x04`) grants a restricted actor access to sequenced `nonce_key`s for **sender-context** transactions; it does not apply to `payer_auth`. The protocol enforces this during validation (see [Validation](#validation)):
+
+| Actor | `nonce_key` allowed |
+|-------|----------------------|
+| Admin (`scope == 0x00`) | Any `nonce_key`, including `NONCE_KEY_MAX` |
+| Restricted, `NONCE` unset | `NONCE_KEY_MAX` (nonce-free) only |
+| Restricted, `NONCE` set | Any `nonce_key`, the full 2D space |
+
+##### Nonce-Free Mode (`NONCE_KEY_MAX`)
+
+When `nonce_key == NONCE_KEY_MAX`, the protocol neither reads nor increments a nonce counter; `nonce_sequence` MUST be `0` and `valid_before` MUST be non-zero. Replay protection uses `replay_id` deduplication held in a fixed-capacity **circular buffer** that is **consensus state**, not per-node bookkeeping: a `seen` map (`replay_id → valid_before`) of live entries plus a ring that evicts the oldest entry once elapsed, so a still-live `replay_id` is rejected and a buffer full of still-live entries rejects the transaction. Because both checks decide block validity, the capacity is a **protocol constant or explicit chain parameter** (`REPLAY_BUFFER_CAPACITY`), identical for every node on the chain, and MUST be at least `peak accepted nonce-free throughput × NONCE_FREE_EXPIRY_WINDOW` so an entry always elapses before its ring slot is reused. Entries are ephemeral, so there is no permanent state growth. See `nonce_key_cost` in [Intrinsic Gas](#intrinsic-gas).
+
+The maximum validity window (`valid_before − now`) accepted for nonce-free transactions is likewise an explicit chain parameter (`NONCE_FREE_EXPIRY_WINDOW`), not a per-node choice, and MUST be sized together with `REPLAY_BUFFER_CAPACITY` so `peak accepted nonce-free throughput × NONCE_FREE_EXPIRY_WINDOW` stays within capacity. Replay protection is handled by the **replay identifier** defined below.
+
+###### Replay Identifier
+
+Nonce-free (`NONCE_KEY_MAX`) transactions have no nonce slot to key deduplication and replacement on, so each carries a **replay identifier** that names the *logical* transaction independent of its fees and authorization blobs. Standard and 2D transactions (`nonce_key != NONCE_KEY_MAX`) do **not** use `replay_id`; they are deduplicated and replaced by `(sender, nonce_key, nonce_sequence)` under the standard nonce rules (see [Mempool Replacement](#mempool-replacement)).
+
+```
+REPLAY_ID_TYPE = 0x7901
+
+replay_id = keccak256(REPLAY_ID_TYPE || rlp([
+  chain_id, resolved_sender, valid_after, valid_before,
+  account_changes, calls, metadata,
+  payer
+]))
+```
+
+`nonce_key` and `nonce_sequence` are omitted: a nonce-free transaction always has `(NONCE_KEY_MAX, 0)`, so they carry no entropy and cannot distinguish two logical transactions.
+
+`resolved_sender` is the sender address recovered via ecrecover (EOA path, where `sender` is empty in the wire format) or taken directly from the `sender` field (configured-actor path). Binding `resolved_sender` keeps the identifier unique per sender on the EOA path, where two distinct EOAs can sign identical transaction bodies.
+
+`replay_id` deliberately excludes:
+
+- `max_fee_per_gas`, `max_priority_fee_per_gas`, and `gas_limit`, so a fee bump on an otherwise-identical transaction does not change its identity.
+- `sender_auth` and `payer_auth`, the authorization blobs, which are excluded both because they are non-deterministic (ECDSA signing is randomized and malleable) and because `payer_auth` can be freshly re-signed (e.g. on a fee bump) without changing the logical transaction.
+
+It includes `payer` (the address field, not `payer_auth`): retargeting a transaction at a different payer is a change to the logical transaction, so it MUST produce a different `replay_id`.
+
+The full transaction hash MUST NOT be used for nonce-free deduplication or mempool replacement (see [Mempool Replacement](#mempool-replacement) below); the rationale for keying on `replay_id` instead is explained in [Security Considerations](#security-considerations).
+
+###### Mempool Replacement
+
+Fee-bump replacement is keyed differently depending on nonce mode:
+
+- **Standard and 2D transactions** (`nonce_key != NONCE_KEY_MAX`): replacement follows the standard nonce rules. Two pending transactions from the same `sender` sharing the same `(sender, nonce_key, nonce_sequence)` are **replacement candidates**; `replay_id` plays no role. Nonce mechanics already prevent two transactions with the same `(sender, nonce_key, nonce_sequence)` from both being included, since inclusion increments the sequence.
+- **Nonce-free transactions** (`nonce_key == NONCE_KEY_MAX`): `replay_id` drives replacement because there is no nonce slot. Two pending transactions from the same `sender` with the same `replay_id` are **replacement candidates**, and block builders MUST NOT include two transactions with the same `(sender, replay_id)` in the same block.
+
+In both modes a replacement MUST increase `max_priority_fee_per_gas` by at least the node's configured minimum bump (e.g., ≥10%), mirroring standard replace-by-fee conventions, and MUST be independently fully valid, including a fresh `payer_auth` when sponsored: `payer_auth` commits to `max_fee_per_gas`, `max_priority_fee_per_gas`, and `gas_limit` (see [Signature Payload](#signature-payload)), so the payer must re-sign to authorize the bumped fees. For nonce-free transactions, changing `payer` yields a new `replay_id` (a new logical transaction) rather than a replacement of the old one.
+
+#### Account Lock
+
+Account lock state is stored in a single packed 32-byte account-state slot that also holds the change channels, an account-flags byte, and the inline default-EOA config. The protocol may read this slot's raw layout directly for mempool rate-limit tiering, so its field order and widths are normative:
+
+When `LOCKED`, all authority changes and delegation are rejected on both paths. Only two changes remain permitted while locked: `Unlock`, which begins the timed release, and `IncrementLocalEpoch`, which cancels outstanding local signatures without touching actor authority. Lock and unlock are themselves the only lock-state transitions. The stored `unlock_delay` is bounded to the `uint16` range, approximately 18.2 hours.
+
+##### Lock Operations
+
+Lock and unlock are **local-only** account changes carried in a signed batch through the single [`applySignedAccountChanges`](#account-config-change-paths) entry point; there is no separate lock function. Each is admin-authorized (`scope == 0x00`), binds `chainId = block.chainid`, and is consumed against the local channel like any sequenced local change. `Lock` and `Unlock` MUST each be the **sole** change in their batch, so a lock transition can never interleave with actor changes in the same signed batch. Anyone may relay; authorization comes from the signature.
+
+**Lifecycle** — `lock`, then `unlock`, with no other actions in between:
+
+1. **Lock**: only from the unlocked state. Sets `LOCKED` and stores `unlock_delay`. Rejected if already locked (a zero delay is rejected); the delay cannot be changed while locked. Emits `AccountLocked`.
+2. **Unlock**: only from `LOCKED` with no pending unlock. Sets `UNLOCK_INITIATED` and `unlocks_at = block.timestamp + unlock_delay` (from the stored delay). Emits `AccountUnlockInitiated`.
+3. **Effective unlock**: once `block.timestamp >= unlocks_at`, the account is unlocked and config changes resume; the flags and `lock_union` are lazily cleared by the next op. Locking again requires a fresh `lock`.
+
+#### Imported Policy Actors
+
+Account import uses the EIP-8130 `InitialActor` format and address commitment without extension data. If an imported actor has `POLICY` set, its initial `policy_manager` and `policy_commitment` are both zero. A later `SetActorPolicy` change MAY install non-zero policy data.
+
+#### Account Establishment
+
+Both `createAccount` and `importAccount` set the `CONTRACT_ESTABLISHED` flag (`flags` bit 0) in the packed account-state slot, regardless of the account's code shape (fresh deployment, plain contract, or [EIP-7702](./eip-7702.md) delegate). The flag is permanent, has no effect on authentication, and marks the account as **keystore-established rather than backed by a proven address-bound key**.
+
+It exists because Keystore state can outlive code: an account established and `SELFDESTRUCT`ed in the same transaction ([EIP-6780](./eip-6780.md)) is left with empty code but retains its authority state. Consumers therefore MUST NOT treat "empty code or a delegate plus Keystore state" as proof of a known externally owned account key; they check `CONTRACT_ESTABLISHED` instead. A future genuinely key-backed native path MAY deliberately leave the bit clear.
+
+#### Delegation Indicator
+
+The delegation indicator is the [EIP-7702](./eip-7702.md) mechanism for pointing an account's code at a shared implementation contract. This proposal relies on it as the foundation for account code: an externally owned account sending its first AA transaction is auto-delegated to `DEFAULT_ACCOUNT_ADDRESS` when it has no code (see [Block Execution](#block-execution)), and accounts MAY set or clear delegation explicitly via a [Delegation Entry](#delegation-entry) in `account_changes`. The delegation indicator MUST be supported on chains implementing this proposal even when standalone EIP-7702 transactions are not enabled.
+
+An account is delegated when its code is exactly `0xef0100 || target`, where `target` is a 20-byte address. Delegated accounts MAY originate transactions, and all code-executing operations targeting a delegated account MUST load code from `target` instead of the indicator.
+
+### Signature Verification
+
+The Keystore exposes one raw primitive, `authenticateActor(account, hash, auth)`, which maps a hash and signature to a verified `(actorId, scope)`. Wallet-originated flows — transactions, account changes, and other protocol paths — authenticate directly against it over their own digest.
+
+Applications that instead request a signature (Sign-In with Ethereum, `Permit`, order flow) use `validateSignature(account, hash, auth)`. This wraps `authenticateActor` with an identity binding that makes the signature replay-safe: `replaySafeHash(account, chainId, hash) = keccak256(SIGNED_MESSAGE_TYPEHASH, account, chainId, hash)` binds the signature to a specific account and chain (`chainId = 0` binds all chains). The `auth` blob is `sigType(1) ‖ authenticator(20) ‖ data`, where `sigType` selects the **Local** (`0x01`) or **Multichain** (`0x02`) domain.
+
+Because both methods return `(actorId, scope)` rather than a bare boolean, a consumer can attribute a signature to a specific key and make a granular authorization decision — the "who signed" and capability set that plain [ERC-1271](./eip-1271.md) discards, surfaced only when a consumer needs it.
+
+This supersedes [ERC-1271](./eip-1271.md) while remaining backwards compatible: an account implementing this proposal exposes `isValidSignature(hash, signature)` on top of `validateSignature`, returning the magic value when the resolved actor is operational and treating any revert as invalid. The recommended wrapper is `Scopes.isOperator`, meaning admin or `SENDER` without `POLICY`.
+
+**Precompiles and native signature verification.** A precompile calling back into the EVM is both undesirable and unimplemented at the time of writing, so [ERC-1271](./eip-1271.md) is unavailable for native or precompile-based checks. The EIP-8130 authority model removes that dependency: the canonical authenticator set is small and enshrinable, and authority lives in a flat `actor_config` slot. `validateSignature` can therefore run entirely in native code and be exposed as a precompile, producing results identical to EVM execution on chains that do not implement this transaction type.
+
+### AA Transaction Type
+
+A new [EIP-2718](./eip-2718.md) transaction with type `AA_TX_TYPE`:
+
+```
+AA_TX_TYPE || rlp([
+  chain_id,
+  sender,             // Sender address (20 bytes) | empty for EOA signature
+  nonce_key,          // uint256: nonce channel selector
+  nonce_sequence,     // uint64: sequence number
+  valid_after,        // uint64: Unix timestamp (ms or s, auto-detected); 0 = no lower bound
+  valid_before,       // uint64: Unix timestamp (ms or s, auto-detected); 0 = no expiry
+  max_priority_fee_per_gas,
+  max_fee_per_gas,
+  gas_limit,
+  account_changes,    // Account creation, config change, and/or delegation operations | empty
+  calls,              // [[call, ...], ...] where call = rlp([to, data]) | empty
+  metadata,           // opaque attribution/annotation bytes | empty
+  payer,              // empty = sender-paid, payer_address = specific payer
+  sender_auth,        // raw ECDSA r||s||v (EOA, sender empty) | authenticator || data (configured actor)
+  payer_auth          // empty = self-pay | authenticator || data = sponsored (same format as sender_auth)
+])
+
+call = rlp([to, data])   // to: address, data: bytes
+```
+
+#### Field Definitions
+
+| Field | Description |
+|-------|-------------|
+| `chain_id` | Chain ID per [EIP-155](./eip-155.md) |
+| `sender` | Sending account address. **Required** (non-empty) for configured actor signatures. **Empty** for EOA signatures; address recovered via ecrecover. The presence or absence of `sender` is the sole distinguisher between EOA and configured actor signatures. |
+| `nonce_key` | `uint256` nonce channel selector. `0` for standard sequential ordering, `1` through `NONCE_KEY_MAX - 1` for parallel channels, `NONCE_KEY_MAX` for nonce-free mode. |
+| `nonce_sequence` | `uint64` expected sequence number within `nonce_key`. Must match current sequence for `(sender, nonce_key)`. Incremented after inclusion regardless of execution outcome. Must be `0` when `nonce_key == NONCE_KEY_MAX`. |
+| `valid_after` | `uint64` Unix timestamp, **milliseconds or seconds** (auto-detected per [Timestamp Normalization](#field-definitions)); encoded as a canonical minimal-length RLP integer. After normalization to milliseconds, transaction invalid when `block.timestamp * 1000 < valid_after`. A value of `0` means no lower bound. Note: many mempools will not hold a not-yet-active transaction and MAY reject one whose `valid_after` is in the future, so it is best used for near-term activation rather than long-dated scheduling. |
+| `valid_before` | `uint64` Unix timestamp, **milliseconds or seconds** (auto-detected per [Timestamp Normalization](#field-definitions)); encoded as a canonical minimal-length RLP integer. After normalization to milliseconds, transaction invalid when `block.timestamp * 1000 > valid_before`. A value of `0` means no expiry. Must be non-zero when `nonce_key == NONCE_KEY_MAX`. |
+| `max_priority_fee_per_gas` | Priority fee per gas unit ([EIP-1559](./eip-1559.md)) |
+| `max_fee_per_gas` | Maximum fee per gas unit ([EIP-1559](./eip-1559.md)) |
+| `gas_limit` | Maximum gas budget for sender-intrinsic gas (intrinsic gas excluding payer authentication) and call execution (see [Intrinsic Gas](#intrinsic-gas)). Payer authentication is metered separately and does not draw from `gas_limit` |
+| `account_changes` | **Empty**: No account changes. **Non-empty**: Array of typed entries: create (type `0x00`) for account deployment, config change (type `0x01`) for actor management, and delegation (type `0x02`) for code delegation. See [Account Changes](#account-changes) |
+| `calls` | **Empty**: No calls. **Non-empty**: Array of call phases; see [Call Execution](#call-execution) |
+| `metadata` | **Empty**: No metadata. **Non-empty**: Opaque attribution or annotation bytes. See [Transaction Metadata](#transaction-metadata) |
+| `payer` | Gas payer identity. **Empty**: Sender pays. **20-byte address**: This specific payer required. See [Payer Modes](#payer-modes) |
+| `sender_auth` | See [Signature Format](#signature-format) |
+| `payer_auth` | Payer authorization. **Empty**: self-pay. **Non-empty**: `authenticator \|\| data`, same format as `sender_auth`. See [Payer Modes](#payer-modes) |
+
+**Millisecond window.** The transaction window (`valid_after`/`valid_before`) is denominated in milliseconds, while on-chain actor and lock expiries are seconds; this split is deliberate and there is no second-denominated variant of these fields. Because `block.timestamp` has second granularity, the **effective** activation/expiry resolution equals the chain's block-timestamp resolution (1 second on most chains today); the millisecond field exists for off-chain clock compatibility (e.g. `Date.now()`, sequencer clocks) and forward-compatibility with sub-second block times, not for finer resolution than the chain itself provides. Can easily be scaled on ingress.
+
+**Timestamp Normalization.** `valid_after` and `valid_before` MAY be expressed in either seconds or milliseconds; a node accepts **both at the same time** and decides the unit per value, not per node or per chain. There is no mode flag: the unit is a fixed function of the value against the threshold `TIMESTAMP_MS_THRESHOLD` = `100_000_000_000` (10^11), applied independently to each field:
+
+- a value **below** `TIMESTAMP_MS_THRESHOLD` is **always** interpreted as **seconds** and normalized to milliseconds as `value * 1000`;
+- a value **at or above** `TIMESTAMP_MS_THRESHOLD` is **always** interpreted as **milliseconds** and used as-is;
+- a `0` value means "no bound" and is not normalized.
+
+This is unambiguous for every realistic value: a 64-bit Unix timestamp in seconds does not reach 10^11 until the year 5138, while any Unix timestamp in milliseconds has exceeded 10^11 since 1973. Because the rule is a pure function of the value, every node derives the same normalized timestamp, so this is consensus-safe (no node-local configuration affects block validity). All validity-window comparisons in this specification operate on the normalized millisecond value; wherever `valid_after` or `valid_before` appears in a comparison below, it denotes the normalized value.
+
+#### Intrinsic Gas
+
+**Intrinsic gas** follows the standard Ethereum meaning: the total cost to include the transaction. As in standard transactions it accounts for signature authentication, here both the sender's authentication (`sender_auth_cost`) and the payer's (`payer_auth_cost`) are included.
+
+**Full-EVM metering model (normative).** The reference cost of an AA transaction is what its work costs when metered as ordinary EVM execution, over four phases:
+
+1. **Account changes.** Apply `account_changes` in order: a create entry calls `createAccount` and config-change entries call `applySignedAccountChanges` (both metered as ordinary Keystore contract calls), and a delegation entry performs a standard [EIP-7702](./eip-7702.md) delegation, metered at the standard delegation cost.
+2. **Validation.** Authenticate the transaction: `STATICCALL` the `sender_auth` authenticator, and (when sponsored) the `payer_auth` authenticator, each followed by the single `actor_config` SLOAD that resolves and authorizes the actor. Metered as ordinary STATICCALL execution.
+3. **Execution.** Dispatch the transaction's `calls`, metered as ordinary EVM execution.
+4. **Bound.** The transaction's total metered gas is bounded by `effective_gas_limit` (defined below), which is the gas limit for the transaction as a whole.
+
+This model is the normative reference for **results**: whatever pricing a chain uses, a transaction MUST be accepted, authenticated, and executed to the same outcome and state changes that phases 1–3 produce under ordinary EVM. A chain MAY implement phases 1 and 2 (account-change application and authentication) as **native** code where applicable (for the enshrined canonical authenticator set and the Keystore reads it depends on), running no EVM for that work and instead charging a fixed gas cost per authenticator and per account-change operation (see [Portability](#portability)). The native path MUST match the Full-EVM model in results, but it need **not** match it in gas: its fixed schedule is its own consensus-fixed pricing, not a re-derivation of what EVM metering would charge. Whether phases 1–2 are metered pure-EVM or priced by a native fixed schedule is decided per chain (see [Adoption Profiles](#adoption-profiles)); phase 3 is always ordinary EVM execution.
+
+The per-component values below are that native fixed schedule for phases 1–2. They approximate the EVM access and data-availability costs ([EIP-2929](./eip-2929.md) / [EIP-2028](./eip-2028.md)) at the time of writing, but a native chain charges them as flat costs rather than metering the underlying EVM. Their normative status follows the chain's [adoption profile](#adoption-profiles):
+
+- **L1 profile:** the values below are **protocol constants** (the gas schedule *is* part of the specification), identical for every node and changeable only through a hard fork. A chain MUST NOT adopt a different intrinsic-gas schedule under this profile.
+- **L2 profile:** the values below are a **recommended default**. A chain MAY reprice them (for example to track a future EVM repricing or a local cost model), provided the schedule is fixed under that chain's consensus and identical across its nodes.
+
+The formula's structure (its components and what each one accounts for) is normative under both profiles; only the absolute numbers may vary, and only under the L2 profile.
+
+```
+intrinsic_gas = AA_BASE_COST + tx_payload_cost + nonce_key_cost + bytecode_cost + account_changes_cost + auto_delegation_cost + sender_auth_cost + payer_auth_cost
+```
+
+**Sender-intrinsic gas** is intrinsic gas excluding payer authentication and is bounded by `gas_limit`. For self-pay transactions `payer_auth_cost` is `0`, so sender-intrinsic gas equals intrinsic gas:
+
+```
+sender_intrinsic_gas = intrinsic_gas - payer_auth_cost
+                     = AA_BASE_COST + tx_payload_cost + nonce_key_cost + bytecode_cost + account_changes_cost + auto_delegation_cost + sender_auth_cost
+```
+
+Intrinsic gas is charged before `calls` run. Since `payer_auth_cost` is metered outside `gas_limit`, the gas available to `calls` is:
+
+```
+execution_gas_available = gas_limit - sender_intrinsic_gas
+```
+
+`payer_auth_cost` is metered separately and charged to the payer on top of `gas_limit`; it does not draw from `gas_limit` and cannot reduce the gas available to `calls`. This isolation is required: `payer_auth` is excluded from both the sender and payer signature hashes (see [Signature Payload](#signature-payload)) and is selected unilaterally by the payer. If it consumed `gas_limit`, a payer could choose an expensive authenticator to starve `calls` and alter execution behavior. Keeping it separate makes the gas available to `calls` a function of sender-signed fields alone. For the same reason the data-availability cost of the serialized `payer_auth` bytes is charged in `payer_auth_cost` rather than `tx_payload_cost`: those bytes are chosen by the payer and excluded from the signed hashes, so their cost is metered outside `gas_limit` and never reduces the sender's execution budget. The payer reimburses `payer_auth_cost` regardless (the payer pays all gas).
+
+Because `payer_auth_cost` sits outside `gas_limit`, total `gasUsed` can exceed `gas_limit` on a sponsored transaction. The overrun is bounded by an **effective gas limit**:
+
+```
+effective_gas_limit = gas_limit + MAX_AUTHENTICATION_GAS
+```
+
+`MAX_AUTHENTICATION_GAS` is the ceiling on a single authenticator's execution: an authenticator outside the canonical set is `STATICCALL`ed with at most this much gas, and it also bounds how much the payer's authenticator (metered outside `gas_limit`) may add on top of the sender-signed `gas_limit`. Its **suggested value is 100,000 gas**. A transaction whose resolved `payer_auth_cost` exceeds `MAX_AUTHENTICATION_GAS` is rejected at [Mempool Acceptance](#mempool-acceptance) rather than metered, so `gasUsed <= effective_gas_limit` always holds and block-gas accounting stays bounded. For self-pay transactions `payer_auth_cost` is `0` and `effective_gas_limit == gas_limit`. Under the L1 profile `MAX_AUTHENTICATION_GAS` is fixed under consensus; under the L2 profile a chain MAY choose its own value (see [Adoption Profiles](#adoption-profiles)).
+
+`sender_auth_cost`, by contrast, is included in `gas_limit`: the sender chooses its own authenticator, and both sender and payer sign over `gas_limit`, so both commit to the full sender-side budget before inclusion.
+
+**`sender_auth_cost`**: authenticator execution + 1 SLOAD (`actor_config`).
+
+**`payer_auth_cost`**: 0 for self-pay (`payer` empty). Otherwise, the same `sender_auth_cost` model applies to the payer's authenticator (authenticator execution + 1 `actor_config` SLOAD), **plus** the data-availability cost of the serialized `payer_auth` field itself (16 gas per non-zero byte, 4 per zero byte, per [EIP-2028](./eip-2028.md)). These `payer_auth` bytes are excluded from `tx_payload_cost` and metered here instead, so the entire payer-authentication cost, execution and bytes alike, sits outside `gas_limit` and is paid by the payer.
+
+| Component | Value |
+|-----------|-------|
+| `AA_BASE_COST` | 15,000 gas: the fixed per-transaction overhead of the AA path, analogous to the standard 21,000 base cost but excluding the components broken out separately below (signature authentication is `sender_auth_cost`/`payer_auth_cost`; calldata is `tx_payload_cost`). It covers transaction decoding, sender/actor resolution and the `actor_config` access accounting common to every AA transaction, nonce-mode dispatch, and receipt assembly. Like the other values it is a protocol constant under the L1 profile that only an L2-profile chain MAY reprice (see [Adoption Profiles](#adoption-profiles)) |
+| `tx_payload_cost` | Standard per-byte cost over the RLP-serialized transaction **excluding the `payer_auth` field**: 16 gas per non-zero byte, 4 gas per zero byte, consistent with [EIP-2028](./eip-2028.md). Ensures all sender-signed fields (`account_changes`, `sender_auth`, `calls`, `metadata`, etc.) are charged for data availability. The `payer_auth` bytes are chosen unilaterally by the payer and excluded from the signed hashes, so their byte cost is metered in `payer_auth_cost` (outside `gas_limit`) rather than here |
+| `nonce_key_cost` | `NONCE_KEY_MAX`: 13,000 gas (ring-buffer replay state: 2 cold SLOADs + 1 warm SLOAD + 3 warm SSTORE resets; the ring pointer's SLOAD/SSTORE are amortized across the block). Otherwise: 22,100 gas for first use of a `nonce_key` (cold SLOAD + SSTORE set), 5,000 gas for existing keys (cold SLOAD + warm SSTORE reset) |
+| `bytecode_cost` | 0 if no create entry in `account_changes`. Otherwise: 32,000 (deployment base) + code deposit cost (200 gas per deployed byte). Byte costs for `code` are covered by `tx_payload_cost`; the create entry's initial-actor slot writes are covered by `account_changes_cost` |
+| `account_changes_cost` | Per applied **create** entry: one `actor_config` slot write per initial actor (22,100 gas each: cold SLOAD + SSTORE set). Per applied **config change** entry: authentication cost plus the storage writes for each mutated base or extension slot. Per applied **delegation** entry: 4,600 gas (indicator deposit, 200 × 23 bytes). Per **skipped** config-change entry: 2,100 gas (sequence SLOAD). `0` when there is no create, config-change, or delegation entry. |
+| `auto_delegation_cost` | Delegation indicator deposit: 4,600 gas (200 × 23 bytes for the `0xef0100 \|\| address` indicator) when a code-less `sender` is auto-delegated to `DEFAULT_ACCOUNT_ADDRESS` (Block Execution step 4). 0 otherwise. |
+
+#### Signature Format
+
+Signature format is determined by the `sender` field:
+
+**EOA signature** (`sender` empty): Raw 65-byte ECDSA signature `(r || s || v)`. The sender address is recovered via ecrecover.
+
+**Configured actor signature** (`sender` set):
+
+```
+authenticator (20 bytes) || data
+```
+
+The first 20 bytes identify the authenticator address. When the authenticator is `K1_AUTHENTICATOR`, `data` is raw ECDSA `(r || s || v)` and the protocol handles ecrecover natively. For all other authenticators, `data` is authenticator-specific; each authenticator defines its own wire format.
+
+##### Validation
+
+1. **Resolve sender**: If `sender` empty, ecrecover derives the sender address (EOA path) with `actorId = bytes32(uint256(uint160(sender)))`. If `sender` set, read the first 20 bytes of `sender_auth` as the authenticator address.
+2. **Authenticate**: Route by authenticator address. For the EOA path (`sender` empty), ecrecover was already performed in step 1. For `K1_AUTHENTICATOR` (`address(1)`), the protocol natively ecrecovers from `data` (as `r || s || v`), returning `actorId = bytes32(uint256(uint160(recovered_address)))`. For all other authenticators, call `authenticator.authenticate(hash, data)` via STATICCALL, returning `actorId` (or `bytes32(0)` for invalid). `address(0)` is never a valid authenticator selector (it is the empty `actor_config` sentinel).
+3. **Authorize**: **Self-actor (native secp256k1) rule**: if authentication in step 2 used the native secp256k1 path (the EOA path or `K1_AUTHENTICATOR`) and `actorId == bytes32(uint256(uint160(sender)))`, resolve the self-actor from the inline default-EOA config in the packed account-state slot: reject if `DEFAULT_EOA_REVOKED` is set; otherwise take `scope` and `expiry` from the inline fields (all-zero = unrestricted, non-expiring full owner, i.e. admin). Otherwise SLOAD `actor_config(sender, actorId)`, reject if its reserved bytes are nonzero (version gate, see [Storage Layout](#storage-layout)), and require that the stored authenticator address matches the effective authenticator (this covers every other actor, including a non-secp256k1 self). In either case, if the resolved `expiry` is non-zero, also require `block.timestamp <= expiry`; an expired actor is rejected.
+4. **Check scope**: Read the resolved `scope` byte (from the inline default-EOA config for the secp256k1 self-actor, or `actor_config` otherwise) and check it against the context being authorized per [Actor Scope](#actor-scope) (for `sender_auth`: `scope == 0x00 || (scope & (SENDER | POLICY)) != 0`, with `POLICY` gating the actor to its `manager`). Payer scope is checked when the payer is resolved (see [Validation Flow](#validation-flow) step 6).
+5. **Check nonce scope** (sender-context only, when `nonce_key != NONCE_KEY_MAX`): require the resolved actor be admin or carry `NONCE`, per [Actor Nonce Scope](#actor-nonce-scope).
+
+#### Signature Payload
+
+Sender and payer use different type bytes for domain separation, preventing signature reuse attacks:
+
+**Sender signature hash**, all tx fields through `payer`, excluding `sender_auth` and `payer_auth`:
+
+```
+keccak256(AA_TX_TYPE || rlp([
+  chain_id, sender, nonce_key, nonce_sequence, valid_after, valid_before,
+  max_priority_fee_per_gas, max_fee_per_gas, gas_limit,
+  account_changes, calls, metadata,
+  payer
+]))
+```
+
+**Payer signature hash**, all tx fields through `payer`, excluding `sender_auth` and `payer_auth`:
+
+```
+keccak256(AA_PAYER_TYPE || rlp([
+  chain_id, sender, nonce_key, nonce_sequence, valid_after, valid_before,
+  max_priority_fee_per_gas, max_fee_per_gas, gas_limit,
+  account_changes, calls, metadata,
+  payer
+]))
+```
+
+The `sender` field in the payer signature hash MUST be the resolved sender address. In the EOA path (`sender` empty in the transaction wire format), the recovered sender address (from `sender_auth` ecrecover, see [Validation](#validation) step 1) MUST be substituted into the `sender` position before computing this hash; it MUST NOT be encoded as the empty wire-format value. This binds the payer's signature to the specific resolved sender and prevents cross-sender replay of payer signatures (see [Payer Security](#security-considerations)). The `payer` field MUST also be included so the payer's signature is bound to the account being charged; without it, a payer authorization could be redirected to any other account that authorizes the same actor with SPONSOR_PAYER scope (e.g., via the [delegate authenticator](#delegate-authenticator)).
+
+#### Payer Modes
+
+Gas payment and sponsorship are controlled by two independent fields:
+
+**`payer`**, the sender's commitment regarding the gas payer, included in the sender's signed hash:
+
+| Value | Mode | Description |
+|-------|------|-------------|
+| empty | Self-pay | Sender pays their own gas |
+| `payer_address` (20 bytes) | Sponsored | Sender binds tx to a specific sponsor |
+
+**`payer_auth`** uses the same `authenticator || data` format as `sender_auth`:
+
+| `payer` | `payer_auth` | Payer Address | Validation |
+|---------|-------------|---------------|------------|
+| empty | empty | `sender` | Self-pay: no separate `payer_auth`; the resolved sender actor MUST have SELF_PAYER scope |
+| `sender` address | `authenticator (20) \|\| data` | `sender` | Self-pay via a dedicated gas key: payer account == sender. Reads the `payer_auth`-resolved actor on the account, which MUST have SELF_PAYER scope (lets a SELF_PAYER-only key fund another sender key's transactions on the same account) |
+| other address | `authenticator (20) \|\| data` | `payer` field | Sponsored (payer != sender): any authenticator. Reads payer's `actor_config`, validates against `payer` address, and requires SPONSOR_PAYER scope |
+
+### Transaction Metadata
+
+The `metadata` field is optional opaque bytes for attaching attribution or annotation data to a transaction, for example builder/app attribution, a payment reference or memo, or a commitment to off-chain data. Legacy transactions carry such data as a "data suffix" appended to `tx.input`; because [calls](#call-phases) replace the single input blob, `metadata` provides the equivalent home.
+
+`metadata` is part of the signed transaction (covered by both the [sender and payer signature payloads](#signature-payload)) and is charged per byte through `tx_payload_cost` like any other transaction bytes. It does not affect validation or execution. Off-chain consumers (indexers, explorers) read it directly from the transaction. Producers MAY use any encoding.
+
+### Account Changes
+
+The `account_changes` field is an array of typed entries for account creation and actor management:
+
+| Type | Name | Description |
+|------|------|-------------|
+| `0x00` | Create | Deploy a new account with initial actors (must be first, at most one) |
+| `0x01` | Config change | Signed account-change batch: authorize/revoke actors, increment local epoch, lock/unlock |
+| `0x02` | Delegation | Set code delegation via the delegation indicator (at most one per transaction) |
+
+Create and delegation entries are authorized by the transaction's `sender_auth` and there is no separate authorization field. The initial `actorId`s for create entries are salt-committed to the derived address. Delegation requires the sender to be the account's implicit EOA actor and admin (`scope == 0x00`). Config change entries carry their own admin `auth` and a `channel`/`sequence` for deterministic ordering and cross-chain replay (see [Config Change Authorization](#config-change-authorization)). Nodes SHOULD enforce a configurable per-transaction limit on the number of config change entries (mempool rule).
+
+#### Create Entry
+
+New smart contract accounts can be created with pre-configured actors in a single transaction. The `code` is placed directly at the account address, it is not executed during deployment. The account's initialization logic runs via `calls` in the execution phase that follows:
+
+```
+rlp([
+  0x00,               // type: create
+  user_salt,          // bytes32: User-chosen uniqueness factor
+  code,               // bytes: Runtime bytecode placed at account address
+  initial_actors      // Array of [actorId, authenticator, scope] tuples
+])
+```
+
+The initial actor format and address commitment are exactly those of EIP-8130. Extension data does not participate in address derivation. Initial actors with `POLICY` set begin with a zero manager and zero commitment, leaving them unable to dispatch a productive call until a `SetActorPolicy` change installs their policy data. That change MAY accompany the create entry in the same `account_changes` array for atomic setup.
+
+##### Address Derivation
+
+Addresses are derived using the CREATE2 address formula with the Keystore contract (`KEYSTORE_ADDRESS`) as the deployer. The `initial_actors` MUST be provided already sorted by `actorId` in strictly ascending order. Requiring a single canonical ordering keeps address derivation deterministic (a given set of actors always produces the same address), and the strict ordering also rejects duplicate `actorId`s:
+
+```
+// initial_actors MUST already be sorted by actorId (strictly ascending); reject otherwise
+
+// Hash each actor to a fixed-width leaf, then hash the ordered list of leaves
+leaf_i           = keccak256(actorId_i || authenticator_i || scope_i)
+actors_commitment = keccak256(leaf_0 || leaf_1 || ... || leaf_n)
+
+effective_salt = keccak256(user_salt || actors_commitment)
+deployment_code = DEPLOYMENT_HEADER(len(code)) || code
+address = keccak256(0xff || KEYSTORE_ADDRESS || effective_salt || keccak256(deployment_code))[12:]
+```
+
+This is byte-for-byte the EIP-8130 address derivation. Each actor's leaf commits the 32-byte `actorId`, 20-byte `authenticator`, and 2-byte `scope`. Policy data and expiry do not participate. Fixed-width leaves make the commitment unambiguous and linear in the actor count. The required strictly ascending `actorId` ordering makes the commitment canonical.
+
+Off-chain address prediction (`computeAddress`) MUST apply the same initial-actor validation as EIP-8130 and the create entry, so a predicted address always corresponds to an acceptable actor set.
+
+`DEPLOYMENT_HEADER(n)` is a fixed 14-byte EVM loader that returns the trailing code (see [Appendix: Deployment Header](#appendix-deployment-header) for the full opcode sequence). On chains that do not implement this proposal, `createAccount()` constructs `deployment_code` and passes it as init code to CREATE2. On chains implementing this proposal, the protocol constructs the same `deployment_code` for address derivation but places `code` directly. Callers only provide `code`; the header is never user-facing.
+
+##### Validation (Create Entry)
+
+When a create entry is present in `account_changes`:
+
+1. Parse `[0x00, user_salt, code, initial_actors]` where each entry is `[actorId, authenticator, scope]`. Validate each actor exactly as EIP-8130 requires. `expiry` and extension data are not accepted in the create entry.
+2. Require `initial_actors` are sorted by `actorId` in strictly ascending order; reject any unsorted set (strict ascending order also rejects duplicate `actorId` values).
+3. Use `initial_actors` in the provided (sorted) order
+4. Compute `actors_commitment` per [Address Derivation](#address-derivation)
+5. Compute `effective_salt = keccak256(user_salt || actors_commitment)`
+6. Compute `deployment_code = DEPLOYMENT_HEADER(len(code)) || code`
+7. Compute `expected = keccak256(0xff || KEYSTORE_ADDRESS || effective_salt || keccak256(deployment_code))[12:]`
+8. Require `sender == expected`
+9. Require the destination matches CREATE2 freshness: `code_size(sender) == 0` and `nonce(sender) == 0` (matching the conditions under which CREATE2 would be permitted to deploy)
+10. Validate `sender_auth` against one of `initial_actors` (actorId resolved from auth must match an entry's actorId and the auth authenticator must match that entry's authenticator)
+
+#### Config Change Entry
+
+A config change entry carries a signed **account-change batch** — the same `SignedAccountChanges` structure applied by the Keystore's single [`applySignedAccountChanges`](#account-config-change-paths) entry point. The batch binds a replay `channel` and a `sequence`, and applies its ordered list of changes atomically (any rejected change reverts the whole batch).
+
+##### Config Change Format
+
+```
+rlp([
+  0x01,               // type: config change
+  channel,            // uint8: 0 = Local (binds block.chainid), 1 = Multichain (binds chain_id 0)
+  sequence,           // uint64: Local  = local_epoch(high 32) || local_sequence(low 32)
+                      //         Multichain = a plain monotonic counter
+  changes,            // Array of account changes
+  auth                // Admin (scope == 0x00) signature over the batch digest
+])
+
+change = rlp([
+  change_type,        // uint8: 0 AuthorizeActor, 1 RevokeActor, 2 IncrementLocalEpoch,
+                      //        3 Lock, 4 Unlock, 5 SetActorPolicy
+  payload             // bytes: operation-specific, ABI-encoded (see below)
+])
+```
+
+The operation-specific `payload` is an opaque `bytes` blob carried in the RLP envelope but encoded with the contract ABI, so the same blob is decoded identically whether the change is applied natively or via `applySignedAccountChanges` on the Keystore contract. It is also the value hashed (as `keccak256(payload)`) in the [Config Change Signature Payload](#config-change-signature-payload).
+
+**Change types**:
+
+| change_type | Name | `payload` | Description |
+|-------------|------|-----------|-------------|
+| `0` | `AuthorizeActor` | `abi.encode(bytes32 actorId, ActorConfig config)` | Apply the EIP-8130 operation. When the resulting scope does not include `POLICY`, also clear `policy_manager` and `policy_commitment`. On the unsequenced path, an already-lapsed non-zero expiry is silently skipped; on a single-consume path it is installed inert. |
+| `1` | `RevokeActor` | `abi.encode(bytes32 actorId)` | Apply the EIP-8130 operation and clear `policy_manager` and `policy_commitment`. |
+| `2` | `IncrementLocalEpoch` | empty | Apply the EIP-8130 operation, invalidating sequenced and unsequenced local signatures at the prior epoch. |
+| `3` | `Lock` | `abi.encode(uint16 unlockDelay)` | **Local only, standalone.** Locks the account. See [Account Lock](#account-lock). |
+| `4` | `Unlock` | empty | **Local only, standalone.** Initiates unlock. See [Account Lock](#account-lock). |
+| `5` | `SetActorPolicy` | `abi.encode(bytes32 actorId, address manager, bytes32 commitment)` | **Local or Multichain.** Require an existing actor whose scope includes `POLICY`, then set its policy slots. Emits `ActorPolicySet`. |
+
+#### Config Change Authorization
+
+Each batch is authorized by a single **admin** signature (`scope == 0x00`; flat authorization, see [Actor Scope](#actor-scope)) over the batch digest. The `auth` follows the same [Signature Format](#signature-format) as `sender_auth` (`authenticator || data`) and, when a batch is applied inside a list, must be valid against the account's actor state *after all previous entries have been applied*. Anyone may relay; authorization comes from the signature.
+
+The `channel` selects the replay domain and how `sequence` is interpreted:
+
+- **Multichain** (`chain_id 0`): a plain monotonic `uint64` counter, valid on any chain, for synchronizing actor state across chains. Each applied batch consumes the counter (`sequence` MUST equal the current value, then it increments). There is no epoch and no unsequenced mode on this channel, though a Multichain batch MAY still carry an `IncrementLocalEpoch` change that bumps the account's local epoch.
+- **Local** (`block.chainid`): `sequence` is the packed word `local_epoch(high 32) || local_sequence(low 32)`. The batch is rejected with `StaleEpoch` unless its high half equals the current `local_epoch`. The low half selects one of two modes:
+  - **Sequenced** (low half `< UNSEQUENCED`): the low half MUST equal the current `local_sequence`; on success `local_sequence` increments. This is the ordered, replay-once mode.
+  - **Unsequenced / JIT** (low half `== UNSEQUENCED`, i.e. `uint32` max): consumes no counter and does not increment `local_sequence`. It is permissive: any change may ride an unsequenced batch and remains replayable until the epoch moves. Ordering between two unsequenced batches is undefined. Retiring an unsequenced authorization durably requires `IncrementLocalEpoch`. See [Unsequenced Change Mode](#unsequenced-change-mode).
+
+**Expiry on `AuthorizeActor` is channel/mode-aware and never reverts.** On the **unsequenced/JIT path**, an already-lapsed grant under the [EIP-8130 expiry rule](./eip-8130.md#actor-expiry-and-epoch) is silently skipped. A JIT grant is replayable, so skipping a lapsed one prevents it from overwriting a newer grant. A single-consume batch cannot be replayed, so an already-lapsed grant is instead installed inert and still consumes its sequence. A zero `expiry` is the "no expiry" sentinel and is always accepted.
+
+The combined local word (`local_epoch || local_sequence`) doubles as the initialized flag: creation and import set `local_sequence = 1`, so an all-zero word means uninitialized (only the implicit EOA is on the account).
+
+##### Config Change Signature Payload
+
+The batch digest is the EIP-8130 typed struct hash binding `account`, the resolved `chainId`, the `sequence` word, and the ordered `changes`. The extension change types use the same `change_type` and `keccak256(payload)` commitment. Domain separation from transaction signatures (`AA_TX_TYPE`, `AA_PAYER_TYPE`) is structural: transaction hashes use `keccak256(type_byte || rlp([...]))`, which cannot collide with the ABI-encoded struct hash.
+
+##### Account Config Change Paths
+
+The same signed batch (`SignedAccountChanges`) can be applied through two paths:
+
+- **`account_changes` (tx field)**: consumed by the protocol before code deployment on chains implementing this proposal.
+- **`applySignedAccountChanges` (EVM)**: applied during EVM execution on any chain, including ERC-4337 deployments.
+
+Both paths carry the same batch, share the same channels and counters, and are equally portable (Multichain for cross-chain, Local for chain-local). They differ only in transport. `applySignedAccountChanges` parses the authenticator from `auth`, resolves the admin `actorId`, verifies the batch digest, and applies each change in order per the [change-type table](#config-change-format). Anyone may call it; authorization comes from the signed batch, not the caller. Authority changes and delegation are blocked while the account is locked; only `Unlock` and `IncrementLocalEpoch` may be applied to a locked account (see [Account Lock](#account-lock)).
+
+#### Delegation Entry
+
+Delegation entries set [EIP-7702](./eip-7702.md)-style code delegation for the sender's account, replacing the need for an `authorization_list` in the transaction. Delegation is authorized by the transaction's `sender_auth`, no separate signature is required. The sender must have been **authenticated via the native secp256k1 path** (the EOA path or `K1_AUTHENTICATOR`; mirroring the [Implicit EOA Rule Scoping](#security-considerations)), with `actorId == bytes32(uint256(uint160(sender)))` and admin (`scope == 0x00`). A non-secp256k1 self authenticator that returns the self-actorId does not qualify, keeping delegation authority ECDSA/7702-portable.
+
+##### Delegation Format
+
+```
+rlp([
+  0x02,               // type: delegation
+  target              // address: delegate to this contract, or address(0) to clear
+])
+```
+
+The delegation is only permitted when:
+
+- `code_size(sender) == 0` (empty account), or
+- `code(sender)` starts with the delegation designator `0xef0100` (updating an existing delegation)
+
+It will not replace non-delegation bytecode.
+
+When `target` is `address(0)`, the delegation indicator is cleared and the account's code hash is reset to the empty code hash.
+
+For AA transactions, successful delegation updates emit a protocol-injected `DelegationApplied(account, target)` receipt log, where `target` is the delegated contract address (or `address(0)` when clearing delegation).
+
+#### Execution (Account Changes)
+
+`account_changes` entries are processed in order before call execution:
+
+1. **Create entry** (if present): apply the create entry (see [Create Entry](#create-entry)) — place `code` at `sender`, register `initial_actors` in Keystore storage, mark the account initialized (local channel = `1`), initialize lock state to safe defaults, and set `DEFAULT_EOA_REVOKED` unless a self-actor is among `initial_actors`.
+2. **Config change entries** (if any): Apply operations in entry order. Reject transaction if account is locked.
+3. **Delegation entries** (if any): Require admin EOA-actor delegation authority (see [Delegation Entry](#delegation-entry)). Reject if account is locked. For each entry, set `code(sender) = 0xef0100 || target` (or clear if `target` is `address(0)`). Reject if account has non-delegation bytecode.
+
+### Execution
+
+#### Call Execution
+
+The protocol dispatches calls directly from `sender` to each call's `to` address:
+
+| Parameter | Value |
+|-----------|-------|
+| `from` (caller) | `sender` (the sender) |
+| `to` | `call.to` |
+| `tx.origin` | `sender` |
+| `msg.sender` at target | `sender` |
+| `msg.value` | 0 |
+| `data` | `call.data` |
+
+Calls carry no ETH value. ETH transfers are initiated by the account's wallet bytecode via the CALL opcode (see [Why No Value in Calls?](#why-no-value-in-calls)).
+
+##### Call Phases
+
+`calls` is a two-level structure: an ordered array of **phases**, where each phase is an ordered array of individual calls (`[[call, ...], [call, ...]]`) — **sequentially-committed atomic call groups**. This gives two levels of atomicity where calls grouped within a phase are all-or-nothing, while phases commit independently in sequence.
+
+Phases execute in order from a single gas pool (`gas_limit`). Within each phase, calls execute in order and are **atomic** so if any call in a phase reverts, all state changes for that phase are discarded and remaining phases are **skipped**. Completed phases **persist** and their state changes are committed and survive later phase reverts.
+
+**Policy gate**: When the transaction's authenticating actor has `POLICY` set (and exclusivity checks passed), each call is gated before dispatch. The protocol resolves the actor's allowed target (`policy_manager(sender, actorId)`) once at the start of `calls` execution, and that snapshot gates every call in every phase; a config change applied by an earlier call does not retarget the gate for later calls. If `call.to` is not that address, the call is **not dispatched** and fails deterministically with the protocol revert `ActorPolicyViolation(bytes32 actorId, address target)`:
+
+```solidity
+error ActorPolicyViolation(bytes32 actorId, address target);
+```
+
+The frame's return data is `abi.encodeWithSelector(ActorPolicyViolation.selector, actorId, call.to)`. This is a consensus-level result, not a validity error, so standard atomicity applies: the enclosing phase's state changes roll back, later phases are skipped, and the phase is reported as failed in `phaseStatuses`. Only work already performed is charged (intrinsic gas plus the one `policy_manager` SLOAD); the undispatched call body costs nothing and the transaction is still included with its nonce consumed.
+
+**Common patterns**:
+
+- **Simple call**: `[[call]]`, one phase, one call (`call = rlp([to, data])`)
+- **Atomic batch**: `[[call_a, call_b, call_c]]`, one phase, all-or-nothing
+- **Sponsor + user**: `[[sponsor_payment], [user_action_a, user_action_b]]`, sponsor in phase 0 (committed), user actions in phase 1 (atomic, skipped if sponsor fails)
+
+#### Transaction Context
+
+The Transaction Context precompile at `TX_CONTEXT_ADDRESS` provides read-only access to the current AA transaction's metadata. It reads directly from the client's in-memory transaction state; protocol "writes" are effectively zero-cost. Gas is charged as a base cost plus 3 gas per 32 bytes of returned data, matching `CALLDATACOPY` pricing.
+
+The static, sender-signed fields (`sender`, `payer`, `calls`, `gas_limit`) are populated during authentication and call execution, so a payer authenticator can inspect the transaction it is being asked to sponsor and decide on chain, at validation time, whether to pay. The authenticated `actorId` is resolved only after authentication succeeds, so it is available during execution only.
+
+| Function | Returns | Available |
+|----------|---------|-----------|
+| `getTransactionSender()` | `address`, the account executing calls (`sender`) | Validation + Execution |
+| `getTransactionPayer()` | `address`, gas payer (`sender` for self-pay, payer for sponsored) | Validation + Execution |
+| `getTransactionCalls()` | `Call[][]`, the full `calls` array (`Call = (address to, bytes data)`) | Validation + Execution |
+| `getTransactionGasLimit()` | `uint256`, the sender-side gas budget (`gas_limit`) before intrinsic costs and call execution | Validation + Execution |
+| `getTransactionSenderActorId()` | `bytes32`, authenticated actor's actorId | Execution only |
+
+Under the [L1 profile](#adoption-profiles) this getter set and its validation-time availability are normative; under the L2 profile a chain MAY populate the precompile during execution only.
+
+If the wallet needs the authenticator address or scope, it calls `getActorConfig(account, actorId)` on the Keystore contract. A policy target reached as a `call.to` identifies which key it is acting for by combining `getTransactionSender()` and the authenticated `getTransactionSenderActorId()` from this precompile, then reads the actor's gate target and signed `commitment` via `getActor(account, actorId)` in one call and validates the presented policy parameters against the commitment. The commitment lives in Keystore storage (where it is written and revoked), not the precompile, keeping the precompile to immutable transaction context.
+
+**Chains without this transaction type**: No code at `TX_CONTEXT_ADDRESS`; `STATICCALL` returns zero/default values.
+
+### Portability
+
+The system is split into storage and authentication layers with different portability characteristics:
+
+| Component | Chains implementing this proposal | Other EIP-8130 chains |
+|-----------|-------------|-----------------|
+| **Keystore contract** | Protocol reads storage directly for validation; EVM interface available | Standard contract (ERC-4337 compatible factory) |
+| **Authenticator Contracts** | Protocol calls authenticators via `STATICCALL` | Same on-chain contracts callable by the Keystore contract and wallets |
+| **Code Delegation** | Delegation entry in `account_changes` (EOA-only authorization in this version) | Standard [EIP-7702](./eip-7702.md) transactions (ECDSA authority) |
+| **Transaction Context** | Precompile at `TX_CONTEXT_ADDRESS`; protocol populates, authenticators read | No code at address; STATICCALL returns zero/default values |
+| **Nonce Manager** | Precompile at `NONCE_MANAGER_ADDRESS` | Not applicable; nonce management by existing systems (e.g., ERC-4337 EntryPoint) |
+
+All contracts are deployed at deterministic CREATE2 addresses across chains.
+
+### Validation Flow
+
+#### Mempool Acceptance
+
+1. Parse and structurally validate `sender_auth`. Verify `account_changes` contains at most one create entry (type `0x00`, must be first) and at most one delegation entry (type `0x02`). Nodes SHOULD enforce a configurable limit on the number of config change entries (type `0x01`).
+2. Resolve sender: if `sender` set, use it; if empty, ecrecover from `sender_auth`
+3. Determine effective actor state:
+   a. If create entry present in `account_changes`: verify address derivation, `code_size(sender) == 0`, use `initial_actors`
+   b. Else: read from Keystore storage
+4. If config change or delegation entries present in `account_changes`: reject if account is locked (see [Account Lock](#account-lock)). For config change entries: simulate applying operations in sequence, skip already-applied entries. For delegation entries: verify `code_size(sender) == 0` or existing delegation designator.
+5. Validate `sender_auth` against resulting actor state (see [Validation](#validation)) and check scope per [Actor Scope](#actor-scope): SENDER (or `POLICY`) for the sender context, and admin or `NONCE` when `nonce_key != NONCE_KEY_MAX`. Payer scope (SELF_PAYER / SPONSOR_PAYER) is checked in step 6, not here — the sender actor is not required to carry a payer bit. If delegation entries are present, the resolved actor must additionally hold admin EOA-actor delegation authority (see [Delegation Entry](#delegation-entry)).
+6. Resolve payer from `payer` and `payer_auth`:
+   - `payer` empty and `payer_auth` empty: self-pay. Payer is `sender`; the resolved sender actor's SELF_PAYER scope authorizes payment. Reject if balance insufficient.
+   - `payer` = `sender` (explicit) with `payer_auth`: self-pay via a dedicated gas key. Payer account == sender; validate `payer_auth` against the account's `actor_config` and require SELF_PAYER scope on the resolved actor. Reject if balance insufficient.
+   - `payer` = a different 20-byte address (sponsored): `payer_auth` uses any authenticator. Validate `payer_auth` against the `payer` address's `actor_config`. Require SPONSOR_PAYER scope on the resolved actor.
+   - In every mode, reject the transaction if the resolved `payer_auth_cost` exceeds `MAX_AUTHENTICATION_GAS`, so total gas stays within `effective_gas_limit = gas_limit + MAX_AUTHENTICATION_GAS` (see [Intrinsic Gas](#intrinsic-gas)).
+7. Verify nonce, payer ETH balance, and validity bounds. The transaction's validity window and the resolved actor's liveness are all checked and MUST hold: after normalizing `valid_after`/`valid_before` to milliseconds (see [Timestamp Normalization](#field-definitions)), the transaction is valid only when `valid_after == 0 || valid_after <= block.timestamp * 1000` and `valid_before == 0 || block.timestamp * 1000 <= valid_before`, and the resolved actor satisfies the [EIP-8130 expiry rule](./eip-8130.md#actor-expiry-and-epoch). Any bound violation rejects the transaction. Regardless of nonce mode, nodes MAY also reject a transaction whose `valid_before` is too near to be reliably included, and MAY reject rather than hold one whose `valid_after` is not yet active.
+   - **Standard keys** (`nonce_key != NONCE_KEY_MAX`): require `nonce_sequence == current_sequence(sender, nonce_key)`.
+   - **Nonce-free key** (`nonce_key == NONCE_KEY_MAX`): skip nonce check, require `nonce_sequence == 0`, require non-zero `valid_before`, and reject if `valid_before` is farther out than `NONCE_FREE_EXPIRY_WINDOW` (the chain parameter bounded by `REPLAY_BUFFER_CAPACITY`, see [Nonce-Free Mode](#nonce-free-mode-nonce_key_max)). Deduplicate by the [Replay Identifier](#replay-identifier) (`replay_id`), not the full transaction hash.
+8. Mempool threshold: gas payer's pending count below node-configured limits.
+9. Apply [Mempool Replacement](#mempool-replacement) rules: for standard and 2D transactions (`nonce_key != NONCE_KEY_MAX`), when a pending transaction from the same `sender` shares this transaction's `(nonce_key, nonce_sequence)`; for nonce-free transactions (`nonce_key == NONCE_KEY_MAX`), when a pending transaction from the same `sender` shares this transaction's `replay_id`.
+
+Nodes recognize the enshrined canonical authenticator set and authenticate any other accepted authenticator via a single `STATICCALL` bounded by `MAX_AUTHENTICATION_GAS`, per the [Canonical Authenticator Set](#canonical-authenticator-set) rules.
+
+Nodes MAY apply higher pending transaction rate limits based on account lock state. A node can cheaply read the packed account-state slot and grant the higher tier when the account is `LOCKED`, has **no pending unlock** (`UNLOCK_INITIATED` clear), and carries an `unlock_delay` at or above the node's threshold (e.g. ≥ 6 hours) — the actor set is then frozen for at least that window:
+
+- **Locked sender**: A locked `sender` account has a stable signature if combined with a stateless authenticator. Nodes can safely allow a higher sender rate.
+- **Locked payer with trusted bytecode**: A locked `payer` account whose bytecode is recognized (e.g. a canonical account implementation that restricts ETH movement while locked) provides an additional guarantee that ETH balance only decreases via gas fees. Nodes can safely allow a higher payer rate for such accounts, supporting high-throughput payer/sponsor services.
+
+#### Block Execution
+
+1. If `account_changes` contains config change or delegation entries, read lock state for `sender`. Reject transaction if account is locked. If delegation entries are present, require admin EOA-actor delegation authority (see [Delegation Entry](#delegation-entry)).
+2. ETH gas precharge from payer (`sender` for self-pay). The payer is precharged for the whole transaction, `effective_gas_limit × max_fee_per_gas`, which reserves `gas_limit` plus `payer_auth_cost` (payer authentication execution and its serialized `payer_auth` bytes, both metered outside `gas_limit`; see [Intrinsic Gas](#intrinsic-gas)). The block reserves `effective_gas_limit` against its gas target for the same reason. Transaction is invalid if the payer's balance cannot cover the precharge.
+3. If `nonce_key != NONCE_KEY_MAX`, increment nonce in Nonce Manager storage for `(sender, nonce_key)`. If `nonce_key == NONCE_KEY_MAX`, skip (nonce-free mode).
+4. If `code_size(sender) == 0` and no create entry and no delegation entry is present in `account_changes`, auto-delegate `sender` to `DEFAULT_ACCOUNT_ADDRESS` (set code to `0xef0100 || DEFAULT_ACCOUNT_ADDRESS`). This delegation persists. A delegation entry that clears the indicator (`target = address(0)`) returns the account to code-less state, but auto-delegation re-applies on its next transaction: a code-less account cannot permanently opt out of auto-delegation without placing non-delegation bytecode (e.g. via a create entry).
+5. Process `account_changes` entries in order (see [Execution (Account Changes)](#execution-account-changes)).
+6. Set the authenticated `actorId` on the Transaction Context precompile. The static sender-signed fields (`sender`, `payer`, `calls`, `gas_limit`) are already exposed from validation onward; `actorId` becomes readable from this point (execution).
+7. Execute `calls` per [Call Execution](#call-execution) semantics.
+
+Settlement charges the payer for gas actually used, sender-intrinsic gas plus executed `calls` (together bounded by `gas_limit`) plus `payer_auth_cost`, and refunds the remainder of the precharge. Because `payer_auth_cost` is metered outside `gas_limit`, it is charged in full and is never part of the refundable unused-`gas_limit` amount. For step 5, the protocol SHOULD inject log entries into the transaction receipt matching the EIP-8130 and extension events, following the protocol-injected log pattern established by [EIP-7708](./eip-7708.md). These protocol-injected logs are emitted only for AA transactions.
+
+### RPC Extensions
+
+**`eth_getTransactionCount`**: Extended with optional `nonceKey` parameter (`uint256`) to query 2D nonce channels. Reads from the Nonce Manager precompile at `NONCE_MANAGER_ADDRESS`.
+
+**`eth_getTransactionReceipt`**: AA transaction receipts include:
+
+- `payer` (address): Gas payer address (`sender` for self-pay, specified payer for sponsored).
+- `status` (uint8): `0x01` = all phases succeeded (or `calls` was empty), `0x00` = one or more phases reverted. Existing tools checking `status == 1` remain correct for the success path. **`status == 0` does not imply "no state change."** Committed earlier phases (the sponsor pattern relies on this), auto-delegation, applied `account_changes`, nonce consumption, and gas payment all persist through a later phase revert. Consumers MUST NOT treat a failed AA receipt as a no-op. `gasUsed` includes `payer_auth_cost` (see [Intrinsic Gas](#intrinsic-gas)).
+- `phaseStatuses` (uint8[]): Per-phase status array. Each entry is `0x01` (success) or `0x00` (reverted). Phases after a revert are not executed and reported as `0x00`. Empty if `calls` was empty.
+
+**`eth_estimateGas`** / **`eth_call`**: Accept the AA transaction fields (`sender`, `nonceKey`, `accountChanges`, `calls`, `validAfter`, `validBefore`, `metadata`, `payer`, `senderAuth`, `payerAuth`) alongside the standard request object and price the request as an `AA_TX_TYPE` transaction. Because authentication gas is determined by the auth blob's *shape* rather than a valid signature (see [Intrinsic Gas](#intrinsic-gas)), the request is priced from an **unsigned** representative blob; no signature is produced or verified. The sender is taken from `sender` or the standard `from` (equivalently) and if both are present they MUST be equal.
+
+### Constants
+
+| Name | Value | Comment |
+|------|-------|---------|
+| `AA_TX_TYPE` | `0x79` | [EIP-2718](./eip-2718.md) transaction type |
+| `AA_PAYER_TYPE` | `0x7A` | Magic byte for payer signature domain separation |
+| `REPLAY_ID_TYPE` | `0x7901` | Magic prefix for `replay_id` domain separation (see [Replay Identifier](#replay-identifier)) |
+| `AA_BASE_COST` | 15000 | Base intrinsic gas cost |
+| `KEYSTORE_ADDRESS` | CREATE2-derived (resolved at deployment) | Keystore system contract address |
+| `K1_AUTHENTICATOR` | `address(1)` | Native secp256k1 (ECDSA) authenticator (implicit default EOA and explicitly registered k1 actors) |
+| `CONTRACT_ESTABLISHED` | `0x01` | Account-state `flags` bit marking a keystore-established account (see [Account Establishment](#account-establishment)) |
+| `DEFAULT_EOA_REVOKED` | `0x02` | Account-state `flags` bit that disables the implicit default-EOA path |
+| `LOCKED` | `0x04` | Account-state `flags` bit that freezes actor configuration (see [Account Lock](#account-lock)) |
+| `UNLOCK_INITIATED` | `0x08` | Account-state `flags` bit selecting the `lock_union` interpretation (`unlock_delay` vs `unlocks_at`) |
+| `NONCE_MANAGER_ADDRESS` | `0x813000000000000000000000000000000000aa01` | Nonce Manager precompile address |
+| `TX_CONTEXT_ADDRESS` | `0x813000000000000000000000000000000000aa02` | Transaction Context precompile address |
+| `DEFAULT_ACCOUNT_ADDRESS` | CREATE2-derived (resolved at deployment) | Default wallet implementation for auto-delegation |
+| `NONCE_KEY_MAX` | `2^256 - 1` | Nonce-free mode (validity-window replay protection) |
+| `TIMESTAMP_MS_THRESHOLD` | `100_000_000_000` | Heuristic unit-detection boundary for `valid_after`/`valid_before`: values below are seconds, values at or above are milliseconds. See [Timestamp Normalization](#field-definitions) |
+| `REPLAY_BUFFER_CAPACITY` | chain parameter | Fixed capacity of the nonce-free `replay_id` ring buffer; identical for every node on the chain (consensus). See [Nonce-Free Mode](#nonce-free-mode-nonce_key_max) |
+| `MAX_AUTHENTICATION_GAS` | configurable (suggested 100,000) | Ceiling on a single authenticator's execution: the `STATICCALL` gas cap for a non-canonical authenticator, and the bound on payer-authentication gas metered outside `gas_limit` (`effective_gas_limit = gas_limit + MAX_AUTHENTICATION_GAS`). Fixed under consensus on the L1 profile. See [Intrinsic Gas](#intrinsic-gas) |
+
+### Appendix: Deployment Header
+
+The `DEPLOYMENT_HEADER(n)` is a 14-byte EVM loader that copies trailing code into memory and returns it. The header encodes code length `n` into its `PUSH2` instructions:
+
+```
+DEPLOYMENT_HEADER(n) = [
+  0x61, (n >> 8) & 0xFF, n & 0xFF,     // PUSH2 n        (code length)
+  0x60, 0x0E,                          // PUSH1 14       (offset: code starts after 14-byte header)
+  0x60, 0x00,                          // PUSH1 0        (memory destination)
+  0x39,                                // CODECOPY       (copy code from code[14..] to memory[0..])
+  0x61, (n >> 8) & 0xFF, n & 0xFF,     // PUSH2 n        (code length)
+  0x60, 0x00,                          // PUSH1 0        (memory offset)
+  0xF3                                 // RETURN         (return code from memory)
+]
+```
+
+The create entry only supports runtime bytecode. Delegation is set via delegation entries (type `0x02`) in `account_changes`.
+
+## Rationale
+
+### Why Authenticator Contracts?
+
+Enables signature-algorithm extension through authenticator contracts. The authenticator returns the `actorId` rather than accepting it as input, so the protocol never needs algorithm-specific logic. All authenticators share a single `authenticate(hash, data)` interface with no type-based dispatch. Actor scope and policy provide protocol-enforced role separation without authenticator cooperation.
+
+### Why a Canonical Authenticator Set?
+
+Without a required authenticator set, nodes could diverge on which signature algorithms they accept beyond `K1_AUTHENTICATOR`. Wallets would face a fragmented network where each node accepts a different combination of algorithms, making it impossible to guarantee transaction delivery for non-k1 signature types.
+
+The canonical set establishes a shared baseline where wallets that use canonical authenticators know their transactions will be accepted by any compliant node. The set is expected to remain small, with new algorithms added through the companion ERC process as they gain broad adoption.
+
+### Why Two Adoption Profiles?
+
+On a base layer the gas schedule and the set of consensus-relevant checks *are* the specification: if two nodes could disagree on the intrinsic-gas schedule, on which authenticators are accepted, or on how they are priced, they could disagree on block validity, a chain-split risk. Leaving those knobs "chain MAY choose" turns one specification into a family of subtly different protocols: acceptable for an L2 or application chain, but not for L1.
+
+The two [adoption profiles](#adoption-profiles) make that split explicit rather than implicit. The **L1 profile** enshrines every consensus-critical parameter (the gas schedule, the canonical authenticator set, and the pricing of enshrined authenticators), so that two independent implementations agreeing on this document produce identical block validity, and changing any of them requires a hard fork rather than an off-chain configuration or companion-ERC rollout. The **L2 profile** keeps the flexibility that lets a faster-moving chain track a local cost model or a future EVM repricing, at the cost of cross-chain uniformity. Because transaction semantics are identical across both, a wallet targeting the canonical set and the recommended schedule is portable regardless of which profile a chain runs.
+
+### Why Actor Policies?
+
+Session keys often need narrow authority: only this token, only this much per day, only this action. `POLICY` makes gated initiation a first-class grant, distinct from ungated `SENDER`: the key may originate transactions, but only to a single call target, bound to a signed opaque **commitment**. The protocol's only policy responsibility is the single-target gate plus storing the commitment. Allowing `POLICY | SELF_PAYER` lets a session key self-pay; note this exposes the account's full ETH balance to gas spend (see [Payer Modes](#payer-modes)).
+
+### Why Unsequenced Changes?
+
+EIP-8130 supplies the local epoch and sequenced change channel. The `UNSEQUENCED` sentinel lets independent session-key or just-in-time authorizations land without contending for the next sequence. Such a batch is intentionally replayable within its epoch; durable retirement is an epoch increment, typically batched with the reducing authority change.
+
+### Why No Public Key Storage?
+
+Authenticators receive the public key or full credential in transaction calldata and recover the `actorId` from it, rather than the protocol storing keys on chain. This keeps per-actor state to a single `actor_config` SLOAD regardless of key size, which matters most for large post-quantum credentials.
+
+### Why Not Reject Scope Combinations at Write Time?
+
+The Keystore stores the EIP-8130 scope word verbatim because future extensions may define new grant combinations. Combination semantics are checked at the point of use, so an unsatisfiable combination is simply inert.
+
+### Why 2D Nonce + `NONCE_KEY_MAX`?
+
+Additional `nonce_key` values allow parallel transaction lanes without nonce contention between independent workflows.
+
+`NONCE_KEY_MAX` enables nonce-free transactions where replay protection comes from a short-lived validity window (`valid_before`) and node-level deduplication by the fee- and signature-invariant [Replay Identifier](#replay-identifier). This is useful for operations where nonce ordering coordination is undesirable. Reserving `NONCE_KEY_MAX` as the sentinel permanently removes one channel from the `2^256`-wide nonce space, which is immaterial in practice; `NONCE_KEY_MAX` is always nonce-free and is never a sequenced channel, even for an actor holding `NONCE` scope.
+
+### Why Account Lock?
+
+Locked accounts have a frozen actor set, so the primary state that can invalidate a validated transaction is nonce consumption. This can enable nodes to cache actor state and apply higher mempool rate limits (see [Mempool Acceptance](#mempool-acceptance)). A locked payer running a canonical account implementation that restricts ETH movement while locked further bounds balance changes to gas fees, letting nodes raise payer rate limits, useful for high-throughput payer/sponsor services.
+
+### Why CREATE2 for Account Creation?
+
+The create entry uses the CREATE2 address formula with `KEYSTORE_ADDRESS` as the deployer address for cross-chain portability:
+
+1. **Deterministic addresses**: Same `user_salt + code + initial_actors` produces the same address on any chain
+2. **Pre-deployment funding**: Users can receive funds at counterfactual addresses before account creation
+3. **Portability**: The same `deployment_code` produces the same address on every compatible EIP-8130 chain (see [Address Derivation](#address-derivation))
+4. **Front-running prevention**: `initial_actors` in the salt prevents attackers from deploying with different actors (see [Create Entry](#create-entry))
+
+### Why Delegation via Account Changes?
+
+[EIP-7702](./eip-7702.md) introduced `authorization_list` as a transaction-level field for code delegation, with ECDSA authority. This proposal moves delegation into `account_changes`, authorized by the transaction's `sender_auth`. Delegation is restricted to senders authenticated through the native secp256k1 path so that it remains portable to chains using standard EIP-7702 transactions.
+
+### External Account Factories
+
+Account creation, import, signed actor changes, and locking are ordinary EVM entry points on the Keystore contract, so external factories can compose them to mint accounts into a desired end state. This is always possible in EVM but is not available on the AA transaction path.
+
+*Non-normative future work:* once [EIP-7819](./eip-7819.md) is adopted, the protocol could be extended with a single canonical external factory. The create entry would emit an [EIP-7702](./eip-7702.md) delegation prefix and deploy the account from that factory, which uses Keystore contract state to check the signature and upgrade, extending the delegation account change to all authenticator types rather than the native secp256k1 EOA only as today.
+
+### Why a Metadata Field?
+
+Attribution and annotation data (builder/app codes, payment references, off-chain commitments) traditionally ride as a trailing "data suffix" on `tx.input`. The structured `calls` array has no such trailing location, so a dedicated optional `metadata` field gives this data a first-class, signed home without overloading a call. Binding it into both signature payloads makes it tamper-evident.
+
+### Why No Value in Calls?
+
+The protocol dispatches each call directly to the specified `to` address with `msg.sender = sender`. Since every account has wallet bytecode (via auto-delegation or explicit deployment), ETH transfers route through wallet code via the CALL opcode; no capability is lost. Removing protocol-level value from calls means the protocol never moves ETH on behalf of the sender.
+
+### Why a Transaction Context Precompile?
+
+Transaction context (sender, payer, calls, gas_limit) is immutable transaction metadata; it never changes during execution, and `actorId` is set after validation and available during execution only. A precompile is the natural fit: it reads directly from the client's in-memory transaction struct, consumers pull only what they need, and new context fields are added as new functions without changing `IAuthenticator` or existing authenticators. Exposing `calls` and `gas_limit` from validation is what lets sponsorship be an on-chain decision rather than an off-chain co-signing step.
+
+## Backwards Compatibility
+
+No breaking changes. Existing EOAs and smart contracts function unchanged. Adoption is opt-in:
+
+- EOAs continue sending standard transactions
+- ERC-4337 infrastructure continues operating
+- Accounts gain AA capabilities by configuring actors. EOAs sending their first AA transaction are auto-delegated to `DEFAULT_ACCOUNT_ADDRESS` if they have no code. EOAs MAY override with a delegation entry in `account_changes` (EOA-only authorization), a standard [EIP-7702](./eip-7702.md) transaction, or use a create entry in `account_changes` for custom wallet implementations
+
+EIP-8130 defines the base `actor_config` layout, change channels, and address commitment. This proposal assigns the reserved `POLICY` and `NONCE` bits and adds side storage without changing the base actor representation or address derivation.
+
+## Reference Implementation
+
+### IKeystore
+
+The following sketch shows the EIP-8130 interface with this proposal's additions.
+
+```solidity
+pragma solidity ^0.8.0;
+
+interface IExtendedKeystore {
+    // Packed account state (see Account Lock). The signed local word is localEpoch(high 32) || localSequence(low 32).
+    struct ChangeSequences {
+        uint64 multichain;    // chain_id 0 channel; a plain monotonic counter
+        uint32 localEpoch;    // local channel epoch; IncrementLocalEpoch bumps it and resets localSequence to 0
+        uint32 localSequence; // local channel counter; low half of the signed local word
+    }
+
+    struct ActorConfig {
+        address authenticator;
+        uint48 expiry;        // Unix seconds; 0 = no expiry. Actor invalid once block.timestamp > expiry
+        uint16 scope;         // grants bitmask; 0x0000 = unrestricted (admin). See Actor Scope
+    }
+
+    // This is byte-compatible with the EIP-8130 initial actor.
+    struct InitialActor {
+        bytes32 actorId;
+        address authenticator;
+        uint16 scope;
+    }
+
+    enum AccountChangeChannel { Local, Multichain }
+    enum ChangeType { AuthorizeActor, RevokeActor, IncrementLocalEpoch, Lock, Unlock, SetActorPolicy }
+    // Leading byte of a signature envelope: Local (0x01) binds block.chainid, Multichain (0x02) binds chainId 0.
+    enum SignatureType { Invalid, Local, Multichain }
+
+    struct AccountChange {
+        ChangeType changeType;
+        bytes payload;
+    }
+
+    struct SignedAccountChanges {
+        AccountChangeChannel channel;
+        uint64 sequence;      // Local: localEpoch || localSequence; Multichain: monotonic counter
+        AccountChange[] changes;
+        bytes signature;      // admin (scope == 0x00): authenticator || data
+    }
+
+    uint32 constant UNSEQUENCED = type(uint32).max; // JIT sentinel for the local low half
+
+    event ActorAuthorized(address indexed account, bytes32 indexed actorId, bytes actorData);
+    event ActorRevoked(address indexed account, bytes32 indexed actorId);
+    event AccountCreated(address indexed account, bytes32 userSalt, bytes32 codeHash);
+    event AccountImported(address indexed account);
+    event LocalEpochIncremented(address indexed account, uint32 localEpoch);
+    event DelegationApplied(address indexed account, address target);
+    event AccountLocked(address indexed account, uint16 unlockDelay);
+    event AccountUnlockInitiated(address indexed account, uint48 unlocksAt);
+    event ActorPolicySet(address indexed account, bytes32 indexed actorId, address manager, bytes32 commitment);
+
+    // Account creation (factory) and counterfactual address preview.
+    function createAccount(bytes32 userSalt, bytes calldata bytecode, InitialActor[] calldata initialActors) external returns (address);
+    function computeAddress(bytes32 userSalt, bytes calldata bytecode, InitialActor[] calldata initialActors) external view returns (address);
+
+    // Import an existing account (ERC-1271). chainId: 0 = multichain; else MUST equal block.chainid.
+    function importAccount(address account, uint256 chainId, InitialActor[] calldata initialActors, bytes calldata signature) external;
+
+    // Single signed entry point for all account changes (authorize/revoke actor, increment epoch, lock/unlock).
+    function applySignedAccountChanges(address account, SignedAccountChanges calldata changes) external;
+
+    // Typed-envelope message signing (see Signature Verification). Returns the verified signer and its authority
+    // — the "who signed" + granular authority that plain ERC-1271 lacks. auth = sigType(1) || authenticator(20) || data.
+    function validateSignature(address account, bytes32 hash, bytes calldata auth) external view returns (bytes32 actorId, uint16 scope);
+    // Envelope digest a signer signs: keccak256(SIGNED_MESSAGE_TYPEHASH, account, chainId, hash). chainId 0 = all chains.
+    function replaySafeHash(address account, uint256 chainId, bytes32 hash) external pure returns (bytes32);
+    function envelopeDigest(SignatureType sigType, address account, bytes32 hash) external view returns (bytes32);
+    // Base EIP-8130 authentication primitive.
+    function authenticateActor(address account, bytes32 hash, bytes calldata auth) external view returns (bytes32 actorId, uint16 scope);
+
+    function getActorConfig(address account, bytes32 actorId) external view returns (ActorConfig memory);
+    function getActor(address account, bytes32 actorId) external view returns (ActorConfig memory config, address policyManager, bytes32 policyCommitment);
+    function getChangeSequences(address account) external view returns (ChangeSequences memory);
+    function getLockStatus(address account) external view returns (bool locked, bool hasInitiatedUnlock, uint48 unlocksAt, uint16 unlockDelay);
+    function isContractEstablished(address account) external view returns (bool); // keystore-established, not a proven address key
+}
+```
+
+### IAuthenticator
+
+```solidity
+interface IAuthenticator {
+    function authenticate(
+        bytes32 hash,
+        bytes calldata data
+    ) external view returns (bytes32 actorId);
+}
+```
+
+### ITransactionContext (Precompile)
+
+```solidity
+interface ITransactionContext {
+    struct Call {
+        address to;
+        bytes data;
+    }
+
+    function getTransactionSender() external view returns (address);
+    function getTransactionPayer() external view returns (address);
+    function getTransactionCalls() external view returns (Call[][] memory);
+    function getTransactionGasLimit() external view returns (uint256);
+    function getTransactionSenderActorId() external view returns (bytes32);
+}
+```
+
+Read-only. Gas is charged as a base cost plus 3 gas per 32 bytes of returned data. `getTransactionSender`, `getTransactionPayer`, `getTransactionCalls`, and `getTransactionGasLimit` read static sender-signed fields and are available during both authentication and call execution; `getTransactionSenderActorId` is available during execution only (the actor is resolved after authentication).
+
+### INonceManager (Precompile)
+
+```solidity
+interface INonceManager {
+    function getNonce(address account, uint256 nonceKey) external view returns (uint64);
+}
+```
+
+Read-only. The protocol manages nonce storage directly; there are no state-modifying functions. Gas is charged as a base cost plus a cold SLOAD (2,100 gas) for the first read of a given `(account, nonceKey)` pair in the transaction, or a warm SLOAD (100 gas) for subsequent reads of the same slot, consistent with [EIP-2929](./eip-2929.md) access rules.
+
+## Security Considerations
+
+**Validation Surface**: For canonical authenticators, invalidators are `actor_config` changes and nonce consumption. Canonical authenticators are pure functions of `(hash, data)` and the resolved `actor_config`, so a validated transaction is invalidated only by those two events, keeping the mempool invalidator set small and enumerable (this is why a canonical-only acceptance policy suits high-throughput chains).
+
+A **permissive** acceptance policy (see [Adoption Profiles](#adoption-profiles)) deliberately widens this surface: accepting non-canonical authenticators on the transaction path means accepting authenticators that may read mutable state, so an accepted transaction can be invalidated by state beyond `actor_config` and the nonce, and a node MUST run additional mempool-validation machinery to bound that. The execution cost is bounded per call by `MAX_AUTHENTICATION_GAS`; the extra machinery is about invalidation tracking, not unbounded execution.
+
+**Replay Protection**: Transactions include `chain_id`, 2D nonce (`nonce_key`, `nonce_sequence`), and a validity window (`valid_after`, `valid_before`). For standard and 2D transactions (`nonce_key != NONCE_KEY_MAX`), replay protection and deduplication are provided by the nonce sequence: inclusion increments `(sender, nonce_key)`, so a given `(sender, nonce_key, nonce_sequence)` can be included at most once. `replay_id` does not apply to these transactions. For `NONCE_KEY_MAX` (nonce-free mode), there is no nonce slot, so replay protection relies on the short-lived `valid_before` bound and deduplication by the fee- and signature-invariant [Replay Identifier](#replay-identifier) (`replay_id`); the chain enforces a tight window (`NONCE_FREE_EXPIRY_WINDOW`) to bound it, and block builders MUST NOT include two transactions with the same `(sender, replay_id)` (see [Mempool Replacement](#mempool-replacement)).
+
+The full transaction hash MUST NOT be used for nonce-free deduplication or mempool replacement. The transaction hash commits to fee fields (`max_fee_per_gas`, `max_priority_fee_per_gas`, `gas_limit`) and to `sender_auth` and `payer_auth` (the authorization blobs), all of which `replay_id` excludes. Keying on the transaction hash would allow trivial duplication of a single logical transaction, or would treat an intentional fee bump as an unrelated transaction:
+
+- **Fee bumps**: a legitimate replacement raising `max_priority_fee_per_gas` (or `max_fee_per_gas`) changes the transaction hash while leaving the effects, `calls`, `metadata`, validity window (`valid_after`, `valid_before`), and `payer` identical. `replay_id` is unaffected, so the bump is recognized as a replacement of the same logical transaction rather than a distinct one; the bumped transaction still requires a fresh `payer_auth` when sponsored, since `payer_auth` commits to the fee fields.
+- **Re-signed `payer_auth`**: the sender signs over the `payer` *address* but not the payer's signature bytes, so a sponsor can produce a different `payer_auth` for the same sender body, yielding a different transaction hash for the same logical transaction.
+- **`sender_auth` non-determinism**: ECDSA signing is randomized (a fresh nonce `k` produces a different valid `(r, s)` for the same message and key) and signatures are additionally malleable, so the same key can produce multiple distinct-but-valid `sender_auth` values for one transaction body. Each recovers the same sender yet yields a different transaction hash.
+
+All three cases resolve to the same `replay_id` (fee bumps included, since `replay_id` excludes the fee fields), so deduplicating and replacing on it collapses them to a single mempool slot and, ultimately, a single includable transaction. The validity window cannot be extended via a fee-bump replacement: `valid_after` and `valid_before` are part of `replay_id`, so changing either produces a different `replay_id` and a new logical transaction, not a replacement of the old one which must independently satisfy nonce/sequence and mempool acceptance rules.
+
+**Actor Scope and Policy**: Scope grants are protocol-enforced after authenticator execution during validation (fail closed). The policy gate is protocol-enforced during execution (`ActorPolicyViolation`). See [Actor Scope](#actor-scope) and [Actor Policies](#actor-policies).
+
+**Policy Target as Trust Anchor**: For a policy-bearing actor, the resolved target is fully trusted to enforce the committed limits; the key can only reach that target, which decides what happens next. A buggy or malicious manager can do anything its own authority over the account allows. Accounts SHOULD point restricted keys only at audited managers and treat installing one with the same care as granting that contract authority over the account. A manager (and any policy it enforces) SHOULD be non-upgradeable: an upgradeable manager lets whoever controls the upgrade rewrite enforcement, which is equivalent to granting that party root access over everything the manager can do for the account. The committed parameters and any target-held state are the target's own authorization surface; checking that `keccak256(params)` matches the stored commitment is the target's responsibility, not the protocol's. How the target obtains authority to act for the account is out of scope for this specification.
+
+**Policy State on Revocation**: `revokeActor` clears `actor_config`, `policy_commitment`, and `policy_manager` (all keyed by `(account, actorId)`), which immediately stops the key from reaching its target; there are no per-target protocol entries to enumerate or resurrect, and storage is fully reclaimed. Any parameters a target keeps in its own storage are not protocol state and are not auto-cleared; wallets uninstall them through the target when retiring a key, and an `expiry` bounds the window during which a not-yet-uninstalled key could otherwise be used.
+
+**Actor Management**: Config change authorization requires the authorizing actor be admin (`scope == 0x00`). The EOA actor is implicitly authorized with unrestricted (admin) scope; revocable via portable config change. All actor modification paths are blocked when the account is locked.
+
+**Actor Expiry**: Prefer non-expiring admins and apply `expiry` only to restricted keys; a sole expiring admin can make the account unusable. See the [EIP-8130 expiry rule](./eip-8130.md#actor-expiry-and-epoch).
+
+**Local Epoch and Outstanding Signatures**: `IncrementLocalEpoch` cancels every unlanded local signature at the prior epoch, including unsequenced batches; it does not revoke live actors or affect the multichain channel. Because an unsequenced batch is replayable within its epoch, wallets MUST treat epoch increment, not mere non-inclusion, as its durable retirement.
+
+**Implicit EOA Rule Scoping**: The implicit EOA authorization rule only applies when authentication used the native secp256k1 path, either the EOA path (`sender` empty) or `K1_AUTHENTICATOR`, and the account's `DEFAULT_EOA_REVOKED` flag is unset. Generic authenticator contracts MUST NOT satisfy the implicit branch even if they return `bytes32(uint256(uint160(sender)))`, otherwise an arbitrary authenticator could authenticate as any EOA whose implicit actor slot has never been written.
+
+**actorId Binding**: The protocol checks that the authenticator's returned `actorId` maps back to that authenticator in `actor_config`, preventing a malicious authenticator from claiming control of another authenticator's actors.
+
+**Payer Security**: `AA_TX_TYPE` vs `AA_PAYER_TYPE` domain separation prevents signature reuse between sender and payer roles. The `payer` field in the sender's signed hash binds to a specific payer address. Scope enforcement adds a second layer: payer-scoped actors cannot be used as `sender_auth`, and vice versa; self-pay requires SELF_PAYER while sponsorship requires SPONSOR_PAYER, so a self-paying session key cannot be repurposed as an unbounded sponsor. The payer's exposure to sender-controlled gas is bounded by signed fee fields because `gas_limit` includes sender authentication, intrinsic costs, account changes, and call execution. Payer authentication uses the payer's chosen authenticator, is validated under SPONSOR_PAYER scope, and is metered separately so the payer's authenticator choice cannot reduce gas available to `calls` or otherwise affect execution behavior.
+
+**Cross-sender Payer Replay**: The payer signature hash binds to the resolved sender via the `sender` field (see [Signature Payload](#signature-payload)). In the EOA path where `sender` is empty in the wire format, the recovered sender address MUST be substituted into the `sender` position before computing the hash. Without this substitution, two different EOAs that construct otherwise identical transaction data (same `chain_id`, `nonce_key`, `nonce_sequence`, `expiry`, fees, `account_changes`, `calls`) would produce identical payer hashes, allowing a second EOA to reuse a payer signature originally issued for the first and drain the payer's gas deposit. The 2D nonce alone does not prevent this: `nonce_key` and `nonce_sequence` are fields in the transaction payload, so each attacker controls their own values. Substituting the recovered sender into the hash makes the payer's commitment per-sender and closes this replay path. The configured-actor path is unaffected because `sender` is non-empty by definition.
+
+**Account Creation Security**: EIP-8130 salt-commits each initial actor's `actorId`, `authenticator`, and `scope`, preventing front-running of actor assignment. Extension policy state is installed only through an authenticated change. Wallet bytecode should be inert when uninitialized because it can be permissionlessly deployed.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
