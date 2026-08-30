@@ -13,6 +13,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   save-pr:
     name: Save PR Number
@@ -26,12 +30,12 @@ jobs:
           MERGE_SHA: ${{ github.sha }}
         run: |
           mkdir -p ./pr
-          echo $PR_NUMBER > ./pr/pr_number
-          echo $PR_SHA > ./pr/pr_sha
-          echo $MERGE_SHA > ./pr/merge_sha
+          echo "$PR_NUMBER" > ./pr/pr_number
+          echo "$PR_SHA" > ./pr/pr_sha
+          echo "$MERGE_SHA" > ./pr/merge_sha
 
       - name: Upload PR Number
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pr_number
           path: pr/
@@ -42,19 +46,20 @@ jobs:
 
     steps:
       - name: Checkout EIPs
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ethereum/EIPs
           path: ''
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
       - name: Setup Ruby
-        uses: ruby/setup-ruby@fb404b9557c186e349162b0d8efb06e2bc36edea # v1.232.0
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
-          ruby-version: '3.1' # Not needed with a .ruby-version file
+          # 3.4 unbundles csv/base64/bigdecimal/logger/ostruct/mutex_m/drb/abbrev, which jekyll 3.10 (github-pages 232) needs.
+          ruby-version: '3.3'
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
-      - name: Build with Jekyll
+      - name: Build Website
         run: |
           bundle exec jekyll doctor
           bundle exec jekyll build
@@ -63,7 +68,8 @@ jobs:
       - name: HTML Proofer
         run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
       - name: DNS Validator
-        run: bundle exec github-pages health-check
+        # github-pages 232's CLI calls File.exists?, which was removed in Ruby 3.2
+        run: bundle exec ruby -e 'File.singleton_class.alias_method(:exists?, :exist?) unless File.respond_to?(:exists?); load Gem.bin_path("github-pages", "github-pages")' health-check
 
   link-check:
     name: Link Check
@@ -71,15 +77,38 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Get Changed Files
+        id: changed
+        run: |
+          set -euo pipefail
+          # A failed `gh pr diff` must fail the job. Skipping is only correct when
+          # the PR genuinely changed no relevant file.
+          gh pr diff "$PR_NUMBER" --name-only > all-changed.txt
+          # tests/ is skipped: its fixtures contain deliberately broken links.
+          grep -E '\.md$' all-changed.txt \
+            | grep -v '^tests/' \
+            | while read -r f; do [ -f "$f" ] && printf '%s\n' "$f"; done > changed-md.txt || true
+          if [ -s changed-md.txt ]; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Link Checker
-        uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
+        if: steps.changed.outputs.has_files == 'true'
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
-          config-file: config/mlc_config.json
-          use-quiet-mode: no
-          use-verbose-mode: yes
-          check-modified-files-only: yes
+          lycheeVersion: v0.24.2
+          args: --config config/lychee.toml --files-from changed-md.txt --root-dir "$GITHUB_WORKSPACE" --no-progress --verbose
+          # Raises the github.com rate limit; see config/lychee.toml.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # A changed file that legitimately contains no links must not fail CI.
+          failIfEmpty: false
 
   codespell:
     name: CodeSpell
@@ -87,21 +116,32 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          set -euo pipefail
+          # A failed `gh pr diff` must fail the job, not silently skip CodeSpell.
+          gh pr diff "$PR_NUMBER" --name-only > all-changed.txt
+          delimiter="EOF_$(openssl rand -hex 16)"
+          {
+            echo "CHANGED_FILES<<$delimiter"
+            sed -e 's|$|,|' all-changed.txt
+            echo "$delimiter"
+          } >> "$GITHUB_ENV"
+          if [ -s all-changed.txt ]; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         with:
           check_filenames: true
           ignore_words_file: config/.codespell-whitelist
@@ -114,10 +154,11 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
+      # Track upstream Node 24 support; ethereum/eipw-action currently uses Node 20.
       - uses: ethereum/eipw-action@b858a0f2687c12af12280aa934c3b842747414fd
         id: eipw
         with:
@@ -130,23 +171,102 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          set -euo pipefail
+          # A failed `gh pr diff` must fail the job, not silently skip the linter.
+          gh pr diff "$PR_NUMBER" --name-only > all-changed.txt
+          delimiter="EOF_$(openssl rand -hex 16)"
+          # grep may legitimately match nothing (no changed markdown files); capture it
+          # first so the heredoc below always gets closed, even under set -e.
+          changed="$(grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' all-changed.txt || true)"
+          {
+            echo "CHANGED_FILES<<$delimiter"
+            printf '%s\n' "$changed"
+            echo "$delimiter"
+          } >> "$GITHUB_ENV"
+          if [ -n "$changed" ]; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Lint
-        uses: DavidAnson/markdownlint-cli2-action@f5cf187ef11bd3a68a127321b794aa252ff23019
-        if: steps.changed.outcome == 'success'
+        uses: DavidAnson/markdownlint-cli2-action@21c1be1b93ad9ed58fa840aacc3f279cde2a72ff # v24.2.0
+        if: steps.changed.outputs.has_files == 'true'
         with:
           command: config
           globs: |
             config/.markdownlint.yaml
             ${{ env.CHANGED_FILES }}
+
+  eip-metadata:
+    name: EIP Metadata Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Report metadata issues
+        run: python3 tests/eip-metadata/check.py EIPS/eip-*.md
+
+  actionlint:
+    name: Workflow Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install actionlint
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+        run: |
+          set -euo pipefail
+          curl -fsSL -o actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          tar xzf actionlint.tar.gz actionlint
+
+      - name: Test Workflow Invariants
+        run: ACTIONLINT="$PWD/actionlint" tests/workflows/run.sh
+
+  link-check-config:
+    name: Link Check Config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check If Config Changed
+        id: changed
+        run: |
+          set -euo pipefail
+          # A failed `gh pr diff` must fail the job, not silently skip the test.
+          gh pr diff "$PR_NUMBER" --name-only > all-changed.txt
+          if grep -qE '^(config/lychee\.toml|tests/link-check/)' all-changed.txt; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+
+      - name: Install lychee
+        if: steps.changed.outputs.has_files == 'true'
+        env:
+          LYCHEE_VERSION: lychee-v0.24.2
+        run: |
+          set -euo pipefail
+          curl -fsSL -o lychee.tar.gz \
+            "https://github.com/lycheeverse/lychee/releases/download/${LYCHEE_VERSION}/lychee-x86_64-unknown-linux-gnu.tar.gz"
+          tar xzf lychee.tar.gz --strip-components=1 lychee-x86_64-unknown-linux-gnu/lychee
+
+      - name: Test Link Checker Config
+        if: steps.changed.outputs.has_files == 'true'
+        run: LYCHEE="$PWD/lychee" tests/link-check/run.sh

@@ -5,6 +5,10 @@ on:
   workflow_dispatch:
 
 name: Auto Stagnant Bot
+
+permissions:
+  contents: read
+
 jobs:
   auto_merge_bot:
     if: github.repository == 'ethereum/eips'
@@ -12,11 +16,11 @@ jobs:
     name: Auto Stagnant Bot
     steps:
       - name: Checkout
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Node.js Environment
-        uses: actions/setup-node@d98fa1113850e562f83c7fc3a89c0ecd7a87fbed
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '14'
+          node-version: '20'
       - name: auto-stagnant-bot
         uses: ethereum/EIP-Bot@b3ac0ba3600aea27157fc68d1e36c08cc5a6db77 # mark-eips-stale
         id: auto-stagnant-bot
