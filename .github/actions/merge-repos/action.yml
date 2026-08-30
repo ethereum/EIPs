@@ -1,10 +1,11 @@
 name: Merge ERCs
+description: Checks out ethereum/ERCs and merges its ERCs, EIPS and assets into this checkout, renaming erc-* to eip-*.
 
 runs:
   using: 'composite'
   steps:
     - name: Checkout ERCs
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         repository: ethereum/ERCs
         path: ERCs

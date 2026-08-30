@@ -16,44 +16,62 @@ concurrency:
   cancel-in-progress: true
 
 name: Auto Review Bot Trigger
+
+permissions:
+  contents: read
+
 jobs:
   trigger:
     runs-on: ubuntu-latest
     name: Trigger
     steps:
-      - name: Write PR Number - PR Target
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_target' && ((!endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')) || github.event.sender.login == 'renovate[bot]')
+      - name: Determine PR Number
+        id: pr
         env:
-          PR_NUMBER: ${{ github.event.number }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_TARGET_NUMBER: ${{ github.event.number }}
+          PR_REVIEW_NUMBER: ${{ github.event.pull_request.number }}
+          DISPATCH_NUMBER: ${{ inputs.pr_number }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          IS_PR_TARGET_ELIGIBLE: ${{ github.event_name == 'pull_request_target' && ((!endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')) || github.event.sender.login == 'renovate[bot]') }}
+          IS_PR_REVIEW_ELIGIBLE: ${{ github.event_name == 'pull_request_review' && !endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]') }}
+          IS_COMMENT_RERUN: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request != null && contains(github.event.comment.body, '@eth-bot rerun') }}
+        run: |
+          set -euo pipefail
+          pr_number=""
+          case "$EVENT_NAME" in
+            pull_request_target)
+              [ "$IS_PR_TARGET_ELIGIBLE" = "true" ] && pr_number="$PR_TARGET_NUMBER"
+              ;;
+            pull_request_review)
+              [ "$IS_PR_REVIEW_ELIGIBLE" = "true" ] && pr_number="$PR_REVIEW_NUMBER"
+              ;;
+            workflow_dispatch)
+              pr_number="$DISPATCH_NUMBER"
+              ;;
+            issue_comment)
+              [ "$IS_COMMENT_RERUN" = "true" ] && pr_number="$ISSUE_NUMBER"
+              ;;
+          esac
 
-      - name: Write PR Number - PR Review
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_review' && !endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          if [ -z "$pr_number" ]; then
+            echo "No PR number applies to this event ($EVENT_NAME); skipping review bot."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
-      - name: Write PR Number - Workflow Dispatch
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          PR_NUMBER: ${{ inputs.pr_number }}
+          if ! echo "$pr_number" | grep -qE '^[0-9]+$'; then
+            echo "::error::Invalid PR number determined for event $EVENT_NAME: '$pr_number'"
+            exit 1
+          fi
 
-      - name: Write PR Number - Comment Retrigger
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@eth-bot rerun')
-        env:
-          PR_NUMBER: ${{ github.event.issue.number }}
-      
-      - name: Check File Existence
-        uses: andstor/file-existence-action@20b4d2e596410855db8f9ca21e96fbe18e12930b
-        id: check_pr_number_exists
-        with:
-          files: pr-number.txt
+          echo "$pr_number" > pr-number.txt
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
 
       - name: Save PR Number
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
-        if: steps.check_pr_number_exists.outputs.files_exists == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: steps.pr.outputs.should_run == 'true'
         with:
           name: pr-number
           path: pr-number.txt
+          if-no-files-found: error

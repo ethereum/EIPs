@@ -7,6 +7,15 @@ on:
 
 name: Post CI
 
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read # required to download the artifact from the triggering run
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.id }}
+  cancel-in-progress: true
+
 # This is adapted from https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run (2022-07-17)
 
 jobs:
@@ -14,22 +23,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch PR Data
-        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
+        id: fetch-pr-data
+        uses: dawidd6/action-download-artifact@57aa996fc1713cc1579039614f4645a7f4841fd4 # v23
         with:
           name: pr_number
           workflow: ci.yml
           run_id: ${{ github.event.workflow_run.id }}
+          if_no_artifact_found: ignore
 
       - name: Save PR Data
         id: save-pr-data
+        if: steps.fetch-pr-data.outputs.found_artifact == 'true'
         run: |
-          echo "pr_number=$(cat pr_number)" >> $GITHUB_OUTPUT
-          echo "pr_sha=$(cat pr_sha)" >> $GITHUB_OUTPUT
-          echo "merge_sha=$(cat merge_sha)" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          for file in pr_number pr_sha merge_sha; do
+            if [ ! -s "$file" ]; then
+              echo "::warning::Artifact file missing or empty: $file; skipping PR feedback."
+              exit 0
+            fi
+          done
+
+          pr_number="$(cat pr_number)"
+          if ! echo "$pr_number" | grep -qE '^[0-9]+$'; then
+            echo "::warning::Invalid PR number in artifact: '$pr_number'; skipping PR feedback."
+            exit 0
+          fi
+
+          {
+            echo "pr_number=$pr_number"
+            echo "pr_sha=$(cat pr_sha)"
+            echo "merge_sha=$(cat merge_sha)"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Add Comment
-        uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
-        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
+        if: steps.save-pr-data.outputs.pr_number != '' && github.event.workflow_run.conclusion == 'failure'
         with:
           number: ${{ steps.save-pr-data.outputs.pr_number }}
           recreate: true
@@ -38,19 +66,15 @@ jobs:
             Please inspect the [Run Summary](https://github.com/ethereum/EIPs/pull/${{ steps.save-pr-data.outputs.pr_number }}/files) for details.
 
       - name: Add Waiting Label
-        uses: actions-ecosystem/action-add-labels@288072f1a3b596f4350fe135bcfe381a23abadef
-        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-        with:
-          labels: w-ci
-          number: ${{ steps.save-pr-data.outputs.pr_number }}
-          repo: ${{ github.repository }}
-          github_token: ${{ github.token }}
+        if: steps.save-pr-data.outputs.pr_number != '' && github.event.workflow_run.conclusion == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.save-pr-data.outputs.pr_number }}
+        run: gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label w-ci
 
       - name: Remove Waiting Label
-        uses: actions-ecosystem/action-remove-labels@d05162525702062b6bdef750ed8594fc024b3ed7
-        if: ${{ github.event.workflow_run.conclusion != 'failure' }}
-        with:
-          labels: w-ci
-          number: ${{ steps.save-pr-data.outputs.pr_number }}
-          repo: ${{ github.repository }}
-          github_token: ${{ github.token }}
+        if: steps.save-pr-data.outputs.pr_number != '' && github.event.workflow_run.conclusion != 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.save-pr-data.outputs.pr_number }}
+        run: gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label w-ci
