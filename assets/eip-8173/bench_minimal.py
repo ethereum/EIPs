@@ -1,10 +1,10 @@
 """Benchmarks for the reference validator (minimal_validator.py).
 
-Reproduces the Python numbers quoted under "Why it is linear": 3-4
-microseconds per byte on ordinary patterns, with the recursion pump —
+Reproduces the Python numbers quoted under "Why it is linear": 2-3
+microseconds per byte on ordinary shapes, with the recursion pump —
 the demand relaxation's O(1024 * n) worst case, invalid code — well
 above that.  The bounds-proving validator (magic_validator.py) runs
-alongside for comparison; native-cost/ measures the same costs natively.
+alongside for comparison; cbench/ measures the same costs natively.
 
 Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
 """

@@ -30,9 +30,7 @@ typedef struct { int32_t pc, off, entry, framed, push; } Item;
 static uint8_t  vis[MAXN + 2], vfr[MAXN + 2], required[MAXN + 2];
 static int32_t  voff[MAXN + 2], vent[MAXN + 2];
 static uint8_t  net_known[MAXN + 2], seen[MAXN + 2], queued[MAXN + 2];
-static uint8_t  scan_op[MAXN + 2];
 static int32_t  net[MAXN + 2], inputs[MAXN + 2], growth[MAXN + 2], calldep[MAXN + 2];
-                                /* inputs: per entry, its demand for caller items */
 static int32_t  pend_head[MAXN + 2], entp_head[MAXN + 2], chld_head[MAXN + 2];
 static int32_t  unfin[MAXN + 2];
 static int32_t  nodes[MAXN + 2], ready[MAXN + 2], ring[RINGSZ];
@@ -94,19 +92,6 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
     memset(pend_head, 0, bytes * 4); memset(entp_head, 0, bytes * 4);
     memset(chld_head, 0, bytes * 4);
     npend = nentp = nchld = nnodes = 0;
-
-    /* JUMPDEST analysis: the sequential scan from position 0 that every
-     * client runs today.  Only its instructions may be executed or
-     * jumped to.  scan_op holds the scanned opcode per position; PUSH
-     * immediate data is marked with an undefined opcode, so the
-     * Constraint 1 check below rejects it at no cost in the hot loop
-     * (Constraints 2, 3). */
-    memset(scan_op, 0x0C, bytes);            /* 0x0C: undefined opcode */
-    for (int32_t i = 0; i < n; ) {
-        int o = code[i];
-        scan_op[i] = (uint8_t)o;
-        i += 1 + (o > 0x5F && o <= 0x7F ? o - 0x5F : 0);
-    }
     const int32_t outer = n;
     touch(outer);
     work[0] = (Item){0, 0, outer, 0, -1};
@@ -118,9 +103,8 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
         int32_t pc = it.pc, off = it.off, entry = it.entry;
         int32_t framed = it.framed, push = it.push;
         if (pc >= n) continue;          /* implicit STOP: a valid end */
-        int op = scan_op[pc];
-        if (!OPSIZE[op]) return 0;      /* Constraint 1 — or PUSH immediate
-                                         * data, marked by the scan (2, 3) */
+        int op = code[pc];
+        if (!OPSIZE[op]) return 0;      /* Constraint 1: not a valid opcode */
 
         /* A CALLDEST is visited at offset 0, as its own entry; arriving
          * any other way first records the link between the subroutines. */

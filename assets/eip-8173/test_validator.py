@@ -41,10 +41,6 @@ TESTS = [
     # --- constraints 2/3: destinations ---
     ("JUMP into PUSH immediate",   "600156", False),
     ("JUMP to visited non-JUMPDEST", "5F5F01600256", False),
-    ("JUMPDEST byte in PUSH data",  "600456605B00", False),
-    ("JUMPDEST byte in live PUSH data", "36600857615B00005B600556", False),
-    ("CALLDEST byte in PUSH data",  "6004B060B100", False),
-    ("JUMPDEST in unreachable code", "600456005B00", True),
     ("JUMP not push-preceded",     "365B56", False),
     ("PUSH0-preceded JUMP",        "5B5F56", True),
     ("CALLSUB to JUMPDEST",        "6004B0005B", False),

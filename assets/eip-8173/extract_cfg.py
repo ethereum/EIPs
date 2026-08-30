@@ -1,4 +1,4 @@
-"""Extract the control-flow graph of valid EIP-8337 MAGIC code in one pass.
+"""Extract the control-flow graph of valid EIP-7979 MAGIC code in one pass.
 
 Because the code has been validated, every JUMP, JUMPI, and CALLSUB is
 immediately preceded by a PUSH, so every destination is a compile-time
