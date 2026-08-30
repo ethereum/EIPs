@@ -1,4 +1,4 @@
-"""Benchmarks for the EIP-7979 reference validator (magic_validator.py).
+"""Benchmarks for the EIP-8337 reference validator (magic_validator.py).
 
 Reproduces the complexity measurements: validation runs in time and
 space linear in the size of the code.  Four shapes of near-24KB input:

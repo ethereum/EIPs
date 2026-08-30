@@ -1,4 +1,4 @@
-"""Reference validator for EIP-7979 MAGIC code.
+"""Reference validator for EIP-8337 MAGIC code.
 
 This validator proves control flow and stack underflow: every
 destination is a proper label, every subroutine entry is a CALLDEST,
@@ -10,7 +10,10 @@ runtime bounds checks that all code has today.  The validator that
 additionally proves overflow for non-recursive code is kept for
 comparison in magic_validator.py.
 
-The traversal visits each reachable instruction once, measuring the
+The traversal is confined to the instructions found by JUMPDEST
+analysis -- the sequential scan from position 0 -- so PUSH immediate
+data can never be executed or jumped to, whatever its bytes.  It
+visits each reachable instruction once, measuring the
 data stack relative to the CALLDEST where the current subroutine
 began: return points wait on their callee's net stack effect, and a
 jump or fall into a CALLDEST links the two subroutines' nets.  The
@@ -19,7 +22,7 @@ to everyone who calls, or jumps or falls into, it.  Demands only
 rise, by whole items, and the stack limit caps them, so the worst
 case is O(1024 * n) — linear in the code, since 1024 is the
 protocol's constant, and approached only by invalid code built to
-pump demands around a recursive cycle (see cbench/ for the measured
+pump demands around a recursive cycle (see native-cost/ for the measured
 costs).
 
 Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
@@ -39,16 +42,26 @@ ENTRY = "calldest"    # destination must be a CALLDEST
 
 
 def validate(code, stack_limit=STACK_LIMIT):
-    """True iff the code satisfies the five constraints of EIP-7979
+    """True iff the code satisfies the five constraints of EIP-8337
     validation: valid opcodes, proven destinations, framed returns,
     no underflow, and one static stack offset per instruction."""
     if len(code) == 0:
         return False
 
+    # JUMPDEST analysis: the sequential scan from position 0 that every
+    # client runs today.  Its instructions are the only bytes that may
+    # be executed or jumped to; PUSH immediate data never qualifies,
+    # whatever its values (Constraints 2 and 3).
+    instructions = set()
+    i = 0
+    while i < len(code):
+        instructions.add(i)
+        i += 1 + (code[i] - PUSH0 if PUSH0 < code[i] <= PUSH32 else 0)
+
     visited = {}                  # pc -> (offset, entry, framed) at first visit
     required = {}                 # pc -> LABEL or ENTRY, set by jumps and calls
     net_effect = {}               # entry -> its *net stack effect*, once known
-    inputs = defaultdict(int)     # entry -> items it needs from its caller
+    inputs = defaultdict(int)     # entry -> its demand: the items it needs from its caller
     # Two parent lists with different lifetimes.  parents is permanent
     # and complete — every call and enter — for propagating demands in
     # the combining.  enter_parents holds only arrivals whose entry's
@@ -81,6 +94,8 @@ def validate(code, stack_limit=STACK_LIMIT):
         pc, offset, entry, framed, push = work_items.pop()
         if pc >= len(code):
             continue                     # implicit STOP: a valid end
+        if pc not in instructions:
+            return False                 # Constraints 2, 3: immediate data
         op = code[pc]
         size, pops, pushes, term = opcode_info(op)
         if size == 0:
@@ -93,7 +108,7 @@ def validate(code, stack_limit=STACK_LIMIT):
             if pc in net_effect:      # settled: the arriving net follows
                 if not resolve(entry, offset + net_effect[pc]):
                     return False
-            else:                     # each record is walked exactly once
+            else:                     # each record is consumed exactly once
                 enter_parents[pc].append((entry, offset))
             offset, entry = 0, pc
 

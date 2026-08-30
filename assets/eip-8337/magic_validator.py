@@ -55,7 +55,7 @@ class StackUse:
     """How one subroutine uses the two stacks.  net is None until a
     frame begun at its entry first returns."""
     net: int | None = None    # items pushed minus popped, entry to the frame's return
-    inputs: int = 0           # items used from the caller's stack
+    inputs: int = 0           # its demand: items used from the caller's stack
     growth: int = 0           # stack growth above the subroutine's start
     call_depth: int = 0       # return addresses outstanding at once
 
@@ -64,6 +64,16 @@ def validate(code, stack_limit=STACK_LIMIT):
     """True iff the code satisfies the five constraints of EIP-8337."""
     if len(code) == 0:
         return False
+
+    # JUMPDEST analysis: the sequential scan from position 0 that every
+    # client runs today.  Its instructions are the only bytes that may
+    # be executed or jumped to; PUSH immediate data never qualifies,
+    # whatever its values (Constraints 2 and 3).
+    instructions = set()
+    i = 0
+    while i < len(code):
+        instructions.add(i)
+        i += 1 + (code[i] - PUSH0 if PUSH0 < code[i] <= PUSH32 else 0)
 
     # ------------------------------------------------------------------
     # Phase 1, the traversal: visit every reachable instruction once.
@@ -104,6 +114,8 @@ def validate(code, stack_limit=STACK_LIMIT):
         pc, offset, entry, framed, push = work_items.pop()
         if pc >= len(code):
             continue                     # implicit STOP: a valid end
+        if pc not in instructions:
+            return False                 # Constraints 2, 3: immediate data
         op = code[pc]
         size, pops, pushes, term = opcode_info(op)
         if size == 0:
