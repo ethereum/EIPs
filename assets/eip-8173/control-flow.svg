@@ -12,10 +12,6 @@
 <rect x="62" y="150" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
 <text x="70" y="164" fill="black">JUMPDEST</text>
 <text x="70" y="180" fill="black">STOP</text>
-<path d="M 142 72 C 168 72, 168 100, 142 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 142 68 C 184 68, 184 164, 142 164" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 62 132 C 36 132, 36 40, 62 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 142 132 C 168 132, 168 160, 142 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
 <rect x="242" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
 <text x="250" y="44" fill="black">JUMPDEST</text>
 <text x="250" y="60" fill="black">GAS</text>
@@ -31,15 +27,6 @@
 <rect x="242" y="210" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
 <text x="250" y="224" fill="black">JUMPDEST</text>
 <text x="250" y="240" fill="black">STOP</text>
-<path d="M 322 72 C 348 72, 348 100, 322 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 68 C 364 68, 364 164, 322 164" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 64 C 380 64, 380 228, 322 228" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 132 C 216 132, 216 40, 242 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 132 C 348 132, 348 160, 322 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 128 C 364 128, 364 224, 322 224" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 188 C 200 188, 200 44, 242 44" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 192 C 216 192, 216 100, 242 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 192 C 348 192, 348 220, 322 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
 <rect x="472" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
 <text x="480" y="44" fill="black">JUMPDEST</text>
 <text x="480" y="60" fill="black">GAS</text>
@@ -59,29 +46,42 @@
 <rect x="472" y="270" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
 <text x="480" y="284" fill="black">JUMPDEST</text>
 <text x="480" y="300" fill="black">STOP</text>
-<path d="M 552 72 C 578 72, 578 100, 552 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 68 C 594 68, 594 164, 552 164" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 64 C 610 64, 610 228, 552 228" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 60 C 626 60, 626 292, 552 292" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 132 C 446 132, 446 40, 472 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 132 C 578 132, 578 160, 552 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 128 C 594 128, 594 224, 552 224" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 124 C 610 124, 610 288, 552 288" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 188 C 430 188, 430 44, 472 44" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 192 C 446 192, 446 100, 472 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 192 C 578 192, 578 220, 552 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 188 C 594 188, 594 284, 552 284" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 244 C 414 244, 414 48, 472 48" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 248 C 430 248, 430 104, 472 104" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 252 C 446 252, 446 160, 472 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 252 C 578 252, 578 280, 552 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 62 72 C 48 72, 48 44, 62 44 " stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 62 128 C 48 128, 48 100, 62 100 " stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 72 C 228 72, 228 48, 242 48 " stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 128 C 228 128, 228 104, 242 104 " stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 184 C 228 184, 228 160, 242 160 " stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 72 C 458 72, 458 52, 472 52 " stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 128 C 458 128, 458 108, 472 108 " stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 184 C 458 184, 458 164, 472 164 " stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 240 C 458 240, 458 220, 472 220 " stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 142 72 C 161 72, 161 100, 142 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 142 72 C 179 72, 179 160, 142 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 62 72 C 46 72, 46 40, 62 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 142 132 C 161 132, 161 160, 142 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 62 132 C 28 132, 28 40, 62 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 62 132 C 46 132, 46 100, 62 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 322 72 C 341 72, 341 100, 322 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 322 72 C 359 72, 359 160, 322 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 322 72 C 374 72, 374 220, 322 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 242 72 C 226 72, 226 40, 242 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 322 132 C 341 132, 341 160, 322 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 322 132 C 359 132, 359 220, 322 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 242 132 C 208 132, 208 40, 242 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 242 132 C 226 132, 226 100, 242 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 322 192 C 341 192, 341 220, 322 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 242 192 C 208 192, 208 100, 242 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 242 192 C 194 192, 194 40, 242 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 242 192 C 226 192, 226 160, 242 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 72 C 571 72, 571 100, 552 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 72 C 589 72, 589 160, 552 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 72 C 604 72, 604 220, 552 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 72 C 618 72, 618 280, 552 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 72 C 456 72, 456 40, 472 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 132 C 571 132, 571 160, 552 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 132 C 589 132, 589 220, 552 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 132 C 604 132, 604 280, 552 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 132 C 438 132, 438 40, 472 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 132 C 456 132, 456 100, 472 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 192 C 571 192, 571 220, 552 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 192 C 589 192, 589 280, 552 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 192 C 438 192, 438 100, 472 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 192 C 424 192, 424 40, 472 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 192 C 456 192, 456 160, 472 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 552 252 C 571 252, 571 280, 552 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 252 C 438 252, 438 160, 472 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 252 C 424 252, 424 100, 472 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 252 C 410 252, 410 40, 472 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 472 252 C 456 252, 456 220, 472 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
 </svg>
