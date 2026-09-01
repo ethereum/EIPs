@@ -32,10 +32,10 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The following notation is used:
 
-- `P` is an RLP-encoded positive integer.
-- `B` is an RLP byte string.
-- `B_16` is a 16-byte cell mask.
-- `B_32` is a 32-byte transaction hash.
+1. `P` is an RLP-encoded positive integer.
+2. `B` is an RLP byte string.
+3. `B_16` is a 16-byte cell mask.
+4. `B_32` is a 32-byte transaction hash.
 
 ### Mask table
 
@@ -58,33 +58,43 @@ A peer receiving an indexed message that violates any of these requirements MUST
 
 `eth/73` accepts two request forms:
 
-- Shared: `[request_id: P, [hash_0: B_32, hash_1: B_32, ...], cell_mask: B_16]`
-- Indexed: `[request_id: P, [hash_0: B_32, hash_1: B_32, ...], [mask_0: B_16, mask_1: B_16, ...], mask_ids: B]`
+1. Shared: `[request_id: P, [hash_0: B_32, hash_1: B_32, ...], cell_mask: B_16]`
+2. Indexed: `[request_id: P, [hash_0: B_32, hash_1: B_32, ...], [mask_0: B_16, mask_1: B_16, ...], mask_ids: B]`
 
 The RLP list length distinguishes the two forms. The shared form has the same encoding and semantics as `eth/72`.
 
 For an indexed request, the mask selected by `mask_ids[i]` specifies the cell indices requested from every blob of the transaction identified by `hashes[i]`.
 
-A sender MUST use the shared form when all transaction hashes require the same mask. When a scheduling batch contains multiple masks, a sender MAY either partition it into shared requests or send an indexed request. A sender SHOULD use the indexed form only when it reduces the number of requests or the total encoded request size.
+A sender selects the request form as follows:
+
+1. It MUST use the shared form when all transaction hashes require the same mask.
+2. When a scheduling batch contains multiple masks, it MAY either partition the batch into shared requests or send an indexed request.
+3. It SHOULD use the indexed form only when doing so reduces the number of requests or the total encoded request size.
 
 ### `Cells` (`0x15`)
 
 `eth/73` accepts two response forms:
 
-- Shared: `[request_id: P, [hash_0: B_32, hash_1: B_32, ...], [[cell_0_0: B_2048, ...], [cell_1_0: B_2048, ...], ...], cell_mask: B_16]`
-- Indexed: `[request_id: P, [hash_0: B_32, hash_1: B_32, ...], [[cell_0_0: B_2048, ...], [cell_1_0: B_2048, ...], ...], [mask_0: B_16, mask_1: B_16, ...], mask_ids: B]`
+1. Shared: `[request_id: P, [hash_0: B_32, hash_1: B_32, ...], [[cell_0_0: B_2048, ...], [cell_1_0: B_2048, ...], ...], cell_mask: B_16]`
+2. Indexed: `[request_id: P, [hash_0: B_32, hash_1: B_32, ...], [[cell_0_0: B_2048, ...], [cell_1_0: B_2048, ...], ...], [mask_0: B_16, mask_1: B_16, ...], mask_ids: B]`
 
-A response MUST use the same form as its corresponding request. An indexed response MAY omit requested transaction hashes or cells according to the existing `eth/72` response-size and serving-capacity rules. Its `masks` and `mask_ids` fields describe only the hashes and cells actually present in that response and MUST satisfy the mask-table requirements above.
+Responses are processed according to the following rules:
 
-For each returned transaction, its response mask MUST be a subset of the mask requested for that transaction. Cells for each transaction MUST be ordered first by blob order in the transaction and then by increasing cell index among the set bits of its response mask.
-
-A requester MUST reject a response containing an unrequested transaction hash, a cell outside the corresponding requested mask, an invalid cell or proof, or a cell ordering inconsistent with the response mask.
+1. A response MUST use the same form as its corresponding request.
+2. An indexed response MAY omit requested transaction hashes or cells according to the existing `eth/72` response-size and serving-capacity rules.
+3. Its `masks` and `mask_ids` fields describe only the hashes and cells actually present in that response and MUST satisfy the mask-table requirements above.
+4. For each returned transaction, its response mask MUST be a subset of the mask requested for that transaction.
+5. Cells for each transaction MUST be ordered first by blob order in the transaction and then by increasing cell index among the set bits of its response mask.
+6. A requester MUST reject a response containing an unrequested transaction hash, a cell outside the corresponding requested mask, an invalid cell or proof, or a cell ordering inconsistent with the response mask.
 
 ### Resource limits
 
-Implementations MUST validate the transaction count, mask count, identifiers, and canonical mask-table ordering before allocating cell-response storage.
+Implementations enforce the following resource limits:
 
-Indexed and shared requests MUST be charged against the same peer request and response quotas. The `eth/72` response soft limit continues to apply. A responder MAY truncate an indexed response independently for each transaction, provided that every returned response mask remains a subset of the corresponding requested mask.
+1. They MUST validate the transaction count, mask count, identifiers, and canonical mask-table ordering before allocating cell-response storage.
+2. Indexed and shared requests MUST be charged against the same peer request and response quotas.
+3. The `eth/72` response soft limit continues to apply.
+4. A responder MAY truncate an indexed response independently for each transaction, provided that every returned response mask remains a subset of the corresponding requested mask.
 
 ## Rationale
 
@@ -110,13 +120,12 @@ This EIP introduces a new negotiated `eth` capability. An `eth/73` implementatio
 
 ## Security Considerations
 
-Indexed messages add parser and memory-amplification surface. Implementations must enforce the 64-hash and 64-mask bounds before allocating response buffers. They must also validate identifiers and canonical table structure before performing transaction or blob lookups.
+The security requirements are:
 
-A small indexed request can imply a large response. Implementations must retain response-size, serving-time, and peer-rate limits and must account for the total cells implied by all selected masks. Indexed requests must not receive a larger quota than equivalent shared requests.
-
-Transaction-specific masks reveal more detailed information about a requester's missing data than a shared custody mask. Implementations should prefer shared requests for routine custody sampling and use indexed requests only when heterogeneous recovery state makes them beneficial.
-
-As with `eth/72`, every returned cell and proof must be cryptographically validated against the transaction's commitments. A response that maps valid cells to the wrong transaction or cell index is invalid.
+1. Implementations must enforce the 64-hash and 64-mask bounds before allocating response buffers. They must validate identifiers and canonical table structure before performing transaction or blob lookups.
+2. Implementations must retain response-size, serving-time, and peer-rate limits and account for the total cells implied by all selected masks. Indexed requests must not receive a larger quota than equivalent shared requests.
+3. Implementations should prefer shared requests for routine custody sampling because transaction-specific masks reveal more information about a requester's missing data. Indexed requests should be used only when heterogeneous recovery state makes them beneficial.
+4. Every returned cell and proof must be cryptographically validated against the transaction's commitments. A response that maps valid cells to the wrong transaction or cell index is invalid.
 
 ## Copyright
 
