@@ -9,9 +9,8 @@ layout: null
     <link>{{ site.url }}</link>
     <atom:link href="{{ site.url }}/rss/erc.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
-    {% assign eips = site.pages | sort: 'eip' %}
+    {% assign eips = site.pages | where: "category", "ERC" | sort: "eip" %}
     {% for eip in eips %}
-      {% if eip.category == "ERC" %}
       {% capture description %}
         <p><strong>EIP #{{ eip.eip }} - {{eip.title }}</strong> is in the {{ eip.category }} category of type {{ eip.type }} and was just updated.</p>
         {% if eip.discussions-to %}
@@ -27,7 +26,6 @@ layout: null
         <link>{{ site.url }}/{{ eip.url }}</link>
         <guid isPermaLink="true">{{ site.url }}/{{ eip.url }}</guid>
       </item>
-      {% endif %}
     {% endfor %}
   </channel>
 </rss>
