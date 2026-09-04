@@ -1,0 +1,51 @@
+name: Workflow Security
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workflow-security-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
+      - name: Validate workflows
+        run: tests/workflows/actionlint.sh
+
+  security-audit:
+    name: Workflow Security Audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
+      - name: Audit workflows
+        run: tests/workflows/security.sh
+
+  dependency-review:
+    name: Dependency Review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@05fe4576374b728f0c523d6a13d64c25081e0803 # v4.9.0
