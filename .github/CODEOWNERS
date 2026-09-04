@@ -1,1 +1,5 @@
 * @eth-bot
+
+# Workflow changes cannot be reviewed by the bot that the workflows configure,
+# so route them to the governance editors instead.
+.github/workflows/** @lightclient @SamWilsn @xinbenlv @g11tech @jochem-brouwer
