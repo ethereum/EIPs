@@ -1,0 +1,144 @@
+;;; ImmutableSetDelegateFactory.eas — non-rotating PQC account factory.
+;;; geas (github.com/fjl/geas).
+;;;
+;;; Given an ML-DSA public key as calldata, deploys (via EIP-7819 SETDELEGATE
+;;; with trailing data) a PQC account whose code is:
+;;;
+;;;     0xef0100 ++ AUTH_ADDR ++ pubkey
+;;;
+;;; at the deterministic, key-derived address:
+;;;
+;;;     salt    = keccak256(pubkey)
+;;;     account = keccak256(0xef0100 ++ FACTORY_ADDR ++ salt)[12:]
+;;;
+;;; Because salt = keccak256(pubkey), THE PUBLIC KEY IS THE SOURCE OF THE ADDRESS:
+;;; one key -> one address, recomputable off-chain before it exists.
+;;;
+;;; "Non-rotating" / immutable: this factory only writes the designator; it has
+;;; no re-point path. A new key => a new address. Stable-address key rotation
+;;; needs a signature-gated auth/factory design and is out of scope here.
+;;;
+;;; IMMUTABILITY GUARD: before writing, the factory derives `location` itself and
+;;; requires EXTCODESIZE(location) == 0. If an account already exists at the
+;;; derived address it reverts, so the factory can never overwrite / re-point an
+;;; already-created account. (This is what makes "immutable" a guarantee rather
+;;; than just "deterministic": even a repeat call with the same key is refused
+;;; once the account exists, instead of silently re-running SETDELEGATE over it.)
+;;;
+;;; NOTE: SETDELEGATE (0xf6) does not exist in any shipped EVM or in geas's
+;;; opcode table. It is emitted as a raw byte via the %setdelegate macro. This
+;;; assembles to a byte string documenting intent; runnable only on an EVM
+;;; patched to recognize the opcode.
+
+;;; ---- new-opcode placeholder ------------------------------------------------
+;;; SETDELEGATE consumes (salt, target, dataOffset, dataLen) with salt on top,
+;;; and pushes `location`. Per EIP-7819 the target is taken from the low 20
+;;; bytes of the word and anything above them is discarded; AUTH_ADDR below is
+;;; a clean 20-byte constant, so no masking is needed here.
+#define %setdelegate {
+    #bytes 0xf6                 ; EIP-7819 SETDELEGATE (0xf6)
+}
+
+;;; Canonical MLDSAAuth deployment address (compile-time constant, placeholder).
+#define AUTH_ADDR = 0x000000000000000000000000000000000000A111
+
+;;; ML-DSA compressed public-key lengths (FIPS 204) — the only legal calldata.
+#define PK44 = 1312
+#define PK65 = 1952
+#define PK87 = 2592
+
+;;; DESIGNATOR (0xef0100) shifted into the high 3 bytes of the 23-byte
+;;; (designator ++ address) field, so `DESIGNATOR_HI | address` right-aligns the
+;;; packed 23 bytes into the low end of a 32-byte word (bytes [9:32]).
+#define DESIGNATOR_HI = 0xef0100 * 0x10000000000000000000000000000000000000000  ; << 160
+
+;;; ===========================================================================
+;;; Calldata ABI: [0 : PK_LEN) = raw ML-DSA public key. PK_LEN = CALLDATASIZE.
+;;; No selector; the factory does exactly one thing.
+;;; Returns: the 32-byte (left-padded) account address created.
+;;; ===========================================================================
+
+;;; ---- 1. validate PK_LEN in {1312,1952,2592}, copy pubkey to mem[0:PK_LEN] --
+        calldatasize            ; [PK_LEN]
+        dup1                    ; [PK_LEN, PK_LEN]
+        dup1
+        push PK44
+        eq
+        jumpi @len_ok
+        dup1
+        push PK65
+        eq
+        jumpi @len_ok
+        dup1
+        push PK87
+        eq
+        jumpi @len_ok
+        push 0                  ; bad key length -> revert
+        push 0
+        revert
+
+len_ok:
+        ;; CALLDATACOPY(dest=0, cdOffset=0, size=PK_LEN)
+        dup1                    ; [PK_LEN, PK_LEN, PK_LEN]   (size)
+        push 0                  ; [0, PK_LEN, ...]           (cd offset)
+        push 0                  ; [0, 0, PK_LEN, ...]        (dest)
+        calldatacopy            ; [PK_LEN, PK_LEN]   (pubkey @ mem[0:PK_LEN])
+
+;;; ---- 2. salt = keccak256(pubkey) ------------------------------------------
+        dup1                    ; [PK_LEN, PK_LEN, PK_LEN]
+        push 0                  ; [0, PK_LEN, PK_LEN, PK_LEN]
+        keccak256               ; [salt, PK_LEN, PK_LEN]   KECCAK256(mem[0:PK_LEN])
+
+;;; ---- 2b. IMMUTABILITY GUARD: derive location and require it be empty. ------
+;;; location = keccak256(0xef0100 ++ FACTORY ++ salt)[12:], matching SETDELEGATE.
+;;; If an account already exists there, refuse — an immutable factory MUST NOT
+;;; touch an already-created account (that would make it mutable/overwritable).
+;;;
+;;; Build the 55-byte preimage in scratch memory (safe to clobber mem[0:64] now;
+;;; the pubkey has already been hashed into `salt`, and it is re-copied fresh in
+;;; step 3 straight from calldata):
+;;;   mem[0:32]  = DESIGNATOR_HI | FACTORY   -> bytes [9:12]=0xef0100, [12:32]=addr
+;;;   mem[32:64] = salt
+;;;   keccak over mem[9:64] = 0xef0100 ++ addr(20) ++ salt(32)  (55 bytes)
+        address                 ; [FACTORY, salt, PK_LEN, PK_LEN]
+        push DESIGNATOR_HI
+        or                      ; [DESIGNATOR_HI|FACTORY, salt, PK_LEN, PK_LEN]
+        push 0
+        mstore                  ; mem[0:32] = designator|factory ; [salt, PK_LEN, PK_LEN]
+        dup1                    ; [salt, salt, PK_LEN, PK_LEN]
+        push 32
+        mstore                  ; mem[32:64] = salt ; [salt, PK_LEN, PK_LEN]
+        ;; location = keccak256(mem[9:64])[12:]
+        push 55                 ; len   (9..64)
+        push 9                  ; offset
+        keccak256               ; [hash, salt, PK_LEN, PK_LEN]
+        ;; mask to low 20 bytes -> the address `location`
+        push 0xffffffffffffffffffffffffffffffffffffffff
+        and                     ; [location, salt, PK_LEN, PK_LEN]
+        extcodesize             ; [EXTCODESIZE(location), salt, PK_LEN, PK_LEN]
+        iszero
+        jumpi @is_empty         ; empty (size==0) -> proceed
+        push 0                  ; already occupied -> refuse (immutability guard)
+        push 0
+        revert
+is_empty:
+
+;;; ---- 3. SETDELEGATE(salt, AUTH_ADDR, dataOff=0, dataLen=PK_LEN) ------------
+;;; Re-copy the pubkey from calldata (step 2b clobbered mem[0:64]).
+        dup2                    ; [PK_LEN, salt, PK_LEN, PK_LEN]   (size)
+        push 0                  ; [0, PK_LEN, ...]                 (cd offset)
+        push 0                  ; [0, 0, PK_LEN, ...]              (dest)
+        calldatacopy            ; [salt, PK_LEN, PK_LEN]   (pubkey re-@ mem[0:PK_LEN])
+;;; stack in (top-first): salt, target, dataOffset, dataLen
+        dup2                    ; [dataLen=PK_LEN, salt, PK_LEN, PK_LEN]
+        push 0                  ; [dataOff=0, dataLen, salt, PK_LEN, PK_LEN]
+        push AUTH_ADDR          ; [target, dataOff, dataLen, salt, PK_LEN, PK_LEN]
+        dup4                    ; [salt, target, dataOff, dataLen, salt, PK_LEN, PK_LEN]
+        %setdelegate            ;; pushes location -> [location, salt, PK_LEN, PK_LEN]
+
+;;; ---- 4. return the account address (left-padded to 32 bytes) --------------
+        push 0
+        mstore                  ; mem[0:32] = location (address right-aligned)
+        push 32
+        push 0
+        return
