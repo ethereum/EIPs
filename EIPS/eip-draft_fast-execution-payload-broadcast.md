@@ -1,5 +1,5 @@
 ---
-eip: xxxx
+eip: 8411
 title: Fast Execution Payload Broadcast
 description: Faster execution payload propagation via chunked gossip
 author: Kamil Salakhiev (@kamilsa), Csaba Kiraly (@cskiraly), Potuz (@potuz)
