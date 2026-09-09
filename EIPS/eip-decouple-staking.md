@@ -12,7 +12,13 @@ requires: 7251
 
 ## Abstract
 
-This EIP separates economic stake creation from validator registration. The execution layer creates stake positions with withdrawal credentials and a versioned authorization commitment. The consensus layer verifies registration and queues the stake for pending-deposit processing. That processing creates the validator and permanently binds it to the stake position. A single append-only stake-event tree records creation and top-up events. New stake IDs equal their creation event indices. Migrated stake IDs retain their original validator indices. The consensus layer maintains authoritative mutable balances and lifecycle state.
+This EIP separates stake creation from validator registration.
+
+A staking contract on the execution layer accepts ETH, withdrawal credentials, and a versioned authorization commitment, and immediately returns a `StakeID`.
+
+A separate registration contract accepts the `StakeID` and registration data. For BLS, the registration data is the validator public key and proof of possession. The consensus layer verifies the registration data before queuing the stake for pending-deposit processing.
+
+Top-ups, withdrawals, and consolidations identify the stake by `StakeID` instead of the validator public key.
 
 ## Motivation
 
@@ -38,14 +44,12 @@ The EL transports registration requests. The CL processes them and determines re
 | Top up | Accept additional ETH for an existing `StakeID`. | Apply the balance increase under lifecycle rules. |
 | Register validator | Transport the opaque registration request to CL. | Verify registration and enqueue the stake for pending-deposit processing. |
 
-In short, validator registration is a two step process:
+Staking has two steps:
 
-- Register stake: Funds are sent from the EL, and a stake position is created in the CL. The staker also gets a stable stakeID.
-- Register validator: This is a transaction that references the stakeID and for BLS, supplies a public key and a signature. This is the authorisation material needed to link the validator to the stake and register them on the CL.
+1. Create stake: send ETH to the staking contract and receive a `StakeID`.
+2. Register a validator: submit the `StakeID`, validator credential, and registration proof. The CL verifies them and queues the stake for pending-deposit processing.
 
-The current deposit contract creates stake and attaches it to a validator in one deposit operation. This links the deposit contract to the authorisation mechanism(BLS in this case) that the CL uses and every EL contract such as withdrawals and consolidations, needs to use the validators public key as a reference because the validator index is created after the deposit.
-
-The new design splits these concerns, the staker (ie the entity who holds the ETH) creates a stake position from the EL and is immediately assigned a stake ID which can be used in other contracts such as withdrawals and consolidations. Furthermore, if the authorisation scheme that the CL uses changes in the future, then this does not require the staker contract to change.
+The existing deposit flow combines these steps. Separating them gives the staker an identifier before validator creation and lets future authorization formats use the same staking contract.
 
 ### Stake Creation and Identity
 
@@ -58,7 +62,7 @@ function stake(
 ) external payable returns (uint64 stakeId);
 ```
 
-`authorizationCommitment` is a versioned commitment to validator credentials. The initial version commits to the validator credential(BLS public key) authorized to register for the stake position.
+`authorizationCommitment` is a versioned commitment to validator credentials. The initial version commits to the BLS public key authorized to register for the stake position.
 
 Stake creation receives this commitment instead of the validator public key and proof of possession. The credential is revealed and verified later during registration.
 
@@ -91,7 +95,7 @@ The Solidity interface uses `uint64` for convenience, however, when the EL proce
 
 Both stake creation and top-ups consume event-tree capacity. Once `event_count` reaches `2**40`, including the reserved migration prefix, the contract MUST reject both operations.
 
-Note: the contract MUST NOT allocate `StakeID`s from a separate counter. Event indices advance for every event. Stake IDs are also monotonically increasing but sparse:
+The contract MUST NOT allocate `StakeID`s from a separate counter. Event indices advance for every event. Stake IDs are also monotonically increasing but sparse:
 
 ```text
 tree-index 8  -> TOP_UP(stake_id=3, ...)
@@ -121,15 +125,15 @@ StakePositionState {
 }
 ```
 
-Registration, top-ups, consolidations, withdrawals, and exit-related accounting reference the original `StakeID`. Existing validators will use their validator index as StakeID. This means that the events counter in the staking contract, should not start from zero, instead the number of validators or deposit events in the old beacon contract.
+Registration, top-ups, consolidations, withdrawals, and exit-related accounting reference the original `StakeID`. The initial event count follows the migration rules in [Existing validators](#existing-validators).
 
-The CL updates `state.stakes[stake_id].balance` as it processes creation and top-up events. It also applies rewards, penalties, slashings, withdrawals, and consolidations to this mutable consensus state.
+The CL stores each stake's balance by `StakeID`. Validator rewards and penalties update the balance of the associated stake, replacing the existing balance lookup by `ValidatorIndex`.
 
 ### Authorization Commitment
 
-The authorization commitment binds a consensus credential and the permissions granted to that credential. It has nothing to do with the withdrawal authority, the withdrawal credentials still denotes who is able to withdraw the stake and receive the rewards from validation.
+The authorization commitment identifies the credential permitted to register for the stake. Withdrawal credentials separately control withdrawals.
 
-One can view the authorised commitment field as granting the ability for a validator to register and use the stake being deposited. This design allows us to, in the future, commit to more granular roles, for example, one could commit to just being a includer/ptc member.
+The initial format authorizes validator registration using a BLS public key. Future versions can include role permissions, such as includer-only or PTC-only participation. Those formats and roles are outside this EIP's current scope.
 
 An authorization commitment is a versioned, fixed-size value:
 
@@ -139,7 +143,7 @@ byte 0       authorization format version
 bytes 1..31  commitment payload
 ```
 
-An initial construction can use:
+The proposed initial construction is:
 
 ```text
 ValidatorCredential {
@@ -148,9 +152,7 @@ ValidatorCredential {
 authorization_commitment = VERSION_1 || SHA256(public_key)[1:]
 ```
 
-Note: this is similar to KZG versioned hashes.
-
-The CL reads the version from the stored authorization commitment to know how to interpret the revealed validator credential and verify its proof of possession.
+The version defines the credential encoding, commitment construction, and proof verification rules. The CL reads it from the stored authorization commitment.
 
 ### Role Registration
 
@@ -218,6 +220,8 @@ The stake-to-validator binding is permanent. Neither the `StakeID` nor the crede
 
 Registration status is authoritative on the CL. The EL MUST NOT expose canonical registration status without an explicit mechanism that returns it from the CL.
 
+### Lifecycle Operations
+
 #### Unregistered stake
 
 A stake position can exist without successful registration. The operator can delay registration, or registration can fail because of a commitment mismatch, invalid proof of possession, or consumed credential.
@@ -236,9 +240,9 @@ function topup(
 
 The EL appends a `TOP_UP { stake_id, amount }` event to the stake-event tree. This advances the event count while preserving the referenced `StakeID`.
 
-The CL consumes the event and updates the mutable stake balance. For example, `CREATE_STAKE(32 ETH)` at index 10 creates stakeID 10. At event index 17, `TOP_UP(stake_id=10, 8 ETH)` increases its CL balance by 8 ETH, subject to the applicable lifecycle rules like whether the validator has exited.
+The CL consumes the event and updates the mutable stake balance. For example, `CREATE_STAKE(32 ETH)` at index 10 creates stake 10. At event index 17, `TOP_UP(stake_id=10, 8 ETH)` increases its CL balance by 8 ETH, subject to the applicable lifecycle rules like whether the validator has exited.
 
-We do not change the rules regarding topups:
+We do not change the CL semantics regarding topups:
 
 | Stake or validator state | Top-up behavior |
 | --- | --- |
@@ -248,7 +252,7 @@ We do not change the rules regarding topups:
 
 #### Consolidations
 
-For registered validators, consolidation retains the CL rules introduced by [EIP-7251](./eip-7251.md). Requests now identify source and target consolidations by `StakeID` instead of validator public keys:
+For registered validators, consolidation retains the CL rules introduced by [EIP-7251](./eip-7251.md). Requests identify source and target stakes by `StakeID` instead of validator public keys:
 
 ```text
 StakeConsolidationRequest {
@@ -257,7 +261,7 @@ StakeConsolidationRequest {
 }
 ```
 
-The CL resolves stakeID to the associated validators and applies existing authorization, eligibility, exit, churn, and transfer rules. Balance transfers update the corresponding stake balances. Consolidation MUST NOT change either position's `StakeID`, authorization commitment, withdrawal credentials, or validator binding.
+The CL resolves the stake IDs to their associated validators and applies existing authorization, eligibility, exit, churn, and transfer rules. Balance transfers update the corresponding stake balances. Consolidation MUST NOT change either position's `StakeID`, authorization commitment, withdrawal credentials, or validator binding.
 
 #### Withdrawals
 
@@ -274,7 +278,7 @@ For registered validators, withdrawal rules remain unchanged. Requests identify 
 
 #### Recovery of unregistered stake
 
-Before stake is registered and enters the deposit queue, the withdrawal authority can request recovery of the full stake balance.
+Before registration is accepted into the pending-deposit queue, the withdrawal authority can request recovery of the full stake balance.
 
 | Constant | Value | Meaning |
 | --- | --- | --- |
@@ -282,10 +286,10 @@ Before stake is registered and enters the deposit queue, the withdrawal authorit
 | `PENDING_UNREGISTERED_WITHDRAWALS_LIMIT` | `4096` | Maximum recovery requests waiting in CL state. |
 
 - The CL MUST verify that the request's authenticated sender matches the stake's withdrawal address before adding it to the queue.
-- Requests are processed in acceptance order, up to eight per block and within the overall withdrawal payload limit. Remaining requests wait for a later block.
+- Requests are immediately eligible, with no mandatory delay. They are processed in acceptance order, up to eight per block and within the overall withdrawal payload limit. Remaining requests wait for a later block.
 - If the queue is full, the CL MUST ignore new recovery requests. The funds remain in the stake, and the owner can retry later.
-- The CL MUST reject recovery/withdrawals after stake enters the deposit queue. While recovery is queued, the CL MUST reject registration and duplicate recovery requests for that stake.
-- Recovery preserves the `StakeID` and authorization commitment. Later top-ups can fund registration under the same commitment. This is opinionated and the main reason is to not need the CL to retain information about a unregistered stake that was withdrawn.
+- The CL MUST reject unregistered-stake recovery after registration enters the pending-deposit queue. Ordinary validator withdrawal rules apply after validator creation. While recovery is queued, the CL MUST reject registration and duplicate recovery requests for that stake.
+- Recovery preserves the `StakeID` and authorization commitment. Later top-ups can fund registration under the same commitment.
 - Unregistered stakes MUST NOT be consolidation sources or targets. To fund another stake, the owner first withdraws the ETH, then deposits it through the staking contract.
 
 ### Outstanding Specification Details
@@ -310,15 +314,15 @@ A fixed-size commitment lets the staking contract accept future credential forma
 
 ### Consensus-layer registration
 
-The CL holds the state needed to check credential reuse and validator status. Verifying registration there avoids duplicating that state in an EL contract. Using the EL to transport the information to the CL lets operators submit registration through FOCIL and be rate limited by the infrastructure we have on the EL (like gas limit).
+The CL holds the state needed to check credential reuse and validator status. Verifying registration there avoids duplicating that state in an EL contract. Using the EL to transport the information to the CL lets operators submit registration through the ELs transaction inclusion mechanisms(FOCIL) and be rate limited by EL infrastructure(gas limit)
 
 ### Withdrawal-only recovery
 
-Allowing unregistered stakes to consolidate would introduce balance transfers outside the existing validator consolidation rules. Since the main purpose is recovery, we only utilise withdrawals for this.
+Allowing unregistered stakes to consolidate would introduce balance transfers outside the existing validator consolidation rules. Withdrawal recovery returns funds to their owner, who can fund another stake through the staking contract.
 
 ## Backwards Compatibility
 
-This is a breaking change.
+This change requires a coordinated fork, a new staking contract, and updates to staking tools and CL balance accounting.
 
 Activation rules remain unchanged. The fork transition must define how pending legacy deposits receive stake IDs and how deposits to the old contract are handled after the fork.
 
