@@ -1,0 +1,68 @@
+
+---
+eip: <to be assigned>
+title: Chain URI Format for Human-Readable Blockchain Transactions
+description: A URI scheme that encodes address, token, and chain stack in a human-readable and linkable format.
+author: Dale Clifford (@daleclifford)
+discussions-to: https://github.com/daleclifford/eips/discussions
+status: Draft
+type: Standards Track
+category: Interface
+created: 2025-05-01
+requires: 
+---
+
+## Abstract
+
+This proposal introduces a standardized URI format using the `chain:` scheme to enable human-readable, machine-actionable blockchain interactions. The format builds on familiar internet conventions (like email and `mailto:` URIs) to make blockchain transactions clearer and safer for end users. It supports tokens, layered chain networks, and optional query parameters like amount and memo.
+
+## Motivation
+
+Blockchain addresses and transaction routing are opaque and error-prone for most users. The average person does not understand hexadecimal wallet addresses, chain compatibility, or token contract safety. This proposal provides a clear, readable, and linkable format to express intent, destination, and token context—bringing blockchain UX in line with the usability of email, links, and QR codes.
+
+## Specification
+
+### URI Format
+
+```
+chain:<address>@$<token>.<chain_path>?<parameters>
+```
+
+### Components
+
+- `address`: The full public blockchain address (e.g. 0x1234abcd...)
+- `$token`: Token being sent, using a dollar-prefixed symbol (e.g. $usdc)
+- `chain_path`: Dot-separated hierarchy (e.g. worldchain.op.eth)
+- `parameters`: Optional key-value query string (e.g. amount, memo)
+
+### Example
+
+```
+chain:0x1234abcd@$usdc.worldchain.op.eth?amount=50.00&memo=Rent
+```
+
+## Rationale
+
+Everyday users find blockchain intimidating due to technical address formats, multiple incompatible chains, and irreversible mistakes. Just as `mailto:` helped email adoption by letting users encode full messages in a URL, `chain:` allows wallet actions to be represented in a clean, shareable form. This lowers the barrier to entry, reduces errors, and supports global-scale UX for Web3 and allows blockchain actions from anywhere e.g. a charity website, just like an email mailto: or call: anchor link.
+
+## Backwards Compatibility
+
+This proposal is non-breaking. It introduces a new URI scheme that can be interpreted by wallets and dApps without interfering with existing transaction methods.
+
+## Test Cases
+
+- `chain:0x1234abcd@$usdc.op.eth?amount=100&memo=Lunch`
+- `chain:0x5678efgh@$world.worldchain.op.eth`
+- `chain:0x9999aaaa:0x04pubkeyhere@$usdt.arb.eth?amount=5.00`
+
+## Reference Implementation
+
+TBD (to be implemented in wallet libraries such as WalletConnect, MetaMask, etc.)
+
+## Security Considerations
+
+Wallets MUST validate the token and contract address on the resolved chain path. Clients should warn users of unsupported tokens, spoofed addresses, or fake domain lookalikes. Public key sharing (if included) MUST be optional and handled securely.
+
+## Copyright
+
+Copyright and related rights waived via CC0.
