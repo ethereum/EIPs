@@ -16,9 +16,13 @@ concurrency:
   cancel-in-progress: true
 
 name: Auto Review Bot Trigger
+permissions:
+  actions: write
+  contents: read
 jobs:
   trigger:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     name: Trigger
     steps:
       - name: Write PR Number - PR Target
@@ -38,6 +42,16 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
+
+      - name: Validate workflow dispatch PR number
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+        run: |
+          if [[ ! "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo 'pr_number must contain digits only' >&2
+            exit 1
+          fi
 
       - name: Write PR Number - Comment Retrigger
         run: echo $PR_NUMBER > pr-number.txt

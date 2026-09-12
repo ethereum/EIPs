@@ -9,23 +9,40 @@ name: Auto Review Bot
 jobs:
   auto-review-bot:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     name: Run
+    permissions:
+      actions: read
+      contents: read
     steps:
       - name: Fetch PR Number
-        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
+        id: fetch-pr-number
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: pr-number
-          workflow: auto-review-trigger.yml
-          run_id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+          if-no-artifact-found: ignore
+
+      - name: Check PR Number file
+        id: check-pr-number
+        run: |
+          if [[ -f pr-number.txt ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Save PR Number
         id: save-pr-number
-        run: echo "pr=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+        if: ${{ steps.check-pr-number.outputs.exists == 'true' }}
+        run: echo "pr=$(cat pr-number.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Auto Review Bot
         id: auto-review-bot
-        uses: ethereum/eip-review-bot@dist
-        continue-on-error: true
+        uses: ethereum/eip-review-bot@5836f86feabefae5640ea1380d08eb2725d4d163 # dist
+        if: ${{ steps.check-pr-number.outputs.exists == 'true' }}
         with:
           token: ${{ secrets.TOKEN }}
           config: config/eip-editors.yml

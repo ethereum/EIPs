@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+validator_name="eipw"
+validator_version="0.11.0"
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+commit=""
+report="validation-report.json"
+repository_kind="eip"
+sources=()
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/verify-eip --commit COMMIT --source PATH [--source PATH ...] [--repository-kind eip|erc] [--report PATH]
+
+Requires eipw 0.11.0 installed locally:
+  cargo install eipw --version 0.11.0 --locked
+EOF
+}
+
+while (($#)); do
+  case "$1" in
+    --commit) commit="$2"; shift 2 ;;
+    --source) sources+=("$2"); shift 2 ;;
+    --repository-kind) repository_kind="$2"; shift 2 ;;
+    --report) report="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "unknown argument: $1" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+if [[ -z "$commit" || ${#sources[@]} -eq 0 ]]; then
+  usage >&2
+  exit 2
+fi
+if [[ ! "$commit" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "--commit must be a full 40-character Git commit SHA" >&2
+  exit 2
+fi
+if [[ "$repository_kind" != eip && "$repository_kind" != erc ]]; then
+  echo "--repository-kind must be eip or erc" >&2
+  exit 2
+fi
+
+actual_commit="$(git -C "$repo_root" rev-parse HEAD)"
+if [[ "$actual_commit" != "$commit" ]]; then
+  echo "checked-out HEAD $actual_commit does not match requested commit $commit" >&2
+  exit 2
+fi
+
+rules_path="$repo_root/config/eipw.toml"
+rules_sha256="$(sha256sum "$rules_path" | awk '{print $1}')"
+canonical_sources=()
+for source in "${sources[@]}"; do
+  path="$source"
+  [[ "$path" = /* ]] || path="$repo_root/$path"
+  if [[ ! -e "$path" ]]; then
+    echo "source does not exist: $source" >&2
+    exit 2
+  fi
+  canonical_sources+=("${path#"$repo_root/"}")
+done
+mapfile -t canonical_sources < <(printf '%s\n' "${canonical_sources[@]}" | sort -u)
+
+if ! command -v "$validator_name" >/dev/null 2>&1; then
+  echo "eipw $validator_version is required; install it with cargo install eipw --version $validator_version --locked" >&2
+  exit 2
+fi
+
+validator_output="$(mktemp)"
+trap 'rm -f "$validator_output"' EXIT
+set +e
+"$validator_name" --format json "${canonical_sources[@]}" > "$validator_output"
+validator_exit=$?
+set -e
+
+ruby -rjson -ryaml -e '
+  output = File.read(ARGV.fetch(0))
+  begin
+    diagnostics = JSON.parse(output)
+  rescue JSON::ParserError
+    diagnostics = [{"message" => output.strip}]
+  end
+  result = ARGV.fetch(1).to_i == 0 ? "pass" : "fail"
+  report = {
+    "schema" => "eip-validation-report-1",
+    "specification" => "eip-validation-v1",
+    "validator" => {"name" => "eipw", "version" => "0.11.0"},
+    "rules" => {"path" => "config/eipw.toml", "sha256" => ARGV.fetch(2)},
+    "input" => {"commit" => ARGV.fetch(3), "repository_kind" => ARGV.fetch(4), "sources" => ARGV.fetch(5).split("\n")},
+    "result" => result,
+    "exit_code" => ARGV.fetch(1).to_i,
+    "diagnostics" => diagnostics
+  }
+  File.write(ARGV.fetch(6), JSON.pretty_generate(report) + "\n")
+' "$validator_output" "$validator_exit" "$rules_sha256" "$commit" "$repository_kind" "$(printf '%s\n' "${canonical_sources[@]}")" "$report"
+
+cat "$report"
+exit "$validator_exit"

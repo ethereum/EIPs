@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+run_check() {
+  printf '\n==> %s\n' "$*"
+  "$@"
+}
+
+run_check "$repo_root/tests/workflows/actionlint.sh"
+run_check "$repo_root/tests/workflows/security.sh"
+run_check "$repo_root/tests/workflows/run.sh"
+run_check "$repo_root/tests/workflows/sync.sh"
+run_check "$repo_root/tests/validation/run.sh"
+
+git -C "$repo_root" diff --check
+printf '\nworkflow verification passed\n'

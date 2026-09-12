@@ -13,10 +13,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  actions: write
+  contents: read
+  pull-requests: read
+
 jobs:
   save-pr:
     name: Save PR Number
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Save PR number
@@ -36,9 +42,27 @@ jobs:
           name: pr_number
           path: pr/
 
+  workflow-checks:
+    name: Workflow Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
+
+      - name: Run Workflow Tests
+        run: ./scripts/verify
+
+      - name: Check workflow files
+        run: tests/workflows/actionlint.sh -color
+
   htmlproofer:
     name: HTMLProofer
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     steps:
       - name: Checkout EIPs
@@ -46,6 +70,8 @@ jobs:
         with:
           repository: ethereum/EIPs
           path: ''
+          fetch-depth: 0
+          persist-credentials: false
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
       - name: Setup Ruby
@@ -54,24 +80,87 @@ jobs:
           ruby-version: '3.1' # Not needed with a .ruby-version file
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
-      - name: Build with Jekyll
+      - name: Determine Jekyll and HTMLProofer scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          bundle exec jekyll doctor
-          bundle exec jekyll build
+          set -euo pipefail
+
+          mapfile -t changed_files < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          if printf '%s\n' "${changed_files[@]}" | grep -Eq '^(_config\.yml|_data/|_includes/|_layouts/|assets/|[^/]+\.html$)'; then
+            echo ./_site > /tmp/htmlproofer_paths.txt
+            echo JEKYLL_CONFIG=_config.yml >> "$GITHUB_ENV"
+          else
+            printf '%s\n' "${changed_files[@]}" \
+              | { grep -E '^EIPS/eip-[0-9]+\.md$' || true; } \
+              | while IFS= read -r source; do [[ -f "$source" ]] && echo "$source"; done \
+              | sort -u > /tmp/jekyll-sources
+
+            if [[ ! -s /tmp/jekyll-sources ]]; then
+              echo ./_site > /tmp/htmlproofer_paths.txt
+              echo JEKYLL_CONFIG=_config.yml >> "$GITHUB_ENV"
+            else
+              sed -E 's|^EIPS/(eip-[0-9]+)\.md$|./_site/EIPS/\1.html|' \
+                /tmp/jekyll-sources > /tmp/htmlproofer_paths.txt
+
+              while IFS= read -r source; do
+                { grep -Eo '(\./|/EIPS/)?eip-[0-9]+(\.md)?' "$source" || true; } \
+                  | sed -E 's|.*eip-([0-9]+).*|EIPS/eip-\1.md|'
+                { grep -E '^requires:' "$source" || true; } \
+                  | { grep -Eo '[0-9]+' || true; } \
+                  | sed -E 's|^|EIPS/eip-|; s|$|.md|'
+              done < /tmp/jekyll-sources > /tmp/jekyll-dependencies
+              cat /tmp/jekyll-dependencies \
+                | while IFS= read -r source; do [[ -f "$source" ]] && echo "$source"; done \
+                >> /tmp/jekyll-sources
+
+              sort -u /tmp/jekyll-sources -o /tmp/jekyll-sources
+              find EIPS -maxdepth 1 -name 'eip-*.md' -print \
+                | sort \
+                | { grep -vxF -f /tmp/jekyll-sources || true; } \
+                > /tmp/jekyll-exclude
+              ruby -ryaml -e '
+                base = YAML.safe_load(File.read("_config.yml"), aliases: true)
+                puts({"exclude" => Array(base["exclude"]) + ARGF.each_line(chomp: true).to_a}.to_yaml)
+              ' /tmp/jekyll-exclude > /tmp/jekyll-ci.yml
+              echo JEKYLL_CONFIG=_config.yml,/tmp/jekyll-ci.yml >> "$GITHUB_ENV"
+            fi
+          fi
+
+          tr ',' '\n' < /tmp/htmlproofer_paths.txt \
+            | sed -E 's/^[[:space:]]+|[[:space:]]+$//g' \
+            | sed '/^$/d' > /tmp/htmlproofer_paths.normalized
+          mv /tmp/htmlproofer_paths.normalized /tmp/htmlproofer_paths.txt
+
+          echo "HTMLProofer paths:"
+          cat /tmp/htmlproofer_paths.txt
+
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --config "$JEKYLL_CONFIG" --baseurl ""
         env:
           JEKYLL_ENV: production
+
+      - name: Jekyll Doctor
+        run: bundle exec jekyll doctor --config "$JEKYLL_CONFIG"
+        env:
+          JEKYLL_ENV: production
+
       - name: HTML Proofer
-        run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
+        run: xargs -a /tmp/htmlproofer_paths.txt -r -n 1 bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https --root-dir ./_site
       - name: DNS Validator
         run: bundle exec github-pages health-check
 
   link-check:
     name: Link Check
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
 
       - name: Link Checker
         uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
@@ -84,24 +173,36 @@ jobs:
   codespell:
     name: CodeSpell
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          set -euo pipefail
+          changed_files="$(gh pr diff "$PR_NUMBER" --name-only)"
+          {
+            echo 'CHANGED_FILES<<EOF'
+            printf '%s\n' "$changed_files"
+            echo EOF
+          } >> "$GITHUB_ENV"
+          if [[ -n "$changed_files" ]]; then
+            echo 'has_files=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'has_files=false' >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         with:
           check_filenames: true
           ignore_words_file: config/.codespell-whitelist
@@ -111,14 +212,17 @@ jobs:
   eipw-validator:
     name: EIP Walidator
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
-      - uses: ethereum/eipw-action@b858a0f2687c12af12280aa934c3b842747414fd
+      - uses: ethereum/eipw-action@be3fa642ec311d0b8e1fdb811e5c9b4ada3d3d93
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -128,23 +232,36 @@ jobs:
   markdownlint:
     name: Markdown Linter
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        with:
+          persist-credentials: false
 
       - name: Get Changed Files
         id: changed
-        continue-on-error: true
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          set -euo pipefail
+          changed_files="$(gh pr diff "$PR_NUMBER" --name-only)"
+          markdown_files="$(printf '%s\n' "$changed_files" | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' || true)"
+          {
+            echo 'CHANGED_FILES<<EOF'
+            printf '%s\n' "$markdown_files"
+            echo EOF
+          } >> "$GITHUB_ENV"
+          if [[ -n "$markdown_files" ]]; then
+            echo 'has_files=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'has_files=false' >> "$GITHUB_OUTPUT"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Lint
         uses: DavidAnson/markdownlint-cli2-action@f5cf187ef11bd3a68a127321b794aa252ff23019
-        if: steps.changed.outcome == 'success'
+        if: steps.changed.outputs.has_files == 'true'
         with:
           command: config
           globs: |
