@@ -1,0 +1,211 @@
+;;; MLDSAAuth.eas — Canonical ML-DSA authenticator for delegated accounts.
+;;; geas (github.com/fjl/geas).
+;;;
+;;; This is the *target* of an EIP-7819 SETDELEGATE. A PQC account's code is:
+;;;
+;;;     0xef0100 ++ <address of THIS contract> ++ <ML-DSA public key>
+;;;                 \__ 20 bytes ____________/    \__ 1312/1952/2592 bytes __/
+;;;
+;;; This contract is a VERIFY-frame authenticator, meaningful ONLY inside an
+;;; EIP-8141 Frame Transaction — it relies on TXPARAMLOAD (frame hash) and
+;;; APPROVE, which exist only there. It is not a general CALL target.
+;;;
+;;; When an 8141 Frame Tx names the account as sender, ENTRY_POINT (0xaa) CALLs
+;;; the account's VERIFY frame; the delegation forwards execution into THIS code,
+;;; running in the ACCOUNT'S context:
+;;;
+;;;     ADDRESS                    == the PQC account
+;;;     EXTCODESIZE(ADDRESS)       == 23 + PK_LEN   (designator + pubkey)
+;;;     (EXTCODECOPY ADDRESS)[23:] == the account's own ML-DSA public key
+;;;
+;;; IMPORTANT: we read the pubkey with EXTCODESIZE/EXTCODECOPY against ADDRESS,
+;;; NOT with CODESIZE/CODECOPY. During delegated (EIP-7702/7819) execution the
+;;; plain CODE* instructions return THIS verifier's own bytecode; only EXTCODE*
+;;; against the account address see the delegation designator + trailing pubkey.
+;;;
+;;; An alternative design bakes verifier+pubkey into every account and reads the
+;;; pubkey from code offset 0. This one makes each account a THIN EIP-7819
+;;; delegation
+;;;   0xef0100 ‖ AUTH_ADDR ‖ pk
+;;; so the verifier is shared canonical code and only the pubkey rides in
+;;; per-account trailing data => pubkey is at offset 23, not 0.
+;;;
+;;; ALGORITHM:
+;;;   1. pk = (extcode of ADDRESS)[23:]    (ADDRESS self-read via EXTCODECOPY)
+;;;   2. pick precompile + SIG_LEN from len(pk)   (44/65/87)
+;;;   3. frameHash = TXPARAMLOAD           (THE MESSAGE; protocol-authenticated)
+;;;   4. lay out  pk ‖ sig ‖ frameHash  and STATICCALL the precompile
+;;;   5. verdict==1 ? APPROVE : REVERT
+;;;
+;;; ASSEMBLES with geas (`geas MLDSAAuth.eas` -> runtime bytecode, exit 0).
+;;; geas may print a few benign "stack comment renames item" notes: the
+;;; `; [ ... ]` post-stack comments are human documentation, and geas's optional
+;;; stack tracker names some intermediates `_N` where our comments name them
+;;; (e.g. SIG_LEN, precompile). Stack DEPTH is verified consistent; the notes are
+;;; naming-only and do not affect the emitted bytes.
+;;;
+;;; NOTE: SETDELEGATE / APPROVE / TXPARAMLOAD and the VERIFY_MLDSA precompiles do
+;;; not exist in any shipped EVM (or in geas's opcode table) yet. They are emitted
+;;; as raw bytes via #bytes-backed instruction macros below, with PLACEHOLDER
+;;; opcode numbers. This assembles to a byte string that documents intent; it is
+;;; runnable only on an EVM patched to recognize these opcodes/precompiles.
+
+;;; ---- new-opcode placeholders (raw byte emit; patch when EIPs assign) --------
+#define %APPROVE {
+    #bytes 0x4b                 ; EIP-8141 APPROVE     (placeholder opcode)
+}
+#define %TXPARAMLOAD {
+    #bytes 0x4c                 ; EIP-8141 TXPARAMLOAD (placeholder opcode)
+}
+;;; ENTRY_POINT (0xaa) is our CALLER, not used inside this frame.
+
+;;; TXPARAMLOAD parameter index for the frame hash (EIP-8141).
+#define TXPARAM_FRAMEHASH = 0x00
+
+;;; ---- ML-DSA parameter tables (FIPS 204, compressed encoding) ---------------
+;;; PK_LEN uniquely identifies the level and drives everything.
+#define PK44  = 1312
+#define PK65  = 1952
+#define PK87  = 2592
+#define SIG44 = 2420
+#define SIG65 = 3309
+#define SIG87 = 4627
+
+;;; Precompile addresses are TBD (contiguous block assigned at standardization):
+;;;   PRECOMPILE_44 = <TBD>, PRECOMPILE_65 = <TBD>+1, PRECOMPILE_87 = <TBD>+2.
+#define PRECOMPILE_BASE = 0x00              ; <TBD> — set at assembly time
+#define PRECOMPILE_44 = PRECOMPILE_BASE
+#define PRECOMPILE_65 = PRECOMPILE_BASE + 1
+#define PRECOMPILE_87 = PRECOMPILE_BASE + 2
+
+;;; ---- memory layout ---------------------------------------------------------
+;;;   PK_MEM = 0x0100 : pubkey     (PK_LEN)
+;;;   +PK_LEN         : signature  (SIG_LEN)   immediately after pubkey
+;;;   +SIG_LEN        : frameHash  (32 bytes)  the message, immediately after sig
+;;;   0x00            : return/scratch word
+#define PK_MEM     = 0x0100
+#define HEADER_LEN = 23                     ; len(0xef0100 ++ address); pubkey starts here
+
+;;; ===========================================================================
+;;; 1. Read our own trailing pubkey from the ACCOUNT'S code into mem[PK_MEM].
+;;;    Use EXTCODESIZE/EXTCODECOPY against ADDRESS (the account) — NOT CODE*,
+;;;    which under delegation would read this verifier's own bytecode.
+;;;    PK_LEN = EXTCODESIZE(ADDRESS) - 23 (the designator).
+;;; ===========================================================================
+        address
+        extcodesize             ; [acctCodeSize]     = 23 + PK_LEN
+        push HEADER_LEN
+        swap1
+        sub                     ; [PK_LEN]           = EXTCODESIZE(ADDRESS) - 23
+        dup1                    ; [PK_LEN, PK_LEN]   (keep copy for dispatch)
+
+        ;; EXTCODECOPY(addr=ADDRESS, destOffset=PK_MEM, offset=HEADER_LEN, size=PK_LEN)
+        dup1                    ; [PK_LEN, PK_LEN, PK_LEN]                (size)
+        push HEADER_LEN         ; [23, PK_LEN, PK_LEN, PK_LEN]           (code offset)
+        push PK_MEM             ; [PK_MEM, 23, PK_LEN, PK_LEN, PK_LEN]   (dest)
+        address                 ; [ADDRESS, PK_MEM, 23, PK_LEN, PK_LEN, PK_LEN]  (addr)
+        extcodecopy             ; [PK_LEN, PK_LEN]   (pubkey now @ PK_MEM)
+
+;;; ===========================================================================
+;;; 2. Dispatch on PK_LEN -> push (SIG_LEN, precompile). Reject unknown lengths.
+;;; ===========================================================================
+        dup1
+        push PK44
+        eq
+        jumpi @is44
+        dup1
+        push PK65
+        eq
+        jumpi @is65
+        dup1
+        push PK87
+        eq
+        jumpi @is87
+        jump @reject            ; not a well-formed PQC account
+
+is44:
+        push SIG44
+        push PRECOMPILE_44
+        jump @selected
+is65:
+        push SIG65
+        push PRECOMPILE_65
+        jump @selected
+is87:
+        push SIG87
+        push PRECOMPILE_87
+        jump @selected
+
+;;; stack at @selected: [precompile, SIG_LEN, PK_LEN]
+selected:
+
+;;; ===========================================================================
+;;; 3. Signature copy. Calldata is JUST the signature: [0 : SIG_LEN).
+;;;    Require calldatasize == SIG_LEN. dest = PK_MEM + PK_LEN.
+;;; ===========================================================================
+        dup2                    ;; dup SIG_LEN -> [SIG_LEN, precompile, SIG_LEN, PK_LEN]
+        calldatasize
+        eq
+        iszero
+        jumpi @reject           ; wrong-size calldata -> reject
+
+        ;; sigDest = PK_MEM + PK_LEN
+        push PK_MEM
+        dup4
+        add                     ;; sigDest = PK_MEM+PK_LEN, atop [precompile, SIG_LEN, PK_LEN]
+        ;; CALLDATACOPY(dest=sigDest, cdOffset=0, len=SIG_LEN)
+        dup3                    ; [SIG_LEN, sigDest, ...]      (len)
+        push 0                  ; [0, SIG_LEN, sigDest, ...]   (cd offset)
+        dup3                    ; [sigDest, 0, SIG_LEN, sigDest, ...]  (dest)
+        calldatacopy            ; [sigDest, precompile, SIG_LEN, PK_LEN]
+        pop                     ; [precompile, SIG_LEN, PK_LEN]
+
+;;; ===========================================================================
+;;; 4. Message = FRAME HASH via TXPARAMLOAD, placed after the sig.
+;;;    THE FRAME HASH IS THE MESSAGE (32 bytes). Loaded from the frame context,
+;;;    NOT calldata, so a caller can't sign a different frame than executes.
+;;;    msgDest = PK_MEM + PK_LEN + SIG_LEN.
+;;; ===========================================================================
+        push PK_MEM
+        dup4
+        add
+        dup3
+        add                     ; [msgDest, precompile, SIG_LEN, PK_LEN]
+        push TXPARAM_FRAMEHASH
+        %TXPARAMLOAD            ; [frameHash, msgDest, precompile, SIG_LEN, PK_LEN]
+        dup2
+        mstore                  ; store frameHash @ msgDest
+        pop                     ; [precompile, SIG_LEN, PK_LEN]  (msgLen const 32)
+
+;;; ===========================================================================
+;;; 5. STATICCALL precompile with input = pk ‖ sig ‖ frameHash.
+;;;    inOff=PK_MEM, inLen=PK_LEN+SIG_LEN+32, out=0x00 len 32.
+;;;    STATICCALL(gas, addr, inOff, inLen, outOff, outLen)
+;;; ===========================================================================
+        push 32                 ; outLen
+        push 0                  ; outOff
+        dup4
+        dup4
+        add
+        push 32
+        add                     ; inLen = PK_LEN+SIG_LEN+32
+        push PK_MEM             ; inOff
+        dup6                    ; precompile addr
+        gas
+        staticcall              ; [ok, precompile, SIG_LEN, PK_LEN]
+        iszero
+        jumpi @reject           ; ok==0 => call itself failed (not a verdict)
+
+;;; ===========================================================================
+;;; 6. Load 32-byte verdict; APPROVE on 1, else reject.
+;;; ===========================================================================
+        push 0
+        mload                   ; [verdict, ...]
+        iszero
+        jumpi @reject           ; verdict==0 => invalid signature
+        %APPROVE                ; verdict==1 => authorize the frame (halts VERIFY)
+
+reject:
+        push 0
+        push 0
+        revert
