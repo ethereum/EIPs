@@ -7,7 +7,7 @@ import { BaseLock } from "./BaseLock.sol";
 /// @title Bidding on Ethereum addresses
 /// @author Victor Porton
 /// @notice Not audited, not enough tested.
-/// This allows anyone claim conditional tokens in order for him to transfer money from the future.
+/// This allows anyone to claim conditional tokens in order for him to transfer money from the future.
 /// See `docs/future-money.rst`.
 abstract contract BaseBidOnAddresses is BaseLock {
     using ABDKMath64x64 for int128;
@@ -63,7 +63,7 @@ abstract contract BaseBidOnAddresses is BaseLock {
     /// @param _oracleId The oracle ID.
     /// @param _condition The condition.
     /// @param _numerator The relative score of the condition.
-    /// Note: We could make oracles easily verificable by a hash of all the data, but
+    /// Note: We could make oracles easily verifiable by a hash of all the data, but
     ///       - It may need allowing to set a numerator only once.
     ///       - It may be not necessary because future technology will allow to aggregate blockchains.
     function reportNumerator(uint64 _oracleId, uint256 _condition, uint256 _numerator) external
