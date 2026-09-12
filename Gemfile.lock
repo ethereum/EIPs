@@ -257,7 +257,7 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rexml (3.2.5)
+    rexml (3.3.9)
     rouge (3.26.0)
     ruby-rc4 (0.1.5)
     ruby2_keywords (0.0.5)
@@ -285,12 +285,13 @@ GEM
       unf_ext
     unf_ext (0.0.8.2)
     unicode-display_width (1.8.0)
-    webrick (1.8.1)
+    webrick (1.8.2)
     yell (2.2.2)
     zeitwerk (2.6.7)
 
 PLATFORMS
   arm64-darwin-22
+  arm64-darwin-24
   x86_64-linux
 
 DEPENDENCIES
@@ -298,8 +299,9 @@ DEPENDENCIES
   github-pages (= 228)
   html-proofer (>= 5.0.7)
   minima (~> 2.0)
+  rexml (~> 3.3.9)
   tzinfo-data
-  webrick (~> 1.8)
+  webrick (~> 1.8.2)
 
 BUNDLED WITH
    2.4.12
