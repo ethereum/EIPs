@@ -1,0 +1,122 @@
+{
+    "$schema": "./storage-layout.schema.json",
+
+    "$comment": "Storage layout for a standard ERC-20 token, taken from solc --storage-layout output and annotated with ERC-7730 display hints. Every entry is compiler-derived sequential storage, so 'source' and 'baseSlotDerivation' are omitted throughout.",
+
+    "compiler": {
+        "language": "Solidity",
+        "version": "0.8.24"
+    },
+
+    "storage": [
+        {
+            "label": "_totalSupply",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256",
+            "display": {
+                "label": "Total Supply",
+                "description": "The total number of tokens in circulation.",
+                "format": "tokenAmount",
+                "params": { "tokenPath": "@.to" }
+            }
+        },
+        {
+            "label": "_balances",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_uint256)",
+            "display": {
+                "label": "Balance of {key[0]}",
+                "description": "Token balance held by each account.",
+                "keyFormats": [
+                    { "format": "addressName" }
+                ],
+                "format": "tokenAmount",
+                "params": { "tokenPath": "@.to" },
+                "template": [
+                    {
+                        "condition": { ">": [{ "var": "newValue" }, { "var": "oldValue" }] },
+                        "value": "Balance of {key[0]} increased from {oldValue} to {newValue}"
+                    },
+                    {
+                        "condition": { "<": [{ "var": "newValue" }, { "var": "oldValue" }] },
+                        "value": "Balance of {key[0]} decreased from {oldValue} to {newValue}"
+                    },
+                    {
+                        "value": "Balance of {key[0]} changed from {oldValue} to {newValue}"
+                    }
+                ]
+            }
+        },
+        {
+            "label": "_allowances",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "display": {
+                "label": "Allowance of {key[1]} granted by {key[0]}",
+                "description": "Spending allowances: the amount account key[1] is permitted to transfer on behalf of account key[0].",
+                "keyFormats": [
+                    { "format": "addressName" },
+                    { "format": "addressName" }
+                ],
+                "format": "tokenAmount",
+                "params": { "tokenPath": "@.to" },
+                "template": "Allowance of {key[1]} granted by {key[0]} changed from {oldValue} to {newValue}"
+            }
+        },
+        {
+            "label": "_name",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_string_storage",
+            "display": {
+                "label": "Token name",
+                "format": "raw"
+            }
+        },
+        {
+            "label": "_symbol",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_string_storage",
+            "display": {
+                "label": "Token symbol",
+                "format": "raw"
+            }
+        }
+    ],
+
+    "types": {
+        "t_uint256": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+        },
+        "t_address": {
+            "encoding": "inplace",
+            "label": "address",
+            "numberOfBytes": "20"
+        },
+        "t_string_storage": {
+            "encoding": "bytes",
+            "label": "string",
+            "numberOfBytes": "32"
+        },
+        "t_mapping(t_address,t_uint256)": {
+            "encoding": "mapping",
+            "key": "t_address",
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32",
+            "value": "t_uint256"
+        },
+        "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "encoding": "mapping",
+            "key": "t_address",
+            "label": "mapping(address => mapping(address => uint256))",
+            "numberOfBytes": "32",
+            "value": "t_mapping(t_address,t_uint256)"
+        }
+    }
+}
