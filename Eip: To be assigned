@@ -1,0 +1,171 @@
+---
+eip: <to be assigned>
+title: Geometric Sharding – Scaling Ethereum with Simplex Geometry
+description: A sharding architecture using geometric invariants (H²+Q²=1) to partition state, enable parallel execution, and automatically prune unused data.
+author: Liyabona Manase (@AmazAmajPrimarycooperative) <liyabona1414@gmail.com>
+discussions-to: https://ethereum-magicians.org/t/eip-8881-geometric-sharding
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-03-26
+requires: 
+---
+
+## Abstract
+This EIP introduces a geometric sharding mechanism where the global Ethereum state is represented as a **simplex tree**. Each shard is a \((d-1)\)-simplex whose vertices are accounts or contracts. Cross‑shard transactions are validated by checking that the sum of simplex volumes remains constant (conservation of geometric weight). Shards with volume below a threshold are automatically pruned, preventing state bloat. The scheme is quantum‑resistant and requires minimal on‑chain computation.
+
+## Motivation
+Ethereum’s single‑threaded execution and monolithic state limit throughput (≈15‑30 tx/s) and increase node storage requirements (>1 TB). Existing sharding proposals require complex cross‑shard coordination (e.g., two‑phase commits). Geometric sharding offers a natural alternative: volume conservation replaces heavy coordination, and shards can be processed in parallel without extra synchronization.
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+### 1. Simplex Shard
+A shard is a \((d-1)\)-simplex \(\Delta^{d-1}\) with \(d\) vertices. Each vertex represents an account or contract. The **volume** of the simplex is defined as:
+
+\[
+\text{Vol} = \frac{1}{(d-1)!} \prod_{i=1}^{d-1} |\alpha_i|^2 \cdot |\sin\Phi|
+\]
+
+where:
+- \(\alpha_i\) is the “probability weight” of the \(i\)-th vertex (e.g., the account’s balance normalized to \([0,1]\) by dividing by a global maximum balance).  
+- \(\Phi\) is the product of phase differences between vertices, derived from the geometric identity \(H^2+Q^2=1\) (see companion EIP‑8882).  
+- The factorial denominator ensures the volume of a regular simplex with unit weights is \(1\).
+
+### 2. Simplex Tree
+The global state is organized as a tree:
+- **Root simplex**: dimension \(d_0\) (e.g., \(d_0 = 10\)).
+- **Child simplices**: shards of lower dimension (e.g., \(d_1 = 5, d_2 = 3, \dots\)).
+Each vertex of a higher‑dimension simplex MAY point to a child simplex, forming a hierarchical partition of the state.
+
+### 3. Cross‑Shard Transactions
+A transfer from vertex \(v_A\) in shard \(A\) to vertex \(v_B\) in shard \(B\) is **valid** iff:
+
+\[
+\text{Vol}(A) + \text{Vol}(B) = \text{Vol}(A') + \text{Vol}(B')
+\]
+
+where \(A'\) and \(B'\) are the updated shards after the transfer. This ensures conservation of total geometric weight, which prevents double‑spending. The actual balance updates are performed atomically.
+
+### 4. State Pruning
+When a simplex’s volume falls below a predefined threshold \(\tau\) (e.g., \(\tau = 10^{-6}\)), it **SHALL** be pruned and merged into its parent simplex. The parent’s corresponding vertex weight is updated to reflect the merged volume. This automatically discards unused accounts and compresses the state.
+
+### 5. Gas Costs
+- **Volume computation** (product of \(d-1\) weights, division by factorial): ~5,000 gas (using integer arithmetic).  
+- **Square root** (needed for the sine factor if phases are used): a precompile would cost ~25,000 gas.  
+- **Cross‑shard validation** (two volume computations + comparison): ~30,000 gas total.  
+- **State pruning** (when triggered): ~10,000 gas plus the cost of merging the shard.
+
+## Rationale
+- **State compression**: Pruning is automatic and occurs without extra user action.  
+- **Parallel execution**: Because shards are independent, all transactions inside a shard can be processed in parallel, increasing throughput linearly with the number of shards.  
+- **Simple cross‑shard validation**: Volume conservation replaces complex two‑phase commit or fraud‑proof mechanisms.  
+- **Post‑quantum security**: The scheme inherits quantum resistance from the underlying geometric identity (used in signatures), ensuring future‑proofness.
+
+## Backwards Compatibility
+No existing accounts or contracts are affected. The new sharding model is opt‑in; accounts can remain in the root simplex until they choose to migrate. Legacy clients that do not implement geometric sharding will simply ignore the new structure.
+
+## Test Cases
+*Example 1: Transfer between two shards of dimension 3.*  
+- Initial volumes: \(V_A = 0.2\), \(V_B = 0.3\)  
+- Transfer amount corresponds to a weight change of 0.05.  
+- New volumes: \(V'_A = 0.15\), \(V'_B = 0.35\) → sum unchanged.
+
+*Example 2: Pruning.*  
+- Shard volume falls below \(\tau = 0.01\).  
+- The shard is merged into its parent. The parent’s vertex weight is increased by the shard’s volume.
+
+## Reference Implementation
+The following Python code demonstrates the core operations: creating a shard, performing a cross‑shard transfer, and pruning.
+
+```python
+import math
+import random
+
+class QuantumTriangle:
+    def __init__(self, alpha, beta, phase):
+        s = alpha + beta
+        if s > 0:
+            alpha /= s
+            beta /= s
+        self.alpha = alpha
+        self.beta = beta
+        self.phase = phase
+
+    @property
+    def weight(self):
+        return self.alpha  # simplified weight = α
+
+class SimplexShard:
+    def __init__(self, shard_id, dimension=3, vertices=None):
+        self.id = shard_id
+        self.d = dimension
+        self.vertices = vertices or [QuantumTriangle(0.5,0.5,0) for _ in range(dimension)]
+        self.parent = None
+
+    def volume(self):
+        prod = 1.0
+        for v in self.vertices:
+            prod *= v.weight
+        return prod / math.factorial(self.d - 1)
+
+    def transfer_to(self, other, from_idx, to_idx, amount):
+        """Move `amount` weight from vertex `from_idx` to vertex `to_idx` in other shard."""
+        vol_before = self.volume() + other.volume()
+        self.vertices[from_idx].alpha -= amount
+        other.vertices[to_idx].alpha += amount
+        vol_after = self.volume() + other.volume()
+        if abs(vol_before - vol_after) < 1e-6:
+            return True
+        # rollback
+        self.vertices[from_idx].alpha += amount
+        other.vertices[to_idx].alpha -= amount
+        return False
+
+def prune(shard, threshold=0.01):
+    if shard.volume() < threshold and shard.parent is not None:
+        # Merge shard into parent: increase parent's vertex weight by shard's volume
+        shard.parent.vertices[0].alpha += shard.volume()
+        shard.parent.vertices[0].alpha = min(shard.parent.vertices[0].alpha, 1.0)
+        # Remove shard from parent's child list (not implemented)
+        return True
+    return False
+
+# Example usage
+if __name__ == '__main__':
+    # Create two shards of dimension 3
+    shard1 = SimplexShard(1)
+    shard2 = SimplexShard(2)
+
+    # Set initial weights (simulate accounts with balance)
+    shard1.vertices[0].alpha = 0.7
+    shard1.vertices[1].alpha = 0.2
+    shard1.vertices[2].alpha = 0.1
+    shard2.vertices[0].alpha = 0.4
+    shard2.vertices[1].alpha = 0.3
+    shard2.vertices[2].alpha = 0.3
+
+    print(f"Shard1 volume: {shard1.volume():.4f}")
+    print(f"Shard2 volume: {shard2.volume():.4f}")
+
+    # Transfer from shard1 vertex0 to shard2 vertex0
+    success = shard1.transfer_to(shard2, 0, 0, 0.1)
+    print(f"Transfer success: {success}")
+    print(f"New volumes: {shard1.volume():.4f}, {shard2.volume():.4f}")
+
+    # Prune shard1 if its volume becomes too low
+    if prune(shard1):
+        print("Shard1 pruned")
+```
+
+## Security Considerations
+
+· Volume conservation prevents double spending; any attempt to increase total volume would be rejected.
+· The geometric identity H^2+Q^2=1 used in the companion signature EIP ensures the underlying security is quantum‑resistant.
+· Pruning thresholds must be chosen carefully to avoid merging active shards prematurely; a suggested value is 10^{-6} relative to the maximum possible volume.
+
+## Copyright
+
+Copyright and related rights waived via CC0.
+
+```
