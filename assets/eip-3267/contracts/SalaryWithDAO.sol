@@ -13,7 +13,7 @@ contract SalaryWithDAO is BaseRestorableSalary {
     /// The DAO interface.
     DAOInterface public daoPlugin;
 
-    /// When set to true, your account can't be moved to new address (by the DAO).
+    /// When set to true, your account can't be moved to a new address (by the DAO).
     ///
     /// By default new users are not under DAO control to avoid front-running of resigning control
     /// by an evil DAO.
@@ -36,7 +36,7 @@ contract SalaryWithDAO is BaseRestorableSalary {
         daoPlugin = _daoPlugin;
     }
 
-    /// Create an oracle for caclcualting salary amounts.
+    /// Create an oracle for calculating salary amounts.
     function createOracle() external returns (uint64) {
         return _createOracle();
     }
@@ -59,7 +59,7 @@ contract SalaryWithDAO is BaseRestorableSalary {
         address _orig = _originalAddress(_customer);
         // Auditor: Check that this value is set to false, when (and if) necessary.
         accountHasSalary[_customer] = true;
-        underDAOControl[_customer] = _underDAOControl; // We don't trigger and event to reduce gas usage.
+        underDAOControl[_customer] = _underDAOControl; // We don't trigger an event to reduce gas usage.
         return super._registerCustomer(_orig, _oracleId, _data);
     }
 
@@ -74,7 +74,7 @@ contract SalaryWithDAO is BaseRestorableSalary {
     function setDAOControl(bool _underControl) public {
         address _orig = _originalAddress(msg.sender);
         require(accountHasSalary[_orig], "Cannot resign account receiving a salary.");
-        underDAOControl[_orig] = _underControl; // We don't trigger and event to reduce gas usage.
+        underDAOControl[_orig] = _underControl; // We don't trigger an event to reduce gas usage.
     }
 
     /// The DAO can replace itself.
