@@ -1,0 +1,66 @@
+goos: linux
+goarch: amd64
+pkg: github.com/ethereum/go-ethereum/core/vm
+cpu: Intel(R) Xeon(R) CPU @ 2.20GHz
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-512-Gas=500-4            377011              9411 ns/op               500.0 gas/op             53.12 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-512-Gas=500-4            373490              9487 ns/op               500.0 gas/op             52.70 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-512-Gas=500-4            377416              9431 ns/op               500.0 gas/op             53.01 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-512-Gas=500-4            372510              9388 ns/op               500.0 gas/op             53.25 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-512-Gas=500-4            377160              9414 ns/op               500.0 gas/op             53.11 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-1024-Gas=1080-4          176936             20419 ns/op              1080 gas/op               52.89 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-1024-Gas=1080-4          177158             20454 ns/op              1080 gas/op               52.80 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-1024-Gas=1080-4          175065             20346 ns/op              1080 gas/op               53.08 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-1024-Gas=1080-4          173500             20340 ns/op              1080 gas/op               53.09 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-Falcon-1024-Gas=1080-4          177889             20454 ns/op              1080 gas/op               52.80 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-ML-DSA-256-Gas=256-4            740838              4785 ns/op               256.0 gas/op             53.49 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-ML-DSA-256-Gas=256-4            740332              4779 ns/op               256.0 gas/op             53.56 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-ML-DSA-256-Gas=256-4            724047              4781 ns/op               256.0 gas/op             53.54 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-ML-DSA-256-Gas=256-4            728769              4826 ns/op               256.0 gas/op             53.04 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_FW/NTT_FW-ML-DSA-256-Gas=256-4            734359              4796 ns/op               256.0 gas/op             53.38 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-512-Gas=500-4          372236              9374 ns/op               500.0 gas/op             53.33 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-512-Gas=500-4          384294              9398 ns/op               500.0 gas/op             53.19 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-512-Gas=500-4          365775              9443 ns/op               500.0 gas/op             52.94 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-512-Gas=500-4          376599              9398 ns/op               500.0 gas/op             53.20 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-512-Gas=500-4          381693              9468 ns/op               500.0 gas/op             52.80 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-1024-Gas=1080-4        176300             20316 ns/op              1080 gas/op               53.15 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-1024-Gas=1080-4        175802             20308 ns/op              1080 gas/op               53.18 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-1024-Gas=1080-4        178256             20177 ns/op              1080 gas/op               53.52 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-1024-Gas=1080-4        175662             20424 ns/op              1080 gas/op               52.87 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-Falcon-1024-Gas=1080-4        176806             20141 ns/op              1080 gas/op               53.62 mgas/s        4096 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-ML-DSA-256-Gas=340-4          558224              6396 ns/op               340.0 gas/op             53.15 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-ML-DSA-256-Gas=340-4          552030              6389 ns/op               340.0 gas/op             53.21 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-ML-DSA-256-Gas=340-4          548637              6397 ns/op               340.0 gas/op             53.14 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-ML-DSA-256-Gas=340-4          552757              6402 ns/op               340.0 gas/op             53.11 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_INV/NTT_INV-ML-DSA-256-Gas=340-4          533818              6382 ns/op               340.0 gas/op             53.27 mgas/s        2048 B/op          2 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-512-Gas=164-4                 1237585              2919 ns/op               164.0 gas/op             56.17 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-512-Gas=164-4                 1241187              2906 ns/op               164.0 gas/op             56.42 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-512-Gas=164-4                 1234399              2920 ns/op               164.0 gas/op             56.16 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-512-Gas=164-4                 1236284              2903 ns/op               164.0 gas/op             56.48 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-512-Gas=164-4                 1230546              2911 ns/op               164.0 gas/op             56.33 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-1024-Gas=328-4                 592540              5999 ns/op               328.0 gas/op             54.67 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-1024-Gas=328-4                 574147              5961 ns/op               328.0 gas/op             55.01 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-1024-Gas=328-4                 583370              5996 ns/op               328.0 gas/op             54.70 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-1024-Gas=328-4                 580230              6060 ns/op               328.0 gas/op             54.12 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-Falcon-1024-Gas=328-4                 590892              6050 ns/op               328.0 gas/op             54.21 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-ML-DSA-256-Gas=82-4                  1726333              1957 ns/op                82.00 gas/op            41.89 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-ML-DSA-256-Gas=82-4                  1834950              1968 ns/op                82.00 gas/op            41.66 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-ML-DSA-256-Gas=82-4                  1819682              1969 ns/op                82.00 gas/op            41.65 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-ML-DSA-256-Gas=82-4                  1829047              1963 ns/op                82.00 gas/op            41.77 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECMULMOD/VECMULMOD-ML-DSA-256-Gas=82-4                  1829451              1983 ns/op                82.00 gas/op            41.34 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-512-Gas=154-4                 1273167              2828 ns/op               154.0 gas/op             54.45 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-512-Gas=154-4                 1272246              2828 ns/op               154.0 gas/op             54.45 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-512-Gas=154-4                 1272122              2817 ns/op               154.0 gas/op             54.66 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-512-Gas=154-4                 1275130              2824 ns/op               154.0 gas/op             54.52 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-512-Gas=154-4                 1276561              2825 ns/op               154.0 gas/op             54.51 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-1024-Gas=308-4                 606345              5829 ns/op               308.0 gas/op             52.84 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-1024-Gas=308-4                 600855              5853 ns/op               308.0 gas/op             52.61 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-1024-Gas=308-4                 598780              5846 ns/op               308.0 gas/op             52.68 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-1024-Gas=308-4                 600212              5855 ns/op               308.0 gas/op             52.60 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-Falcon-1024-Gas=308-4                 601774              5838 ns/op               308.0 gas/op             52.75 mgas/s        2048 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-ML-DSA-256-Gas=77-4                  2178388              1645 ns/op                77.00 gas/op            46.81 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-ML-DSA-256-Gas=77-4                  2191171              1659 ns/op                77.00 gas/op            46.41 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-ML-DSA-256-Gas=77-4                  2187492              1632 ns/op                77.00 gas/op            47.18 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-ML-DSA-256-Gas=77-4                  2211986              1632 ns/op                77.00 gas/op            47.19 mgas/s        1024 B/op          1 allocs/op
+BenchmarkPrecompiledNTT_VECADDMOD/VECADDMOD-ML-DSA-256-Gas=77-4                  2175309              1647 ns/op                77.00 gas/op            46.74 mgas/s        1024 B/op          1 allocs/op
+PASS
+ok      github.com/ethereum/go-ethereum/core/vm 265.207s

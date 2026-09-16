@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import List, Optional, Tuple
 from dataclasses import dataclass
-from abc import ABC,abstractmethod
+from abc import abstractmethod
 from eip_4881 import DEPOSIT_CONTRACT_DEPTH,Hash32,sha256,to_le_bytes,zerohashes
 
 @dataclass
