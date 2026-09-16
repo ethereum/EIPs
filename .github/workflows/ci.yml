@@ -55,15 +55,11 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
       - name: Build with Jekyll
-        run: bundle exec jekyll build
-        env:
-          JEKYLL_ENV: production
-
-      - name: Build Website
         run: |
           bundle exec jekyll doctor
           bundle exec jekyll build
-
+        env:
+          JEKYLL_ENV: production
       - name: HTML Proofer
         run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
       - name: DNS Validator
@@ -122,7 +118,7 @@ jobs:
       - name: Merge Repos
         uses: ./.github/actions/merge-repos
 
-      - uses: ethereum/eipw-action@be3fa642ec311d0b8e1fdb811e5c9b4ada3d3d93
+      - uses: ethereum/eipw-action@b858a0f2687c12af12280aa934c3b842747414fd
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

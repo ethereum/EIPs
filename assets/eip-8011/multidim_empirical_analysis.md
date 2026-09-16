@@ -2,7 +2,7 @@
 
 **This document is a copy-paste from [this ethresearch post](https://ethresear.ch/t/going-multidimensional-an-empirical-analysis-on-gas-metering-in-the-evm/22621)**
 
-This post summarizes the key takeaways from an empirical analysis focused on understanding how different EVM gas metering schemes impact network throughput and block utilization. Concretely, we were focussed on multidimensional schemes, where the usage of different resources is metered separately.
+This post summarizes the key takeaways from an empirical analysis focused on understanding how different EVM gas metering schemes impact network throughput and block utilization. Concretely, we were focused on multidimensional schemes, where the usage of different resources is metered separately.
 
 For conciseness, I am jumping over many technical details. Please refer to the [project documentation](https://hackmd.io/@nightingale/evm-gas-meter) for more details.
 
@@ -92,7 +92,7 @@ The next plot shows the median block utilization and the inter-quartile range (I
 
 In line with previous results, the base demand (multiplier = 1x) is insufficient to achieve high utilization rates across all metering schemes. As demand levels increase, median utilization rates also rise. In the two-dimensional schemes, a demand level of 3x is needed to achieve full blocks for the median case. The three-dimensional scheme requires a demand of 5x. Regarding the four-dimensional model, all demand levels tested result in partially filled blocks in the median case.
 
-## Going multidimensional. Wat do?
+## Going multidimensional. What do?
 
 Based on our empirical analysis, there is a significant gain in L1 scalability in moving to a multidimensional metering scheme. However, are there any downsides? The key tradeoff is complexity.
 

@@ -1,0 +1,406 @@
+---
+eip: 8272
+title: Recent Roots for Frame Transactions
+description: Frame transactions can declare verified recent roots
+author: Thomas Thiery (@soispoke), Vitalik Buterin (@vbuterin), Toni Wahrstätter (@nerolation), lightclient (@lightclient)
+discussions-to: https://ethereum-magicians.org/t/eip-8272-recent-roots-for-frame-transactions/28621
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-05-15
+requires: 7843, 8141
+---
+
+## Abstract
+
+[EIP-8141](./eip-8141.md) frame transactions can verify recent roots through a canonical `VERIFY` frame. The frame carries one to sixteen `(source_id, slot, root)` tuples and calls a recent root contract that checks each tuple against its storage. Root sources write to the same contract. Each root is keyed by `(source_id, slot)`, where `source_id` is derived from the writer address and a salt.
+
+The frame runs before account validation in the public mempool. A failed check invalidates the transaction, while account validation can read the verified tuples through existing frame introspection. This requires no change to the `FrameTx` envelope and no new opcode.
+
+## Motivation
+
+Public mempool validation under [EIP-8141](./eip-8141.md) cannot read arbitrary storage controlled by another account or application. Some validation rules still need recent application state, such as privacy tree roots, wallet authorization roots, or account validation roots.
+
+The recent root contract stores each entry under a key determined by its source and slot. Except after a chain reorganization, that entry cannot change while a transaction may reference it. The canonical frame lets clients check and index these dependencies without changing the transaction envelope.
+
+Privacy applications, for example, keep a tree of commitments and prove spends against a recent tree root. The application writes roots by slot, and a spend transaction verifies one of those roots before its account validation frame runs.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+This specification extends [EIP-8141](./eip-8141.md). Terms not defined here, including `FrameTx`, `VERIFY`, `expiry_verify`, the validation prefix, `MAX_VERIFY_GAS`, `FRAMEPARAM`, `FRAMEDATALOAD`, and `FRAMEDATACOPY`, have the meanings defined in EIP-8141.
+
+### Constants
+
+| Name | Value |
+| --- | ---: |
+| `RECENT_ROOT_ADDRESS` | `0x0000000000000000000000000000000000008272` |
+| `RECENT_ROOT_CODE` | `TBD` |
+| `RECENT_ROOT_LENGTH` | `8192` |
+| `RECENT_ROOT_USABLE_WINDOW` | `8191` |
+| `MAX_RECENT_ROOT_REFERENCES` | `16` |
+| `RECENT_ROOT_TUPLE_BYTES` | `72` |
+| `RECENT_ROOT_ENTRY_DOMAIN` | `keccak256("RECENT_ROOT_ENTRY")` |
+| `RECENT_ROOT_STORAGE_DOMAIN` | `keccak256("RECENT_ROOT_STORAGE")` |
+
+All concatenations below use encodings with fixed lengths. Domains are 32 bytes. Addresses are 20 bytes. Slots and indices are unsigned integers encoded in eight bytes, with the most significant byte first. Roots, salts, source identifiers, entry hashes, and storage keys are 32 bytes.
+
+### Current slot
+
+During block execution, `current_slot` is the consensus slot of the beacon block containing the execution payload.
+
+Execution clients MUST obtain `current_slot` from the [EIP-7843](./eip-7843.md) `slotNumber` field. Clients MUST NOT derive it from `block.timestamp` using a fixed slot duration.
+
+During public mempool validation, `current_slot` is one greater than the `slotNumber` in the latest canonical execution header. The simulated `SLOTNUM` value MUST equal this slot. This value deliberately does not advance during empty slots. Before including a transaction in a payload, a client MUST revalidate it with `SLOTNUM` set to that payload's `slotNumber`.
+
+References MUST target slots strictly before `current_slot`. A root written during slot `S` becomes referenceable beginning in slot `S + 1`.
+
+### Root sources
+
+A root source is identified by:
+
+```text
+source_id = keccak256(source_address || salt)
+```
+
+where `source_address` is an address and `salt` is a `bytes32` value.
+
+The source address MAY be an externally owned account or a contract, and MAY use multiple root sources through different salts. Applications using a root source are responsible for controlling who can write to it and how salts are allocated.
+
+### Entry and storage keys
+
+The committed entry for `(source_id, slot, root)` is:
+
+```text
+entry_hash = keccak256(
+    RECENT_ROOT_ENTRY_DOMAIN ||
+    source_id ||
+    uint64_be(slot) ||
+    root
+)
+```
+
+The storage key for index `i` is:
+
+```text
+storage_key = keccak256(
+    RECENT_ROOT_STORAGE_DOMAIN ||
+    source_id ||
+    uint64_be(i)
+)
+```
+
+Each root source has a conceptual array:
+
+```text
+entries: bytes32[RECENT_ROOT_LENGTH]
+```
+
+`entries[i]` is stored at `RECENT_ROOT_ADDRESS[storage_key]`. All entries are initially zero.
+
+Each root source uses at most `RECENT_ROOT_LENGTH` storage keys. The global storage footprint is `RECENT_ROOT_LENGTH` keys per written `source_id`.
+
+### Recent root contract
+
+At activation, clients MUST create or update the account at `RECENT_ROOT_ADDRESS` as specified in [Activation](#activation).
+
+Calls with nonzero value MUST revert. Calldata selects one of two operations by length.
+
+#### Write operation
+
+The write operation has exactly 64 bytes of calldata:
+
+```text
+salt: bytes32
+root: bytes32
+```
+
+Bytes `0..31` are `salt`. Bytes `32..63` are `root`.
+
+The source address is `msg.sender` of the call to `RECENT_ROOT_ADDRESS`. When a successful call is made during slot `S`, the contract computes:
+
+```text
+source_address = msg.sender
+source_id = keccak256(source_address || salt)
+i = S mod RECENT_ROOT_LENGTH
+entry_hash = keccak256(
+    RECENT_ROOT_ENTRY_DOMAIN ||
+    source_id ||
+    uint64_be(S) ||
+    root
+)
+storage_key = keccak256(
+    RECENT_ROOT_STORAGE_DOMAIN ||
+    source_id ||
+    uint64_be(i)
+)
+```
+
+and sets:
+
+```text
+storage[storage_key] = entry_hash
+```
+
+In static context, the write MUST fail and storage MUST remain unchanged.
+
+Only execution whose storage context is `RECENT_ROOT_ADDRESS` writes recent root storage. `DELEGATECALL` and `CALLCODE` use the invoking account's storage context, while [EIP-7702](./eip-7702.md) delegated code uses the delegating account's storage context. None modifies recent root storage unless that context is `RECENT_ROOT_ADDRESS`.
+
+Each `(source_id, S)` has at most one referenceable root on the canonical chain. Multiple writes by the same source address and salt during slot `S` target the same storage key. The final write in canonical block execution order overwrites earlier writes, and only that root is referenceable beginning in slot `S + 1`.
+
+A successful write returns no data or logs.
+
+#### Validation operation
+
+The validation operation has `n * RECENT_ROOT_TUPLE_BYTES` bytes of calldata, where:
+
+```text
+1 <= n <= MAX_RECENT_ROOT_REFERENCES
+```
+
+The calldata is the concatenation of `n` tuples without a selector or length prefix:
+
+```text
+source_id: bytes32
+slot:       uint64_be
+root:       bytes32
+```
+
+The contract MUST revert for empty calldata, for a length that is not a multiple of `RECENT_ROOT_TUPLE_BYTES`, or for more than `MAX_RECENT_ROOT_REFERENCES` tuples. The 64-byte write encoding and every valid validation encoding are disjoint.
+
+For each tuple, the contract MUST check:
+
+```text
+slot < current_slot
+current_slot - slot <= RECENT_ROOT_USABLE_WINDOW
+i = slot mod RECENT_ROOT_LENGTH
+entry_hash = keccak256(
+    RECENT_ROOT_ENTRY_DOMAIN ||
+    source_id ||
+    uint64_be(slot) ||
+    root
+)
+storage_key = keccak256(
+    RECENT_ROOT_STORAGE_DOMAIN ||
+    source_id ||
+    uint64_be(i)
+)
+storage[storage_key] == entry_hash
+```
+
+The call MUST revert if any tuple fails. Duplicate tuples are valid and are checked independently. If every tuple passes, the call MUST succeed with no return data, logs, or state changes.
+
+The validation operation MUST read the current slot with `SLOTNUM`, MUST NOT call another account, and MUST read only the recent root storage keys derived from its calldata.
+
+All calls use ordinary EVM execution and gas accounting.
+
+### Recent root verifier frame
+
+A **recent root verifier frame** is a frame with all of the following properties:
+
+```text
+frame.mode == VERIFY
+frame.target == RECENT_ROOT_ADDRESS
+frame.flags == 0
+frame.value == 0
+frame.limits.state == 0
+RECENT_ROOT_TUPLE_BYTES <= len(frame.data)
+len(frame.data) <= MAX_RECENT_ROOT_REFERENCES * RECENT_ROOT_TUPLE_BYTES
+len(frame.data) mod RECENT_ROOT_TUPLE_BYTES == 0
+```
+
+For public mempool classification, this frame is named `recent_root_verify`.
+
+The frame executes the validation operation through the `STATICCALL` semantics of EIP-8141. If the contract reverts or the frame halts exceptionally, EIP-8141 makes the transaction invalid.
+
+The frame consumes ordinary EVM gas. Its target access and storage reads follow the normal warm and cold access rules, and its data follows the normal EIP-8141 transaction data pricing. This EIP adds no special intrinsic gas, warming rule, or exemption from block gas.
+
+EIP-8141's canonical signature hash already covers the complete frame list, including each frame's data. This EIP does not change the transaction payload or signature hash.
+
+### Application introspection
+
+Applications read a recent root verifier frame through EIP-8141's existing `FRAMEPARAM`, `FRAMEDATALOAD`, and `FRAMEDATACOPY` instructions. This EIP adds no transaction parameter or opcode.
+
+Application validation can identify a completed recent root verifier frame through `FRAMEPARAM` by checking `resolved_target == RECENT_ROOT_ADDRESS`, `mode == VERIFY`, `flags == 0`, `limits.state == 0`, a valid recent root data length, and `status == 1`.
+
+In a transaction eligible for the public mempool, the recent root verifier frame is frame `0`, or frame `1` when an `expiry_verify` frame is present.
+
+### Public mempool handling
+
+EIP-8141's public mempool policy is extended to permit the `current_slot` value defined above and the code and storage reads required by a `recent_root_verify` frame, subject to the rules below.
+
+A transaction eligible for the public mempool MUST contain no more than one recent root verifier frame. If present, it MUST appear immediately after an optional `expiry_verify` frame and before every other frame:
+
+```text
+[expiry_verify?] [recent_root_verify?] [deploy?] [account validation] ...
+```
+
+For the purpose of matching EIP-8141's four recognized validation prefix shapes, clients MUST skip both optional leading protocol verifier frames. The EIP-8141 rule that `deploy` is first applies after these frames are skipped.
+
+Clients MUST check this frame shape and data encoding before reading sender state.
+
+A recent root verifier frame is subject to EIP-8141's generic validation trace and opcode rules with exactly two additional permissions. These permissions apply only while this frame executes at the top level and the runtime code at `RECENT_ROOT_ADDRESS` exactly equals `RECENT_ROOT_CODE`:
+
+1. `SLOTNUM` MAY execute inside `RECENT_ROOT_CODE`.
+2. `SLOAD` MAY read `RECENT_ROOT_ADDRESS[storage_key]` for storage keys derived from the frame's tuples as specified above.
+
+No nested call receives either permission. No other opcode, call, storage read, or storage write exception is added. Clients MUST reject the transaction from the public mempool if the code at `RECENT_ROOT_ADDRESS` does not equal `RECENT_ROOT_CODE`.
+
+The frame MUST execute successfully. During public mempool validation, a client MAY evaluate this frame directly instead of executing `RECENT_ROOT_CODE`, even when other frames in the validation prefix require simulation. This direct evaluation MUST produce the same frame receipt and gas use as EVM execution. It MUST also apply the same warm account and storage key updates and rollbacks as EVM execution. A client MUST reject the transaction if EVM execution would revert or halt exceptionally, including when `frame.limits.execution` is insufficient.
+
+Clients MUST count the recent root verifier frame's `limits.execution` toward EIP-8141's `MAX_VERIFY_GAS` limit.
+
+Clients MUST reject a transaction from the public mempool if any tuple has `slot >= current_slot`.
+
+Clients MUST evict a pending transaction if any tuple has `slot >= current_slot`. Otherwise, they MUST evict it when any tuple reaches:
+
+```text
+current_slot - slot >= RECENT_ROOT_LENGTH
+```
+
+To avoid admitting a transaction that expires almost immediately, clients SHOULD NOT admit a transaction whose oldest reference is within a margin chosen by the node.
+
+On admission, clients MUST record each distinct `(storage_key, entry_hash)` dependency and the first `current_slot` at which it expires. Clients SHOULD index pending transactions by these values so that a slot advance or chain reorganization does not require scanning unrelated transactions. Clients MUST also track the code and activation status of `RECENT_ROOT_ADDRESS` as dependencies. These records MUST be removed when the transaction leaves the public mempool. When one transaction replaces another, clients MUST replace these records atomically with the transaction.
+
+When any recorded dependency may have changed, clients MUST recheck the complete age and storage predicates for each affected transaction and evict transactions that no longer satisfy them. Reorganization handling MUST consider state changes on both the removed and added branches, including a referenced entry removed by rollback without a replacement write. A change to the code or activation status of `RECENT_ROOT_ADDRESS` requires revalidation of every pending transaction containing a recent root verifier frame. The ordinary EIP-8141 revalidation rules continue to apply to all other dependencies.
+
+### Activation
+
+This EIP MUST activate at or after EIP-8141 and EIP-7843.
+
+For the first block in which this EIP is active, clients MUST initialize `RECENT_ROOT_ADDRESS` against the parent state before executing any transaction.
+
+If `RECENT_ROOT_ADDRESS` does not exist, clients MUST create it with balance 0, nonce 1, code `RECENT_ROOT_CODE`, and empty storage.
+
+If `RECENT_ROOT_ADDRESS` already exists with empty code and empty storage, clients MUST set its code to `RECENT_ROOT_CODE`, set its nonce to `max(existing_nonce, 1)`, preserve its balance, and leave storage empty.
+
+The fork configuration MUST choose a `RECENT_ROOT_ADDRESS` with empty code and empty storage in the parent state of the first active block. If this condition is false, the first active block is invalid.
+
+For all other blocks, clients MUST NOT run this initialization. Clients MUST handle reorganizations across activation by applying or undoing this transition according to the canonical chain.
+
+## Rationale
+
+[EIP-8141](./eip-8141.md) public mempool validation normally rejects reads from shared mutable storage. Recent root storage is a narrow exception because a valid entry cannot be overwritten during its usable window. A write in the current slot uses the only ring buffer index that could collide with a root exactly `RECENT_ROOT_LENGTH` slots old, and that older root is already expired.
+
+### Canonical frame instead of an envelope field
+
+The canonical frame reuses EIP-8141's transaction encoding, signature hash, execution semantics, gas accounting, and frame introspection. An envelope field would require a new transaction schema, native checks before frame execution, special gas and warming rules, and a new introspection opcode.
+
+A contract and an informal transaction pool convention are not enough. EIP-8141 has a closed public mempool validation prefix grammar and normally bans both `SLOTNUM` and reads from storage outside `tx.sender`. The protocol must define the frame's shape, position, work bound, allowed storage reads, and revalidation rules.
+
+### Full tuples in frame data
+
+Including `(source_id, slot, root)` in the frame lets clients derive every storage dependency without executing application validation. After a reorganization, a client can identify and evict transactions that reference an orphaned root.
+
+The packed encoding uses 72 bytes per tuple and has no redundant count or selector. Its valid lengths do not collide with the write operation, which uses 64 bytes.
+
+The stored entry commits to `source_id`, `slot`, and `root`. This prevents a root from another source or a stale occupant of the same ring buffer index from satisfying the tuple.
+
+### Fixed early position
+
+The recent root verifier frame runs after the optional expiry check and before deployment or account validation. This order rejects invalid or orphaned roots before more expensive application validation runs and lets every dependent validation frame inspect a successful frame.
+
+The fixed position affects public mempool eligibility, not block validity. Privately submitted transactions remain subject to ordinary EIP-8141 execution, including its rule that a failed `VERIFY` frame invalidates the transaction.
+
+### Public mempool validation budget
+
+The frame's `limits.execution` counts toward `MAX_VERIFY_GAS`, together with the declared execution limits of the other frames in the validation prefix and the cost of checking the transaction signatures. This uses EIP-8141's existing validation budget. EIP-8141 can change that budget later if needed.
+
+Direct evaluation does not change the frame's execution gas or fees. The frame's declared execution limit still contributes to the transaction's maximum cost and block gas reservation, and the payer still pays for the gas used.
+
+### Window choice
+
+References are limited to slots strictly before `current_slot`. During slot `S`, writes update index `S mod RECENT_ROOT_LENGTH`, but references to `S` are invalid and references old enough to share that index are expired. Writes in the current slot cannot invalidate valid references.
+
+`RECENT_ROOT_LENGTH = 8192` gives `RECENT_ROOT_USABLE_WINDOW = 8191`, because the current slot is not referenceable.
+
+For public mempool simulation, the latest canonical header slot plus one is the earliest possible slot for the next payload. A reference close to expiry may become stale if slots are skipped, so builders revalidate it against the exact payload slot before inclusion.
+
+### Implicit source creation
+
+No creation transaction is required. A root source is created when a source address first writes with a new `(source_address, salt)` pair. Each root source has a bounded rolling window. Aggregate storage grows linearly with the number of written root sources, and writes that create storage entries pay the ordinary state growth cost.
+
+## Backwards Compatibility
+
+This EIP does not change the EIP-8141 transaction payload or signature hash and does not modify other transaction types.
+
+The account at `RECENT_ROOT_ADDRESS` must have empty code and storage before activation. Calls to that address change behavior after activation because `RECENT_ROOT_CODE` is installed there.
+
+References to slots before activation are not satisfiable because recent root storage is empty at activation.
+
+## Test Cases
+
+Implementations should cover at least the following cases. Rejection from the public mempool does not by itself make a transaction invalid in a block. The contract and EIP-8141 columns state any separate block execution or static validity result.
+
+| Case | Contract or EIP-8141 result | Public mempool result |
+| --- | --- | --- |
+| One valid tuple from the previous slot | success | accept if all other EIP-8141 rules pass |
+| Sixteen valid tuples with distinct cold storage keys | success when `limits.execution` is sufficient | accept if all other EIP-8141 rules pass |
+| Duplicate valid tuples | success | accept |
+| Wrong root, source, or slot | revert | reject |
+| Tuple for the current or a future slot | revert | reject |
+| Ages `8191` and `8192` slots | success, then revert | accept, then reject |
+| Empty validation data, data of length 71 or 73 bytes, or data with seventeen tuples | revert | reject |
+| Nonzero `VERIFY` value | statically invalid under EIP-8141 | reject |
+| `flags == 1` | contract executes normally | reject; not `recent_root_verify` |
+| `flags` contains `ATOMIC_BATCH_FLAG` | statically invalid under EIP-8141 | reject |
+| Nonzero state gas limit | contract executes normally | reject; not `recent_root_verify` |
+| More than one matching frame | each frame executes normally | reject |
+| Matching frame after deployment or account validation | executes normally | reject |
+| `limits.execution` is one gas less than the recent root verifier frame requires | halts exceptionally | reject |
+| Signature verification cost plus all validation prefix execution limits, including `recent_root_verify`, equals `MAX_VERIFY_GAS` | ordinary execution | accept |
+| Signature verification cost plus all validation prefix execution limits, including `recent_root_verify`, exceeds `MAX_VERIFY_GAS` by one | ordinary execution if sufficiently funded | reject |
+| Direct evaluation instead of EVM execution | identical frame receipt, gas use, and warm access sets | same admission result |
+| Root removed by a reorganization | revert after revalidation | evict |
+| Activation installs `RECENT_ROOT_CODE` with empty storage | subsequent writes and validation use `RECENT_ROOT_CODE` | revalidate; reject until every referenced entry exists |
+| Activation finds empty code and storage with an existing balance and nonce | preserve balance and set nonce to `max(existing_nonce, 1)` | revalidate |
+| Activation finds nonempty code or storage | first active block is invalid | not applicable |
+| A later block follows successful activation | do not rerun initialization or clear storage | retain and revalidate normally |
+| Reorganization crosses back before activation | this EIP is inactive | evict |
+
+The case with sixteen tuples must include the cold target account access charged at frame entry by EIP-8141, not only the contract's internal execution.
+
+Each of EIP-8141's four recognized validation prefix shapes must be tested with no protocol verifier, with `recent_root_verify`, with `expiry_verify`, and with `expiry_verify` followed by `recent_root_verify`. Reversed or duplicate protocol verifiers must be rejected from the public mempool.
+
+### Reference vector
+
+The following vector uses `current_slot = 2`:
+
+| Name | Value |
+| --- | --- |
+| `source_address` | `0x0000000000000000000000000000000000000001` |
+| `salt` | `0x0000000000000000000000000000000000000000000000000000000000000000` |
+| `source_id` | `0xb9382d35273c75a50631a3e84d3c75ec9266e2b18c35a627e16cdbf26a18ca85` |
+| `slot` | `1`, encoded as `0x0000000000000001` |
+| `root` | `0x0000000000000000000000000000000000000000000000000000000000000002` |
+| `entry_hash` | `0x0a0d1254c851be5a133b4c9a9e300f5602fc0f43dbe65aa6a66930d4ca0a51b8` |
+| `storage_key` | `0x5f027aa1cbe2df279bf6518edd4b44ea5409fd800189ec35224e10ab05e574c3` |
+
+The 72-byte validation calldata is:
+
+```text
+0xb9382d35273c75a50631a3e84d3c75ec9266e2b18c35a627e16cdbf26a18ca8500000000000000010000000000000000000000000000000000000000000000000000000000000002
+```
+
+With `storage[storage_key] = entry_hash`, the validation operation succeeds.
+
+## Security Considerations
+
+Consensus treats `root` as an opaque `bytes32`. Applications define what it commits to and should bind the expected `(source_id, slot, root)` tuple to the statement being authorized. Before treating frame data as verified, application validation should check the completed frame's defining fields and success status as described in [Application introspection](#application-introspection). A successful recent root verifier frame proves only that the tuple is currently stored and recent.
+
+EIP-8141's canonical signature hash covers the frame data, but EIP-8141 also permits validation based on an explicit 32-byte signature message. Validation logic that does not authorize the canonical signature hash must bind the recent root verifier frame and every other relevant frame itself.
+
+For each `(source_id, slot)`, only the last root written in canonical execution order is referenceable. An application that needs multiple roots from the same source and slot should write an aggregate commitment.
+
+This EIP does not guarantee inclusion of root writes. Applications that rely on timely publication need their own publication path, redundant root sources, or an inclusion policy for write transactions.
+
+The same `(source_address, salt)` pair produces the same `source_id` on different chains, but each chain maintains its own recent root state. Proofs, bridge messages, and attestations produced off chain that carry recent root references must bind the intended chain domain outside the tuple.
+
+Recent roots create persistent storage under `RECENT_ROOT_ADDRESS`. Existing root sources overwrite at most `RECENT_ROOT_LENGTH` cells, while new root sources create additional cells. A future proposal may add a source registration cost or a surcharge for the first write if ordinary state growth pricing is insufficient.
+
+Because the recent root verifier frame counts toward `MAX_VERIFY_GAS`, EIP-8141 bounds the total work a node may do to check signatures and execute the validation prefix before admitting a transaction to the public mempool. A reorganization or synchronized expiry may evict many transactions that use one popular root, but dependency indexing lets clients identify affected transactions without rerunning unrelated validation prefixes.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
