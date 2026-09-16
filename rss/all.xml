@@ -9,7 +9,7 @@ layout: null
     <link>{{ site.url }}</link>
     <atom:link href="{{ site.url }}/all.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
-    {% assign eips = site.pages | sort: 'eip' %}
+    {% assign eips = site.pages | where_exp: "page", "page.url contains '/EIPS/'" | sort: 'eip' %}
     {% for eip in eips %}
       <item>
         <title>{{ eip.title | xml_escape }}</title>
