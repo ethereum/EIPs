@@ -1,0 +1,20 @@
+version: 1
+canonical_repository: ethereum/EIPs
+compatibility_adapter_retirement: shared-workflow-v2
+files:
+  - path: tests/workflows/actionlint.sh
+    owner: ethereum/EIPs
+    compatibility: 1
+  - path: tests/workflows/security.sh
+    owner: ethereum/EIPs
+    compatibility: 1
+  - path: tests/workflows/run.sh
+    owner: ethereum/EIPs
+    compatibility: 1
+  - path: .github/actionlint.yaml
+    owner: ethereum/EIPs
+    compatibility: 1
+
+# ERCs must copy this manifest or consume it from the shared workflow repository.
+# The sync check compares paths and compatibility versions when both repositories
+# are available in an integration workspace.

@@ -1,0 +1,11 @@
+paths:
+  .github/workflows/**/*.{yml,yaml}:
+    ignore:
+      # Style/info-level shellcheck rules present across many long-standing
+      # workflow scripts. Not worth a repo-wide cleanup right now; actionlint's
+      # own checks (unpinned actions, unknown inputs, permissions, syntax) are
+      # unaffected and still enforced.
+      - 'shellcheck reported issue in this script: SC2086:'
+      - 'shellcheck reported issue in this script: SC2129:'
+      - 'shellcheck reported issue in this script: SC2002:'
+      - 'shellcheck reported issue in this script: SC2267:'
