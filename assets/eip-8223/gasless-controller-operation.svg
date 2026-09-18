@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 820" role="img" aria-labelledby="title desc">
+  <title id="title">Gasless Controller Operation via Contract Payer Transaction</title>
+  <desc id="desc">Architecture diagram showing the clean separation between the EOA (signer only, no ETH) and the NFT-controlled smart account (wallet, assets, gas payer). The EOA signs a sponsored transaction targeting the account. The protocol reads the canonical payer registry (one SLOAD), confirms the account authorized the EOA, and charges gas to the account's balance. The EOA never holds ETH.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#304254"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4c7a62"/>
+    </marker>
+  </defs>
+  <style>
+    .bg { fill: #fbfaf6; }
+    .title { font: 700 30px 'Segoe UI', Arial, sans-serif; fill: #1c2733; }
+    .subtitle { font: 400 16px 'Segoe UI', Arial, sans-serif; fill: #52606d; }
+    .box { stroke: #304254; stroke-width: 2.4; rx: 24; ry: 24; }
+    .eoa { fill: #eef3ff; }
+    .account { fill: #eaf7ef; }
+    .registry { fill: #f3f7ff; }
+    .nft { fill: #fff3db; }
+    .note { fill: #fffdf8; stroke: #c7d0d9; stroke-width: 2; rx: 18; ry: 18; }
+    .good { fill: #f5fbf7; stroke: #7fa18e; stroke-width: 2; rx: 18; ry: 18; }
+    .warn { fill: #fff3ef; stroke: #cf8168; stroke-width: 2; rx: 18; ry: 18; }
+    .asset { fill: #d8eadf; stroke: #4d7a63; stroke-width: 2; rx: 16; ry: 16; }
+    .gas-badge { fill: #d8eadf; stroke: #4d7a63; stroke-width: 2; rx: 14; ry: 14; }
+    .empty { fill: #ffe0d6; stroke: #b45d42; stroke-width: 2; rx: 14; ry: 14; }
+    .reg-slot { fill: #e8eef8; stroke: #8ea8c7; stroke-width: 2; rx: 14; ry: 14; }
+    .title2 { font: 700 22px 'Segoe UI', Arial, sans-serif; fill: #1c2733; }
+    .label { font: 700 17px 'Segoe UI', Arial, sans-serif; fill: #304254; }
+    .body { font: 400 15px 'Segoe UI', Arial, sans-serif; fill: #23313d; }
+    .mono { font: 600 15px Consolas, 'Courier New', monospace; fill: #23313d; }
+    .edge { stroke: #304254; stroke-width: 3.2; fill: none; marker-end: url(#arrow); }
+    .edge-ok { stroke: #4c7a62; stroke-width: 3.2; fill: none; marker-end: url(#arrow-green); }
+    .dash { stroke-dasharray: 8 7; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1440" height="820"/>
+
+  <text class="title" x="720" y="48" text-anchor="middle">Gasless Controller Operation via Contract Payer Transaction</text>
+  <text class="subtitle" x="720" y="80" text-anchor="middle">The EOA is just a signer. The contract account is the wallet: it holds assets, pays gas, and executes.</text>
+  <text class="subtitle" x="720" y="104" text-anchor="middle">The controller EOA needs no ETH at all.</text>
+
+  <!-- EOA (signer only) -->
+  <rect class="box eoa" x="60" y="180" width="300" height="200"/>
+  <text class="title2" x="210" y="218" text-anchor="middle">Controller EOA</text>
+  <text class="label" x="210" y="248" text-anchor="middle">Signer only</text>
+
+  <!-- Empty ETH badge inside EOA -->
+  <rect class="empty" x="100" y="272" width="220" height="40"/>
+  <text class="label" x="210" y="297" text-anchor="middle" style="fill: #b45d42;">ETH balance: 0</text>
+
+  <text class="body" x="210" y="340" text-anchor="middle">Signs transactions.</text>
+  <text class="body" x="210" y="362" text-anchor="middle">Holds nothing else.</text>
+
+  <!-- Arrow: EOA sends sponsored tx to Account -->
+  <path class="edge" d="M 360 280 L 540 280"/>
+  <text class="label" x="450" y="264" text-anchor="middle">sponsored tx</text>
+  <text class="mono" x="450" y="300" text-anchor="middle">tx.to = Account</text>
+
+  <!-- Smart Account (the wallet) -->
+  <rect class="box account" x="540" y="140" width="500" height="440"/>
+  <text class="title2" x="790" y="178" text-anchor="middle">Smart Account (A)</text>
+  <text class="label" x="790" y="206" text-anchor="middle">The wallet, identity, and address. Holds everything.</text>
+
+  <!-- NFT badge inside Account -->
+  <rect class="box nft" x="580" y="228" width="420" height="50"/>
+  <text class="label" x="790" y="250" text-anchor="middle">Contract: owned by EOA</text>
+  <text class="mono" x="790" y="270" text-anchor="middle">e.g. owner() = EOA</text>
+
+  <!-- Assets inside Account -->
+  <rect class="asset" x="580" y="302" width="200" height="44"/>
+  <text class="label" x="680" y="329" text-anchor="middle">ETH balance</text>
+
+  <rect class="asset" x="800" y="302" width="200" height="44"/>
+  <text class="label" x="900" y="329" text-anchor="middle">ERC-20 tokens</text>
+
+  <rect class="asset" x="580" y="362" width="200" height="44"/>
+  <text class="label" x="680" y="389" text-anchor="middle">NFT holdings</text>
+
+  <rect class="asset" x="800" y="362" width="200" height="44"/>
+  <text class="label" x="900" y="389" text-anchor="middle">DeFi positions</text>
+
+  <!-- Gas payer badge -->
+  <rect class="gas-badge" x="580" y="428" width="420" height="50"/>
+  <text class="label" x="790" y="450" text-anchor="middle">Gas payer for sponsored transactions</text>
+  <text class="body" x="790" y="470" text-anchor="middle">ETH escrowed from this balance before execution</text>
+
+  <!-- Execution -->
+  <rect class="note" x="580" y="500" width="420" height="50"/>
+  <text class="body" x="790" y="522" text-anchor="middle">execute(), executeBatch(), signed execution</text>
+  <text class="body" x="790" y="542" text-anchor="middle">All execution happens here.</text>
+
+  <!-- Payer Registry (system contract) -->
+  <rect class="box registry" x="1120" y="200" width="260" height="200"/>
+  <text class="title2" x="1250" y="240" text-anchor="middle">Payer Registry</text>
+  <text class="body" x="1250" y="268" text-anchor="middle">System contract at 0x13</text>
+
+  <rect class="reg-slot" x="1150" y="290" width="200" height="44"/>
+  <text class="mono" x="1250" y="317" text-anchor="middle">storage[A] = EOA</text>
+
+  <text class="body" x="1250" y="360" text-anchor="middle">One SLOAD to validate.</text>
+  <text class="body" x="1250" y="382" text-anchor="middle">No code execution.</text>
+
+  <!-- Arrow: Account registered in registry -->
+  <path class="edge dash" d="M 1000 340 L 1120 340"/>
+  <text class="label" x="1060" y="324" text-anchor="middle">authorize</text>
+
+  <!-- Arrow: Protocol checks registry -->
+  <path class="edge-ok" d="M 1250 400 L 1250 490 L 1040 490"/>
+  <text class="label" x="1260" y="450" text-anchor="start">protocol verifies</text>
+  <text class="mono" x="1260" y="474" text-anchor="start">registry[A] == sender</text>
+
+  <!-- Bottom panels -->
+  <rect class="good" x="70" y="660" width="420" height="130"/>
+  <text class="label" x="280" y="698" text-anchor="middle">EOA = Signer Only</text>
+  <text class="body" x="280" y="728" text-anchor="middle">The EOA holds no ETH, no tokens,</text>
+  <text class="body" x="280" y="750" text-anchor="middle">no assets. It exists only to sign</text>
+  <text class="body" x="280" y="772" text-anchor="middle">transactions targeting the account(s)</text>
+
+  <rect class="warn" x="530" y="660" width="380" height="130"/>
+  <text class="label" x="720" y="698" text-anchor="middle">Account = Wallet + Identity</text>
+  <text class="body" x="720" y="728" text-anchor="middle">Assets, execution, gas payment,</text>
+  <text class="body" x="720" y="750" text-anchor="middle">address, and on-chain identity all</text>
+  <text class="body" x="720" y="772" text-anchor="middle">live at the account contract</text>
+
+  <rect class="note" x="950" y="660" width="420" height="130"/>
+  <text class="label" x="1160" y="698" text-anchor="middle">Validation = One SLOAD</text>
+  <text class="body" x="1160" y="728" text-anchor="middle">Protocol reads one slot from one</text>
+  <text class="body" x="1160" y="750" text-anchor="middle">known system contract. No code</text>
+  <text class="body" x="1160" y="772" text-anchor="middle">execution. FOCIL/VOPS compatible</text>
+</svg>
