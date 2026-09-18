@@ -1,0 +1,56 @@
+{
+    "$schema": "./storage-layout.schema.json",
+
+    "$comment": "Storage layout for a Diamond proxy mixing manually defined ERC-8042 storage with standard sequential layout.",
+
+    "compiler": {
+        "language": "Solidity",
+        "version": "0.8.26"
+    },
+
+    "storage": [
+        {
+            "label": "diamondStorage",
+            "path": "diamondStorage",
+            "offset": 0,
+            "slot": "42469820562479799825417469720884591996671680000710712918799708120930930543920",
+            "type": "t_struct(DiamondStorage)",
+            "source": "manual",
+            "baseSlotDerivation": {
+                "scheme": "erc8042",
+                "namespaceId": "diamond.storage.Example"
+            },
+            "display": {
+                "label": "Diamond Storage",
+                "description": "Diamond facet tracking."
+            }
+        }
+    ],
+
+    "types": {
+        "t_address": {
+            "encoding": "inplace",
+            "label": "address",
+            "numberOfBytes": "20"
+        },
+        "t_struct(DiamondStorage)": {
+            "encoding": "inplace_struct",
+            "label": "struct DiamondStorage",
+            "numberOfBytes": "32",
+            "members": [
+                {
+                    "label": "facetAddress",
+                    "path": "diamondStorage.facetAddress",
+                    "offset": 0,
+                    "slot": "0",
+                    "type": "t_address",
+                    "source": "manual",
+                    "display": {
+                        "label": "Facet Address",
+                        "format": "addressName"
+                    }
+                }
+            ]
+        }
+    }
+}
