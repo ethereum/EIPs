@@ -77,6 +77,12 @@ TESTS = [
     ("jump to CALLDEST, nets disagree","6004B000B15F36600B57B2B150B2", False),
     ("unframed jump to called sub","6006B0600656B1B2", False),
 
+    # Framing is a property of entries
+    ("shared revert block, both framings", "36600C576008B000B1600C56B15F80FD", True),
+    ("entered by jump and by call, returns", "366008576008B000B1B2", False),
+    ("framed chain: called, jumps on, returns", "6004B000B1600856B1B2", True),
+    ("unframed chain: jumped to, jumps on, returns", "600356B1600756B1B2", False),
+
     # --- constraint 4: overflow (STACK_LIMIT = 16 in the test build) ---
     ("17 pushes overflow",         "5F" * 17 + "00", False),
     ("16 pushes fit",              "5F" * 16 + "00", True),

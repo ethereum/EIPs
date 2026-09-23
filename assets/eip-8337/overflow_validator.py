@@ -77,10 +77,11 @@ def validate(code, stack_limit=STACK_LIMIT):
     # ------------------------------------------------------------------
     # Phase 1, the traversal: visit every reachable instruction once.
     # A work item is (pc, offset from the subroutine's start, entry —
-    # the CALLDEST pc or OUTER, framed — an unreturned CALLSUB on the
-    # path, and the value of the immediately preceding PUSH, or None).
+    # the CALLDEST pc or OUTER, and the value of the immediately
+    # preceding PUSH, or None).  Framing is a property of entries,
+    # settled after the traversal from the edges it records.
     # ------------------------------------------------------------------
-    visited = {}                  # pc -> (offset, entry, framed) at first visit
+    visited = {}                  # pc -> (offset, entry) at first visit
     required = {}                 # pc -> LABEL or ENTRY, set by jumps and calls
     stack_use = defaultdict(StackUse)  # entry -> that subroutine's use
     edges = []                    # (parent, offset, child, is_call): parent
@@ -89,7 +90,8 @@ def validate(code, stack_limit=STACK_LIMIT):
                                   # the arrivals that were not calls
     pending = defaultdict(list)   # entry -> return points waiting on its
                                   # net
-    work_items = [(0, 0, OUTER, False, None)]
+    returning = set()             # entries that contain a RETURNSUB
+    work_items = [(0, 0, OUTER, None)]
 
     def resolve(entry, value):
         """Record an entry's net: release the return points waiting on
@@ -103,14 +105,14 @@ def validate(code, stack_limit=STACK_LIMIT):
                     return False  # Constraint 5: one net per entry
                 continue
             stack_use[e].net = v
-            for ret_pc, offset, caller, framed in pending.pop(e, ()):
-                work_items.append((ret_pc, offset + v, caller, framed, None))
+            for ret_pc, offset, caller in pending.pop(e, ()):
+                work_items.append((ret_pc, offset + v, caller, None))
             for parent, d in enter_parents[e]:
                 settle.append((parent, d + v))
         return True
 
     while work_items:
-        pc, offset, entry, framed, push = work_items.pop()
+        pc, offset, entry, push = work_items.pop()
         if pc >= len(code):
             continue                     # implicit STOP: a valid end
         if pc not in instructions:
@@ -131,10 +133,10 @@ def validate(code, stack_limit=STACK_LIMIT):
 
         if pc in visited:
             # Constraint 5: paths must agree.
-            if visited[pc] != (offset, entry, framed):
+            if visited[pc] != (offset, entry):
                 return False
             continue
-        visited[pc] = (offset, entry, framed)
+        visited[pc] = (offset, entry)
 
         # Constraints 2 and 3: a required destination type, if any.
         if required.get(pc) == LABEL and op not in (JUMPDEST, CALLDEST):
@@ -161,15 +163,14 @@ def validate(code, stack_limit=STACK_LIMIT):
                 return False
             required[dest] = ENTRY       # a jump's LABEL upgrades to ENTRY
             edges.append((entry, offset, dest, True))
-            work_items.append((dest, 0, dest, True, None))
+            work_items.append((dest, 0, dest, None))
             if stack_use[dest].net is not None:
                 # Return point: call-site offset plus the callee's net.
-                work_items.append((nxt, offset + stack_use[dest].net, entry, framed, None))
+                work_items.append((nxt, offset + stack_use[dest].net, entry, None))
             else:
-                pending[dest].append((nxt, offset, entry, framed))
+                pending[dest].append((nxt, offset, entry))
         elif op == RETURNSUB:
-            if not framed:
-                return False             # Constraint 4: no CALLSUB to return from
+            returning.add(entry)
             if not resolve(entry, offset):
                 return False
         elif op in (JUMP, JUMPI):
@@ -181,12 +182,27 @@ def validate(code, stack_limit=STACK_LIMIT):
             if dest in visited and code[dest] not in (JUMPDEST, CALLDEST):
                 return False
             required.setdefault(dest, LABEL)
-            work_items.append((dest, offset, entry, framed, None))
+            work_items.append((dest, offset, entry, None))
             if op == JUMPI:              # and the fall-through arm
-                work_items.append((nxt, offset, entry, framed, None))
+                work_items.append((nxt, offset, entry, None))
         elif not term:                   # everything else falls through
             value = push_value(code, pc) if PUSH0 <= op <= PUSH32 else None
-            work_items.append((nxt, offset, entry, framed, value))
+            work_items.append((nxt, offset, entry, value))
+
+    # Constraint 4, framing: the top level is unframed, and so is every
+    # entry that an unframed entry jumps or falls into (the edges that
+    # are not calls); no unframed entry may contain a RETURNSUB.  The
+    # set only grows, so this ends.
+    unframed = {OUTER}
+    changed = True
+    while changed:
+        changed = False
+        for parent, _, child, is_call in edges:
+            if not is_call and parent in unframed and child not in unframed:
+                unframed.add(child)
+                changed = True
+    if unframed & returning:
+        return False
 
     # ------------------------------------------------------------------
     # Phase 2, the combining: fold each subroutine's stack use into
