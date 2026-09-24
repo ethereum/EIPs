@@ -123,6 +123,15 @@ To clarify the merge blocker if needed, add applicable labels.
 Your contributions help maintain the integrity and accessibility of Ethereum’s open-source governance process.  
 Together, we make the protocol and its documentation stronger, clearer, and more collaborative.
 
+## When a green PR does not merge
+
+Passing CI is necessary but not always sufficient. If every check is green and the PR still will not merge:
+
+* Check the labels. `e-consensus`, `e-review` and similar process labels mean an editor still has to act.
+* Confirm author acknowledgement. Editing someone else's EIP needs that author's approval, even for typo and lint fixes.
+* Files under `.github/workflows/**` are owned by the governance editors rather than `@eth-bot`, so they require a human review.
+* Avoid mixing categories in one PR. An EIP bundled with workflow or tooling changes needs approval from both sets of reviewers; splitting it is normally faster.
+
 ## References
 
 * [EIP-1: EIP Purpose and Guidelines](https://eips.ethereum.org/EIPS/eip-1) 
