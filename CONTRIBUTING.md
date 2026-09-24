@@ -11,20 +11,14 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 
 #### Text
 
-* Avoid mentioning specific commercial products.
-* Don't use [RFC 2119](https://www.ietf.org/rfc/rfc2119.html) keywords (all-caps SHOULD/MUST/etc.) outside of the specification section.
 * Prefer "on-chain" and "off-chain" when appearing before the noun they describe, and "on chain" or "off chain" when appearing after. 
-* Do not include punctuation at the end of headings (so no `# Example A:`, but `# Example A`).
 * Titles should be in title case: "In Title Case only Important Words are Capitalized".
 * Descriptions should be in sentence case: "Only the first word and proper nouns like Jupiter are capitalized".
-* Do not use articles (the/a/an/etc.) in front of EIP identifiers (so not "an ERC-20"), unless the EIP identifier is used as an adjective/compound noun (so "an ERC-20 token" is fine.)
 * Initialisms should be written in uppercase (eg. "NFT" instead of "nft".)
 * Only use backticks (\`) for code snippets.
-* Avoid single paragraph sentences and sections containing only bulleted lists.
 * Put abbreviations after the expanded form (so liquidity provider (LP) and not LP (liquidity provider).)
 * Use [example domains](https://en.wikipedia.org/wiki/Example.com) in examples, not real services.
 * It's "Ethereum", not "the Ethereum".
-* Unless you're writing a fork meta EIP, don't include fork activation criteria (eg. timestamp/epoch).
 * Include language versions (eg. `pragma solidity ^0.5.2;`) when writing code blocks or importing language terms/concepts.
 
 #### Diagrams
@@ -42,7 +36,13 @@ The goal is to keep contributions consistent, transparent, and easy to review - 
 
 ### Don’ts
 
-TBA.  
+* Don't self-allocate EIP number to your proposal; wait for the EIP Editor or Associate EIP Editor to take a look at the Pull Request.
+* Avoid mentioning specific commercial products.
+* Don't use [RFC 2119](https://www.ietf.org/rfc/rfc2119.html) keywords (all-caps SHOULD/MUST/etc.) outside of the specification section.
+* Do not include punctuation at the end of headings (so no `# Example A:`, but `# Example A`).
+* Do not use articles (the/a/an/etc.) in front of EIP identifiers (so not "an ERC-20"), unless the EIP identifier is used as an adjective/compound noun (so "an ERC-20 token" is fine.)
+* Avoid single paragraph sentences and sections containing only bulleted lists.
+*  Unless you're writing a fork meta EIP, don't include fork activation criteria (eg. timestamp/epoch).
 
 ## For Contributors (Non-Authors)
 
@@ -116,7 +116,10 @@ To clarify the merge blocker if needed, add applicable labels.
 
 * Don’t merge substantive changes without author approval.  
 * Don’t alter author list, status, or numbering silently.  
-* Don’t override the author’s technical intent or interpretation.  
+* Don’t override the author’s technical intent or interpretation.
+* **Don't merge changes to active or non-Final EIPs without author approval.**
+  * If an EIP is under active discussion, has not reached `Final` status, or its authors are still active in the community, editors should wait for author approval before merging changes.
+  * The discretionary merge policy for typo or formatting fixes should only be used when author involvement is no longer reasonably expected.
 
 ### Thank You
 
