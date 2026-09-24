@@ -1,0 +1,116 @@
+{
+    "$schema": "./storage-layout.schema.json",
+
+    "$comment": "Storage layout for an EIP-7702 delegate contract mixing sequential and ERC-7201 namespaced storage. '_owner' is ordinary sequential storage emitted by solc. 'spendingLimit' is a struct reached through an ERC-7201 namespaced pointer in inline assembly — solc's own storageLayout output is empty for it, so it is declared manually here with a verifiable baseSlotDerivation.",
+
+    "compiler": {
+        "language": "Solidity",
+        "version": "0.8.26"
+    },
+
+    "storage": [
+        {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address",
+            "display": {
+                "label": "Owner",
+                "description": "The account that controls this delegate.",
+                "format": "addressName"
+            }
+        },
+        {
+            "label": "spendingLimit",
+            "path": "spendingLimit",
+            "offset": 0,
+            "slot": "112319066037093618069807655578501645787519347644613079360284539174630667485440",
+            "type": "t_struct(SpendingLimit)",
+            "source": "manual",
+            "baseSlotDerivation": {
+                "scheme": "erc7201",
+                "namespaceId": "erc7702delegate.storage.SpendingLimit"
+            },
+            "display": {
+                "label": "Spending Limit",
+                "description": "Daily spending limit configuration for this delegate."
+            }
+        }
+    ],
+
+    "types": {
+        "t_address": {
+            "encoding": "inplace",
+            "label": "address",
+            "numberOfBytes": "20"
+        },
+        "t_uint256": {
+            "encoding": "inplace",
+            "label": "uint256",
+            "numberOfBytes": "32"
+        },
+        "t_uint48": {
+            "encoding": "inplace",
+            "label": "uint48",
+            "numberOfBytes": "6"
+        },
+        "t_struct(SpendingLimit)": {
+            "encoding": "inplace_struct",
+            "label": "struct SpendingLimit",
+            "numberOfBytes": "96",
+            "members": [
+                {
+                    "label": "dailyLimit",
+                    "path": "spendingLimit.dailyLimit",
+                    "offset": 0,
+                    "slot": "0",
+                    "type": "t_uint256",
+                    "source": "manual",
+                    "display": {
+                        "label": "Daily Limit",
+                        "description": "Maximum amount that may be spent in a 24-hour window.",
+                        "format": "tokenAmount",
+                        "params": { "tokenPath": "@.to" }
+                    }
+                },
+                {
+                    "label": "spentToday",
+                    "path": "spendingLimit.spentToday",
+                    "offset": 0,
+                    "slot": "1",
+                    "type": "t_uint256",
+                    "source": "manual",
+                    "display": {
+                        "label": "Spent Today",
+                        "description": "Cumulative amount spent within the current 24-hour window.",
+                        "format": "tokenAmount",
+                        "params": { "tokenPath": "@.to" },
+                        "template": [
+                            {
+                                "condition": { ">": [{ "var": "newValue" }, { "var": "oldValue" }] },
+                                "value": "Spent Today increased from {oldValue} to {newValue}"
+                            },
+                            {
+                                "condition": { "<": [{ "var": "newValue" }, { "var": "oldValue" }] },
+                                "value": "Spent Today reset from {oldValue} to {newValue}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "label": "windowResetAt",
+                    "path": "spendingLimit.windowResetAt",
+                    "offset": 0,
+                    "slot": "2",
+                    "type": "t_uint48",
+                    "source": "manual",
+                    "display": {
+                        "label": "Window Resets At",
+                        "description": "Unix timestamp when the current spending window expires.",
+                        "format": "date"
+                    }
+                }
+            ]
+        }
+    }
+}
