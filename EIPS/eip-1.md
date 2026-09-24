@@ -140,6 +140,8 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `requires`: *EIP number(s)* (Optional field)
 
+`tags`: *List of EIP tags*  (Optional field, only required for core EIPs to finalize)
+
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
 
 Headers that permit lists must separate elements with commas.
@@ -191,6 +193,16 @@ The `created` header records the date that the EIP was assigned a number. Both h
 EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on. If such a dependency exists, this field is required.
 
 A `requires` dependency is created when the current EIP cannot be understood or implemented without a concept or technical element from another EIP. Merely mentioning another EIP does not necessarily create such a dependency.
+
+### `tags` header
+
+The `tags` header is for tags that describe the scope of the EIP. If defined, tags MUST be minimal and MUST comprehensively cover all aspects of the EIP.
+
+Tags MUST be defined on all core EIPs for them to finalize but are also RECOMMENDED on all EIPs.
+
+Draft EIPs SHOULD use the `meta:experimental` instead of defining new tags.
+
+The list of acceptable tags and the process governing modifications to the list is described in [EIP-8235](./eip-8235.md).
 
 ## Linking to External Resources
 
