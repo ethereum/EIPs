@@ -1,0 +1,191 @@
+---
+eip: <to be assigned>
+title: Escalating gas for repeated references to an enrolled address within a block
+description: A block-scoped, per-address reference counter kept by the client; the k-th call into an enrolled address in a block costs k² times a base surcharge.
+author: Jarett Dunn (@staccDOTsol)
+discussions-to: <ethereum-magicians thread>
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-09-28
+requires: 2929
+---
+
+## Abstract
+
+This EIP adds a block-scoped counter, kept by the execution client and not part of world state, that records how many times each *enrolled* address has been called during the current block. Any account may enroll itself, once and irrevocably, through a system registry contract. Every message call into an enrolled address is charged a surcharge of `G_REF * k²` gas, where `k` is the number of calls into that address so far in the block, capped at `G_REF_MAX`. The counter is global: it does not care which transaction, sender, or `tx.origin` made the earlier calls.
+
+The effect is that touching the same enrolled contract many times inside one block, whether inside one transaction or across a bundle of transactions, becomes quadratically more expensive than touching it once. A human transfer or a single swap pays close to nothing. A machine that initializes dozens of pools on a token, walks a price ladder, or adds and removes liquidity in the same block pays for it in gas that goes to the protocol, not to the extractor.
+
+## Motivation
+
+Chains with a single sequencer and private submission are immune to the classic sandwich, and a 2026 study of six chains confirms it (arXiv:2609.28115): Arbitrum and Monad show zero sandwiches against protected order flow. They are not immune to *cataloguing*. On Robinhood Chain a token launched on 2026-09-26 was farmed within 32 minutes with no sandwich at all: 59 permissionless pools on the token, fee tiers of 70 to 98%, a price ladder walked 17x on a sibling pool by initializing pool after pool at rising quotes with no tokens deposited, liquidity added and pulled inside the same block, and a fixed toll on every fill. One bot touched 532 tokens in a month. Net per token for the bot was about zero; the extraction is from everyone routed through the surface it built.
+
+Every step of that machine is the same primitive: *reference the same token many times in the same block*. The market structure is provable precisely because it repeats. None of it needs the mempool, so encrypted mempools, private RPCs and batch auctions do not touch it. It cannot be fixed by the token (a foreign AMM with flash accounting nets its operations into one transfer), nor by one AMM (the bot initializes its own pools). It can only be priced at the layer that sees every call: the execution client.
+
+EIP-2929 already keeps a per-transaction set of accessed addresses and charges a cold/warm difference. This EIP keeps a per-block *count* for enrolled addresses and charges a superlinear price. Gas is the right instrument because it is paid to the protocol (burned through the base fee, or to the sequencer on rollups) and cannot be recaptured by the party being priced.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "SHOULD", and "MAY" are to be interpreted as described in RFC 2119.
+
+### Parameters
+
+| Constant | Value | Notes |
+|---|---|---|
+| `REGISTRY_ADDRESS` | `0x000000000000000000000000000000000000E5CA` (placeholder; to be assigned) | system contract, deployed at fork block |
+| `G_REF` | 2,000 | base surcharge in gas |
+| `G_REF_MAX` | 5,000,000 | surcharge cap per call |
+| `K_FREE` | 1 | references per block with no surcharge |
+
+Rollups and app-chains MAY set different constants. The recommended values for a single-sequencer chain with sub-second blocks are `G_REF = 20,000`, `K_FREE = 1`.
+
+### Enrollment registry
+
+A system contract at `REGISTRY_ADDRESS` exposes:
+
+```
+enroll()            // msg.sender is enrolled; irrevocable; emits Enrolled(address)
+isEnrolled(address) // view
+```
+
+Enrollment is by the account itself (`msg.sender == account`). A contract enrolls from its constructor or from any later call it makes. There is no un-enroll. Enrollment takes effect at the start of the next block, so the client can snapshot the set once per block.
+
+Rationale for self-enrollment only: a third party MUST NOT be able to make an address expensive to call.
+
+### Block-scoped counter
+
+At the start of each block the client initializes an empty map `refs: address → uint`. The map is discarded at the end of the block. It is not part of world state, is not committed, and has no effect on the state root, exactly like the EIP-2929 accessed sets.
+
+### Charged operations
+
+For every message call whose target is an enrolled address, including:
+
+- the top-level transaction `to`,
+- `CALL`, `CALLCODE`, `STATICCALL`,
+
+the client performs, before charging the call's other gas:
+
+```
+k = refs[target]
+refs[target] = k + 1
+if k >= K_FREE:
+    surcharge = min(G_REF * (k + 1)², G_REF_MAX)
+    charge surcharge to the caller frame
+```
+
+If the frame cannot pay the surcharge, the call fails with an out-of-gas exception in the caller, the same as an unaffordable `CALL`.
+
+`DELEGATECALL` targets are NOT counted: the code runs in the caller's storage context, and the reference that matters for a token is the account whose storage changes. A proxy that is enrolled is counted when it is called; its implementation is not.
+
+Calls to precompiles and to accounts with no code are never counted, whether enrolled or not.
+
+`CREATE` and `CREATE2` are not counted. `SELFDESTRUCT` is not counted.
+
+### Fee destination
+
+The surcharge is charged as gas, so it cannot be recaptured by the party being priced. At the end of each transaction the client computes `S = surcharge_gas_used * base_fee` (the surcharge is tracked separately from other gas, the same way refunds are) and splits it:
+
+- `S / 2` is credited to `SINK_ADDRESS`, a system contract with no owner, no upgrade path and one purpose: to be staked forever.
+- `S / 2` is credited to the enrolled address's `beneficiary`, chosen at enrollment. It MUST be a stake account: a contract whose code hash equals the canonical `StakeVault` template (below). Anyone can deploy a `StakeVault` with a withdrawal address of their choosing; the vault can only move ETH into the beacon deposit contract with withdrawal credentials `0x01 || withdrawalAddress`. The enroller therefore receives its half as stake, not as spendable ETH, and only ever sees it through validator rewards and exits.
+
+`enroll(address beneficiary)` reverts unless `beneficiary.codehash == STAKE_VAULT_CODEHASH`. `enroll()` with no argument sets `beneficiary = SINK_ADDRESS`, i.e. the whole surcharge is staked forever.
+
+`SINK_ADDRESS` (`0x000000000000000000000000000000000000E5CB`, placeholder) exposes:
+
+```
+stake(bytes pubkey, bytes signature, bytes32 depositDataRoot)
+    // deposits 32 ETH from the sink into the beacon deposit contract for `pubkey`,
+    // with withdrawal credentials forced to 0x01 || SINK_ADDRESS. Anyone may call.
+    // The caller must hold a bond of BOND (1 ETH) in the sink, locked per validator,
+    // returned to them by exit(pubkey) after the validator has fully withdrawn.
+exit(bytes pubkey)   // releases the operator bond once the validator's balance has returned to the sink
+```
+
+`StakeVault` is the same contract with one constructor argument, `withdrawalAddress`, and the same `stake` / `exit` / bond rules; `SINK_ADDRESS` is the instance whose `withdrawalAddress` is itself.
+
+There is no withdraw. Everything that returns to the sink through the withdrawal credentials (consensus rewards, exited stake) can only be staked again. The operator who supplies the validator key keeps what the execution layer pays the fee recipient (priority fees, builder payments) and nothing else; that is the incentive to run the validator. The bond covers the initial slashing penalty so an operator cannot cost the sink more than they staked.
+
+The intent is a fund nobody controls, that grows with every machine that walks a token, and that never leaves the validator set.
+
+On rollups without a beacon deposit path, `SINK_ADDRESS` MAY hold the ETH and expose a single `bridgeAndStake()` that moves it to the same contract on the parent chain.
+
+### Reverts
+
+The counter is NOT rolled back when a call reverts. A reverted attempt is still a reference. This is deliberate: probing a token with calls that revert is part of the pattern being priced.
+
+### Gas estimation
+
+`eth_estimateGas` executes against the pending block's counter state as of the end of the pending block. Wallets SHOULD surface the surcharge separately, since it is the only component of a call's gas that depends on what other transactions in the block did.
+
+## Rationale
+
+**Why block scope and not transaction scope.** Transaction scope is defeated by splitting a machine across a bundle of transactions in the same block, which is exactly how same-block add/remove liquidity is done on sequencer chains. Block scope prices the bundle as one thing. Transaction-scoped escalation can be layered on top by application code (transient storage), and is out of scope here.
+
+**Why global and not per sender.** A counter keyed by `tx.origin` or by sender is defeated by using a fresh wallet per transaction, which costs nothing. A global counter has a real cost: a popular token pays for its own organic volume. Two things bound that cost. First, enrollment is opt-in and irrevocable, so an issuer chooses it knowing the trade. Second, the surcharge is the only cost that scales: a token launch expects tens of references per block, a machine doing 59 pool initializations and a 17-rung ladder expects hundreds. At `G_REF = 2,000`, the 10th reference in a block costs 200,000 gas extra, the 30th costs 1.8 million, and the cap is hit at the 50th. A wallet-to-wallet transfer as the first reference pays nothing.
+
+**Why square.** Linear is a per-reference tax that a bot with a positive expected value per reference absorbs and passes to its victims. Quadratic means the marginal reference cost grows with the machine's own size, so the largest surfaces (many pools, many rungs) are priced out first while single operations are untouched. Cubic and above were considered and rejected as pricing out legitimate routers that hop a token through two or three venues.
+
+**Why gas and not a fee in the token.** A fee in the token is captured by whoever controls the venue, which is the party being priced. Gas is captured by the protocol.
+
+**Why half to a perpetual stake and not all burned.** A burn benefits every holder of ETH pro rata, including the extractor. A perpetual stake with no owner benefits the network's security budget directly and belongs to nobody: no foundation, no research org, no GP. The other half is burned so the surcharge still reduces supply the way base fee does.
+
+**Why not extend EIP-2929 directly.** EIP-2929's sets are per transaction and reset at each transaction boundary; its warm cost is lower than its cold cost, the opposite direction to this EIP. Reusing its machinery would confuse two different signals. The implementation is nevertheless the same shape: a client-side map consulted on the call path.
+
+**Why the registry is a contract and not an account flag.** A per-account flag needs an account trie format change. A system contract whose storage the client reads once per block needs no state format change and can be deployed at a fork block like EIP-4788's beacon roots contract.
+
+## Backwards Compatibility
+
+No existing contract is enrolled, so no existing contract's gas changes at the fork. Contracts that enroll accept that calls into them may cost more when they are called repeatedly in a block. Tooling that assumes a call's gas is independent of other transactions in the block (some bundle simulators, some fixed-gas relayers) will under-estimate for enrolled targets and MUST read `isEnrolled`.
+
+## Test Cases
+
+1. Address `A` not enrolled: 100 calls into `A` in one block cost the same as before the fork.
+2. `A` enrolled at block `N`: in block `N` it is still uncounted; in block `N+1` the second call into `A` within one transaction costs `G_REF * 4` more than the first.
+3. `A` enrolled; transaction 1 calls `A` once, transaction 2 in the same block calls `A` once: transaction 2 pays `G_REF * 4`.
+4. `A` enrolled; a call into `A` that reverts still increments the counter for the next caller.
+5. `A` enrolled; 60 calls into `A` in one block: the surcharge for calls 50 through 60 equals `G_REF_MAX`.
+6. `DELEGATECALL` into `A` from proxy `P` (not enrolled): no surcharge; `CALL` into `P` where `P` is enrolled: surcharge.
+7. `eth_estimateGas` for a call into `A` after 9 pending references returns the base gas plus `G_REF * 100`.
+
+## Reference Implementation
+
+Client-side, in the call path (pseudocode in the shape of go-ethereum's `core/vm`):
+
+```go
+// per block, built once from REGISTRY storage at block start
+type refState struct {
+    enrolled map[common.Address]bool
+    refs     map[common.Address]uint64
+}
+
+func (evm *EVM) chargeReference(caller *Contract, target common.Address) error {
+    if !evm.refState.enrolled[target] { return nil }
+    k := evm.refState.refs[target]
+    evm.refState.refs[target] = k + 1
+    if k < params.KFree { return nil }
+    n := k + 1
+    surcharge := params.GRef * n * n
+    if surcharge > params.GRefMax { surcharge = params.GRefMax }
+    if !caller.UseGas(surcharge) { return ErrOutOfGas }
+    return nil
+}
+```
+
+`chargeReference` is invoked in `opCall`, `opCallCode`, `opStaticCall` after the target is known and before EIP-2929 access accounting, and once in the transaction entry point for `tx.to`. The registry contract is a 40-line Solidity contract with `mapping(address => bool)`; the client reads its storage into `enrolled` at the start of each block.
+
+An implementation for Arbitrum Nitro (ArbOS) is the same hook in the geth fork's `EVM.Call` family, with the surcharge routed to the chain's fee account rather than burned.
+
+## Security Considerations
+
+**Griefing an enrolled address.** Anyone can spend gas to push an enrolled contract's counter up early in a block, making it expensive for everyone else in that block. The attacker pays the same escalating price and cannot recapture it, so this is a pure burn: at the recommended constants, occupying a token for one block costs the attacker roughly `G_REF_MAX * 10` gas per block, forever. This is the same class of cost as spamming the chain and is bounded the same way.
+
+**Counter determinism.** The counter depends only on the ordered execution of the block, so every client computes the same values. Block builders can order transactions to change who pays a surcharge; that is already true of every ordering-dependent cost (EIP-2929 warmth across a transaction, gas refunds) and is priced by the same market.
+
+**Denial of service through enrollment.** Enrollment is by the account itself, so no address can be made expensive by a third party. A malicious token can enroll itself and then call itself repeatedly to burn its callers' gas; it could already burn their gas with a loop.
+
+**Interaction with EIP-7702.** A delegated EOA has code and can enroll; calls into it are then counted. Delegation designators are not counted through `DELEGATECALL` semantics, consistent with the proxy rule.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
