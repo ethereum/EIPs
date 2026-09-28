@@ -16,34 +16,37 @@ interface IStakePool {
     function sync(address token) external returns (uint256, uint256);
 }
 
-/// @title NativeSettler: reference fees become native, half burned, half staked.
+/// @title NativeSettler: reference fees become native, and both halves become stake.
 /// @notice A token cannot take ETH from its sender at transfer time, so IERC12384 tokens pay
 ///         their fee in kind, all of it here. Anyone then settles a token: what has landed is
 ///         sold for ETH through the token's own market (the same venue adapters the scooper
-///         uses), half of the ETH is burned, and half is wrapped and handed to the stake pool
-///         the deployer fixed, which must be a pool and nothing else. Nobody owns this.
+///         uses). Half of the ETH goes to the chain's sink, an ownerless contract that can only
+///         hold (on L1, only stake). Half is wrapped and handed to the stake pool the deployer
+///         fixed, which must be a pool and nothing else. Nothing is burned. Nobody owns this.
 contract NativeSettler is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     uint256 public constant BPS = 10_000;
     /// @notice A settlement must clear spot less this much, or it waits for a better block.
     uint256 public constant MAX_IMPACT_BPS = 500;
-    /// @notice ETH burned here is gone: the canonical dead address holds it.
-    address public constant BURN = 0x000000000000000000000000000000000000dEaD;
+    /// @notice The chain's half: an ownerless sink that only holds.
+    address payable public immutable sink;
 
     IVenue[] public venues;
     IStakePool public immutable pool;
     IWETH public immutable weth;
 
-    event Settled(address indexed token, address indexed venue, uint256 sold, uint256 ethOut, uint256 burned, uint256 staked);
+    event Settled(address indexed token, address indexed venue, uint256 sold, uint256 ethOut, uint256 sunk, uint256 staked);
 
     error NoMarket();
     error NotAPool();
     error Nothing();
 
-    constructor(IVenue[] memory venues_, IStakePool pool_, IWETH weth_) {
+    constructor(IVenue[] memory venues_, IStakePool pool_, IWETH weth_, address payable sink_) {
         // the destination has to answer as a pool; a wallet or an EOA cannot
         if (address(pool_.square()) == address(0)) revert NotAPool();
+        if (sink_ == address(0) || sink_.code.length == 0) revert NotAPool();
+        sink = sink_;
         for (uint256 i = 0; i < venues_.length; i++) {
             venues.push(venues_[i]);
         }
@@ -82,13 +85,13 @@ contract NativeSettler is ReentrancyGuard {
         v.sell(token, amount, minOut);
         ethOut = address(this).balance - before;
         require(ethOut >= minOut, "slip");
-        uint256 burned = ethOut / 2;
-        uint256 staked = ethOut - burned;
-        (bool ok,) = BURN.call{value: burned}("");
-        require(ok, "burn");
+        uint256 sunk = ethOut / 2;
+        uint256 staked = ethOut - sunk;
+        (bool ok,) = sink.call{value: sunk}("");
+        require(ok, "sink");
         weth.deposit{value: staked}();
         IERC20(address(weth)).safeTransfer(address(pool), staked);
         pool.sync(address(weth));
-        emit Settled(token, address(v), amount, ethOut, burned, staked);
+        emit Settled(token, address(v), amount, ethOut, sunk, staked);
     }
 }

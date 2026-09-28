@@ -36,7 +36,7 @@ interface IERC12384 {
 ///           2. Two ratchets, and a transfer pays the larger:
 ///              FAST, global, per block: every reference to this token in the chain's
 ///                own block counts, whoever made it. The first FAST_FREE are free, then
-///                FAST_FLOOR·k² bp, capped at 99%. A sandwich is front, victim, back:
+///                FAST_FLOOR·k² bp, capped at 100%. A sandwich is front, victim, back:
 ///                the victim is #2 and free, the back-run is #3 and pays, however many
 ///                wallets the machine uses. Griefing it means dust every 250 ms forever.
 ///              SLOW, per originator, per window of SLOW_WINDOW blocks: what tx.origin
@@ -64,11 +64,10 @@ interface IERC12384 {
 ///         That is the reason the Ethereum core EIP counts calls at the client
 ///         instead. This contract is the version that needs no fork.
 abstract contract ReferenceFeeERC20 is ERC20, IERC12384 {
-    /// @notice Fast ratchet: 10 bp per k², first two references in a block free, never above 99%:
-    ///         a transfer always delivers something, so nothing can be made untransferable.
+    /// @notice Fast ratchet: 10 bp per k², first two references in a block free, never above 100%.
     uint256 public constant FAST_FLOOR = 10;
     uint256 public constant FAST_FREE = 2;
-    uint256 public constant FAST_CAP = 9_900;
+    uint256 public constant FAST_CAP = 10_000;
     /// @notice Slow ratchet: 2 bp per k² of an originator's references in a ~8.5 minute window, first free, at most 10%.
     uint256 public constant SLOW_FLOOR = 2;
     uint256 public constant SLOW_FREE = 1;
