@@ -1,5 +1,5 @@
 ---
-title: BLS validator retirement
+title: Retire 0x00 validators
 description: Exit remaining validators with 0x00 withdrawal credentials at a capped rate after a grace period, keeping the credential change path open
 author: NC (@ensi321)
 discussions-to: https://ethereum-magicians.org/t/tbd
