@@ -13,3 +13,7 @@ Compiles with solc 0.8.26+ against OpenZeppelin 5. Tests, venue adapters, the st
 ## Naming
 
 This draft was opened under the provisional number 12384 and the contracts deployed on Robinhood Chain were compiled with the interface named `IERC12384`. The editors assigned 8429. The sources here are the deployed sources with that one identifier renamed to `IERC8429`; the ABI and the interface id are unchanged.
+
+## Stake vault
+
+`StakeVault.sol` is the vault the protocol form pays into, and what `NativeSink` stands in for on a chain with no validator set. It never creates a validator: an operator does, and the vault tops up one it has proven, through EIP-4788, to carry its withdrawal credentials. Tests, the mainnet proof fixture and the script that produced it are at https://github.com/staccDOTsol/squarefun (`test/StakeVault.t.sol`, `test/StakeVaultMainnetProof.t.sol`, `script/beacon/prove.py`).
