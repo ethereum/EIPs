@@ -17,7 +17,7 @@ interface IStakePool {
 }
 
 /// @title NativeSettler: reference fees become native, and both halves become stake.
-/// @notice A token cannot take ETH from its sender at transfer time, so IERC12384 tokens pay
+/// @notice A token cannot take ETH from its sender at transfer time, so IERC8429 tokens pay
 ///         their fee in kind, all of it here. Anyone then settles a token: what has landed is
 ///         sold for ETH through the token's own market (the same venue adapters the scooper
 ///         uses). Half of the ETH goes to the chain's sink, an ownerless contract that can only

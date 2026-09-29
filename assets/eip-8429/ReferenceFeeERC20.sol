@@ -3,12 +3,12 @@ pragma solidity ^0.8.26;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-/// @title IERC12384: block-scoped reference counting with an escalating in-kind fee.
-/// @notice The ERC-20 form of EIP-12384. Where the EIP has the client count calls into
+/// @title IERC8429: block-scoped reference counting with an escalating in-kind fee.
+/// @notice The ERC-20 form of EIP-8429. Where the EIP has the client count calls into
 ///         an enrolled address per block and charge gas, this token counts its own
 ///         transfers per block and charges itself, in kind. Same schedule, same
 ///         destinations, no protocol change needed, deployable on any EVM chain today.
-interface IERC12384 {
+interface IERC8429 {
     /// @notice A counted transfer paid its reference fee.
     /// @param n the reference ordinal in this block (1 = first)
     /// @param fee tokens taken from `value` and split between sink and beneficiary
@@ -28,7 +28,7 @@ interface IERC12384 {
     function beneficiary() external view returns (address);
 }
 
-/// @title ReferenceFeeERC20: reference implementation of IERC12384.
+/// @title ReferenceFeeERC20: reference implementation of IERC8429.
 /// @notice Rules, in the EIP's terms:
 ///
 ///           1. Every transfer between two non-zero addresses is a reference to this
@@ -63,7 +63,7 @@ interface IERC12384 {
 ///         operations into one settlement transfer, so it counts as one reference.
 ///         That is the reason the Ethereum core EIP counts calls at the client
 ///         instead. This contract is the version that needs no fork.
-abstract contract ReferenceFeeERC20 is ERC20, IERC12384 {
+abstract contract ReferenceFeeERC20 is ERC20, IERC8429 {
     /// @notice Fast ratchet: 10 bp per k², first two references in a block free, never above 100%.
     uint256 public constant FAST_FLOOR = 10;
     uint256 public constant FAST_FREE = 2;
