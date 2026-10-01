@@ -81,18 +81,18 @@ Comparison using compressed block average of **78.98 KiB**:
 | Metric | BAL Size (KiB) | Block Size (KiB) | Ratio (BAL/Block) | Size Difference |
 |--------|---------------|------------------|-------------------|------------------|
 | **Full BAL (with reads)** | 92.1 | 79.0 | 1.17x | +13.1 KiB |
-| **BAL without reads** | 66.8 | 79.0 | 0.85x | -12.2 KiB |
+| **BAL without reads** | 61.1 | 79.0 | 0.77x | -17.9 KiB |
 
 - Full BAL **with reads** is 1.17x the size of a compressed block
-- BAL **without reads** is 0.85x the size of a compressed block
-- Storage reads add **25.3 KiB** (37.9%) to BAL size
-- BAL overhead vs blocks: **+16.6%** (with reads), **-15.5%** (without reads)
+- BAL **without reads** is 0.77x the size of a compressed block
+- Storage reads add **31.0 KiB** (50.7%) to BAL size
+- BAL overhead vs blocks: **+16.6%** (with reads), **-22.7%** (without reads)
 
 ## Storage Reads Impact Analysis
 
 - **WITH reads** (Full BAL): 92.1 KiB compressed
-- **WITHOUT reads**: 66.8 KiB compressed
-- **Storage reads overhead**: 25.3 KiB (37.9%)
+- **WITHOUT reads**: 61.1 KiB compressed
+- **Storage reads overhead**: 31.0 KiB (50.7%)
 
 ## Compressed Full BAL Size Percentiles (KiB)
 
@@ -106,15 +106,13 @@ Comparison using compressed block average of **78.98 KiB**:
 |--------|----------|---------------|--------|
 | Full BAL avg raw (KiB) | 110.8 | 136.6 | +23.3% |
 | Full BAL avg compressed (KiB) | 72.5 | 92.1 | +27.0% |
-| BAL w/o reads avg compressed (KiB) | 53.5 | 66.8 | +24.7% |
+| BAL w/o reads avg compressed (KiB) | 49.4 | 61.1 | +23.7% |
 | Compressed block avg (KiB) | 55.4 | 79.0 | +42.6% |
 | Total accounts (avg) | 606.7 | 765.6 | +26.2% |
 | Storage writes count (avg) | 807.3 | 986.1 | +22.1% |
 | Storage reads count (avg) | 981.5 | 1200.7 | +22.3% |
 | Balance changes count (avg) | 611.6 | 794.8 | +30.0% |
 | Nonce changes count (avg) | 228.6 | 314.3 | +37.5% |
-
-Previous-window values are re-measured over blocks 23,991,474 to 23,992,473 with this pipeline; the prior report's 71.7 KiB block average and its 700 storage writes count (unique slots, not write entries) do not carry over.
 
 Gas per block is unchanged (30.5M to 30.3M) while storage writes per Mgas rose from 26.5 to 32.6 (+23%) and raw BAL payload from 110.8 to 136.6 KiB (+23%): the growth comes from gas shifting toward state writes, not from higher gas usage.
 
