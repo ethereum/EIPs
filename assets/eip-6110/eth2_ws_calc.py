@@ -32,7 +32,6 @@ def compute_weak_subjectivity_period(N: uint64, t: Ether) -> uint64:
     # t = get_total_active_balance(state) // N // ETH_TO_GWEI
     T = MAX_EFFECTIVE_BALANCE // ETH_TO_GWEI
     delta = get_validator_churn_limit(N)
-    MAX_DEPOSITS = 1024
     Delta = MAX_DEPOSITS * SLOTS_PER_EPOCH
     D = SAFETY_DECAY
 
