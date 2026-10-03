@@ -1,0 +1,241 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "EVM Contract Storage Layout",
+    "type": "object",
+    "description": "Language-neutral description of an EVM contract's storage layout. See ERC-8317 (Contract Storage Layout Descriptor Format).",
+
+    "properties": {
+
+        "$schema": {
+            "title": "Schema",
+            "type": "string",
+            "format": "uri-reference",
+            "description": "The schema this file conforms to."
+        },
+
+        "$comment": {
+            "title": "Comment",
+            "type": "string",
+            "description": "An optional comment string documenting the purpose or provenance of this file."
+        },
+
+        "compiler": {
+            "title": "Compiler information",
+            "type": "object",
+            "description": "Identifies the source language and compiler used to produce this storage layout. Used to select the correct slot derivation formula.",
+            "properties": {
+                "language": {
+                    "type": "string",
+                    "description": "Source language. This ERC defines formulas for 'Solidity' and 'Vyper'. 'manual' MUST be used when no compiler produced any part of the layout (e.g. Huff, raw Yul, hand-written assembly)."
+                },
+                "version": {
+                    "type": "string",
+                    "description": "Compiler version string (e.g. '0.8.24'). Informative only."
+                },
+                "settings": {
+                    "type": "object",
+                    "description": "Compiler settings (e.g. optimizer configuration). Informative only.",
+                    "additionalProperties": true
+                }
+            },
+            "required": ["language"],
+            "additionalProperties": false
+        },
+
+        "storage": {
+            "title": "Storage entries",
+            "type": "array",
+            "description": "Ordered list of top-level contract state variables.",
+            "items": { "$ref": "#/$defs/storageEntry" }
+        },
+
+        "types": {
+            "title": "Type definitions",
+            "type": "object",
+            "description": "Type definitions referenced by storage entries.",
+            "additionalProperties": { "$ref": "#/$defs/typeDefinition" }
+        }
+    },
+
+    "required": ["compiler", "storage", "types"],
+    "additionalProperties": false,
+
+    "$defs": {
+
+        "storageEntry": {
+            "title": "Storage entry",
+            "type": "object",
+            "description": "A single state variable or struct member.",
+            "properties": {
+                "label": {
+                    "type": "string",
+                    "description": "Source-level variable name."
+                },
+                "path": {
+                    "type": "string",
+                    "description": "Stable dot-separated identifier for this entry (e.g. 'vaults.lockedAmount'). If absent, consumers MUST compute it by joining label values from the top-level entry down through struct members."
+                },
+                "offset": {
+                    "type": "integer",
+                    "description": "Byte offset within the storage slot where this entry begins."
+                },
+                "slot": {
+                    "type": "string",
+                    "description": "Storage slot as a decimal string. For struct members, relative to the struct's base slot. For mappings and dynamic arrays, the base slot used to derive child slots."
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Type identifier referencing an entry in the file's 'types' object."
+                },
+                "source": {
+                    "type": "string",
+                    "enum": ["compiler", "manual"],
+                    "default": "compiler",
+                    "description": "'compiler' (default): slot/offset were emitted by the compiler named in compiler.language from verifiable source code. 'manual': the file author declared slot directly."
+                },
+                "baseSlotDerivation": {
+                    "$ref": "#/$defs/baseSlotDerivation"
+                },
+                "display": {
+                    "$ref": "#/$defs/displayAnnotation"
+                }
+            },
+            "required": ["label", "offset", "slot", "type"],
+            "additionalProperties": false
+        },
+
+        "baseSlotDerivation": {
+            "title": "Base slot derivation",
+            "type": "object",
+            "description": "Names the scheme used to compute this entry's base slot, so it can be independently re-derived and verified instead of trusted as an opaque constant. MUST NOT be used for sequential, compiler-assigned slots.",
+            "properties": {
+                "scheme": {
+                    "type": "string",
+                    "enum": ["erc7201", "erc8042", "custom"]
+                },
+                "namespaceId": {
+                    "type": "string",
+                    "description": "Required for 'erc7201' and 'erc8042': the human-readable namespace id string the scheme hashes."
+                },
+                "formula": {
+                    "type": "string",
+                    "description": "Required for 'custom': free-text, non-machine-verified description of how 'slot' was computed."
+                }
+            },
+            "required": ["scheme"],
+            "additionalProperties": false
+        },
+
+        "typeDefinition": {
+            "title": "Type definition",
+            "type": "object",
+            "description": "A type definition referenced by storage entries via 'type'.",
+            "properties": {
+                "encoding": {
+                    "type": "string",
+                    "enum": ["inplace", "inplace_struct", "mapping", "dynamic_array", "bytes"],
+                    "description": "Storage encoding. 'inplace': primitive value type stored directly at its slot. 'inplace_struct': struct type with members. 'mapping', 'dynamic_array', 'bytes': complex types requiring slot derivation per compiler.language."
+                },
+                "label": {
+                    "type": "string",
+                    "description": "Human-readable type name as it appears in the source language (e.g. 'uint256', 'mapping(address => uint256)')."
+                },
+                "numberOfBytes": {
+                    "type": "string",
+                    "description": "Number of bytes this type occupies in storage, as a decimal string."
+                },
+                "key": {
+                    "type": "string",
+                    "description": "For mapping types: type identifier of the mapping key."
+                },
+                "value": {
+                    "type": "string",
+                    "description": "For mapping and dynamic_array types: type identifier of the value/element type."
+                },
+                "base": {
+                    "type": "string",
+                    "description": "For dynamic_array types: type identifier of the element type (alias of 'value', kept for compatibility with Solidity compiler output)."
+                },
+                "members": {
+                    "type": "array",
+                    "description": "For inplace_struct types only: ordered list of struct member entries.",
+                    "items": { "$ref": "#/$defs/storageEntry" }
+                }
+            },
+            "required": ["encoding", "label", "numberOfBytes"],
+            "additionalProperties": false
+        },
+
+        "displayAnnotation": {
+            "title": "Display annotation",
+            "type": "object",
+            "description": "Optional ERC-7730 display hints for this storage entry. Consumed by wallets to present the variable's value in human-readable form during transaction simulation and clear signing.",
+            "properties": {
+                "label": {
+                    "type": "string",
+                    "description": "User-facing name for the variable. For mappings, use {key[N]} to embed the Nth mapping key (outermost = {key[0]}). For arrays, use {index[N]} to embed the Nth element index."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Human-readable explanation of the variable's semantic meaning. Informative only — MUST NOT be relied upon for security decisions without additional authenticity assurances."
+                },
+                "keyFormats": {
+                    "type": "array",
+                    "description": "Array of formatters applied to mapping keys or array indices before they are embedded in label. keyFormats[0] applies to {key[0]}/{index[0]}, and so on.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "format": {
+                                "type": "string",
+                                "description": "ERC-7730 formatter name (e.g. 'addressName', 'raw', 'date')."
+                            },
+                            "params": {
+                                "type": "object",
+                                "description": "Formatter parameters. Same structure as ERC-7730 field formatter params.",
+                                "additionalProperties": true
+                            }
+                        },
+                        "required": ["format"],
+                        "additionalProperties": false
+                    }
+                },
+                "format": {
+                    "type": "string",
+                    "description": "ERC-7730 formatter (tokenAmount, addressName, raw, date, etc.) applied to the storage value itself. Same vocabulary as display.formats[*].fields[*].format in ERC-7730."
+                },
+                "params": {
+                    "type": "object",
+                    "description": "Formatter parameters for format. Same structure as display.formats[*].fields[*].params in ERC-7730.",
+                    "additionalProperties": true
+                },
+                "template": {
+                    "description": "Natural-language description of the change. Either a plain string or an ordered array of conditional entries evaluated with JSON Logic. Supports {label}, {oldValue}, and {newValue} placeholders.",
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "condition": {
+                                        "type": "object",
+                                        "description": "JSON Logic expression evaluated against {oldValue, newValue, key, index}. Omit for an unconditional fallback entry."
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "Template string with {label}, {oldValue}, {newValue} placeholders."
+                                    }
+                                },
+                                "required": ["value"],
+                                "additionalProperties": false
+                            }
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}
