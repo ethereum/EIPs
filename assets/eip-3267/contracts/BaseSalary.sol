@@ -83,6 +83,7 @@ contract BaseSalary is BaseBidOnAddresses {
     function mintSalary(uint64 _oracleId, uint256 _condition, bytes calldata _data)
         ensureLastConditionInChain(_condition) external
     {
+        require(msg.sender == salaryReceivers[_condition], "Only the salary receiver can mint.");
         uint _lastSalaryDate = lastSalaryDates[_condition];
         require(_lastSalaryDate != 0, "You are not registered.");
         // Note: Even if you withdraw once per 20 years, you will get only 630,720,000 tokens.
@@ -172,7 +173,7 @@ contract BaseSalary is BaseBidOnAddresses {
         uint256 _oldCondition = firstToLastConditionInChain[_condition];
         uint256 _newCondition = _doCreateCondition(_customer);
         firstConditionInChain[_newCondition] = _condition;
-
+        firstToLastConditionInChain[_condition] = _newCondition;
         uint256 _amount = _balances[_oldCondition][_customer];
         _balances[_newCondition][_customer] = _amount;
         _balances[_oldCondition][_customer] = 0;
