@@ -54,13 +54,13 @@ eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
 
 1. Open Terminal.
 
-2. Check whether you have Ruby 3.1.4 installed. Later [versions are not supported](https://stackoverflow.com/questions/14351272/undefined-method-exists-for-fileclass-nomethoderror).
+2. Check whether you have a Ruby version compatible with the repository's `Gemfile` and `github-pages` dependency.
 
    ```sh
    ruby --version
    ```
 
-3. If you don't have Ruby installed, install Ruby 3.1.4.
+3. If you do not have a compatible Ruby version installed, install one (the CI workflows currently use Ruby 3.1).
 
 4. Install Bundler:
 
@@ -84,4 +84,4 @@ eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
 
 2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
 
-More information on Jekyll and GitHub Pages [here](https://docs.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
+More information on Jekyll and GitHub Pages is available in the [GitHub Pages documentation](https://docs.github.com/pages/setting-up-a-github-pages-site-with-jekyll/testing-your-github-pages-site-locally-with-jekyll).
