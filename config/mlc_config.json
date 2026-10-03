@@ -1,6 +1,7 @@
 {
   "ignorePatterns": [
-    "[`]*csl-json"
+    // Escaping ']' to avoid malformed character class in regex; matches optional backticks before 'csl-json'
+    "[`\]]*csl-json"
   ],
   "replacementPatterns": [
     {
