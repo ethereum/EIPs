@@ -67,7 +67,7 @@ class Optional(MonoSubtreeView):
             if elem_cls.is_fixed_byte_length():
                 return elem_cls.type_byte_length()
             else:
-                return cast(View, el).value_byte_length()
+                return cast(View, self.get(0)).value_byte_length()
 
     def get(self) -> PyOptional[View]:
         if self.length() == 0:
