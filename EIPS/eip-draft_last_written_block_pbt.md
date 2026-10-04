@@ -1,5 +1,5 @@
 ---
-title: Last-Written Block in Partitioned Binary Tree Leaves
+title: Last-Written Block in PBT Leaves
 description: Packs last_written_block write-age metadata into the account and storage leaves of the Partitioned Binary Tree.
 author: Iman Kalyan Chakraborty (@astrion-coder), Wei Han Ng (@weiihann)
 discussions-to: https://ethereum-magicians.org/t/eip-tbd-last-written-block-in-partitioned-binary-tree-leaves/29860
