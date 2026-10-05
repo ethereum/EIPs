@@ -2,7 +2,7 @@
 title: Proof Object Transport over devp2p
 description: Defines request-driven proof transfer over devp2p using authenticated chunks, bounded reassembly, and recovery.
 author: Marchhill (@Marchhill)
-discussions-to: https://ethereum-magicians.org/t/eip-8288-frame-type-for-pq-sig-and-stark-aggregation/28723
+discussions-to:
 status: Draft
 type: Standards Track
 category: Networking
