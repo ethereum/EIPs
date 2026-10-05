@@ -3,7 +3,7 @@ eip: 8435
 title: Last-Written Block in PBT Leaves
 description: Packs last_written_block write-age metadata into the account and storage leaves of the Partitioned Binary Tree.
 author: Iman Kalyan Chakraborty (@astrion-coder), Wei Han Ng (@weiihann)
-discussions-to: https://ethereum-magicians.org/t/eip-tbd-last-written-block-in-partitioned-binary-tree-leaves/29860
+discussions-to: https://ethereum-magicians.org/t/eip-8435-last-written-block-in-pbt-leaves/29860
 status: Draft
 type: Standards Track
 category: Core
