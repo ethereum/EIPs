@@ -41,7 +41,9 @@ ENTRY = "calldest"    # destination must be a CALLDEST
 def validate(code, stack_limit=STACK_LIMIT):
     """True iff the code satisfies the five constraints of EIP-8337
     validation: valid opcodes, proven destinations, framed returns,
-    no underflow, and one static stack offset per instruction."""
+    no underflow, and one static stack offset per instruction.
+    Framing is a property of entries: no entry reachable by jumps from
+    the top level may contain a RETURNSUB."""
     if len(code) == 0:
         return False
 
@@ -55,7 +57,7 @@ def validate(code, stack_limit=STACK_LIMIT):
         instructions.add(i)
         i += 1 + (code[i] - PUSH0 if PUSH0 < code[i] <= PUSH32 else 0)
 
-    visited = {}                  # pc -> (offset, entry, framed) at first visit
+    visited = {}                  # pc -> (offset, entry) at first visit
     required = {}                 # pc -> LABEL or ENTRY, set by jumps and calls
     net_effect = {}               # entry -> its *net stack effect*, once known
     inputs = defaultdict(int)     # entry -> its demand: the items it needs from its caller
@@ -67,7 +69,9 @@ def validate(code, stack_limit=STACK_LIMIT):
     parents = defaultdict(list)   # child -> [(parent, offset)]
     enter_parents = defaultdict(list)  # entry -> [(parent, offset)]
     pending = defaultdict(list)   # entry -> return points waiting on its net
-    work_items = [(0, 0, OUTER, False, None)]
+    jump_parents = defaultdict(list)  # entry -> entries reaching it by jump or fall-through
+    returning = set()             # entries that contain a RETURNSUB
+    work_items = [(0, 0, OUTER, None)]
 
     def resolve(entry, value):
         """Record an entry's net: release the return points waiting on
@@ -81,14 +85,14 @@ def validate(code, stack_limit=STACK_LIMIT):
                     return False  # Constraint 5: one net per entry
                 continue
             net_effect[e] = v
-            for ret_pc, offset, caller, framed in pending.pop(e, ()):
-                work_items.append((ret_pc, offset + v, caller, framed, None))
+            for ret_pc, offset, caller in pending.pop(e, ()):
+                work_items.append((ret_pc, offset + v, caller, None))
             for parent, d in enter_parents[e]:
                 settle.append((parent, d + v))
         return True
 
     while work_items:
-        pc, offset, entry, framed, push = work_items.pop()
+        pc, offset, entry, push = work_items.pop()
         if pc >= len(code):
             continue                     # implicit STOP: a valid end
         if pc not in instructions:
@@ -102,6 +106,7 @@ def validate(code, stack_limit=STACK_LIMIT):
         # any other way first records the link between the subroutines.
         if op == CALLDEST and (entry != pc or offset != 0):
             parents[pc].append((entry, offset))
+            jump_parents[pc].append(entry)
             if pc in net_effect:      # settled: the arriving net follows
                 if not resolve(entry, offset + net_effect[pc]):
                     return False
@@ -111,10 +116,10 @@ def validate(code, stack_limit=STACK_LIMIT):
 
         if pc in visited:
             # Constraint 5: paths must agree.
-            if visited[pc] != (offset, entry, framed):
+            if visited[pc] != (offset, entry):
                 return False
             continue
-        visited[pc] = (offset, entry, framed)
+        visited[pc] = (offset, entry)
 
         # Constraints 2 and 3: a required destination type, if any.
         if required.get(pc) == LABEL and op not in (JUMPDEST, CALLDEST):
@@ -141,15 +146,14 @@ def validate(code, stack_limit=STACK_LIMIT):
                 return False
             required[dest] = ENTRY       # a jump's LABEL upgrades to ENTRY
             parents[dest].append((entry, offset))
-            work_items.append((dest, 0, dest, True, None))
+            work_items.append((dest, 0, dest, None))
             if dest in net_effect:
                 # Return point: call-site offset plus the callee's net.
-                work_items.append((nxt, offset + net_effect[dest], entry, framed, None))
+                work_items.append((nxt, offset + net_effect[dest], entry, None))
             else:
-                pending[dest].append((nxt, offset, entry, framed))
+                pending[dest].append((nxt, offset, entry))
         elif op == RETURNSUB:
-            if not framed:
-                return False             # no CALLSUB to return from
+            returning.add(entry)
             if not resolve(entry, offset):
                 return False
         elif op in (JUMP, JUMPI):
@@ -161,12 +165,27 @@ def validate(code, stack_limit=STACK_LIMIT):
             if dest in visited and code[dest] not in (JUMPDEST, CALLDEST):
                 return False
             required.setdefault(dest, LABEL)
-            work_items.append((dest, offset, entry, framed, None))
+            work_items.append((dest, offset, entry, None))
             if op == JUMPI:              # and the fall-through arm
-                work_items.append((nxt, offset, entry, framed, None))
+                work_items.append((nxt, offset, entry, None))
         elif not term:                   # everything else falls through
             value = push_value(code, pc) if PUSH0 <= op <= PUSH32 else None
-            work_items.append((nxt, offset, entry, framed, value))
+            work_items.append((nxt, offset, entry, value))
+
+    # Constraint 4, framing: the top level is unframed, and so is every
+    # entry that an unframed entry jumps or falls into; no unframed entry
+    # may contain a RETURNSUB.  Framing propagates along jump links only,
+    # since a CALLSUB frames its callee.  The set only grows, so this ends.
+    unframed = {OUTER}
+    changed = True
+    while changed:
+        changed = False
+        for e, ps in jump_parents.items():
+            if e not in unframed and any(p in unframed for p in ps):
+                unframed.add(e)
+                changed = True
+    if unframed & returning:
+        return False
 
     # The demand checking: a subroutine's demand for caller items, less the
     # depth already on the stack at the entrance, becomes its parent's
