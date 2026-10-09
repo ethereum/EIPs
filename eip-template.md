@@ -8,6 +8,7 @@ type: <Standards Track, Meta, or Informational>
 category: <Core, Networking, Interface, or ERC> # Only required for Standards Track. Otherwise, remove this field.
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
 requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+tags: # EIP tags, optional for non-core EIPs
 ---
 
 <!--
