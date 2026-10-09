@@ -77,7 +77,7 @@ func BenchmarkOpDecExp(b *testing.B) {
 }
 
 func BenchmarkOpDecLn(b *testing.B) {
-	// opDecExp benchmark depends on steps
+	// opDecLn benchmark depends on steps
 	steps := uint256.NewInt(10)
 	intArgs := []*uint256.Int{steps, PRECISION, uint256.NewInt(0), uint256.NewInt(2)}
 	fmt.Println("BenchmarkOpDecLn steps=", steps)
