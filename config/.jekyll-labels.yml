@@ -16,7 +16,7 @@ t-process: this?.old?.status == "Living" || this?.old?.title == "<The EIP title 
 # Status
 s-draft: this?.new?.status == "Draft"
 s-final: this?.new?.status == "Final"
-s-lastcall: this?.new?.status == "Lastcall"
+s-lastcall: this?.new?.status == "Last Call"
 s-review: this?.new?.status == "Review"
 s-stagnant: this?.new?.status == "Stagnant"
 s-withdrawn: this?.new?.status == "Withdrawn"
