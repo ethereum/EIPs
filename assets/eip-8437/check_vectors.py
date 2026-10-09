@@ -62,6 +62,14 @@ def tree_levels(leaves):
     return levels
 
 
+def commitment_scope(descriptor):
+    kind, profile, context, size, content_hash, _ = descriptor
+    count = (size + CHUNK_BYTES - 1) // CHUNK_BYTES
+    context_hash = h(domain("context") + rlp(context))
+    return (uint(kind, 1) + profile + context_hash + content_hash
+            + uint(size, 8) + uint(count, 4))
+
+
 def commit(body, kind=1, profile=bytes(32), context=None):
     if not 1 <= len(body) <= MAX_OBJECT_BYTES:
         raise ValueError("object size")
@@ -69,10 +77,8 @@ def commit(body, kind=1, profile=bytes(32), context=None):
         context = []
     count = (len(body) + CHUNK_BYTES - 1) // CHUNK_BYTES
     width = 1 << (count - 1).bit_length()
-    content_hash = h(body)
-    context_hash = h(domain("context") + rlp(context))
-    scope = (uint(kind, 1) + profile + context_hash + content_hash
-             + uint(len(body), 8) + uint(count, 4))
+    descriptor = [kind, profile, context, len(body), h(body), bytes(32)]
+    scope = commitment_scope(descriptor)
     leaves = []
     for index in range(width):
         if index < count:
@@ -83,8 +89,7 @@ def commit(body, kind=1, profile=bytes(32), context=None):
             leaf = h(domain("empty") + scope + uint(index, 4))
         leaves.append(leaf)
     levels = tree_levels(leaves)
-    root = h(domain("root") + scope + levels[-1][0])
-    descriptor = [kind, profile, context, len(body), content_hash, root]
+    descriptor[5] = h(domain("root") + scope + levels[-1][0])
     return descriptor, scope, levels
 
 
@@ -93,8 +98,10 @@ def branch_at(levels, index):
             for level, nodes in enumerate(levels[:-1])]
 
 
-def check_branch(descriptor, scope, index, chunk, branch):
+def check_branch(descriptor, index, chunk, branch):
     size = descriptor[3]
+    if not 1 <= size <= MAX_OBJECT_BYTES:
+        return False
     count = (size + CHUNK_BYTES - 1) // CHUNK_BYTES
     if not 0 <= index < count or len(branch) != (count - 1).bit_length():
         return False
@@ -102,6 +109,7 @@ def check_branch(descriptor, scope, index, chunk, branch):
         return False
     if any(len(sibling) != 32 for sibling in branch):
         return False
+    scope = commitment_scope(descriptor)
     current = h(domain("leaf") + scope + uint(index, 4)
                 + uint(len(chunk), 4) + chunk)
     for level, sibling in enumerate(branch):
@@ -154,22 +162,26 @@ def main():
         for index in sorted({0, count // 2, count - 1}):
             chunk = body[index * CHUNK_BYTES:(index + 1) * CHUNK_BYTES]
             branch = branch_at(levels, index)
-            assert check_branch(descriptor, scope, index, chunk, branch)
-            assert not check_branch(descriptor, scope, count, chunk, branch)
-            assert not check_branch(descriptor, scope, index, chunk[:-1], branch)
+            assert check_branch(descriptor, index, chunk, branch)
+            assert not check_branch(descriptor, count, chunk, branch)
+            assert not check_branch(descriptor, index, chunk[:-1], branch)
             changed = bytes([chunk[0] ^ 1]) + chunk[1:]
-            assert not check_branch(descriptor, scope, index, changed, branch)
-            assert not check_branch(descriptor, scope, index, chunk, branch + [bytes(32)])
+            assert not check_branch(descriptor, index, changed, branch)
+            assert not check_branch(descriptor, index, chunk, branch + [bytes(32)])
             if branch:
                 bad = [bytes([branch[0][0] ^ 1]) + branch[0][1:]] + branch[1:]
-                assert not check_branch(descriptor, scope, index, chunk, bad)
-        # Bind kind, profile, context, content hash, length and chunk count.
+                assert not check_branch(descriptor, index, chunk, bad)
+        # Derive scope from the received descriptor; bind every descriptor field.
         index = count - 1
         chunk = body[index * CHUNK_BYTES:]
         branch = branch_at(levels, index)
-        for position in (0, 1, 33, 65, 97, 105):
-            changed = scope[:position] + bytes([scope[position] ^ 1]) + scope[position + 1:]
-            assert not check_branch(descriptor, changed, index, chunk, branch)
+        changes = [(0, 2), (1, b"\x01" + bytes(31)), (2, [bytes(32)]),
+                   (3, size + 1), (3, size + CHUNK_BYTES), (3, 0),
+                   (3, MAX_OBJECT_BYTES + 1), (4, bytes(32)), (5, bytes(32))]
+        for field, value in changes:
+            altered_descriptor = list(descriptor)
+            altered_descriptor[field] = value
+            assert not check_branch(altered_descriptor, index, chunk, branch)
         if count < len(levels[0]):
             # Even a branch matching an attacker-chosen root must use canonical padding.
             leaves = list(levels[0])
@@ -177,8 +189,16 @@ def main():
             altered_levels = tree_levels(leaves)
             altered_descriptor = list(descriptor)
             altered_descriptor[5] = h(domain("root") + scope + altered_levels[-1][0])
-            assert not check_branch(altered_descriptor, scope, index, chunk,
+            assert not check_branch(altered_descriptor, index, chunk,
                                     branch_at(altered_levels, index))
+
+    # Non-default profiles and both other context shapes use the same commitments.
+    body = pattern(131073)
+    contexts = [(2, [bytes(32), 42, bytes(32), bytes(32), bytes(32)]),
+                (3, [h(body)])]
+    for kind, context in contexts:
+        descriptor, _, levels = commit(body, kind, h(b"profile"), context)
+        assert check_branch(descriptor, 0, body[:CHUNK_BYTES], branch_at(levels, 0))
     try:
         commit(b"")
         raise AssertionError("accepted empty object")
