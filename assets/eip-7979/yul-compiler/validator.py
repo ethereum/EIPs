@@ -69,7 +69,7 @@ def validate(code, stack_limit=STACK_LIMIT):
     parents = defaultdict(list)   # child -> [(parent, offset)]
     enter_parents = defaultdict(list)  # entry -> [(parent, offset)]
     pending = defaultdict(list)   # entry -> return points waiting on its net
-    jump_parents = defaultdict(list)  # entry -> entries reaching it by jump or fall-through
+    jump_children = defaultdict(list)  # entry -> entries it jumps or falls into
     returning = set()             # entries that contain a RETURNSUB
     work_items = [(0, 0, OUTER, None)]
 
@@ -106,7 +106,7 @@ def validate(code, stack_limit=STACK_LIMIT):
         # any other way first records the link between the subroutines.
         if op == CALLDEST and (entry != pc or offset != 0):
             parents[pc].append((entry, offset))
-            jump_parents[pc].append(entry)
+            jump_children[entry].append(pc)
             if pc in net_effect:      # settled: the arriving net follows
                 if not resolve(entry, offset + net_effect[pc]):
                     return False
@@ -174,16 +174,15 @@ def validate(code, stack_limit=STACK_LIMIT):
 
     # Constraint 4, framing: the top level is unframed, and so is every
     # entry that an unframed entry jumps or falls into; no unframed entry
-    # may contain a RETURNSUB.  Framing propagates along jump links only,
-    # since a CALLSUB frames its callee.  The set only grows, so this ends.
+    # may contain a RETURNSUB.  A worklist walks each jump link at most
+    # once — a CALLSUB makes no link, since it frames its callee.
     unframed = {OUTER}
-    changed = True
-    while changed:
-        changed = False
-        for e, ps in jump_parents.items():
-            if e not in unframed and any(p in unframed for p in ps):
+    work = [OUTER]
+    while work:
+        for e in jump_children[work.pop()]:
+            if e not in unframed:
                 unframed.add(e)
-                changed = True
+                work.append(e)
     if unframed & returning:
         return False
 

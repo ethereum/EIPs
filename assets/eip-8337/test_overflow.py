@@ -82,6 +82,8 @@ TESTS = [
     ("entered by jump and by call, returns", "366008576008BC00BBBF", False),
     ("framed chain: called, jumps on, returns", "6004BC00BB600856BBBF", True),
     ("unframed chain: jumped to, jumps on, returns", "600356BB600756BBBF", False),
+    ("unframed chain of three links, no return", "600356BB600756BB600B56BB00", True),
+    ("unframed chain of three links, returns", "600356BB600756BB600B56BBBF", False),
 
     # --- constraint 4: overflow (STACK_LIMIT = 16 in the test build) ---
     ("17 pushes overflow",         "5F" * 17 + "00", False),
