@@ -20,11 +20,11 @@ and executes CALLSUB; the callee's RETURNSUB leaves the return value
 where the arguments were.  Legacy: the caller pushes a return label
 below the arguments and jumps; the callee jumps back through it.
 
-Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
 """
 import re
 
-CALLSUB, CALLDEST, RETURNSUB = 0xB0, 0xB1, 0xB2
+CALLSUB, CALLDEST, RETURNSUB = 0xBC, 0xBB, 0xBF
 JUMP, JUMPI, JUMPDEST = 0x56, 0x57, 0x5B
 PUSH0, POP, ISZERO = 0x5F, 0x50, 0x15
 DUP1, SWAP1 = 0x80, 0x90
