@@ -25,7 +25,7 @@ protocol's constant, and approached only by invalid code built to
 pump demands around a recursive cycle (see native-cost/ for the measured
 costs).
 
-Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
 """
 from collections import defaultdict, deque
 

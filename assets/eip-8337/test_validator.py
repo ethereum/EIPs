@@ -5,7 +5,7 @@ to 16 so the overflow examples stay small.  The overflow-only
 rejections of the bounds-proving validator are valid here — overflow
 is not validated — and every other expectation, underflow included,
 is unchanged.
-Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
 """
 import validator as ref
 from test_overflow import TESTS

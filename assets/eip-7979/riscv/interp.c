@@ -189,7 +189,7 @@ static const u8 GASTBL[256] = {
     [0x16] = 3, [0x17] = 3, [0x18] = 3, [0x19] = 3, [0x1B] = 3, [0x1C] = 3,
     [0x35] = 3, [0x36] = 2, [0x50] = 2, [0x51] = 3, [0x52] = 3,
     [0x56] = 8, [0x57] = 10, [0x5B] = 1,
-    [0xB0] = 8, [0xB1] = 1, [0xB2] = 5,
+    [0xBC] = 8, [0xBB] = 1, [0xBF] = 5,
     [0xF3] = 0, [0xFD] = 0,
     [0xC1] = 3, [0xC2] = 5, [0xC3] = 3, [0xC4] = 5, [0xC6] = 5,
     [0xD0] = 3, [0xD1] = 3, [0xD2] = 3, [0xD3] = 3, [0xD4] = 3, [0xD5] = 3,
@@ -220,7 +220,7 @@ void evm_entry(void)
         [0x5F ... 0x7F] = &&op_push,
         [0x80 ... 0x8F] = &&op_dup,
         [0x90 ... 0x9F] = &&op_swap,
-        [0xB0] = &&op_callsub, [0xB1] = &&op_calldest, [0xB2] = &&op_returnsub,
+        [0xBC] = &&op_callsub, [0xBB] = &&op_calldest, [0xBF] = &&op_returnsub,
         [0xF3] = &&op_return, [0xFD] = &&op_revert,
         [0xC1] = &&op_add64, [0xC2] = &&op_mul64, [0xC3] = &&op_sub64,
         [0xC4] = &&op_div64, [0xC6] = &&op_mod64,
@@ -241,7 +241,7 @@ void evm_entry(void)
         u64 i = 0;
         while (i < CODE_LEN) {
             u8 o = CODE[i];
-            if (o == 0x5B || o == 0xB1) jd[i] = 1;
+            if (o == 0x5B || o == 0xBB) jd[i] = 1;
             i += (o > 0x5F && o <= 0x7F) ? o - 0x5E : 1;
         }
     }
@@ -342,7 +342,7 @@ op_swap:   { u64 n = op - 0x8F; NEED(n + 1);
 
 op_callsub: NEED(1); { u64 d = stk[sp-1].w[0];
     if ((stk[sp-1].w[1] | stk[sp-1].w[2] | stk[sp-1].w[3]) || d >= CODE_LEN
-        || CODE[d] != 0xB1) __rt_trap("CALLSUB to non-CALLDEST");
+        || CODE[d] != 0xBB) __rt_trap("CALLSUB to non-CALLDEST");
     if (rsp >= RSTACK_LIMIT) __rt_trap("return stack overflow");
     rstack[rsp++] = (u32)(pc + 1);
     sp--; pc = d; } goto next;
