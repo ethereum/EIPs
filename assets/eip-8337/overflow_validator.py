@@ -35,7 +35,7 @@ points therefore wait on a pending list until that net is first fixed
 subroutine it lies.  If a callee never returns, its return points are
 never visited.  That is correct: they are unreachable.
 
-Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
 """
 from collections import defaultdict, deque
 from dataclasses import dataclass
