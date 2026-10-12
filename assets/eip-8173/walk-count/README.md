@@ -105,6 +105,14 @@ certain.
 programs; running it prints the route listing that names all thirteen
 walks — `>` marks a transfer the walker knows, `?` one it guesses.
 
+## The ladders
+
+`ladders.py` builds the ladder programs of the EIP's "EVM: Any Jump,
+Anywhere" and prints what the EIP quotes: the jump edges a traversal
+follows — (N−1)·N of them — and the walks a sound walker must count —
+⌊e·(N−1)!⌋.
+
 ## Reproduce
 
     python3 walker.py
+    python3 ladders.py
