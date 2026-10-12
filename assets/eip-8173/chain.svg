@@ -1,18 +1,26 @@
-<svg width="240" height="218" viewBox="0 0 240 218" xmlns="http://www.w3.org/2000/svg" font-family="Courier, monospace" font-size="13" fill="none">
-<desc>Control flow graph of a three-block program: each block is jumpdest/push/jump, pushing the next block's address, and the last block is jumpdest/stop. Three nodes and two forward edges, drawn on the right: one path, every destination static.</desc>
+<svg width="380" height="218" viewBox="0 0 380 218" xmlns="http://www.w3.org/2000/svg" font-family="Courier, monospace" font-size="13" fill="none">
+<desc>Control flow graphs of two static chains, of two and three blocks: each block is jumpdest/push/jump, pushing the next block's address, and the last block is jumpdest/stop. Every jump has one destination, so a chain of N blocks has N-1 edges and one path.</desc>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black"/></marker></defs>
-<rect width="240" height="218" fill="white"/>
+<rect width="380" height="218" fill="white"/>
 <rect x="62" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
 <text x="70" y="44" fill="black">JUMPDEST</text>
 <text x="70" y="60" fill="black">PUSH 4</text>
 <text x="70" y="76" fill="black">JUMP</text>
-<rect x="62" y="90" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<rect x="62" y="90" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
 <text x="70" y="104" fill="black">JUMPDEST</text>
-<text x="70" y="120" fill="black">PUSH 8</text>
-<text x="70" y="136" fill="black">JUMP</text>
-<rect x="62" y="150" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="70" y="164" fill="black">JUMPDEST</text>
-<text x="70" y="180" fill="black">STOP</text>
+<text x="70" y="120" fill="black">STOP</text>
 <path d="M 142 72 C 161 72, 161 100, 142 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 142 132 C 161 132, 161 160, 142 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="242" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="250" y="44" fill="black">JUMPDEST</text>
+<text x="250" y="60" fill="black">PUSH 4</text>
+<text x="250" y="76" fill="black">JUMP</text>
+<rect x="242" y="90" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="250" y="104" fill="black">JUMPDEST</text>
+<text x="250" y="120" fill="black">PUSH 8</text>
+<text x="250" y="136" fill="black">JUMP</text>
+<rect x="242" y="150" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="250" y="164" fill="black">JUMPDEST</text>
+<text x="250" y="180" fill="black">STOP</text>
+<path d="M 322 72 C 341 72, 341 100, 322 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 322 132 C 341 132, 341 160, 322 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
 </svg>
