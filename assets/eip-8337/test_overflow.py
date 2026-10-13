@@ -49,14 +49,14 @@ TESTS = [
     ("PUSH0-preceded JUMP",        "5B5F56", True),
     ("CALLSUB to JUMPDEST",        "6004BC005B", False),
 
-    # --- constraint 4: underflow, return stack ---
+    # --- constraint 5: underflow, return stack ---
     ("ADD on empty stack",         "01", False),
     ("POP on empty stack",         "50", False),
     ("sub consumes caller arg",    "6002600BBC6003600BBC00BB8002BF", True),
     ("sub underflows outer",       "6004BC00BB5050BF", False),
     ("fall into sub, RETURNSUB",   "BBBF", False),
 
-    # --- constraint 5: offsets and net effects ---
+    # --- constraint 4: offsets and net effects ---
     ("JUMPI arms disagree at join","366005575F5B00", False),
     ("JUMPI diamond consistent",   "366006575F005B5F00", True),
     ("two RETURNSUBs disagree",    "6004BC00BB36600A57BF5B5FBF", False),
@@ -85,7 +85,7 @@ TESTS = [
     ("unframed chain of three links, no return", "600356BB600756BB600B56BB00", True),
     ("unframed chain of three links, returns", "600356BB600756BB600B56BBBF", False),
 
-    # --- constraint 4: overflow (STACK_LIMIT = 16 in the test build) ---
+    # --- constraint 5: overflow (STACK_LIMIT = 16 in the test build) ---
     ("17 pushes overflow",         "5F" * 17 + "00", False),
     ("16 pushes fit",              "5F" * 16 + "00", True),
     ("sub high amplified, 2 calls","6007BC6007BC00" + "BB" + "5F" * 9 + "BF", False),
