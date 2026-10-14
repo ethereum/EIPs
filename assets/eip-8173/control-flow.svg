@@ -1,7 +1,7 @@
 <svg width="650" height="398" viewBox="0 0 650 398" xmlns="http://www.w3.org/2000/svg" font-family="Courier, monospace" font-size="13" fill="none">
 <desc>Control flow graphs of three EVM programs of 2, 4, and 6 blocks. Each block is jumpdest/gas/jump, the last jumpdest/stop. Every jump may reach every jumpdest, its own block's included: forward edges on the right, backward and self edges on the left. The edge counts are 2, 12, and 30.</desc>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black"/></marker></defs>
-<rect width="650" height="398" fill="white"/>
+<rect width="650" height="398" fill="#e0e0e0"/>
 <rect x="40" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
 <text x="48" y="44" fill="black">JUMPDEST</text>
 <text x="48" y="60" fill="black">GAS</text>
