@@ -62,7 +62,7 @@ static int resolve(int32_t e0, int32_t v0)
     while (top > 0) {
         int32_t e = settle[--top].e, v = settle[top].v;
         if (net_known[e]) {
-            if (net[e] != v) return 0;  /* Constraint 5: one net per entry */
+            if (net[e] != v) return 0;  /* Constraint 4: one net per entry */
             continue;
         }
         net_known[e] = 1; net[e] = v;
@@ -143,7 +143,7 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
             off = 0; entry = pc;
         }
 
-        if (vis[pc]) {                  /* Constraint 5: paths must agree */
+        if (vis[pc]) {                  /* Constraint 4: paths must agree */
             if (voff[pc] != off || vent[pc] != entry)
                 return 0;
             continue;
@@ -156,7 +156,7 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
         if (required[pc] == REQ_ENTRY && op != CALLDEST)
             return 0;
 
-        /* Constraint 4: items used below the start; growth above it. */
+        /* Constraint 5: items used below the start; growth above it. */
         int32_t cand = OPPOPS[op] - off;
         if (cand > inputs[entry]) {
             if (cand > limit) return 0;
@@ -213,7 +213,7 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
         }
     }
 
-    /* Constraint 4, framing: the top level is unframed, and so is every
+    /* Constraint 5, framing: the top level is unframed, and so is every
      * entry that an unframed entry jumps or falls into (the edges that
      * are not calls); no unframed entry may contain a RETURNSUB.  A
      * walk over the non-call edges from the top level, each entry once. */

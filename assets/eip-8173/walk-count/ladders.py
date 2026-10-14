@@ -52,6 +52,17 @@ def walks(code):
     walk(0, set(), [0])
     return out
 
+def count_walks(code):
+    """The walk count alone, nothing stored."""
+    def walk(pc, seen):
+        if pc >= len(code) or code[pc] == STOP or pc in seen:
+            return 1
+        if code[pc] == JUMP:
+            return sum(walk(d, seen | {pc})
+                       for d, op in enumerate(code) if op == JUMPDEST)
+        return walk(pc + 1, seen | {pc})
+    return walk(0, set())
+
 if __name__ == "__main__":
     for blocks in (2, 3):
         code = build(blocks)
@@ -63,8 +74,8 @@ if __name__ == "__main__":
         for route in walks(code):
             print("    " + " → ".join(map(str, route)))
     print(f"\n{'blocks':>6} {'edges':>6} {'walks':>9} {'= ⌊e·(N−1)!⌋':>12}")
-    for n in range(2, 9):
-        w = len(walks(build(n)))
+    for n in range(2, 11):
+        w = count_walks(build(n))
         f = math.floor(math.e * math.factorial(n - 1))
         assert n < 3 or w == f
         print(f"{n:>6} {(n-1)*n:>6} {w:>9,} {f:>12,}")
