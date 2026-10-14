@@ -33,7 +33,7 @@ Placeholder opcodes as in evm64.py / interp.c.
 """
 
 JUMP, JUMPI, JUMPDEST = 0x56, 0x57, 0x5B
-CALLSUB, CALLDEST, RETURNSUB = 0xB0, 0xB1, 0xB2
+CALLSUB, CALLDEST, RETURNSUB = 0xBC, 0xBB, 0xBF
 PUSH0, PUSH32 = 0x5F, 0x7F
 STOP, RETURN, REVERT = 0x00, 0xF3, 0xFD
 OUTER = None
@@ -73,7 +73,7 @@ def evm_gas(op):
     """Per-opcode gas as the baseline interpreter charges it: the
     block sums here and the per-op charges there add up the same."""
     return {0x02: 5, 0x04: 5, 0x06: 5, 0x36: 2, 0x50: 2, 0x5B: 1,
-            0x5F: 2, 0x56: 8, 0x57: 10, 0xB0: 8, 0xB1: 1, 0xB2: 5,
+            0x5F: 2, 0x56: 8, 0x57: 10, 0xBC: 8, 0xBB: 1, 0xBF: 5,
             0xC2: 5, 0xC4: 5, 0xC6: 5}.get(op, 3)
 
 
