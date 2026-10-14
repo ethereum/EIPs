@@ -6,7 +6,7 @@ the demand relaxation's O(1024 * n) worst case, invalid code — well
 above that.  The bounds-proving validator (overflow_validator.py) runs
 alongside for comparison; native-cost/ measures the same costs natively.
 
-Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
 """
 import time
 
@@ -17,15 +17,15 @@ from bench_overflow import call_chain, jumpi_diamonds, recursion_pump, straight_
 
 def mixed_chain(n_subs):
     """Subroutines with 16-byte straight-line bodies: a realistic mix."""
-    code = bytearray([0x61, 0, 5, 0xB0, 0x00])
+    code = bytearray([0x61, 0, 5, 0xBC, 0x00])
     pos = 5
     for i in range(n_subs):
         body = [0x5F, 0x50] * 8
         if i < n_subs - 1:
             nxt = pos + 22
-            unit = [0xB1] + body + [0x61, nxt >> 8, nxt & 0xFF, 0xB0, 0xB2]
+            unit = [0xBB] + body + [0x61, nxt >> 8, nxt & 0xFF, 0xBC, 0xBF]
         else:
-            unit = [0xB1] + body + [0xB2]
+            unit = [0xBB] + body + [0xBF]
         code += bytes(unit)
         pos += len(unit)
     return bytes(code)
