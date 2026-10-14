@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check EIP-8437 transport commitments, not EIP-8288 proof validity.
+"""Check EIP-8437 content commitments and wire bounds, not proof validity.
 
 Requires Python 3.9+ and pycryptodome. Run with:
     python3 assets/eip-8437/check_vectors.py
@@ -10,9 +10,8 @@ from pathlib import Path
 
 from Crypto.Hash import keccak
 
-
 CHUNK_BYTES = 65536
-MAX_OBJECT_BYTES = 67108864
+MAX_OBJECT_BYTES = 9437184
 
 
 def h(data):
@@ -50,101 +49,31 @@ def pattern(size):
     return (bytes(range(251)) * ((size + 250) // 251))[:size]
 
 
-def tree_levels(leaves):
-    levels = [leaves]
-    while len(levels[-1]) > 1:
-        level = len(levels) - 1
-        nodes = levels[-1]
-        levels.append([
-            h(domain("node") + uint(level, 1) + nodes[i] + nodes[i + 1])
-            for i in range(0, len(nodes), 2)
-        ])
-    return levels
-
-
-def commitment_scope(descriptor):
-    kind, profile, context, size, content_hash, _ = descriptor
-    count = (size + CHUNK_BYTES - 1) // CHUNK_BYTES
-    context_hash = h(domain("context") + rlp(context))
-    return (uint(kind, 1) + profile + context_hash + content_hash
-            + uint(size, 8) + uint(count, 4))
-
-
 def commit(body, kind=1, profile=bytes(32), context=None):
     if not 1 <= len(body) <= MAX_OBJECT_BYTES:
         raise ValueError("object size")
     if context is None:
         context = []
-    count = (len(body) + CHUNK_BYTES - 1) // CHUNK_BYTES
-    width = 1 << (count - 1).bit_length()
-    descriptor = [kind, profile, context, len(body), h(body), bytes(32)]
-    scope = commitment_scope(descriptor)
-    leaves = []
-    for index in range(width):
-        if index < count:
-            chunk = body[index * CHUNK_BYTES:(index + 1) * CHUNK_BYTES]
-            leaf = h(domain("leaf") + scope + uint(index, 4)
-                     + uint(len(chunk), 4) + chunk)
-        else:
-            leaf = h(domain("empty") + scope + uint(index, 4))
-        leaves.append(leaf)
-    levels = tree_levels(leaves)
-    descriptor[5] = h(domain("root") + scope + levels[-1][0])
-    return descriptor, scope, levels
+    return [kind, profile, context, len(body), h(body)]
 
 
-def branch_at(levels, index):
-    return [nodes[(index >> level) ^ 1]
-            for level, nodes in enumerate(levels[:-1])]
-
-
-def check_branch(descriptor, index, chunk, branch):
-    size = descriptor[3]
-    if not 1 <= size <= MAX_OBJECT_BYTES:
-        return False
-    count = (size + CHUNK_BYTES - 1) // CHUNK_BYTES
-    if not 0 <= index < count or len(branch) != (count - 1).bit_length():
-        return False
-    if len(chunk) != min(CHUNK_BYTES, size - index * CHUNK_BYTES):
-        return False
-    if any(len(sibling) != 32 for sibling in branch):
-        return False
-    scope = commitment_scope(descriptor)
-    current = h(domain("leaf") + scope + uint(index, 4)
-                + uint(len(chunk), 4) + chunk)
-    for level, sibling in enumerate(branch):
-        sibling_start = ((index >> level) ^ 1) << level
-        if sibling_start >= count:
-            empty_leaves = [h(domain("empty") + scope + uint(i, 4))
-                            for i in range(sibling_start, sibling_start + (1 << level))]
-            if sibling != tree_levels(empty_leaves)[-1][0]:
-                return False
-        left, right = ((sibling, current) if index & (1 << level)
-                       else (current, sibling))
-        current = h(domain("node") + uint(level, 1) + left + right)
-    return h(domain("root") + scope + current) == descriptor[5]
+def object_id(descriptor):
+    return h(domain("object") + rlp(descriptor))
 
 
 def vector(size):
-    body = pattern(size)
-    descriptor, scope, levels = commit(body)
-    count = (size + CHUNK_BYTES - 1) // CHUNK_BYTES
+    descriptor = commit(pattern(size))
     return {
         "size": size,
-        "chunk_count": count,
+        "chunk_count": (size + CHUNK_BYTES - 1) // CHUNK_BYTES,
         "content_hash": descriptor[4].hex(),
-        "context_hash": h(domain("context") + rlp([])).hex(),
-        "last_leaf": levels[0][count - 1].hex(),
-        "padding_leaf": levels[0][count].hex() if count < len(levels[0]) else None,
-        "chunk_root": descriptor[5].hex(),
-        "object_id": h(domain("object") + rlp(descriptor)).hex(),
-        "last_index": count - 1,
-        "branch": [node.hex() for node in branch_at(levels, count - 1)],
+        "descriptor_rlp": rlp(descriptor).hex(),
+        "object_id": object_id(descriptor).hex(),
+        "last_chunk_bytes": (size - 1) % CHUNK_BYTES + 1,
     }
 
 
 def main():
-    # Anchor the hash primitive and RLP encoding independently of the vectors.
     assert h(b"").hex() == "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
     assert rlp(0) == b"\x80" and rlp([]) == b"\xc0"
     assert rlp(b"dog").hex() == "83646f67"
@@ -152,95 +81,58 @@ def main():
     for expected in vectors:
         assert vector(expected["size"]) == expected, expected["size"]
 
-    # Exercise both sides of chunk/tree boundaries, including maximum geometry.
-    sizes = (1, 65535, 65536, 65537, 131072, 131073, 262145, MAX_OBJECT_BYTES)
+    sizes = (1, 65535, 65536, 65537, 131072, 131073, MAX_OBJECT_BYTES)
     for size in sizes:
         body = pattern(size)
-        descriptor, scope, levels = commit(body)
-        count = (size + CHUNK_BYTES - 1) // CHUNK_BYTES
-        assert len(rlp(descriptor)) <= 512
-        for index in sorted({0, count // 2, count - 1}):
-            chunk = body[index * CHUNK_BYTES:(index + 1) * CHUNK_BYTES]
-            branch = branch_at(levels, index)
-            assert check_branch(descriptor, index, chunk, branch)
-            assert not check_branch(descriptor, count, chunk, branch)
-            assert not check_branch(descriptor, index, chunk[:-1], branch)
-            changed = bytes([chunk[0] ^ 1]) + chunk[1:]
-            assert not check_branch(descriptor, index, changed, branch)
-            assert not check_branch(descriptor, index, chunk, branch + [bytes(32)])
-            if branch:
-                bad = [bytes([branch[0][0] ^ 1]) + branch[0][1:]] + branch[1:]
-                assert not check_branch(descriptor, index, chunk, bad)
-        # Derive scope from the received descriptor; bind every descriptor field.
-        index = count - 1
-        chunk = body[index * CHUNK_BYTES:]
-        branch = branch_at(levels, index)
-        changes = [(0, 2), (1, b"\x01" + bytes(31)), (2, [bytes(32)]),
-                   (3, size + 1), (3, size + CHUNK_BYTES), (3, 0),
-                   (3, MAX_OBJECT_BYTES + 1), (4, bytes(32)), (5, bytes(32))]
-        for field, value in changes:
-            altered_descriptor = list(descriptor)
-            altered_descriptor[field] = value
-            assert not check_branch(altered_descriptor, index, chunk, branch)
-        if count < len(levels[0]):
-            # Even a branch matching an attacker-chosen root must use canonical padding.
-            leaves = list(levels[0])
-            leaves[count] = bytes(32)
-            altered_levels = tree_levels(leaves)
-            altered_descriptor = list(descriptor)
-            altered_descriptor[5] = h(domain("root") + scope + altered_levels[-1][0])
-            assert not check_branch(altered_descriptor, index, chunk,
-                                    branch_at(altered_levels, index))
+        descriptor = commit(body)
+        chunks = [body[i:i + CHUNK_BYTES] for i in range(0, size, CHUNK_BYTES)]
+        assert 1 <= len(chunks) <= 144
+        assert all(len(c) == CHUNK_BYTES for c in chunks[:-1])
+        assert len(chunks[-1]) == (size - 1) % CHUNK_BYTES + 1
+        assert h(b"".join(chunks)) == descriptor[4]
+        corrupted = [bytes([chunks[0][0] ^ 1]) + chunks[0][1:]] + chunks[1:]
+        assert h(b"".join(corrupted)) != descriptor[4]
+        # Every metadata field participates in object identity.
+        for field, value in ((0, 2), (1, h(b"profile")), (2, [h(b"block")]),
+                             (3, size + 1), (4, bytes(32))):
+            changed = list(descriptor)
+            changed[field] = value
+            assert object_id(changed) != object_id(descriptor)
+    for body in (b"", bytes(MAX_OBJECT_BYTES + 1)):
+        try:
+            commit(body)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("accepted invalid object length")
 
-    # Non-default profiles and both other context shapes use the same commitments.
-    body = pattern(131073)
-    contexts = [(2, [bytes(32), 42, bytes(32), bytes(32), bytes(32)]),
-                (3, [h(body)])]
-    for kind, context in contexts:
-        descriptor, _, levels = commit(body, kind, h(b"profile"), context)
-        assert check_branch(descriptor, 0, body[:CHUNK_BYTES], branch_at(levels, 0))
-    try:
-        commit(b"")
-        raise AssertionError("accepted empty object")
-    except ValueError:
-        pass
-
-    object_id = bytes.fromhex(next(v["object_id"] for v in vectors if v["size"] == 131073))
-    assert rlp([7, object_id, [0, 2]]).hex() == (
-        "e507a0f0d141fc8ee27459e661bd8459f51199967afdcb76b0155459b660954be94fe2c28002")
+    # Published wire values include a request-ID gap and no Merkle branch.
     assert rlp([7]).hex() == "c107"
-    assert rlp([[[0, bytes.fromhex("7f00")]], 0, [[], []]]).hex() == "cac5c480827f0080c2c0c0"
-
-    # Maximum legal Chunk and announcement sizes fit the capability ceiling.
-    largest_chunk = rlp([2**64 - 1, bytes(32), 1023, bytes(CHUNK_BYTES), [bytes(32)] * 10])
+    assert rlp([7, bytes(32), [0, 2]]).hex() == "e507a0" + "00" * 32 + "c28002"
+    assert rlp([7, bytes(32), 0, b"a"]).hex() == "e407a0" + "00" * 32 + "8061"
+    largest_chunk = rlp([2**64 - 1, bytes(32), 143, bytes(CHUNK_BYTES)])
     assert len(largest_chunk) < 131072
-    context = [bytes(32), 2**64 - 1, bytes(32), bytes(32), bytes(32)]
-    descriptor = [2, bytes(32), context, MAX_OBJECT_BYTES, bytes(32), bytes(32)]
-    assert len(rlp(descriptor)) <= 512
+    descriptor = [2, bytes(32), [bytes(32)], MAX_OBJECT_BYTES, bytes(32)]
+    assert len(rlp(descriptor)) <= 256
     assert len(rlp([descriptor] * 64)) < 131072
+    assert len(rlp([2**64 - 1, [[0, descriptor]] * 16])) < 65536
 
-    # Synthetic header checks only the skeleton algorithm, not a fork's schema.
-    fields = [bytes(32), 42, bytes(32), [b"proof", bytes(32)], b"extra"]
-    encodings = [rlp(field) for field in fields]
-    encodings[3] = b""
-    skeleton = [3, encodings]
-    skeleton_hash = h(domain("skeleton") + rlp(skeleton))
-    restored = list(encodings)
-    restored[3] = rlp([b"proof", bytes(32)])
-    payload = b"".join(restored)
-    canonical = rlp(fields)
-    length = uint(len(payload), (len(payload).bit_length() + 7) // 8)
-    prefix = (bytes([0xc0 + len(payload)]) if len(payload) < 56
-              else bytes([0xf7 + len(length)]) + length)
-    reconstructed = prefix + payload
-    assert reconstructed == canonical
-    assert h(rlp(restored)) != h(canonical), "double encoding must change the header hash"
-    encodings[1] = rlp(43)
-    assert h(domain("skeleton") + rlp(skeleton)) != skeleton_hash
-    fields[1] = 43
-    assert h(rlp(fields)) != h(reconstructed)
-    print(f"PASS: {len(vectors)} published vectors; {len(sizes)} boundary sizes; "
-          f"tampering, message encodings and header reconstruction; maximum Chunk {len(largest_chunk)} bytes")
+    # The aggregate wrapper fits without embedding any transaction envelopes.
+    hashes = [uint(i, 32) for i in range(4096)]
+    deps = [bytes(31) + b"\x10" + uint(i, 32) + bytes(32) for i in range(4096)]
+    maximum_wrapper = rlp([hashes, 1, [deps, bytes(8388608)]])
+    assert len(maximum_wrapper) <= MAX_OBJECT_BYTES
+
+    # Header commitment binds the raw proof, not its lean transport RLP.
+    proof = b"proof"
+    proof_hash = h(proof)
+    block_hash = h(rlp([b"synthetic header", [proof_hash, h(b"dependencies")]]))
+    descriptor = commit(rlp([proof]), 2, h(b"profile"), [block_hash])
+    assert descriptor[4] != proof_hash
+    assert h(proof + b"!") != proof_hash
+    assert commit(rlp([b""]), 2, h(b"profile"), [block_hash])[3] == 2
+    print(f"PASS: {len(vectors)} vectors, {len(sizes)} boundaries, identity mutations, "
+          f"message bounds and proof commitments; maximum wrapper {len(maximum_wrapper)} bytes")
 
 
 if __name__ == "__main__":
