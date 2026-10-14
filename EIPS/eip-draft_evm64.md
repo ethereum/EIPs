@@ -1,0 +1,267 @@
+---
+title: 64-bit Opcodes for the EVM
+description: Single-byte opcodes for 64-bit arithmetic, comparison, bitwise, and memory operations
+author: Greg Colvin (@gcolvin) <greg@colvin.org>, Wei Tang (@sorpaas)
+discussions-to: https://ethereum-magicians.org/t/eip-series-evm64/23794
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-10-14
+---
+
+## Abstract
+
+Not every computation needs 256 bits.  Counters, offsets, lengths, and the inner loops of hashes and big-number arithmetic fit in 64, and the EVM makes them pay for 256 at every step.  This proposal adds twenty-eight instructions that compute on the low 64 bits of their operands: the EVM64 instruction set of [EIP-7937](./eip-7937.md) — the same operations at the same costs — encoded as ordinary single-byte opcodes rather than behind a prefix byte.  Each is the *twin* of an existing instruction, at the existing opcode plus `0xC0`.
+
+The instructions take no immediate data and enter no mode: they mix freely with the rest of the instruction set, and every result is an ordinary 256-bit word.  Alone they make interpreted arithmetic modestly cheaper.  Composed with static control flow they compound: code compiled to RISC-V under both executes 19 to 51 times fewer instructions than today's interpreted EVM, because a stack slot becomes a machine register only when its offset is static *and* its value fits the register.
+
+*Note: Significant assistance from AI is acknowledged, primarily for the reference implementation and its tests.*
+
+## Motivation
+
+Most of the values a contract computes with fit in 64 bits.  On the 64-bit machines that run the EVM a 256-bit addition is four limbs and three carries, a multiplication ten partial products, a comparison up to four; the same work on a 64-bit value is one instruction.  An interpreter hides most of the difference behind its dispatch.  Compiled code does not, and neither does a zero-knowledge (ZK) virtual machine, where the prover pays per RISC-V instruction executed.  These instructions let code that fits in 64 bits pay for 64.
+
+## Specification
+
+> *The key words MUST and MUST NOT in this Specification are to be interpreted as described in RFC 2119 and RFC 8174.*
+
+The EVM's machine state includes a *data stack* of 256-bit words.  These instructions leave it so.  Each reads only the low 64 bits of its operands — the operand modulo 2^64 — and pushes a 64-bit result zero-extended to 256 bits: the high 192 bits of every result are zero.  *Signed* instructions read the low 64 bits as a two's-complement integer.  No mode is entered or left; the instructions may appear anywhere, in any mix with the rest of the instruction set.
+
+### The instructions
+
+Each instruction is the *twin* of an existing one — the same operation on 64-bit operands — at the existing opcode plus `0xC0`.  In the table, *a* is the top of the *data stack*, *b* the item beneath it, and *N* the third, each read modulo 2^64; every result is reduced modulo 2^64; division truncates toward zero and division by zero yields zero.
+
+| Opcode | Instruction | Pops | Pushes | Cost | Result |
+|--------|-------------|-----:|-------:|------|--------|
+| `0xC1` | `ADD64` | 2 | 1 | *verylow64* | a + b |
+| `0xC2` | `MUL64` | 2 | 1 | *low64* | a × b |
+| `0xC3` | `SUB64` | 2 | 1 | *verylow64* | a - b |
+| `0xC4` | `DIV64` | 2 | 1 | *low64* | a / b |
+| `0xC5` | `SDIV64` | 2 | 1 | *low64* | a / b, signed |
+| `0xC6` | `MOD64` | 2 | 1 | *low64* | a mod b |
+| `0xC7` | `SMOD64` | 2 | 1 | *low64* | a mod b, signed, with the sign of a |
+| `0xC8` | `ADDMOD64` | 3 | 1 | *mid64* | (a + b) mod N, the sum not reduced; 0 if N = 0 |
+| `0xC9` | `MULMOD64` | 3 | 1 | *mid64* | (a × b) mod N, the product not reduced; 0 if N = 0 |
+| `0xCA` | `EXP64` | 2 | 1 | *exp64* | a to the power b |
+| `0xCB` | `SIGNEXTEND64` | 2 | 1 | *low64* | b sign-extended from bit 8a + 7; b if a > 6 |
+| `0xCC` | `CALLDATALOAD64` | 1 | 1 | *verylow64* | `CALLDATALOAD` of a, modulo 2^64 |
+| `0xCD` | `MLOAD64` | 1 | 1 | *verylow64* + memory | `MLOAD` of a, modulo 2^64 |
+| `0xCE` | `MSTORE64` | 2 | 0 | *verylow64* + memory | `MSTORE` of b modulo 2^64 at a |
+| `0xD0` | `LT64` | 2 | 1 | *verylow64* | 1 if a < b, else 0 |
+| `0xD1` | `GT64` | 2 | 1 | *verylow64* | 1 if a > b, else 0 |
+| `0xD2` | `SLT64` | 2 | 1 | *verylow64* | 1 if a < b, signed, else 0 |
+| `0xD3` | `SGT64` | 2 | 1 | *verylow64* | 1 if a > b, signed, else 0 |
+| `0xD4` | `EQ64` | 2 | 1 | *verylow64* | 1 if a = b, else 0 |
+| `0xD5` | `ISZERO64` | 1 | 1 | *verylow64* | 1 if a = 0, else 0 |
+| `0xD6` | `AND64` | 2 | 1 | *verylow64* | a and b, bitwise |
+| `0xD7` | `OR64` | 2 | 1 | *verylow64* | a or b, bitwise |
+| `0xD8` | `XOR64` | 2 | 1 | *verylow64* | a xor b, bitwise |
+| `0xD9` | `NOT64` | 1 | 1 | *verylow64* | not a, bitwise |
+| `0xDB` | `SHL64` | 2 | 1 | *verylow64* | b shifted left a bits; 0 if a > 63 |
+| `0xDC` | `SHR64` | 2 | 1 | *verylow64* | b shifted right a bits; 0 if a > 63 |
+| `0xDD` | `SAR64` | 2 | 1 | *verylow64* | b shifted right a bits, signed, filling with the sign of b |
+| `0xDE` | `CLZ64` | 1 | 1 | *low64* | the number of leading zero bits of a; 64 if a = 0 |
+
+`0xC0`, `0xCF`, `0xDA`, and `0xDF` are left unassigned.
+
+Equivalently, each instruction computes what its twin computes when every operand is replaced by its low 64 bits — zero-extended to 256 bits, or sign-extended for the signed instructions — and the result is reduced modulo 2^64 (less 192, for `CLZ64`).  The reference implementation's tests check the table against the twins on exactly this property.
+
+The three load and store instructions are their twins reduced modulo 2^64: the same 32-byte window at the same offset, the same memory expansion, the same bytes.  `MLOAD64` reads the low eight bytes of the word `MLOAD` would read, so it reads back what `MSTORE` stored of a 64-bit value; `CALLDATALOAD64` reads the low eight bytes of a calldata word, so it reads an ABI-encoded 64-bit argument in place.  `MSTORE64` writes the full 32-byte word, its high 24 bytes zero.
+
+### Costs
+
+Four new tiers, each a step below the tier of the twin: *verylow64* is 2 where *verylow* is 3, *low64* is 3 where *low* is 5, *mid64* is 5 where *mid* is 8, and *exp64* is 5 plus 25 per byte of the exponent — the exponent being b modulo 2^64, so at most eight bytes — where `EXP` is 10 plus 50.  `MLOAD64` and `MSTORE64` pay memory expansion exactly as `MLOAD` and `MSTORE` do.
+
+The discounts reflect the work: one machine word where the twin handles four, with no carries between limbs.  Benchmarking will be needed to tell if the costs are well-balanced.
+
+### Analysis
+
+None of the instructions takes immediate data, so JUMPDEST analysis is unchanged.  Each has the fixed stack effect the table gives, so any validator or translator that works from an opcode table covers them by adding rows.
+
+## Rationale
+
+### Why single-byte opcodes rather than a prefix?
+
+EIP-7937 specifies these operations behind a prefix: `0xC0` followed by the opcode of the 256-bit twin.  That saves opcode space and costs a byte of code per instruction — and it makes the EVM's first multibyte opcode.  JUMPDEST analysis must step over the prefix as it steps over `PUSH` data, with the oddity that `C0 5B` marks a valid destination yet halts when executed; a bad second byte needs its own halting rule; and every disassembler, validator, translator, and compiler must learn the one exception.  Single-byte opcodes need none of this.  They are rows in the opcode table, and everything that works from the table — the validators and translators behind the measurements below among them — covers them by adding rows.  The rows `0xC1`–`0xCB` and `0xD0`–`0xDE` make the encoding mechanical, twin plus `0xC0`, and the three memory instructions take spare slots beside the arithmetic.  The price is opcode space: twenty-eight of the thirty-two values from `0xC0` to `0xDF`, all unassigned today.
+
+EIP-7937 also proposed reserving `0xC0`–`0xCF` for further prefixes, such as a mode that halts on overflow.  This proposal forecloses that row; a future mode would need another.
+
+### Why zero-extended results rather than a 64-bit mode?
+
+EIP-7937 and its EOF alternative, [EIP-7961](./eip-7961.md), define a mode in which the high 192 bits of a 64-bit result are unobservable.  Here they are simply zero.  That is the specification; the implementation remains free.  An interpreter can keep a typed stack, holding a 64-bit result as one machine word and zero-extending it only when a 256-bit instruction reads it, because the zeros are exactly what that representation reconstructs.  A compiler can keep it in a register for the same reason.  Nothing is lost against the mode, and nothing enters or leaves one.
+
+### Why these instructions?
+
+The arithmetic row `0x01`–`0x0B` and the comparison and bitwise row `0x10`–`0x1E`, less `BYTE`, plus three loads and stores.
+
+`BYTE` already indexes a big-endian word, so byte *j* of a 64-bit value is `BYTE` of 24 + *j*; a twin would save one gas.  `CLZ` is in: it is the kind of thing 64-bit code does, and it counts to 64 rather than 256.
+
+EIP-7937's `JUMP` and `JUMPI` twins are out.  A destination already fits in 64 bits, and `JUMPI` tests for nonzero, which gives the same answer on a zero-extended value; the twins would save gas only.  `PUSH` needs no twin: a push of up to eight bytes already pushes a 64-bit value with zero high bits.  `DUP`, `SWAP`, and `POP` move words; there is nothing to narrow.
+
+The loads and stores are the twins modulo 2^64 rather than eight-byte accesses.  Eight-byte windows would pack arrays four times denser, but they would be the first instructions to touch memory at anything but the word, would need their own expansion rule, and would read ABI-encoded calldata 24 bytes off.  The window chosen here reads back what existing code and existing compilers store, in place.  Denser packing is a different proposal.
+
+### Why these costs?
+
+They are EIP-7937's, carried over unchanged, and they are approximate: the saving is in the arithmetic, not in dispatch or gas accounting, and under an interpreter it is modest, as the measurements below show.  The right costs will come from benchmarking.
+
+### Are there real-time performance gains?
+
+[EIP-7979](./eip-7979.md) measured them in its assets, on two kernels at opposite ends of the workload — a loop of dependent multiplies and a recursive tree of calls — counting executed RISC-V instructions exactly, with the arithmetic and comparison instructions at the opcodes proposed here and the memory instructions at placeholders.  Alone, under a bytecode interpreter, the 64-bit instructions buy 1.1x to 1.4x: dispatch dominates, and cheap arithmetic hardly shows.  Composed with validated static control flow they buy 3.2x to 3.3x interpreting a register intermediate code, and 19x to 51x compiled ahead of time to RISC-V — more than the product of the two, because a stack slot can live in a machine register only when its offset is proven static and its value fits.  Run in the Zisk zkVM, every program cost the prover its executed-instruction count plus a fixed startup, so the ratios are ratios of proving cost.
+
+Storage dominates most transactions and lies outside these kernels, so such gains would be most visible where overhead can be minimal: precompiles, layer 2 chains, and EVM-compatible chains.
+
+## Backwards Compatibility
+
+The opcodes `0xC0`–`0xDF` are unassigned.  Executing one today halts exceptionally and consumes all gas; code that does so was always broken, and after this change twenty-eight of them execute instead.  Existing code's semantics are otherwise unchanged: no existing instruction changes, no instruction takes immediate data, and JUMPDEST analysis is the same.
+
+This proposal is an alternative encoding of EIP-7937, not a complement: the two specify the same instructions twice.  It does not preclude running the EVM in zero knowledge, nor foreclose EOF, RISC-V, or other changes.
+
+## Test Cases
+
+Inputs are listed top of stack first; every output is a 256-bit word whose high 192 bits are zero.  `0x10000000000000005` is 2^64 + 5: the high bits are garbage to be ignored.
+
+| Op | Inputs, top first | Output |
+|----|-------------------|--------|
+| `ADD64` | 0xffffffffffffffff, 0x1 | 0x0 |
+| `ADD64` | 0x10000000000000005, 0x7 | 0xc |
+| `SUB64` | 0x0, 0x1 | 0xffffffffffffffff |
+| `MUL64` | 0x100000000, 0x100000000 | 0x0 |
+| `DIV64` | 0x10, 0x3 | 0x5 |
+| `DIV64` | 0x1, 0x0 | 0x0 |
+| `SDIV64` | 0xfffffffffffffff8, 0x2 | 0xfffffffffffffffc |
+| `SDIV64` | 0x8000000000000000, 0xffffffffffffffff | 0x8000000000000000 |
+| `MOD64` | 0x11, 0x5 | 0x2 |
+| `SMOD64` | 0xfffffffffffffff9, 0x3 | 0xffffffffffffffff |
+| `ADDMOD64` | 0xffffffffffffffff, 0xffffffffffffffff, 0x7 | 0x2 |
+| `MULMOD64` | 0x8000000000000000, 0x8000000000000000, 0xffffffffffffffff | 0x4000000000000000 |
+| `EXP64` | 0x2, 0x40 | 0x0 |
+| `EXP64` | 0x3, 0x28 | 0xa8b8b452291fe821 |
+| `SIGNEXTEND64` | 0x0, 0x80 | 0xffffffffffffff80 |
+| `SIGNEXTEND64` | 0x1, 0x80 | 0x80 |
+| `SIGNEXTEND64` | 0x7, 0x80 | 0x80 |
+| `LT64` | 0x10000000000000005, 0x7 | 0x1 |
+| `GT64` | 0x7, 0x10000000000000005 | 0x1 |
+| `SLT64` | 0xffffffffffffffff, 0x0 | 0x1 |
+| `SGT64` | 0x0, 0xffffffffffffffff | 0x1 |
+| `EQ64` | 0x10000000000000005, 0x5 | 0x1 |
+| `ISZERO64` | 0x10000000000000000 | 0x1 |
+| `AND64` | 0x10000000000000005, 0xff | 0x5 |
+| `OR64` | 0x10000000000000005, 0x2 | 0x7 |
+| `XOR64` | 0xff, 0xf | 0xf0 |
+| `NOT64` | 0x0 | 0xffffffffffffffff |
+| `SHL64` | 0x3f, 0x1 | 0x8000000000000000 |
+| `SHL64` | 0x40, 0x1 | 0x0 |
+| `SHR64` | 0x1, 0x8000000000000000 | 0x4000000000000000 |
+| `SAR64` | 0x1, 0x8000000000000000 | 0xc000000000000000 |
+| `SAR64` | 0x64, 0x8000000000000000 | 0xffffffffffffffff |
+| `CLZ64` | 0x1 | 0x3f |
+| `CLZ64` | 0x10000000000000000 | 0x40 |
+
+The `ADDMOD64` and `MULMOD64` rows distinguish the unreduced sum and product from wrapped ones: 2^65 - 2 is 2 modulo 7 where 2^64 - 2 is 0, and 2^126 is 2^62 modulo 2^64 - 1 where the wrapped product is 0.  The `SLT64` row is 0 under `SLT`, which reads 2^64 - 1 as positive.
+
+`EXP64` costs 5 with an exponent of 0, 30 with 255, and 55 with 256.  With an exponent of 2^64 it costs 5 and yields 1: the exponent is read modulo 2^64.
+
+For the loads and stores, let the calldata, or memory, hold the forty bytes `0x00` to `0x27`.  `CALLDATALOAD64` of 0 yields `0x18191a1b1c1d1e1f`, of 8 yields `0x2021222324252627`, and of 16 yields 0, the window lying past the end.  `MLOAD64` of 0 yields `0x18191a1b1c1d1e1f`.  `MSTORE64` of `0x10000000000000005` at 0 leaves the word at 0 reading 5 under `MLOAD` and `MLOAD64` alike, its first 24 bytes zero; `MSTORE64` at 8 extends memory to 40 bytes, as `MSTORE` at 8 would.
+
+## Reference Implementation
+
+[`evm64.py`](../assets/eip-draft_evm64/evm64.py) gives every instruction as a pure function on integers, with the opcode table of costs and stack effects; [`test_evm64.py`](../assets/eip-draft_evm64/test_evm64.py) checks each against an independent implementation of its twin on the defining property, on edge values and on random words with garbage high bits, and runs the vectors above.
+
+Against the Ethereum Execution Layer Specifications (EELS), following its conventions, the instructions are their twins with the operands masked and the gas tiers renamed.  Four of the twenty-eight:
+
+```python
+U64_MAX_VALUE = Uint(2**64 - 1)
+U64_CEIL_VALUE = Uint(2**64)
+
+class GasCosts:
+    ...
+    VERY_LOW_64: Final[ExecutionGas] = ExecutionGas(Uint(2))
+    LOW_64: Final[ExecutionGas] = ExecutionGas(Uint(3))
+    MID_64: Final[ExecutionGas] = ExecutionGas(Uint(5))
+    OPCODE_EXP64_BASE: Final[ExecutionGas] = ExecutionGas(Uint(5))
+    OPCODE_EXP64_PER_BYTE: Final[ExecutionGas] = ExecutionGas(Uint(25))
+    OPCODE_ADD64: Final[ExecutionGas] = VERY_LOW_64
+    OPCODE_SDIV64: Final[ExecutionGas] = LOW_64
+    OPCODE_MLOAD64_BASE: Final[ExecutionGas] = VERY_LOW_64
+    OPCODE_MSTORE64_BASE: Final[ExecutionGas] = VERY_LOW_64
+
+def low64(x: U256) -> Uint:
+    """The low 64 bits of a word."""
+    return Uint(x) & U64_MAX_VALUE
+
+def signed64(x: U256) -> int:
+    """The low 64 bits of a word, as a two's-complement integer."""
+    v = int(low64(x))
+    return v - 2**64 if v >> 63 else v
+
+def add64(evm: Evm) -> None:
+    # STACK
+    x = low64(pop(evm.stack))
+    y = low64(pop(evm.stack))
+    # GAS
+    charge_gas(evm, GasCosts.OPCODE_ADD64)
+    # OPERATION
+    push(evm.stack, U256((x + y) % U64_CEIL_VALUE))
+    # PROGRAM COUNTER
+    evm.pc += Uint(1)
+
+def sdiv64(evm: Evm) -> None:
+    # STACK
+    dividend = signed64(pop(evm.stack))
+    divisor = signed64(pop(evm.stack))
+    # GAS
+    charge_gas(evm, GasCosts.OPCODE_SDIV64)
+    # OPERATION
+    if divisor == 0:
+        quotient = 0
+    elif dividend == -(2**63) and divisor == -1:
+        quotient = -(2**63)
+    else:
+        sign = get_sign(dividend * divisor)
+        quotient = sign * (abs(dividend) // abs(divisor))
+    push(evm.stack, U256(quotient % 2**64))
+    # PROGRAM COUNTER
+    evm.pc += Uint(1)
+
+def mload64(evm: Evm) -> None:
+    # STACK
+    start_position = pop(evm.stack)
+    # GAS
+    extend_memory = calculate_gas_extend_memory(
+        evm.memory, [(start_position, U256(32))]
+    )
+    charge_gas(evm, GasCosts.OPCODE_MLOAD64_BASE + extend_memory.cost)
+    # OPERATION: the low eight bytes of the word MLOAD would read
+    evm.memory += b"\x00" * extend_memory.expand_by
+    value = U256.from_be_bytes(
+        memory_read_bytes(evm.memory, start_position + U256(24), U256(8))
+    )
+    push(evm.stack, value)
+    # PROGRAM COUNTER
+    evm.pc += Uint(1)
+
+def mstore64(evm: Evm) -> None:
+    # STACK
+    start_position = pop(evm.stack)
+    value = U256(low64(pop(evm.stack))).to_be_bytes32()
+    # GAS
+    extend_memory = calculate_gas_extend_memory(
+        evm.memory, [(start_position, U256(len(value)))]
+    )
+    charge_gas(evm, GasCosts.OPCODE_MSTORE64_BASE + extend_memory.cost)
+    # OPERATION
+    evm.memory += b"\x00" * extend_memory.expand_by
+    memory_write(evm.memory, start_position, value)
+    # PROGRAM COUNTER
+    evm.pc += Uint(1)
+```
+
+## Security Considerations
+
+The instructions add no state and no resource: each does bounded work on one machine word, pays memory expansion exactly as its twin does, and offers nothing new to exhaust.
+
+The hazards are for compilers.  `EQ64`, `ISZERO64`, and the comparisons judge the low 64 bits only: two words that differ above bit 63 are equal to `EQ64`, and a word that is zero below bit 63 is zero to `ISZERO64`.  Arithmetic wraps at 2^64, not 2^256, so overflow checks must be written for the width in use.  A compiler that emits these instructions for values it has not proven to fit in 64 bits emits wrong code; one that has proven it emits code that is cheaper and no less safe.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
