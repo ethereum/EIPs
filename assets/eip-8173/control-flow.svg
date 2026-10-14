@@ -1,99 +1,94 @@
-<svg viewBox="0 0 890 360" xmlns="http://www.w3.org/2000/svg" font-family="Courier, monospace" font-size="13" fill="none">
-<desc>Control flow graphs of four EVM programs of 2, 3, 4, and 5 blocks. Each block is jumpdest/gas/jump, the last jumpdest/stop. Every jump may reach every jumpdest, its own block's included: forward edges on the right, backward and self edges on the left.</desc>
+<svg width="650" height="398" viewBox="0 0 650 398" xmlns="http://www.w3.org/2000/svg" font-family="Courier, monospace" font-size="13" fill="none">
+<desc>Control flow graphs of three EVM programs of 2, 4, and 6 blocks. Each block is jumpdest/gas/jump, the last jumpdest/stop. Every jump may reach every jumpdest, its own block's included: forward edges on the right, backward and self edges on the left. The edge counts are 2, 12, and 30.</desc>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black"/></marker></defs>
-<rect width="890" height="360" fill="white"/>
-<rect x="62" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="70" y="44" fill="black">JUMPDEST</text>
-<text x="70" y="60" fill="black">GAS</text>
-<text x="70" y="76" fill="black">JUMP</text>
-<rect x="62" y="90" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="70" y="104" fill="black">JUMPDEST</text>
-<text x="70" y="120" fill="black">STOP</text>
-<path d="M 62 72 C 46 72, 46 40, 62 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 142 72 C 161 72, 161 100, 142 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<g transform="translate(170,0)">
-<rect x="62" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="70" y="44" fill="black">JUMPDEST</text>
-<text x="70" y="60" fill="black">GAS</text>
-<text x="70" y="76" fill="black">JUMP</text>
-<rect x="62" y="90" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="70" y="104" fill="black">JUMPDEST</text>
-<text x="70" y="120" fill="black">GAS</text>
-<text x="70" y="136" fill="black">JUMP</text>
-<rect x="62" y="150" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="70" y="164" fill="black">JUMPDEST</text>
-<text x="70" y="180" fill="black">STOP</text>
-<rect x="242" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="250" y="44" fill="black">JUMPDEST</text>
-<text x="250" y="60" fill="black">GAS</text>
-<text x="250" y="76" fill="black">JUMP</text>
-<rect x="242" y="90" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="250" y="104" fill="black">JUMPDEST</text>
-<text x="250" y="120" fill="black">GAS</text>
-<text x="250" y="136" fill="black">JUMP</text>
-<rect x="242" y="150" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="250" y="164" fill="black">JUMPDEST</text>
-<text x="250" y="180" fill="black">GAS</text>
-<text x="250" y="196" fill="black">JUMP</text>
-<rect x="242" y="210" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="250" y="224" fill="black">JUMPDEST</text>
-<text x="250" y="240" fill="black">STOP</text>
-<rect x="472" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="480" y="44" fill="black">JUMPDEST</text>
-<text x="480" y="60" fill="black">GAS</text>
-<text x="480" y="76" fill="black">JUMP</text>
-<rect x="472" y="90" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="480" y="104" fill="black">JUMPDEST</text>
-<text x="480" y="120" fill="black">GAS</text>
-<text x="480" y="136" fill="black">JUMP</text>
-<rect x="472" y="150" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="480" y="164" fill="black">JUMPDEST</text>
-<text x="480" y="180" fill="black">GAS</text>
-<text x="480" y="196" fill="black">JUMP</text>
-<rect x="472" y="210" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="480" y="224" fill="black">JUMPDEST</text>
-<text x="480" y="240" fill="black">GAS</text>
-<text x="480" y="256" fill="black">JUMP</text>
-<rect x="472" y="270" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
-<text x="480" y="284" fill="black">JUMPDEST</text>
-<text x="480" y="300" fill="black">STOP</text>
-<path d="M 142 72 C 161 72, 161 100, 142 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 142 72 C 179 72, 179 160, 142 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 62 72 C 46 72, 46 40, 62 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 142 132 C 161 132, 161 160, 142 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 62 132 C 28 132, 28 40, 62 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 62 132 C 46 132, 46 100, 62 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 72 C 341 72, 341 100, 322 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 72 C 359 72, 359 160, 322 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 72 C 374 72, 374 220, 322 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 72 C 226 72, 226 40, 242 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 132 C 341 132, 341 160, 322 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 132 C 359 132, 359 220, 322 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 132 C 208 132, 208 40, 242 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 132 C 226 132, 226 100, 242 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 322 192 C 341 192, 341 220, 322 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 192 C 208 192, 208 100, 242 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 192 C 194 192, 194 40, 242 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 242 192 C 226 192, 226 160, 242 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 72 C 571 72, 571 100, 552 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 72 C 589 72, 589 160, 552 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 72 C 604 72, 604 220, 552 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 72 C 618 72, 618 280, 552 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 72 C 456 72, 456 40, 472 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 132 C 571 132, 571 160, 552 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 132 C 589 132, 589 220, 552 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 132 C 604 132, 604 280, 552 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 132 C 438 132, 438 40, 472 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 132 C 456 132, 456 100, 472 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 192 C 571 192, 571 220, 552 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 192 C 589 192, 589 280, 552 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 192 C 438 192, 438 100, 472 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 192 C 424 192, 424 40, 472 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 192 C 456 192, 456 160, 472 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 552 252 C 571 252, 571 280, 552 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 252 C 438 252, 438 160, 472 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 252 C 424 252, 424 100, 472 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 252 C 410 252, 410 40, 472 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M 472 252 C 456 252, 456 220, 472 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
-</g>
+<rect width="650" height="398" fill="#e0e0e0"/>
+<rect x="40" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="48" y="44" fill="black">JUMPDEST</text>
+<text x="48" y="60" fill="black">GAS</text>
+<text x="48" y="76" fill="black">JUMP</text>
+<rect x="40" y="90" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="48" y="104" fill="black">JUMPDEST</text>
+<text x="48" y="120" fill="black">STOP</text>
+<path d="M 40 72 C 24 72, 24 40, 40 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 120 72 C 139 72, 139 100, 120 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="215" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="223" y="44" fill="black">JUMPDEST</text>
+<text x="223" y="60" fill="black">GAS</text>
+<text x="223" y="76" fill="black">JUMP</text>
+<rect x="215" y="90" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="223" y="104" fill="black">JUMPDEST</text>
+<text x="223" y="120" fill="black">GAS</text>
+<text x="223" y="136" fill="black">JUMP</text>
+<rect x="215" y="150" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="223" y="164" fill="black">JUMPDEST</text>
+<text x="223" y="180" fill="black">GAS</text>
+<text x="223" y="196" fill="black">JUMP</text>
+<rect x="215" y="210" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="223" y="224" fill="black">JUMPDEST</text>
+<text x="223" y="240" fill="black">STOP</text>
+<path d="M 215 72 C 199 72, 199 40, 215 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 295 72 C 314 72, 314 100, 295 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 295 72 C 332 72, 332 160, 295 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 295 72 C 350 72, 350 220, 295 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 215 132 C 181 132, 181 40, 215 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 215 132 C 199 132, 199 100, 215 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 295 132 C 314 132, 314 160, 295 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 295 132 C 332 132, 332 220, 295 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 215 192 C 163 192, 163 40, 215 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 215 192 C 181 192, 181 100, 215 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 215 192 C 199 192, 199 160, 215 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 295 192 C 314 192, 314 220, 295 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="458" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="466" y="44" fill="black">JUMPDEST</text>
+<text x="466" y="60" fill="black">GAS</text>
+<text x="466" y="76" fill="black">JUMP</text>
+<rect x="458" y="90" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="466" y="104" fill="black">JUMPDEST</text>
+<text x="466" y="120" fill="black">GAS</text>
+<text x="466" y="136" fill="black">JUMP</text>
+<rect x="458" y="150" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="466" y="164" fill="black">JUMPDEST</text>
+<text x="466" y="180" fill="black">GAS</text>
+<text x="466" y="196" fill="black">JUMP</text>
+<rect x="458" y="210" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="466" y="224" fill="black">JUMPDEST</text>
+<text x="466" y="240" fill="black">GAS</text>
+<text x="466" y="256" fill="black">JUMP</text>
+<rect x="458" y="270" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="466" y="284" fill="black">JUMPDEST</text>
+<text x="466" y="300" fill="black">GAS</text>
+<text x="466" y="316" fill="black">JUMP</text>
+<rect x="458" y="330" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="466" y="344" fill="black">JUMPDEST</text>
+<text x="466" y="360" fill="black">STOP</text>
+<path d="M 458 72 C 442 72, 442 40, 458 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 72 C 557 72, 557 100, 538 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 72 C 575 72, 575 160, 538 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 72 C 593 72, 593 220, 538 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 72 C 611 72, 611 280, 538 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 72 C 629 72, 629 340, 538 340" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 132 C 424 132, 424 40, 458 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 132 C 442 132, 442 100, 458 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 132 C 557 132, 557 160, 538 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 132 C 575 132, 575 220, 538 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 132 C 593 132, 593 280, 538 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 132 C 611 132, 611 340, 538 340" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 192 C 406 192, 406 40, 458 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 192 C 424 192, 424 100, 458 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 192 C 442 192, 442 160, 458 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 192 C 557 192, 557 220, 538 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 192 C 575 192, 575 280, 538 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 192 C 593 192, 593 340, 538 340" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 252 C 388 252, 388 40, 458 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 252 C 406 252, 406 100, 458 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 252 C 424 252, 424 160, 458 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 252 C 442 252, 442 220, 458 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 252 C 557 252, 557 280, 538 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 252 C 575 252, 575 340, 538 340" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 312 C 370 312, 370 40, 458 40" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 312 C 388 312, 388 100, 458 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 312 C 406 312, 406 160, 458 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 312 C 424 312, 424 220, 458 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 458 312 C 442 312, 442 280, 458 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 538 312 C 557 312, 557 340, 538 340" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
 </svg>
