@@ -81,7 +81,7 @@ Attesters need their own benchmark; builder benchmark success alone does not est
 - wrapper proofs published on the proof topic by the `t=0s` target of slot `N` (provisional) reach a cached verdict by the end of EIP-7805's construction window;
 - lists committing to those proofs or to wrapper proofs the attester already holds are checked through `engine_verifyInclusionListProofV1` by a cache lookup by the EIP-7805 view freeze deadline.
 
-Without it, the null fallback preserves the lists' dependency-free obligations but may substantially weaken censorship resistance for dependency-bearing transactions.
+Both must hold under the full permitted background load (see [Required workload](#required-workload)). Without this delivery, the null fallback preserves the lists' dependency-free obligations but may substantially weaken censorship resistance for dependency-bearing transactions.
 
 ### Timing
 
@@ -90,17 +90,25 @@ Without it, the null fallback preserves the lists' dependency-free obligations b
 | From slot `N - 1` to `t=0s` (provisional target) | Members publish committed wrapper proofs on the proof topic. |
 | During the construction window | Members publish reproven proofs, as their second topic publication, when proving completes, and publish their lists. |
 | End of the construction window (currently `t=8s`) | Latest list release; topic proof delivery is measured to here. |
-| View freeze deadline (currently `t=9s`) | Every list must be checked; that second carries lists and cache lookups, not proof bytes. |
+| View freeze deadline (currently `t=9s`) | Every list must be checked; on the required path that second carries lists and cache lookups, not proof bytes. |
 
 ### Required workload
 
 The attester receives on the proof topic and verifies `IL_COMMITTEE_SIZE` (16) wrapper proofs, up to `IL_COMMITTEE_SIZE` × `MAX_AGGREGATE_PROOF_BYTES` (16 × 1.25 MiB = 20 MiB) of proof data plus their dependency lists, measuring delivery from each proof's publication. It then receives the committee's 16 lists, each at most EIP-7805's `MAX_BYTES_PER_INCLUSION_LIST` (8 KiB), released at the end of the construction window as the latest case, and checks each by the view freeze deadline, by a cache lookup when its execution layer already holds the committed proof from a mempool wrapper or the proof topic.
 
+The required workload must be met while the node also receives and verifies the full permitted background load:
+
+- slot `N`: up to 16 second topic publications and up to 16 committed proofs fetched by request and verified through `engine_verifyInclusionListProofV1`, for 48 `il_proof`s (78 MiB) per committee with the required 16;
+- slot `N - 1`, until the attestation deadline of slot `N`: requests for its committed proofs, sent and served, and its retained proofs;
+- slot `N + 1`: up to 16 early topic proofs.
+
+Late proofs in the background, second publications and committed proofs fetched by request, keep their weaker guarantee and are measured below, not required.
+
 ### Measured workloads
 
 These are reported, not required:
 
-- Reproven proofs: up to 16 further proofs, one per member, published as second topic publications when proving completes during the construction window, for up to `2 × IL_COMMITTEE_SIZE` (32) topic proofs and 52 MiB of `il_proof`s per committee. A reproven proof published late in the window may miss, leaving its list's dependency-bearing entries unenforced in that attester's view.
+- Reproven proofs: up to 16 further proofs, one per member, published as second topic publications when proving completes during the construction window, for up to `2 × IL_COMMITTEE_SIZE` (32) topic proofs and 52 MiB of `il_proof`s per committee, before committed proofs fetched by request. A reproven proof published late in the window may miss, leaving its list's dependency-bearing entries unenforced in that attester's view.
 - Freshness: a proof selected before slot `N` cannot cover dependencies first received during it. In a variant in which a fraction of the lists' dependency-bearing transactions first arrive during slot `N`, the benchmark reports the fraction of those lists' committed proofs reaching a cached verdict by the view freeze deadline. The delivery requirement otherwise mainly covers transactions seen before the slot.
 - Cold case: fetching by request, in the second before the view freeze deadline, committed proofs the attester neither held nor received on the topic, from peers that serve every other attester at once. Up to 16 `il_proof`s of `MAX_AGGREGATE_PROOF_BYTES` with 4,096-entry dependency lists, about 26 MiB, do not reliably fit that second, so the cold case need not succeed under every network condition and is measured as a degradation.
 
@@ -108,7 +116,7 @@ These are reported, not required:
 
 An attester benchmark run reports:
 
-- the reference hardware and network conditions;
+- the reference hardware and network conditions, and the background load applied;
 - the fraction of topic proofs reaching a cached verdict by the end of the construction window, separately for wrapper proofs published by the `t=0s` target and for reproven proofs;
 - the fraction of lists checked by the view freeze deadline, and how many were cache lookups;
 - for the freshness variant, the fraction of affected lists' committed proofs with a cached verdict by the view freeze deadline;
