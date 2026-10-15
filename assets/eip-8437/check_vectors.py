@@ -13,6 +13,10 @@ from Crypto.Hash import keccak
 CHUNK_BYTES = 65536
 MAX_OBJECT_BYTES = 9437184
 MAX_CHUNKS = (MAX_OBJECT_BYTES + CHUNK_BYTES - 1) // CHUNK_BYTES
+MAX_MESSAGE_BYTES = 131072
+MAX_ENVELOPE_RESPONSE_BYTES = 2097152
+MAX_ENVELOPES_PER_REQUEST = 1024
+MAX_TXS_PER_WRAPPER = 4096
 LEANSPHINCS_SCHEME = 0x10
 
 
@@ -98,6 +102,18 @@ def wrapper_vectors():
     return out
 
 
+def envelope_response(request_id, envelopes):
+    # Longest prefix of the requested envelopes that fits MAX_ENVELOPE_RESPONSE_BYTES.
+    served = []
+    for envelope in envelopes:
+        if len(rlp([request_id, served + [envelope]])) > MAX_ENVELOPE_RESPONSE_BYTES:
+            break
+        served.append(envelope)
+    if not served:
+        raise ValueError("envelope does not fit alone")
+    return rlp([request_id, served])
+
+
 def vector(size):
     descriptor = commit(pattern(size))
     return {
@@ -149,9 +165,30 @@ def main():
     assert rlp([7, bytes(32), [0, 2]]).hex() == "e507a0" + "00" * 32 + "c28002"
     assert rlp([7, bytes(32), 0, b"a"]).hex() == "e407a0" + "00" * 32 + "8061"
     largest_chunk = rlp([2**64 - 1, bytes(32), MAX_CHUNKS - 1, bytes(CHUNK_BYTES)])
-    assert len(largest_chunk) < 131072
+    assert len(largest_chunk) < MAX_MESSAGE_BYTES
     descriptor = [bytes(32), MAX_OBJECT_BYTES, bytes(32)]
-    assert len(rlp([descriptor] * 64)) < 131072
+    assert len(rlp([descriptor] * 64)) < MAX_MESSAGE_BYTES
+
+    # GetWrapperEnvelopes (0x06) and WrapperEnvelopes (0x07) encodings and bounds.
+    assert rlp([7, bytes(32), [0, 2]]).hex() == "e507a0" + "00" * 32 + "c28002"
+    assert rlp([7, [b"\x02\xc0"]]).hex() == "c507c38202c0"
+    indices = list(range(MAX_TXS_PER_WRAPPER - MAX_ENVELOPES_PER_REQUEST, MAX_TXS_PER_WRAPPER))
+    assert len(rlp([2**64 - 1, bytes(32), indices])) < MAX_MESSAGE_BYTES
+    # Largest envelope that fits alone: the response is then exactly at the ceiling.
+    largest = MAX_ENVELOPE_RESPONSE_BYTES - 21  # 9-byte request ID, three 4-byte headers
+    assert len(envelope_response(2**64 - 1, [bytes(largest)])) == MAX_ENVELOPE_RESPONSE_BYTES
+    try:
+        envelope_response(2**64 - 1, [bytes(largest + 1)])
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("served an envelope above the response ceiling")
+    # Truncation keeps the longest fitting prefix; the requester re-requests the rest.
+    envelopes = [bytes(600000)] * 4
+    response = envelope_response(7, envelopes)
+    assert len(response) <= MAX_ENVELOPE_RESPONSE_BYTES
+    assert response == rlp([7, envelopes[:3]])
+    assert envelope_response(7, envelopes[3:]) == rlp([7, envelopes[3:]])
     # A 64-bit byte_length bounds every canonical descriptor at 77 bytes.
     assert len(rlp([bytes(32), 2**64 - 1, bytes(32)])) == 77
 
@@ -162,7 +199,7 @@ def main():
     assert len(maximum_wrapper) <= MAX_OBJECT_BYTES
 
     print(f"PASS: {len(vectors)} vectors, {len(sizes)} boundaries, identity mutations, "
-          f"message bounds, wrapper placeholders; maximum wrapper {len(maximum_wrapper)} bytes")
+          f"message bounds, envelope truncation, wrapper placeholders; maximum wrapper {len(maximum_wrapper)} bytes")
 
 
 if __name__ == "__main__":
