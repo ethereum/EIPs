@@ -49,12 +49,10 @@ def pattern(size):
     return (bytes(range(251)) * ((size + 250) // 251))[:size]
 
 
-def commit(body, kind=1, profile=bytes(32), context=None):
+def commit(body, profile=bytes(32)):
     if not 1 <= len(body) <= MAX_OBJECT_BYTES:
         raise ValueError("object size")
-    if context is None:
-        context = []
-    return [kind, profile, context, len(body), h(body)]
+    return [profile, len(body), h(body)]
 
 
 def object_id(descriptor):
@@ -66,7 +64,7 @@ def vector(size):
     return {
         "size": size,
         "chunk_count": (size + CHUNK_BYTES - 1) // CHUNK_BYTES,
-        "content_hash": descriptor[4].hex(),
+        "content_hash": descriptor[2].hex(),
         "descriptor_rlp": rlp(descriptor).hex(),
         "object_id": object_id(descriptor).hex(),
         "last_chunk_bytes": (size - 1) % CHUNK_BYTES + 1,
@@ -89,12 +87,11 @@ def main():
         assert 1 <= len(chunks) <= 144
         assert all(len(c) == CHUNK_BYTES for c in chunks[:-1])
         assert len(chunks[-1]) == (size - 1) % CHUNK_BYTES + 1
-        assert h(b"".join(chunks)) == descriptor[4]
+        assert h(b"".join(chunks)) == descriptor[2]
         corrupted = [bytes([chunks[0][0] ^ 1]) + chunks[0][1:]] + chunks[1:]
-        assert h(b"".join(corrupted)) != descriptor[4]
+        assert h(b"".join(corrupted)) != descriptor[2]
         # Every metadata field participates in object identity.
-        for field, value in ((0, 2), (1, h(b"profile")), (2, [h(b"block")]),
-                             (3, size + 1), (4, bytes(32))):
+        for field, value in ((0, h(b"profile")), (1, size + 1), (2, bytes(32))):
             changed = list(descriptor)
             changed[field] = value
             assert object_id(changed) != object_id(descriptor)
@@ -106,14 +103,13 @@ def main():
         else:
             raise AssertionError("accepted invalid object length")
 
-    # Published wire values include a request-ID gap and no Merkle branch.
+    # Published request and chunk encodings.
     assert rlp([7]).hex() == "c107"
     assert rlp([7, bytes(32), [0, 2]]).hex() == "e507a0" + "00" * 32 + "c28002"
     assert rlp([7, bytes(32), 0, b"a"]).hex() == "e407a0" + "00" * 32 + "8061"
     largest_chunk = rlp([2**64 - 1, bytes(32), 143, bytes(CHUNK_BYTES)])
     assert len(largest_chunk) < 131072
-    descriptor = [1, bytes(32), [], MAX_OBJECT_BYTES, bytes(32)]
-    assert len(rlp(descriptor)) <= 256
+    descriptor = [bytes(32), MAX_OBJECT_BYTES, bytes(32)]
     assert len(rlp([descriptor] * 64)) < 131072
 
     # The aggregate wrapper fits without embedding any transaction envelopes.
