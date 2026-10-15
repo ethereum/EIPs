@@ -12,6 +12,8 @@ from Crypto.Hash import keccak
 
 CHUNK_BYTES = 65536
 MAX_OBJECT_BYTES = 9437184
+MAX_CHUNKS = (MAX_OBJECT_BYTES + CHUNK_BYTES - 1) // CHUNK_BYTES
+LEANSPHINCS_SCHEME = 0x10
 
 
 def h(data):
@@ -59,6 +61,43 @@ def object_id(descriptor):
     return h(domain("object") + rlp(descriptor))
 
 
+def encode_dep(scheme, data_hash, key):
+    # EIP-8288 96-byte dependency encoding, after zero data_hash substitution.
+    return bytes(31) + bytes([scheme]) + data_hash + key
+
+
+def placeholder_deps_hash(encoded_deps):
+    # Keccak-256 stands in for the fork's DEPS_HASH; only the encoding is normative.
+    return h(b"".join(encoded_deps))
+
+
+def wrapper_vectors():
+    profile = h(domain("profile") + b"dummy AGGREGATED_VK")
+    deps = sorted(encode_dep(LEANSPHINCS_SCHEME, h(b"message %d" % i), uint(i + 1, 32))
+                  for i in range(2))
+    hashes = sorted(h(b"transaction %d" % i) for i in range(2))
+    bodies = {
+        "mode0": rlp([hashes, 0, [deps, [b"witness 0", b"witness 1"]]]),
+        "mode1": rlp([hashes, 1, [deps, b"aggregate proof"]]),
+    }
+    out = {
+        "profile_vk": b"dummy AGGREGATED_VK".hex(),
+        "profile_id": profile.hex(),
+        "deps": [d.hex() for d in deps],
+        "placeholder_deps_hash": placeholder_deps_hash(deps).hex(),
+        "placeholder_empty_deps_hash": placeholder_deps_hash([]).hex(),
+        "transactions": [x.hex() for x in hashes],
+    }
+    for name, body in bodies.items():
+        descriptor = commit(body, profile)
+        out[name] = {
+            "body": body.hex(),
+            "content_hash": descriptor[2].hex(),
+            "object_id": object_id(descriptor).hex(),
+        }
+    return out
+
+
 def vector(size):
     descriptor = commit(pattern(size))
     return {
@@ -78,13 +117,15 @@ def main():
     vectors = json.loads(Path(__file__).with_name("commitment-vectors.json").read_text())
     for expected in vectors:
         assert vector(expected["size"]) == expected, expected["size"]
+    wrappers = json.loads(Path(__file__).with_name("wrapper-vectors.json").read_text())
+    assert wrapper_vectors() == wrappers
 
     sizes = (1, 65535, 65536, 65537, 131072, 131073, MAX_OBJECT_BYTES)
     for size in sizes:
         body = pattern(size)
         descriptor = commit(body)
         chunks = [body[i:i + CHUNK_BYTES] for i in range(0, size, CHUNK_BYTES)]
-        assert 1 <= len(chunks) <= 144
+        assert 1 <= len(chunks) <= MAX_CHUNKS == 144
         assert all(len(c) == CHUNK_BYTES for c in chunks[:-1])
         assert len(chunks[-1]) == (size - 1) % CHUNK_BYTES + 1
         assert h(b"".join(chunks)) == descriptor[2]
@@ -107,10 +148,12 @@ def main():
     assert rlp([7]).hex() == "c107"
     assert rlp([7, bytes(32), [0, 2]]).hex() == "e507a0" + "00" * 32 + "c28002"
     assert rlp([7, bytes(32), 0, b"a"]).hex() == "e407a0" + "00" * 32 + "8061"
-    largest_chunk = rlp([2**64 - 1, bytes(32), 143, bytes(CHUNK_BYTES)])
+    largest_chunk = rlp([2**64 - 1, bytes(32), MAX_CHUNKS - 1, bytes(CHUNK_BYTES)])
     assert len(largest_chunk) < 131072
     descriptor = [bytes(32), MAX_OBJECT_BYTES, bytes(32)]
     assert len(rlp([descriptor] * 64)) < 131072
+    # A 64-bit byte_length bounds every canonical descriptor at 77 bytes.
+    assert len(rlp([bytes(32), 2**64 - 1, bytes(32)])) == 77
 
     # The aggregate wrapper fits without embedding any transaction envelopes.
     hashes = [uint(i, 32) for i in range(4096)]
@@ -119,7 +162,7 @@ def main():
     assert len(maximum_wrapper) <= MAX_OBJECT_BYTES
 
     print(f"PASS: {len(vectors)} vectors, {len(sizes)} boundaries, identity mutations, "
-          f"message bounds; maximum wrapper {len(maximum_wrapper)} bytes")
+          f"message bounds, wrapper placeholders; maximum wrapper {len(maximum_wrapper)} bytes")
 
 
 if __name__ == "__main__":
