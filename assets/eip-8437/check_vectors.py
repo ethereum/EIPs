@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check EIP-8437 content commitments and message bounds, not proof validity.
+"""Check EIP-8437 wrapper descriptors, message and body encodings and response limits, not proof validity.
 
 Requires Python 3.9+ and pycryptodome. Run with:
     python3 assets/eip-8437/check_vectors.py
@@ -12,7 +12,6 @@ from Crypto.Hash import keccak
 
 SOFT_RESPONSE_LIMIT = 2097152
 MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
-MAX_RESPONSE_BYTES = SOFT_RESPONSE_LIMIT + 32
 MAX_REQUEST_BYTES = 16384
 MAX_ANNOUNCEMENTS = 64
 MAX_WRAPPERS_PER_REQUEST = 64
@@ -49,22 +48,15 @@ def rlp(value):
     return bytes([offset + 55 + len(size)]) + size + payload
 
 
-def domain(name):
-    return b"ethereum/8437/" + name.encode("ascii") + b"/v1\0"
-
-
 def pattern(size):
     return (bytes(range(251)) * ((size + 250) // 251))[:size]
 
 
-def commit(body, profile=bytes(32)):
+def describe(body):
+    # descriptor = [byte_length, content_hash]; the object ID is content_hash.
     if not 1 <= len(body) <= MAX_WRAPPER_BYTES:
         raise ValueError("wrapper size")
-    return [profile, len(body), h(body)]
-
-
-def object_id(descriptor):
-    return h(domain("object") + rlp(descriptor))
+    return [len(body), h(body)]
 
 
 def encode_dep(scheme, data_hash, key):
@@ -78,7 +70,6 @@ def placeholder_deps_hash(encoded_deps):
 
 
 def wrapper_vectors():
-    profile = h(domain("profile") + b"dummy AGGREGATED_VK")
     deps = sorted(encode_dep(LEANSPHINCS_SCHEME, h(b"message %d" % i), uint(i + 1, 32))
                   for i in range(2))
     hashes = sorted(h(b"transaction %d" % i) for i in range(2))
@@ -87,19 +78,17 @@ def wrapper_vectors():
         "mode1": rlp([hashes, 1, [deps, b"aggregate proof"]]),
     }
     out = {
-        "profile_vk": b"dummy AGGREGATED_VK".hex(),
-        "profile_id": profile.hex(),
         "deps": [d.hex() for d in deps],
         "placeholder_deps_hash": placeholder_deps_hash(deps).hex(),
         "placeholder_empty_deps_hash": placeholder_deps_hash([]).hex(),
         "transactions": [x.hex() for x in hashes],
     }
     for name, body in bodies.items():
-        descriptor = commit(body, profile)
+        descriptor = describe(body)
         out[name] = {
             "body": body.hex(),
-            "content_hash": descriptor[2].hex(),
-            "object_id": object_id(descriptor).hex(),
+            "content_hash": descriptor[1].hex(),
+            "descriptor_rlp": rlp(descriptor).hex(),
         }
     return out
 
@@ -111,9 +100,7 @@ def response(request_id, items):
         if served and len(rlp([request_id, served + [item]])) > SOFT_RESPONSE_LIMIT:
             break
         served.append(item)
-    message = rlp([request_id, served])
-    assert len(message) <= MAX_RESPONSE_BYTES
-    return message
+    return rlp([request_id, served])
 
 
 def wrappers_response(request_id, wrappers):
@@ -123,9 +110,7 @@ def wrappers_response(request_id, wrappers):
         if served and len(splice(request_id, served + [wrapper])) > SOFT_RESPONSE_LIMIT:
             break
         served.append(wrapper)
-    message = splice(request_id, served)
-    assert len(message) <= MAX_RESPONSE_BYTES
-    return message
+    return splice(request_id, served)
 
 
 def splice(request_id, encoded_items):
@@ -140,12 +125,11 @@ def rlp_list(payload):
 
 
 def vector(size):
-    descriptor = commit(pattern(size))
+    descriptor = describe(pattern(size))
     return {
         "size": size,
-        "content_hash": descriptor[2].hex(),
+        "content_hash": descriptor[1].hex(),
         "descriptor_rlp": rlp(descriptor).hex(),
-        "object_id": object_id(descriptor).hex(),
     }
 
 
@@ -161,31 +145,26 @@ def main():
     assert h(b"").hex() == "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
     assert rlp(0) == b"\x80" and rlp([]) == b"\xc0"
     assert rlp(b"dog").hex() == "83646f67"
-    vectors = json.loads(Path(__file__).with_name("commitment-vectors.json").read_text())
+    vectors = json.loads(Path(__file__).with_name("descriptor-vectors.json").read_text())
     for expected in vectors:
         assert vector(expected["size"]) == expected, expected["size"]
     wrappers = json.loads(Path(__file__).with_name("wrapper-vectors.json").read_text())
     assert wrapper_vectors() == wrappers
 
     for size in (1, 65536, 131073, MAX_WRAPPER_BYTES):
-        descriptor = commit(pattern(size))
+        # A one-byte change gives a different content hash, hence a different object.
         corrupted = bytes([pattern(size)[0] ^ 1]) + pattern(size)[1:]
-        assert h(corrupted) != descriptor[2]
-        # Every descriptor field participates in object identity.
-        for field, value in ((0, h(b"profile")), (1, size + 1), (2, bytes(32))):
-            changed = list(descriptor)
-            changed[field] = value
-            assert object_id(changed) != object_id(descriptor)
-    expect_error(commit, b"")
-    expect_error(commit, bytes(MAX_WRAPPER_BYTES + 1))
-    # A maximum-length descriptor encodes in 72 bytes.
-    assert len(rlp([bytes(32), MAX_WRAPPER_BYTES, bytes(32)])) == 72
+        assert h(corrupted) != describe(pattern(size))[1]
+    expect_error(describe, b"")
+    expect_error(describe, bytes(MAX_WRAPPER_BYTES + 1))
+    # A maximum-length descriptor encodes in 38 bytes.
+    assert len(rlp([MAX_WRAPPER_BYTES, bytes(32)])) == 38
 
     # Request and announcement encodings stay under MAX_REQUEST_BYTES.
     assert rlp([7, [bytes(32)]]).hex() == "e307e1a0" + "00" * 32
     assert rlp([7, bytes(32), [0, 2]]).hex() == "e507a0" + "00" * 32 + "c28002"
     max_id = 2**64 - 1
-    assert len(rlp([[bytes(32), MAX_WRAPPER_BYTES, bytes(32)]] * MAX_ANNOUNCEMENTS)) < MAX_REQUEST_BYTES
+    assert len(rlp([[MAX_WRAPPER_BYTES, bytes(32)]] * MAX_ANNOUNCEMENTS)) < MAX_REQUEST_BYTES
     assert len(rlp([max_id, [bytes(32)] * MAX_WRAPPERS_PER_REQUEST])) < MAX_REQUEST_BYTES
     indices = list(range(MAX_TXS_PER_WRAPPER - MAX_ENVELOPES_PER_REQUEST, MAX_TXS_PER_WRAPPER))
     assert len(rlp([max_id, bytes(32), indices])) < MAX_REQUEST_BYTES
@@ -193,7 +172,7 @@ def main():
     # ProofWrappers (0x18): wrappers are embedded as RLP items, hashed as sent.
     mode1 = bytes.fromhex(wrappers["mode1"]["body"])
     assert wrappers_response(7, [mode1]) == bytes.fromhex("f9012407f90120") + mode1
-    # A wrapper of exactly MAX_WRAPPER_BYTES fits alone under MAX_RESPONSE_BYTES.
+    # A wrapper of exactly MAX_WRAPPER_BYTES is served alone: the first item is always included.
     hashes = [uint(i + 1, 32) for i in range(MAX_TXS_PER_WRAPPER)]
     deps = [bytes(31) + bytes([LEANSPHINCS_SCHEME]) + uint(i, 32) + bytes(32)
             for i in range(MAX_DEPS_PER_AGGREGATE_WRAPPER)]
@@ -210,13 +189,16 @@ def main():
 
     # WrapperEnvelopes (0x1a): longest fitting prefix, first envelope always included.
     assert rlp([7, [b"\x02\xc0"]]).hex() == "c507c38202c0"
-    assert len(response(max_id, [bytes(SOFT_RESPONSE_LIMIT)])) == SOFT_RESPONSE_LIMIT + 21
-    expect_error(response, max_id, [bytes(MAX_RESPONSE_BYTES)])
+    assert len(response(max_id, [bytes(SOFT_RESPONSE_LIMIT)] * 2)) == SOFT_RESPONSE_LIMIT + 21
     envelopes = [bytes(600000)] * 4
     assert response(7, envelopes) == rlp([7, envelopes[:3]])
     assert response(7, envelopes[3:]) == rlp([7, envelopes[3:]])
 
-    print(f"PASS: {len(vectors)} vectors, identity mutations, message bounds, response limits, "
+    # eth/73 BlockBodies (0x06): stark_proof follows the existing body fields; empty without dependencies.
+    assert rlp([[], [], [], b""]).hex() == "c4c0c0c080"
+    assert rlp([[b"\x02\xc0"], [], [], b"proof"]).hex() == "ccc38202c0c0c085" + b"proof".hex()
+
+    print(f"PASS: {len(vectors)} vectors, content hashes, message and body encodings, response limits, "
           f"wrapper placeholders; proof room at list ceilings {proof_room} bytes")
 
 
