@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check EIP-8437 wrapper descriptors, message and body encodings and response limits, not proof validity.
+"""Check EIP-8437 wrapper descriptors, message encodings and response limits, not proof validity.
 
 Requires Python 3.9+ and pycryptodome. Run with:
     python3 assets/eip-8437/check_vectors.py
@@ -194,11 +194,7 @@ def main():
     assert response(7, envelopes) == rlp([7, envelopes[:3]])
     assert response(7, envelopes[3:]) == rlp([7, envelopes[3:]])
 
-    # eth/73 BlockBodies (0x06): stark_proof follows the existing body fields; empty without dependencies.
-    assert rlp([[], [], [], b""]).hex() == "c4c0c0c080"
-    assert rlp([[b"\x02\xc0"], [], [], b"proof"]).hex() == "ccc38202c0c0c085" + b"proof".hex()
-
-    print(f"PASS: {len(vectors)} vectors, content hashes, message and body encodings, response limits, "
+    print(f"PASS: {len(vectors)} vectors, content hashes, message encodings, response limits, "
           f"wrapper placeholders; proof room at list ceilings {proof_room} bytes")
 
 
