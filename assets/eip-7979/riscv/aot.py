@@ -98,6 +98,8 @@ def block_gas(code, notes):
 
 
 def size_of(code, pc):
+    if getattr(code, "prefixed", False) and code.raw(pc) == 0xC0:
+        return 2
     op = code[pc]
     return op - 0x5E if PUSH0 < op <= PUSH32 else 1
 
@@ -611,6 +613,14 @@ class Translate256(Translator):
         if op == 0x35:                   # CALLDATALOAD
             self.e(f"addi t4, s0, {32 * (at - 1)}", "call __cdload256")
             return
+        if op == 0x51:                   # MLOAD
+            self.e(f"ld t4, {self.at(at - 1, 0)}",
+                   f"ld t5, {self.at(at - 1, 1)}",
+                   f"ld t6, {self.at(at - 1, 2)}", "or t5, t5, t6",
+                   f"ld t6, {self.at(at - 1, 3)}", "or t5, t5, t6",
+                   "bnez t5, __trap_mem",
+                   f"addi t5, s0, {32 * (at - 1)}", "call __mload256")
+            return
         if op == 0x52:                   # MSTORE
             self.e(f"ld t4, {self.at(at - 1, 0)}",
                    f"ld t5, {self.at(at - 1, 1)}",
@@ -735,6 +745,20 @@ class Translate256(Translator):
             self.e(f"sd zero, {8 * limb}(t4)")
         self.e(f"{out}:", "ld s3, 0(sp)", "ld s4, 8(sp)",
                "addi sp, sp, 16", "ret")
+
+        # __mload256: t4 = offset (bounded by caller check to one limb),
+        # t5 = &result slot.  Big-endian bytes from MEM.
+        self.label("__mload256")
+        self.e(f"li t6, {(1 << 20) - 32}", "bgtu t4, t6, __trap_mem",
+               "la t6, MEM", "add t4, t6, t4")
+        for limb in (3, 2, 1, 0):
+            base = 8 * (3 - limb)
+            self.e("li t6, 0")
+            for b in range(8):
+                self.e("slli t6, t6, 8", f"lbu t0, {base + b}(t4)",
+                       "or t6, t6, t0")
+            self.e(f"sd t6, {8 * limb}(t5)")
+        self.e("ret")
 
         # __mstore256: t4 = offset (bounded by caller check to one limb),
         # t5 = &value.  Big-endian bytes into MEM.

@@ -27,18 +27,22 @@ so the counts are pure):
     kernel     interp/256  interp/64    ir/256    ir/64  aot/256  aot/64
     mul chain     6122597    4492253   4081563  1856126  1315924  120641
     call tree     7833101    7360257   3669063  2450626  1119924  405641
+    matmul       15841125    8093752  12325272  4130334  4516353  536517
 
-    ratios        1.0        1.4/1.1   1.5/2.1  3.3/3.2  4.7/7.0  50.8/19.3
+    ratios        1.0        1.4/1.1/2.0   1.5/2.1/1.3   3.3/3.2/3.8   4.7/7.0/3.5   50.8/19.3/29.5
 
-The two kernels bracket the workload space: one arithmetic-heavy
-loop, one call-heavy tree.  Four readings.  EVM64 alone buys
-1.1–1.4x: under a bytecode interpreter, dispatch dominates and cheap
-arithmetic hardly matters.  The register IR — translated once at
-deploy under the validation proofs, then interpreted — buys 1.5–2.1x
-at 256 bits and 3.2–3.3x composed with EVM64: this is the row for
-consensus clients that will never JIT, and it keeps one dispatch per
-operation, which is why it stops there.  Full AOT removes the
-dispatch too: 4.7–7.0x from validation alone, and 19–51x composed —
+Three kernels: an arithmetic-heavy loop, a call-heavy tree, and a
+16x16 matrix product of 64-bit values held in memory, a word each,
+with its inner product as a subroutine.  Four readings.  EVM64 alone
+buys 1.1–2.0x: under a bytecode interpreter, dispatch dominates and
+cheap arithmetic hardly matters, except where the 256-bit work is
+heaviest — the matrix product's multiplies and loads.  The register
+IR — translated once at deploy under the validation proofs, then
+interpreted — buys 1.3–2.1x at 256 bits and 3.2–3.8x composed with
+EVM64: this is the row for consensus clients that will never JIT,
+and it keeps one dispatch per operation, which is why it stops there.
+Full AOT removes the dispatch too: 3.5–7.0x from validation alone,
+and 19–51x composed —
 far more than the product of the two, because a stack slot can live
 in a machine register only when its offset is static (validation)
 *and* its value fits the register (EVM64).  The proposals do not
@@ -60,7 +64,9 @@ The same twelve binaries, executed by the Zisk zkVM's emulator
 
     ratios         1.0       1.4/1.1   1.5/2.1  3.3/3.2  4.7/7.0  50.6/19.3
 
-Every count is the qemu instruction count plus exactly 444 steps of
+The matmul kernel was added later and has not been run in Zisk;
+`python3 harness.py zisk` adds its row.  Every count is the qemu
+instruction count plus exactly 444 steps of
 fixed startup, so the ratios reproduce to three digits: the
 instruction-count proxy is not a proxy here — in an RV64 zkVM these
 *are* the proving-cost figures.  Outputs were verified in-VM (the
@@ -94,6 +100,39 @@ Not counted: validation and translation themselves.  Those are
 one-time deploy costs.  The
 counts here are the recurring execution the network pays for.
 
+## The prefix encoding
+
+EIP-7937 encodes the same 64-bit instructions as `0xC0` followed by
+the twin's opcode; EIP-12504 encodes them as single-byte opcodes.
+`prefix_table.py` measures the two encodings against each other at all
+three tiers.  The PREFIX64 build of interp.c adds one handler, a
+second dispatch on the byte after the prefix, and runs every
+interpreted cell of that table, so across the interpreted row the
+encoding is the only difference; the translators read prefixed code
+through `PrefixedCode`, which decodes each prefix at translation time.
+Executed RISC-V instructions, exact:
+
+    kernel      tier         256-bit   64 prefixed  64 single-byte
+    mul chain   interpreted  6332643      5132437       4707299
+                register IR  4081563      1856126       1856126
+                compiled     1315924       120641        120641
+    call tree   interpreted  8163147      7894441       7690303
+                register IR  3669063      2450626       2450626
+                compiled     1119924       405641        405641
+    matmul      interpreted 16239303      9644432       8513841
+                register IR 12325272      4130334       4130334
+                compiled     4516353       536517        536517
+
+The prefix costs 17 instructions per prefixed instruction under this
+interpreter -- one more pass through the dispatch loop plus the
+handler -- 3% of the call tree's interpreted total, 9% of the mul
+chain's, 13% of the matmul's, and nothing after translation.  The
+code is a byte longer per 64-bit instruction: 60 bytes against 53
+for the mul chain, 127 against 120 for the call tree, 314 against
+259 for the matmul.  The interpreted 256-bit cells differ
+from the table above because the PREFIX64 build is a different
+binary; within this table every interpreted cell is one binary.
+
 ## Files
 
     evm64.py     EVM64 opcode remap over the yul-compiler
@@ -104,11 +143,13 @@ counts here are the recurring execution the network pays for.
     runtime.c    _start, syscalls, hex printer; keeps counts pure
     zisk.ld      linker script for the Zisk zkVM build
     harness.py   builds all cells, verifies agreement, counts
+    prefix_table.py  the prefix encoding against single-byte, three tiers
     setup.sh     non-root toolchain from Ubuntu debs
 
 Run `sh setup.sh` once, then `python3 harness.py` (or the phases
-`examples`, `counter`, `measure [substring]`).  Every program runs in
-all four cells and every cell must produce the same result (the
+`examples`, `counter`, `measure [substring]`), and `python3
+prefix_table.py` for the prefix table.  Every program runs in
+all six cells and every cell must produce the same result (the
 64-bit cells modulo 2^64); the 256-bit cells are additionally checked
 against the pure-Python interpreter, and the fast TB-log counter is
 checked against plain singlestep counting.

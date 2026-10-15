@@ -62,6 +62,8 @@ def word(v):
 
 
 # Measurement kernels: workloads big enough that counts are signal.
+# matmul: two 16x16 matrices of 64-bit values in memory, a word per
+# element, their product by a dot-product subroutine, and a checksum.
 # Values wrap modulo the word size; the oracle below wraps with them.
 def mulchain_oracle(n, mask):
     s = 0
@@ -75,6 +77,19 @@ def calls_oracle(n, mask):
     for i in range(n):
         s = (s + i + 4) & mask
     return s
+
+
+def matmul_oracle(n, mask):
+    a = [[(i + j + 1) & mask for j in range(n)] for i in range(n)]
+    b = [[(i * j + 1) & mask for j in range(n)] for i in range(n)]
+    h = 0
+    for i in range(n):
+        for j in range(n):
+            s = 0
+            for k in range(n):
+                s = (s + a[i][k] * b[k][j]) & mask
+            h = (h * 31 + s) & mask
+    return h
 
 
 KERNELS = [
@@ -100,6 +115,33 @@ KERNELS = [
             }
         }
     }""", word(1500), calls_oracle, 1500),
+
+    ("matmul", """{
+        let n := calldataload(0)
+        for { let i := 0 } lt(i, n) { i := add(i, 1) } {
+            for { let j := 0 } lt(j, n) { j := add(j, 1) } {
+                mstore(mul(add(mul(i, n), j), 32), add(add(i, j), 1))
+                mstore(add(0x2000, mul(add(mul(i, n), j), 32)), add(mul(i, j), 1))
+            }
+        }
+        for { let i := 0 } lt(i, n) { i := add(i, 1) } {
+            for { let j := 0 } lt(j, n) { j := add(j, 1) } {
+                mstore(add(0x4000, mul(add(mul(i, n), j), 32)), dot(i, j, n))
+            }
+        }
+        let h := 0
+        for { let i := 0 } lt(i, mul(n, n)) { i := add(i, 1) } {
+            h := add(mul(h, 31), mload(add(0x4000, mul(i, 32))))
+        }
+        mstore(0, h)
+        return(0, 32)
+        function dot(i, j, n) -> s {
+            for { let k := 0 } lt(k, n) { k := add(k, 1) } {
+                s := add(s, mul(mload(mul(add(mul(i, n), k), 32)),
+                                mload(add(0x2000, mul(add(mul(k, n), j), 32)))))
+            }
+        }
+    }""", word(16), matmul_oracle, 16),
 ]
 
 
@@ -118,6 +160,10 @@ def compile_objects(zisk=False):
         r = sh(GCC + CFLAGS + extra0 + ["-Wall", "-c", "-o", obj,
                                         os.path.join(HERE, src)])
         assert r.returncode == 0, r.stderr
+    obj = os.path.join(BUILD, f"interp_p{suffix}.o")
+    r = sh(GCC + CFLAGS + extra0 + ["-Wall", "-DPREFIX64", "-c", "-o", obj,
+                                    os.path.join(HERE, "interp.c")])
+    assert r.returncode == 0, r.stderr
     for obj, extra in ((f"interp_ir256{suffix}.o", []),
                        (f"interp_ir64{suffix}.o", ["-DWIDTH64"])):
         r = sh(GCC + CFLAGS + extra0 + ["-Wall", "-I", BUILD, "-c", "-o",
@@ -136,7 +182,8 @@ def prog_data(code, calldata):
             f"const u64 CALLDATA_LEN = {len(calldata)};\n")
 
 
-def build(tag, code, calldata, asm=None, ir_width=None, zisk=False):
+def build(tag, code, calldata, asm=None, ir_width=None, zisk=False,
+          prefix=False):
     """Link a bytecode-interpreter binary (default), an AOT binary
     (asm given), or an IR-interpreter binary (ir_width given) — for
     qemu, or for the Zisk zkVM (zisk=True)."""
@@ -158,7 +205,8 @@ def build(tag, code, calldata, asm=None, ir_width=None, zisk=False):
             f.write(translate_ir(code))
         parts += [pi, os.path.join(BUILD, f"interp_ir{ir_width}{suffix}.o")]
     else:
-        parts.append(os.path.join(BUILD, f"interp{suffix}.o"))
+        parts.append(os.path.join(
+            BUILD, f"interp{'_p' if prefix else ''}{suffix}.o"))
     r = sh(GCC + CFLAGS + extra + ["-I", BUILD, "-o", out] + parts)
     assert r.returncode == 0, f"{tag}: {r.stderr}"
     return out
