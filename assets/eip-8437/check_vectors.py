@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check EIP-8437 content commitments and wire bounds, not proof validity.
+"""Check EIP-8437 content commitments and message bounds, not proof validity.
 
 Requires Python 3.9+ and pycryptodome. Run with:
     python3 assets/eip-8437/check_vectors.py
@@ -10,13 +10,15 @@ from pathlib import Path
 
 from Crypto.Hash import keccak
 
-CHUNK_BYTES = 65536
-MAX_OBJECT_BYTES = 9437184
-MAX_CHUNKS = (MAX_OBJECT_BYTES + CHUNK_BYTES - 1) // CHUNK_BYTES
-MAX_MESSAGE_BYTES = 131072
-MAX_ENVELOPE_RESPONSE_BYTES = 2097152
+SOFT_RESPONSE_LIMIT = 2097152
+MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
+MAX_RESPONSE_BYTES = SOFT_RESPONSE_LIMIT + 32
+MAX_REQUEST_BYTES = 16384
+MAX_ANNOUNCEMENTS = 64
+MAX_WRAPPERS_PER_REQUEST = 64
 MAX_ENVELOPES_PER_REQUEST = 1024
 MAX_TXS_PER_WRAPPER = 4096
+MAX_DEPS_PER_AGGREGATE_WRAPPER = 4096
 LEANSPHINCS_SCHEME = 0x10
 
 
@@ -48,7 +50,7 @@ def rlp(value):
 
 
 def domain(name):
-    return b"lean/1/" + name.encode("ascii") + b"\0"
+    return b"ethereum/8437/" + name.encode("ascii") + b"/v1\0"
 
 
 def pattern(size):
@@ -56,8 +58,8 @@ def pattern(size):
 
 
 def commit(body, profile=bytes(32)):
-    if not 1 <= len(body) <= MAX_OBJECT_BYTES:
-        raise ValueError("object size")
+    if not 1 <= len(body) <= MAX_WRAPPER_BYTES:
+        raise ValueError("wrapper size")
     return [profile, len(body), h(body)]
 
 
@@ -102,28 +104,57 @@ def wrapper_vectors():
     return out
 
 
-def envelope_response(request_id, envelopes):
-    # Longest prefix of the requested envelopes that fits MAX_ENVELOPE_RESPONSE_BYTES.
+def response(request_id, items):
+    # Requested items in order: the first always, then stop before passing the soft limit.
     served = []
-    for envelope in envelopes:
-        if len(rlp([request_id, served + [envelope]])) > MAX_ENVELOPE_RESPONSE_BYTES:
+    for item in items:
+        if served and len(rlp([request_id, served + [item]])) > SOFT_RESPONSE_LIMIT:
             break
-        served.append(envelope)
-    if not served:
-        raise ValueError("envelope does not fit alone")
-    return rlp([request_id, served])
+        served.append(item)
+    message = rlp([request_id, served])
+    assert len(message) <= MAX_RESPONSE_BYTES
+    return message
+
+
+def wrappers_response(request_id, wrappers):
+    # A wrapper is embedded as its RLP item: splice its exact bytes into the list.
+    served = []
+    for wrapper in wrappers:
+        if served and len(splice(request_id, served + [wrapper])) > SOFT_RESPONSE_LIMIT:
+            break
+        served.append(wrapper)
+    message = splice(request_id, served)
+    assert len(message) <= MAX_RESPONSE_BYTES
+    return message
+
+
+def splice(request_id, encoded_items):
+    return rlp_list(rlp(request_id) + rlp_list(b"".join(encoded_items)))
+
+
+def rlp_list(payload):
+    if len(payload) < 56:
+        return bytes([0xc0 + len(payload)]) + payload
+    size = uint(len(payload), (len(payload).bit_length() + 7) // 8)
+    return bytes([0xf7 + len(size)]) + size + payload
 
 
 def vector(size):
     descriptor = commit(pattern(size))
     return {
         "size": size,
-        "chunk_count": (size + CHUNK_BYTES - 1) // CHUNK_BYTES,
         "content_hash": descriptor[2].hex(),
         "descriptor_rlp": rlp(descriptor).hex(),
         "object_id": object_id(descriptor).hex(),
-        "last_chunk_bytes": (size - 1) % CHUNK_BYTES + 1,
     }
+
+
+def expect_error(fn, *args):
+    try:
+        fn(*args)
+    except (ValueError, AssertionError):
+        return
+    raise AssertionError("accepted invalid input")
 
 
 def main():
@@ -136,70 +167,57 @@ def main():
     wrappers = json.loads(Path(__file__).with_name("wrapper-vectors.json").read_text())
     assert wrapper_vectors() == wrappers
 
-    sizes = (1, 65535, 65536, 65537, 131072, 131073, MAX_OBJECT_BYTES)
-    for size in sizes:
-        body = pattern(size)
-        descriptor = commit(body)
-        chunks = [body[i:i + CHUNK_BYTES] for i in range(0, size, CHUNK_BYTES)]
-        assert 1 <= len(chunks) <= MAX_CHUNKS == 144
-        assert all(len(c) == CHUNK_BYTES for c in chunks[:-1])
-        assert len(chunks[-1]) == (size - 1) % CHUNK_BYTES + 1
-        assert h(b"".join(chunks)) == descriptor[2]
-        corrupted = [bytes([chunks[0][0] ^ 1]) + chunks[0][1:]] + chunks[1:]
-        assert h(b"".join(corrupted)) != descriptor[2]
-        # Every metadata field participates in object identity.
+    for size in (1, 65536, 131073, MAX_WRAPPER_BYTES):
+        descriptor = commit(pattern(size))
+        corrupted = bytes([pattern(size)[0] ^ 1]) + pattern(size)[1:]
+        assert h(corrupted) != descriptor[2]
+        # Every descriptor field participates in object identity.
         for field, value in ((0, h(b"profile")), (1, size + 1), (2, bytes(32))):
             changed = list(descriptor)
             changed[field] = value
             assert object_id(changed) != object_id(descriptor)
-    for body in (b"", bytes(MAX_OBJECT_BYTES + 1)):
-        try:
-            commit(body)
-        except ValueError:
-            pass
-        else:
-            raise AssertionError("accepted invalid object length")
+    expect_error(commit, b"")
+    expect_error(commit, bytes(MAX_WRAPPER_BYTES + 1))
+    # A maximum-length descriptor encodes in 72 bytes.
+    assert len(rlp([bytes(32), MAX_WRAPPER_BYTES, bytes(32)])) == 72
 
-    # Published request and chunk encodings.
-    assert rlp([7]).hex() == "c107"
+    # Request and announcement encodings stay under MAX_REQUEST_BYTES.
+    assert rlp([7, [bytes(32)]]).hex() == "e307e1a0" + "00" * 32
     assert rlp([7, bytes(32), [0, 2]]).hex() == "e507a0" + "00" * 32 + "c28002"
-    assert rlp([7, bytes(32), 0, b"a"]).hex() == "e407a0" + "00" * 32 + "8061"
-    largest_chunk = rlp([2**64 - 1, bytes(32), MAX_CHUNKS - 1, bytes(CHUNK_BYTES)])
-    assert len(largest_chunk) < MAX_MESSAGE_BYTES
-    descriptor = [bytes(32), MAX_OBJECT_BYTES, bytes(32)]
-    assert len(rlp([descriptor] * 64)) < MAX_MESSAGE_BYTES
-
-    # GetWrapperEnvelopes (0x06) and WrapperEnvelopes (0x07) encodings and bounds.
-    assert rlp([7, bytes(32), [0, 2]]).hex() == "e507a0" + "00" * 32 + "c28002"
-    assert rlp([7, [b"\x02\xc0"]]).hex() == "c507c38202c0"
+    max_id = 2**64 - 1
+    assert len(rlp([[bytes(32), MAX_WRAPPER_BYTES, bytes(32)]] * MAX_ANNOUNCEMENTS)) < MAX_REQUEST_BYTES
+    assert len(rlp([max_id, [bytes(32)] * MAX_WRAPPERS_PER_REQUEST])) < MAX_REQUEST_BYTES
     indices = list(range(MAX_TXS_PER_WRAPPER - MAX_ENVELOPES_PER_REQUEST, MAX_TXS_PER_WRAPPER))
-    assert len(rlp([2**64 - 1, bytes(32), indices])) < MAX_MESSAGE_BYTES
-    # Largest envelope that fits alone: the response is then exactly at the ceiling.
-    largest = MAX_ENVELOPE_RESPONSE_BYTES - 21  # 9-byte request ID, three 4-byte headers
-    assert len(envelope_response(2**64 - 1, [bytes(largest)])) == MAX_ENVELOPE_RESPONSE_BYTES
-    try:
-        envelope_response(2**64 - 1, [bytes(largest + 1)])
-    except ValueError:
-        pass
-    else:
-        raise AssertionError("served an envelope above the response ceiling")
-    # Truncation keeps the longest fitting prefix; the requester re-requests the rest.
+    assert len(rlp([max_id, bytes(32), indices])) < MAX_REQUEST_BYTES
+
+    # ProofWrappers (0x18): wrappers are embedded as RLP items, hashed as sent.
+    mode1 = bytes.fromhex(wrappers["mode1"]["body"])
+    assert wrappers_response(7, [mode1]) == bytes.fromhex("f9012407f90120") + mode1
+    # A wrapper of exactly MAX_WRAPPER_BYTES fits alone under MAX_RESPONSE_BYTES.
+    hashes = [uint(i + 1, 32) for i in range(MAX_TXS_PER_WRAPPER)]
+    deps = [bytes(31) + bytes([LEANSPHINCS_SCHEME]) + uint(i, 32) + bytes(32)
+            for i in range(MAX_DEPS_PER_AGGREGATE_WRAPPER)]
+    proof_room = MAX_WRAPPER_BYTES - len(rlp([hashes, 1, [deps, b""]]))
+    while len(rlp([hashes, 1, [deps, bytes(proof_room)]])) > MAX_WRAPPER_BYTES:
+        proof_room -= 1
+    largest = rlp([hashes, 1, [deps, bytes(proof_room)]])
+    assert len(largest) == MAX_WRAPPER_BYTES and proof_room == 1560555
+    assert len(rlp(hashes)) + len(rlp(deps)) == 536584
+    assert len(wrappers_response(max_id, [largest, mode1])) == MAX_WRAPPER_BYTES + 17
+    # Responses stop before the wrapper that would pass the soft limit.
+    medium = rlp([hashes[:1], 1, [deps[:1], bytes(600000)]])
+    assert wrappers_response(7, [medium] * 4) == splice(7, [medium] * 3)
+
+    # WrapperEnvelopes (0x1a): longest fitting prefix, first envelope always included.
+    assert rlp([7, [b"\x02\xc0"]]).hex() == "c507c38202c0"
+    assert len(response(max_id, [bytes(SOFT_RESPONSE_LIMIT)])) == SOFT_RESPONSE_LIMIT + 21
+    expect_error(response, max_id, [bytes(MAX_RESPONSE_BYTES)])
     envelopes = [bytes(600000)] * 4
-    response = envelope_response(7, envelopes)
-    assert len(response) <= MAX_ENVELOPE_RESPONSE_BYTES
-    assert response == rlp([7, envelopes[:3]])
-    assert envelope_response(7, envelopes[3:]) == rlp([7, envelopes[3:]])
-    # A 64-bit byte_length bounds every canonical descriptor at 77 bytes.
-    assert len(rlp([bytes(32), 2**64 - 1, bytes(32)])) == 77
+    assert response(7, envelopes) == rlp([7, envelopes[:3]])
+    assert response(7, envelopes[3:]) == rlp([7, envelopes[3:]])
 
-    # The aggregate wrapper fits without embedding any transaction envelopes.
-    hashes = [uint(i, 32) for i in range(4096)]
-    deps = [bytes(31) + b"\x10" + uint(i, 32) + bytes(32) for i in range(4096)]
-    maximum_wrapper = rlp([hashes, 1, [deps, bytes(8388608)]])
-    assert len(maximum_wrapper) <= MAX_OBJECT_BYTES
-
-    print(f"PASS: {len(vectors)} vectors, {len(sizes)} boundaries, identity mutations, "
-          f"message bounds, envelope truncation, wrapper placeholders; maximum wrapper {len(maximum_wrapper)} bytes")
+    print(f"PASS: {len(vectors)} vectors, identity mutations, message bounds, response limits, "
+          f"wrapper placeholders; proof room at list ceilings {proof_room} bytes")
 
 
 if __name__ == "__main__":
