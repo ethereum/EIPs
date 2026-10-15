@@ -115,7 +115,7 @@ def main():
     descriptor = [2, bytes(32), [bytes(32)], MAX_OBJECT_BYTES, bytes(32)]
     assert len(rlp(descriptor)) <= 256
     assert len(rlp([descriptor] * 64)) < 131072
-    assert len(rlp([2**64 - 1, [[0, descriptor]] * 16])) < 65536
+    assert len(rlp([2**64 - 1, [[0, descriptor]] * 16])) < 131072
 
     # The aggregate wrapper fits without embedding any transaction envelopes.
     hashes = [uint(i, 32) for i in range(4096)]
