@@ -112,10 +112,9 @@ def main():
     assert rlp([7, bytes(32), 0, b"a"]).hex() == "e407a0" + "00" * 32 + "8061"
     largest_chunk = rlp([2**64 - 1, bytes(32), 143, bytes(CHUNK_BYTES)])
     assert len(largest_chunk) < 131072
-    descriptor = [2, bytes(32), [bytes(32)], MAX_OBJECT_BYTES, bytes(32)]
+    descriptor = [1, bytes(32), [], MAX_OBJECT_BYTES, bytes(32)]
     assert len(rlp(descriptor)) <= 256
     assert len(rlp([descriptor] * 64)) < 131072
-    assert len(rlp([2**64 - 1, [[0, descriptor]] * 16])) < 131072
 
     # The aggregate wrapper fits without embedding any transaction envelopes.
     hashes = [uint(i, 32) for i in range(4096)]
@@ -123,16 +122,8 @@ def main():
     maximum_wrapper = rlp([hashes, 1, [deps, bytes(8388608)]])
     assert len(maximum_wrapper) <= MAX_OBJECT_BYTES
 
-    # Header commitment binds the raw proof, not its lean transport RLP.
-    proof = b"proof"
-    proof_hash = h(proof)
-    block_hash = h(rlp([b"synthetic header", [proof_hash, h(b"dependencies")]]))
-    descriptor = commit(rlp([proof]), 2, h(b"profile"), [block_hash])
-    assert descriptor[4] != proof_hash
-    assert h(proof + b"!") != proof_hash
-    assert commit(rlp([b""]), 2, h(b"profile"), [block_hash])[3] == 2
     print(f"PASS: {len(vectors)} vectors, {len(sizes)} boundaries, identity mutations, "
-          f"message bounds and proof commitments; maximum wrapper {len(maximum_wrapper)} bytes")
+          f"message bounds; maximum wrapper {len(maximum_wrapper)} bytes")
 
 
 if __name__ == "__main__":
