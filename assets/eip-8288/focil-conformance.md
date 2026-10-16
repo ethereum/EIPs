@@ -24,3 +24,4 @@ These cases extend Test Case 9 of [EIP-8288](../../EIPS/eip-8288.md), FOCIL with
 | 18 | An attester holding a valid proof for a counted list's commitment obligates all its transactions; one without it, or under a null commitment, obligates only the dependency-free ones. |
 | 19 | A CL passes the commitment to block building or `engine_newPayload` only after `VALID` on its own EL, and null otherwise. |
 | 20 | Re-signing a list with a re-proved proof is handled by EIP-7805's equivocation rule: a CL fetches and verifies a proof for at most one list per member, cancels pending work for the member once it receives a second list, and its EL retains at most `IL_COMMITTEE_SIZE` proofs per slot. |
+| 21 | One aggregate proof covers list A but not list B: verification returns `INVALID` for B without invalidating the aggregate verdict; A still returns `VALID` with the retained proof. |

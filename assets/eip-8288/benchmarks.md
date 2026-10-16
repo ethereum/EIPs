@@ -57,7 +57,7 @@ The construction merges `IL_COMMITTEE_SIZE` (16) committed proofs the builder do
 
 ### Fixtures and workloads
 
-The builder workloads are not valid blocks. Valid-block fixtures, in Test Case 11 of the EIP, are blocks of transactions with one dependency each, as many as fit: with `o` the gas each transaction uses besides its dependency, `floor(gas_limit / (33,000 + o))` leanSPHINCS or `floor(gas_limit / (60,000 + o))` leanSTARK transactions. The table uses `o` = 21,000, a transfer; fixtures recompute their counts from the `o` of the transactions they build.
+The builder workloads are not valid blocks. Valid-block fixtures are blocks of transactions with one dependency each, as many as fit: with `o` the gas each transaction uses besides its dependency, `floor(gas_limit / (33,000 + o))` leanSPHINCS or `floor(gas_limit / (60,000 + o))` leanSTARK transactions. The table uses `o` = 21,000, a transfer; fixtures recompute their counts from the `o` of the transactions they build.
 
 | Gas limit | Fixture, leanSPHINCS | Fixture, leanSTARK | Workload, leanSPHINCS | Workload, leanSTARK |
 | --------- | -------------------- | ------------------ | --------------------- | ------------------- |
@@ -121,8 +121,20 @@ These are reported, not required:
 An attester benchmark run reports:
 
 - the reference hardware and network conditions, and the background load applied;
-- measured `stark_proof` and `proof_deps` sizes, separately, and the resulting `il_proof` volume per committee, against the bounds of 1.625 MiB per `il_proof` and 78 MiB per committee;
+- measured `stark_proof` and `proof_deps` sizes, separately, and the resulting `il_proof` volume per committee, against the payload bounds in [Resource accounting](#resource-accounting), with encoding and transport overhead reported separately;
 - the fraction of topic proofs reaching a cached verdict by the end of the construction window, separately for wrapper proofs published by the `t=0s` target and for reproven proofs;
 - the fraction of lists checked by the view freeze deadline, and how many were cache lookups;
 - for the freshness variant, the fraction of affected lists' committed proofs with a cached verdict by the view freeze deadline;
 - for the cold case, fetch time, bandwidth and the fraction of committed proofs held by the deadline.
+
+## Resource accounting
+
+At the provisional bounds, each proof contributes at most 1,310,720 bytes and its dependency list 4,096 × 96 = 393,216 bytes: 1.625 MiB combined, excluding serialization, signatures and transport overhead. The following figures count distinct proofs at both bounds; shared proofs and smaller objects reduce them.
+
+| Scope | Proofs | Proof and dependency bytes |
+| ----- | ------ | -------------------------- |
+| Topic publications per committee | 32 | 52 MiB |
+| Topic publications plus committed proofs retrieved separately | 48 | 78 MiB |
+| Peak retention across overlapping committees | 80 | 130 MiB |
+
+Peak retention occurs before slot `N + 1`'s attestation deadline: 16 committed proofs from slot `N`, up to 48 topic and committed proofs from slot `N + 1`, and 16 early first publications for slot `N + 2`. Slot `N`'s uncommitted topic proofs were released at its view freeze deadline; second publications for slot `N + 2` are not yet admitted. Other retention requirements may share these bytes. Ordinary mempool caching is additional.
