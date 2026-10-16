@@ -1,6 +1,6 @@
 # EIP-8288 benchmark protocol
 
-This document gives the benchmark protocol for [EIP-8288](../../EIPS/eip-8288.md): the workloads, what each benchmark must show and what it reports. The EIP states which benchmarks are activation preconditions; this document does not add requirements beyond it. Counts marked provisional are fixed by the activating fork together with its proof profile.
+This document gives the benchmark protocol for [EIP-8288](../../EIPS/eip-8288.md): the workloads, what each benchmark must show and what it reports. The EIP states which benchmarks are activation preconditions; this document does not add requirements beyond it. Counts marked provisional are fixed by the activating fork together with its proof format and verifier.
 
 ## Builder benchmark
 
