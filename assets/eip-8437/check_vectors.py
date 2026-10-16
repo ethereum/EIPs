@@ -174,6 +174,8 @@ def main():
     requested_hashes = [uint(i + 1, 32) for i in range(MAX_WRAPPERS_PER_REQUEST)]
     assert len(rlp(announced)) == 2435
     assert len(rlp([max_id, requested_hashes])) == 2127
+    # Request IDs up to 2**63 - 1 for implementations using signed 64-bit integers.
+    assert len(rlp([2**63 - 1, requested_hashes])) == 2127
 
     # ProofWrappers (0x18): wrappers are embedded as RLP items, hashed as sent.
     mode1 = bytes.fromhex(wrappers["mode1"]["body"])
