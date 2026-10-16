@@ -15,7 +15,6 @@ MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
 MAX_REQUEST_BYTES = 16384
 MAX_ANNOUNCEMENTS = 64
 MAX_WRAPPERS_PER_REQUEST = 64
-MAX_ENVELOPES_PER_REQUEST = 1024
 MAX_TXS_PER_WRAPPER = 4096
 MAX_DEPS_PER_AGGREGATE_WRAPPER = 4096
 LEANSPHINCS_SCHEME = 0x10
@@ -103,6 +102,15 @@ def response(request_id, items):
     return rlp([request_id, served])
 
 
+def check_envelopes(requested_hashes, envelopes):
+    # PooledTransactions may omit entries, but may not repeat or reorder them.
+    remaining = iter(requested_hashes)
+    for envelope in envelopes:
+        envelope_hash = h(envelope)
+        if not any(requested == envelope_hash for requested in remaining):
+            raise ValueError("unrequested or misordered envelope")
+
+
 def wrappers_response(request_id, wrappers):
     # A wrapper is embedded as its RLP item: splice its exact bytes into the list.
     served = []
@@ -162,12 +170,9 @@ def main():
 
     # Request and announcement encodings stay under MAX_REQUEST_BYTES.
     assert rlp([7, [bytes(32)]]).hex() == "e307e1a0" + "00" * 32
-    assert rlp([7, bytes(32), [0, 2]]).hex() == "e507a0" + "00" * 32 + "c28002"
     max_id = 2**64 - 1
     assert len(rlp([[MAX_WRAPPER_BYTES, bytes(32)]] * MAX_ANNOUNCEMENTS)) < MAX_REQUEST_BYTES
     assert len(rlp([max_id, [bytes(32)] * MAX_WRAPPERS_PER_REQUEST])) < MAX_REQUEST_BYTES
-    indices = list(range(MAX_TXS_PER_WRAPPER - MAX_ENVELOPES_PER_REQUEST, MAX_TXS_PER_WRAPPER))
-    assert len(rlp([max_id, bytes(32), indices])) < MAX_REQUEST_BYTES
 
     # ProofWrappers (0x18): wrappers are embedded as RLP items, hashed as sent.
     mode1 = bytes.fromhex(wrappers["mode1"]["body"])
@@ -187,15 +192,28 @@ def main():
     medium = rlp([hashes[:1], 1, [deps[:1], bytes(600000)]])
     assert wrappers_response(7, [medium] * 4) == splice(7, [medium] * 3)
 
-    # WrapperEnvelopes (0x1a): longest fitting prefix, first envelope always included.
+    # Existing PooledTransactions (0x0a) encoding for typed transaction envelopes.
     assert rlp([7, [b"\x02\xc0"]]).hex() == "c507c38202c0"
     assert len(response(max_id, [bytes(SOFT_RESPONSE_LIMIT)] * 2)) == SOFT_RESPONSE_LIMIT + 21
     envelopes = [bytes(600000)] * 4
     assert response(7, envelopes) == rlp([7, envelopes[:3]])
     assert response(7, envelopes[3:]) == rlp([7, envelopes[3:]])
 
+    # Transport fixtures only: hashes bind envelope bytes independently of pool admission.
+    a, b, c = [b"\x06" + rlp([i]) for i in range(3)]
+    requested = [h(a), h(b), h(c)]
+    check_envelopes(requested, [a, b, c])
+    check_envelopes(requested, [a, c])  # Missing middle entry is allowed.
+    check_envelopes(requested, [c])     # Missing prefix is allowed.
+    check_envelopes(requested, [a])     # Truncated response is allowed.
+    check_envelopes(requested, [])
+    expect_error(check_envelopes, requested, [a, a])
+    expect_error(check_envelopes, requested, [c, a])
+    expect_error(check_envelopes, requested, [b"\x06\xc0"])
+    expect_error(check_envelopes, requested, [a, b, c, a])
+
     print(f"PASS: {len(vectors)} vectors, content hashes, message encodings, response limits, "
-          f"wrapper placeholders; proof room at list ceilings {proof_room} bytes")
+          f"pooled-envelope matching, wrapper placeholders; proof room at list ceilings {proof_room} bytes")
 
 
 if __name__ == "__main__":
