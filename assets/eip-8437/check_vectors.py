@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check EIP-8437 wrapper descriptors, message encodings and response limits, not proof validity.
+"""Check EIP-8437 announcements, message encodings and response limits, not proof validity.
 
 Requires Python 3.9+ and pycryptodome. Run with:
     python3 assets/eip-8437/check_vectors.py
@@ -51,7 +51,7 @@ def pattern(size):
 
 
 def describe(body):
-    # Each NewWrapperHashes entry is [length, hash].
+    # Each NewProofWrapperHashes entry is [length, hash].
     if not 1 <= len(body) <= MAX_WRAPPER_BYTES:
         raise ValueError("wrapper size")
     return [len(body), h(body)]
@@ -167,7 +167,7 @@ def main():
     # A maximum-length descriptor encodes in 38 bytes.
     assert len(rlp([MAX_WRAPPER_BYTES, bytes(32)])) == 38
 
-    # GetWrappers (0x17) and NewWrapperHashes (0x16) at their 64-entry limits.
+    # GetProofWrappers (0x17) and NewProofWrapperHashes (0x16) at their 64-entry limits.
     assert rlp([7, [bytes(32)]]).hex() == "e307e1a0" + "00" * 32
     max_id = 2**64 - 1
     announced = [[MAX_WRAPPER_BYTES, uint(i + 1, 32)] for i in range(MAX_ANNOUNCEMENTS)]
@@ -175,7 +175,7 @@ def main():
     assert len(rlp(announced)) == 2435
     assert len(rlp([max_id, requested_hashes])) == 2127
 
-    # Wrappers (0x18): wrappers are embedded as RLP items, hashed as sent.
+    # ProofWrappers (0x18): wrappers are embedded as RLP items, hashed as sent.
     mode1 = bytes.fromhex(wrappers["mode1"]["body"])
     assert wrappers_response(7, [mode1]) == bytes.fromhex("f9012407f90120") + mode1
     # A wrapper of exactly MAX_WRAPPER_BYTES is served alone: the first item is always included.
