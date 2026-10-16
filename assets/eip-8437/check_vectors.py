@@ -12,7 +12,6 @@ from Crypto.Hash import keccak
 
 SOFT_RESPONSE_LIMIT = 2097152
 MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
-MAX_REQUEST_BYTES = 16384
 MAX_ANNOUNCEMENTS = 64
 MAX_WRAPPERS_PER_REQUEST = 64
 MAX_TXS_PER_WRAPPER = 4096
@@ -52,7 +51,7 @@ def pattern(size):
 
 
 def describe(body):
-    # descriptor = [byte_length, content_hash]; the object ID is content_hash.
+    # Each NewWrapperHashes entry is [length, hash].
     if not 1 <= len(body) <= MAX_WRAPPER_BYTES:
         raise ValueError("wrapper size")
     return [len(body), h(body)]
@@ -168,13 +167,15 @@ def main():
     # A maximum-length descriptor encodes in 38 bytes.
     assert len(rlp([MAX_WRAPPER_BYTES, bytes(32)])) == 38
 
-    # Request and announcement encodings stay under MAX_REQUEST_BYTES.
+    # GetWrappers (0x17) and NewWrapperHashes (0x16) at their 64-entry limits.
     assert rlp([7, [bytes(32)]]).hex() == "e307e1a0" + "00" * 32
     max_id = 2**64 - 1
-    assert len(rlp([[MAX_WRAPPER_BYTES, bytes(32)]] * MAX_ANNOUNCEMENTS)) < MAX_REQUEST_BYTES
-    assert len(rlp([max_id, [bytes(32)] * MAX_WRAPPERS_PER_REQUEST])) < MAX_REQUEST_BYTES
+    announced = [[MAX_WRAPPER_BYTES, uint(i + 1, 32)] for i in range(MAX_ANNOUNCEMENTS)]
+    requested_hashes = [uint(i + 1, 32) for i in range(MAX_WRAPPERS_PER_REQUEST)]
+    assert len(rlp(announced)) == 2435
+    assert len(rlp([max_id, requested_hashes])) == 2127
 
-    # ProofWrappers (0x18): wrappers are embedded as RLP items, hashed as sent.
+    # Wrappers (0x18): wrappers are embedded as RLP items, hashed as sent.
     mode1 = bytes.fromhex(wrappers["mode1"]["body"])
     assert wrappers_response(7, [mode1]) == bytes.fromhex("f9012407f90120") + mode1
     # A wrapper of exactly MAX_WRAPPER_BYTES is served alone: the first item is always included.
