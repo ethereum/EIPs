@@ -25,8 +25,8 @@ layout: null
         <title>{{ eip.title | xml_escape }}</title>
         <description>{{ description | xml_escape }}</description>
         <pubDate>{{ eip.created | date_to_rfc822 }}</pubDate>
-        <link>{{ site.url }}/{{ eip.url }}</link>
-        <guid isPermaLink="true">{{ site.url }}/{{ eip.url }}</guid>
+        <link>{{ site.url }}{{ eip.url }}</link>
+        <guid isPermaLink="true">{{ site.url }}{{ eip.url }}</guid>
       </item>
       {% endif %}
       {% endunless %}
