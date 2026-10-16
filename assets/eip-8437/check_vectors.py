@@ -152,7 +152,7 @@ def main():
     assert h(b"").hex() == "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
     assert rlp(0) == b"\x80" and rlp([]) == b"\xc0"
     assert rlp(b"dog").hex() == "83646f67"
-    vectors = json.loads(Path(__file__).with_name("descriptor-vectors.json").read_text())
+    vectors = json.loads(Path(__file__).with_name("announcement-vectors.json").read_text())
     for expected in vectors:
         assert vector(expected["size"]) == expected, expected["size"]
     wrappers = json.loads(Path(__file__).with_name("wrapper-vectors.json").read_text())
