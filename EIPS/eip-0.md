@@ -1,6 +1,7 @@
 ---
 eip: 0
-title: Introduces CPCU, a common scaling factor for computational opcode gas costs, enabling collective repricing at hard fork boundaries
+title: Common Computational Gas Scaling Factor
+description: Introduces CPCU, a common scaling factor for computational opcode gas costs, enabling collective repricing at hard fork boundaries
 author: Helkomine (@Helkomine)
 discussions-to: placeholder
 status: Draft
