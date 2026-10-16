@@ -31,6 +31,8 @@ Under [EIP-7805](../../EIPS/eip-7805.md), a builder can maintain a running aggre
 
 How the merge is split into steps is a parameter of the benchmarked construction. Merging the running aggregate and `IL_COMMITTEE_SIZE` committed proofs in one step takes `IL_COMMITTEE_SIZE + 1` (17) recursive inputs and as many discards as their dependency lists hold; smaller steps take fewer of each and more steps.
 
+Builder liveness depends on the latency of one merge or aggregation step times the number of steps that run in sequence on the critical path. A step's latency need not track its discard count, so the protocol measures per-step latency against fan-in and prover parallelism, and reports discards separately.
+
 ### Gas-derived case
 
 The construction produces a block proof over the gas-derived count from a running aggregate of, provisionally, twice that count, discarding its surplus: the running aggregate minus `dependencies(block)`.
@@ -70,6 +72,8 @@ A builder benchmark run reports, for each case:
 - the reference hardware;
 - the case, the gas limit, the running aggregate's size and the input, output and discarded dependency counts;
 - the construction's parameters: step count, each step's fan-in and discard count, and the work done ahead of the slot;
+- per-step latency, the time for one merge or aggregation step, for each fan-in and prover parallelism benchmarked, reported separately from the step's discard count, and the number of steps that run in sequence;
+- the measured size of each aggregate proof the construction produces;
 - the time from the last input to the finished block proof, against the proving budget.
 
 ## Attester benchmark
@@ -117,6 +121,7 @@ These are reported, not required:
 An attester benchmark run reports:
 
 - the reference hardware and network conditions, and the background load applied;
+- measured `stark_proof` and `proof_deps` sizes, separately, and the resulting `il_proof` volume per committee, against the bounds of 1.625 MiB per `il_proof` and 78 MiB per committee;
 - the fraction of topic proofs reaching a cached verdict by the end of the construction window, separately for wrapper proofs published by the `t=0s` target and for reproven proofs;
 - the fraction of lists checked by the view freeze deadline, and how many were cache lookups;
 - for the freshness variant, the fraction of affected lists' committed proofs with a cached verdict by the view freeze deadline;
