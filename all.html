@@ -2,6 +2,9 @@
 layout: page
 title: All
 ---
-
-{% assign eips=site.pages|where_exp:"page","page.url contains '/EIPS/'" %}
+{% assign eips=site.pages|where_exp:"page","page.url contains '/EIPS/'"|where_exp:"page","page.status != 'Moved'" %}
+<div id="eip-listing-container">
 {% include eiptable.html eips=eips %}
+</div>
+<div id="eip-load-more-sentinel" class="eip-load-more-sentinel"></div>
+{% include infinite-scroll-table.html %}
