@@ -1,7 +1,6 @@
 ---
 eip: 0
-title: Common Computational Gas Scaling Factor
-description: Introduces a common scaling factor, CPCU, for computational opcode gas costs, enabling collective repricing at hard fork boundaries while preserving relative costs. CPCU remains fixed within each hard fork and does not automatically respond to network conditions.
+title: Introduces CPCU, a common scaling factor for computational opcode gas costs, enabling collective repricing at hard fork boundaries
 author: Helkomine (@Helkomine)
 discussions-to: placeholder
 status: Draft
@@ -29,7 +28,7 @@ By introducing a common scaling factor for computational opcodes, this proposal 
 - **Reduced implementation complexity:** A single parameter can be selected and updated at hard fork boundaries to adjust the prices of all covered computational opcodes. This is particularly useful when scaling efforts focus on computation, as it simplifies the process of adjusting computational prices across hard forks.
 - **Avoidance of additional computational repricing costs:** Keeping computational gas prices unchanged or reducing them avoids introducing an additional increase in the gas required for computation, thereby preserving gas-sensitive contract compatibility and reducing upward pressure on transaction costs caused by computational repricing.
 - **More scaling options:** Rather than relying exclusively on increasing the block gas limit, which may require increasing the prices of bottleneck resources, the protocol can also explore increasing computational capacity relative to gas by reducing computational gas costs. This provides an additional scaling option without requiring a corresponding increase in the block gas limit.
-- **Consistency with common pricing parameters:** EIP-8037 introduces `CPSB` as a common parameter for pricing state creation costs. This proposal applies a similar approach to computational resources by introducing `CPCU`, allowing their relative prices to be preserved while their absolute gas costs are adjusted according to the network's scaling requirements.
+- **Consistency with common pricing parameters:** [EIP-8037](./eip-8037.md) introduces `CPSB` as a common parameter for pricing state creation costs. This proposal applies a similar approach to computational resources by introducing `CPCU`, allowing their relative prices to be preserved while their absolute gas costs are adjusted according to the network's scaling requirements.
 
 ## Specification
 
@@ -151,7 +150,7 @@ Consequently, reducing computational gas costs below their initial values throug
 
 ### Changes to Computational Work per Transaction and Block
 
-EIP-7825 limits the maximum execution-gas budget of a transaction to \(2^{24}\) gas. EIP-8037 separates state-related and execution-related costs, with the EIP-7825 limit applying to the execution dimension.
+[EIP-7825](./eip-7825.md) limits the maximum execution-gas budget of a transaction to \(2^{24}\) gas. [EIP-8037](./eip-8037.md) separates state-related and execution-related costs, with the [EIP-7825](./eip-7825.md) limit applying to the execution dimension.
 
 Changing `CPCU` does not change the computational work performed by an individual opcode. It changes the amount of computational work that can be represented by a fixed execution-gas budget. Consequently, reducing `CPCU` can increase the maximum computational work permitted per transaction and, subject to the applicable block gas limit and other protocol constraints, per block.
 
@@ -164,3 +163,7 @@ At activation, `CPCU` is set to `1 gas/CU`, so this EIP does not change the gas 
 `CPCU` provides a mechanism for collectively adjusting computational gas prices; it does not itself change those prices beyond the initial conversion to CU-based accounting, nor does it automatically adapt to network conditions or scaling requirements.
 
 Its usefulness depends on whether a common adjustment is appropriate for the covered computational operations. A common factor preserves their relative pricing and therefore cannot independently correct cases where the relative costs of individual opcodes no longer reflect their resource consumption. Such cases may still require opcode-specific repricing or a separate cost model.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
