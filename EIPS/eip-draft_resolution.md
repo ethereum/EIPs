@@ -1,15 +1,12 @@
 ---
 title: Non-Self-Authorizing State Transitions
 description: Producing, proving or validating a transition does not by itself grant authority to make it effective
-author: chugarchugarr (@chugarchugarr)
+author: Joseph Lerma (@chugarchugarr)
 discussions-to: https://ethereum-magicians.org/t/eip-tbd-resolution-non-self-authorizing-state-transitions/29846
 status: Draft
 type: Informational
 created: 2026-10-03
 ---
-
-<!-- PREPARED BY babyblueviper1 FOR THE AUTHOR'S APPROVAL (ethmag t/29846 #4, #7). Text taken from the author's posts #1, #3, #4
-     with only the restructuring EIP-1 requires; nothing is submitted or changed without the author's explicit approval. -->
 
 ## Abstract
 
