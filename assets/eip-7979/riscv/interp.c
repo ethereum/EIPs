@@ -189,7 +189,7 @@ static const u8 GASTBL[256] = {
     [0x16] = 3, [0x17] = 3, [0x18] = 3, [0x19] = 3, [0x1B] = 3, [0x1C] = 3,
     [0x35] = 3, [0x36] = 2, [0x50] = 2, [0x51] = 3, [0x52] = 3,
     [0x56] = 8, [0x57] = 10, [0x5B] = 1,
-    [0xB0] = 8, [0xB1] = 1, [0xB2] = 5,
+    [0xBC] = 8, [0xBB] = 1, [0xBF] = 5,
     [0xF3] = 0, [0xFD] = 0,
     [0xC1] = 3, [0xC2] = 5, [0xC3] = 3, [0xC4] = 5, [0xC6] = 5,
     [0xD0] = 3, [0xD1] = 3, [0xD2] = 3, [0xD3] = 3, [0xD4] = 3, [0xD5] = 3,
@@ -220,7 +220,7 @@ void evm_entry(void)
         [0x5F ... 0x7F] = &&op_push,
         [0x80 ... 0x8F] = &&op_dup,
         [0x90 ... 0x9F] = &&op_swap,
-        [0xB0] = &&op_callsub, [0xB1] = &&op_calldest, [0xB2] = &&op_returnsub,
+        [0xBC] = &&op_callsub, [0xBB] = &&op_calldest, [0xBF] = &&op_returnsub,
         [0xF3] = &&op_return, [0xFD] = &&op_revert,
         [0xC1] = &&op_add64, [0xC2] = &&op_mul64, [0xC3] = &&op_sub64,
         [0xC4] = &&op_div64, [0xC6] = &&op_mod64,
@@ -229,6 +229,9 @@ void evm_entry(void)
         [0xD6] = &&op_and64, [0xD7] = &&op_or64, [0xD8] = &&op_xor64,
         [0xD9] = &&op_not64, [0xDB] = &&op_shl64, [0xDC] = &&op_shr64,
         [0xE0] = &&op_cdload64, [0xE1] = &&op_mload64, [0xE2] = &&op_mstore64,
+#ifdef PREFIX64
+        [0xC0] = &&op_prefix64,
+#endif
     };
 
     u64 pc = 0, gas = 0, sp = 0, rsp = 0;
@@ -241,7 +244,7 @@ void evm_entry(void)
         u64 i = 0;
         while (i < CODE_LEN) {
             u8 o = CODE[i];
-            if (o == 0x5B || o == 0xB1) jd[i] = 1;
+            if (o == 0x5B || o == 0xBB) jd[i] = 1;
             i += (o > 0x5F && o <= 0x7F) ? o - 0x5E : 1;
         }
     }
@@ -342,11 +345,38 @@ op_swap:   { u64 n = op - 0x8F; NEED(n + 1);
 
 op_callsub: NEED(1); { u64 d = stk[sp-1].w[0];
     if ((stk[sp-1].w[1] | stk[sp-1].w[2] | stk[sp-1].w[3]) || d >= CODE_LEN
-        || CODE[d] != 0xB1) __rt_trap("CALLSUB to non-CALLDEST");
+        || CODE[d] != 0xBB) __rt_trap("CALLSUB to non-CALLDEST");
     if (rsp >= RSTACK_LIMIT) __rt_trap("return stack overflow");
     rstack[rsp++] = (u32)(pc + 1);
     sp--; pc = d; } goto next;
 op_calldest: pc++; goto next;
+
+#ifdef PREFIX64
+/* EIP-7937 encoding: C0 then the twin's opcode.  `next` has charged the
+ * default 3 for the C0 byte; charge the twin's cost less that, then
+ * dispatch on the second byte.  The handlers advance pc past it. */
+op_prefix64: {
+    static const void *J64[256] = {
+        [0 ... 255] = &&op_bad,
+        [0x01] = &&op_add64, [0x02] = &&op_mul64, [0x03] = &&op_sub64,
+        [0x04] = &&op_div64, [0x06] = &&op_mod64,
+        [0x10] = &&op_lt64, [0x11] = &&op_gt64, [0x12] = &&op_slt64,
+        [0x13] = &&op_sgt64, [0x14] = &&op_eq64, [0x15] = &&op_iszero64,
+        [0x16] = &&op_and64, [0x17] = &&op_or64, [0x18] = &&op_xor64,
+        [0x19] = &&op_not64, [0x1B] = &&op_shl64, [0x1C] = &&op_shr64,
+        [0x35] = &&op_cdload64, [0x51] = &&op_mload64, [0x52] = &&op_mstore64,
+    };
+    static const u8 G64[256] = {
+        [0x01] = 3, [0x02] = 5, [0x03] = 3, [0x04] = 5, [0x06] = 5,
+        [0x10 ... 0x1C] = 3, [0x35] = 3, [0x51] = 3, [0x52] = 3,
+    };
+    pc++;
+    if (pc >= CODE_LEN) __rt_trap("truncated prefix");
+    op = CODE[pc];
+    gas += G64[op] - 3;
+    goto *J64[op];
+}
+#endif
 op_returnsub: if (!rsp) __rt_trap("return stack underflow");
     pc = rstack[--rsp]; goto next;
 
