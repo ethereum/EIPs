@@ -14,6 +14,7 @@ together, on the same programs, at three execution tiers:
 | **Interpreted bytecode** | status quo | EVM64 alone |
 | **Interpreted register IR** | the deployable middle path | |
 | **Compiled AOT**    | validation alone | both        |
+| **Compiled by LLVM** |              | both, optimized: the ceiling |
 
 The metric is executed RISC-V instructions, counted exactly by qemu.
 RISC-V instruction count is the proving-cost proxy for the RISC-V
@@ -24,16 +25,19 @@ zkVMs (SP1, RISC Zero) and a rough native-throughput proxy.
 Executed instructions, whole program, freestanding binaries (no libc,
 so the counts are pure):
 
-    kernel     interp/256  interp/64    ir/256    ir/64  aot/256  aot/64
-    mul chain     6122597    4492253   4081563  1856126  1315924  120641
-    call tree     7833101    7360257   3669063  2450626  1119924  405641
-    matmul       15841125    8093752  12325272  4130334  4516353  536517
+    kernel     interp/256  interp/64    ir/256    ir/64  aot/256  aot/64  llvm/64
+    mul chain     6122597    4492253   4081563  1856126  1315924  120641    30572
+    call tree     7833101    7360257   3669063  2450626  1119924  405641     8069
+    matmul       15841125    8093752  12325272  4130334  4516353  536517   311117
 
-    ratios        1.0        1.4/1.1/2.0   1.5/2.1/1.3   3.3/3.2/3.8   4.7/7.0/3.5   50.8/19.3/29.5
+    ratio to interp/256
+    mul chain         1.0        1.4       1.5      3.3      4.7    50.8    200.3
+    call tree         1.0        1.1       2.1      3.2      7.0    19.3    970.8
+    matmul            1.0        2.0       1.3      3.8      3.5    29.5     50.9
 
 Three kernels: an arithmetic-heavy loop, a call-heavy tree, and a
 16x16 matrix product of 64-bit values held in memory, a word each,
-with its inner product as a subroutine.  Four readings.  EVM64 alone
+with its inner product as a subroutine.  Five readings.  EVM64 alone
 buys 1.1–2.0x: under a bytecode interpreter, dispatch dominates and
 cheap arithmetic hardly matters, except where the 256-bit work is
 heaviest — the matrix product's multiplies and loads.  The register
@@ -48,9 +52,11 @@ in a machine register only when its offset is static (validation)
 *and* its value fits the register (EVM64).  The proposals do not
 merely add; they compound.
 
-The translation here is deliberately naive — EVM stack shuffles
-become `mv` chains that any peephole pass would coalesce — so these
-ratios are floors, not ceilings.
+The AOT translation is deliberately naive — EVM stack shuffles
+become `mv` chains that any peephole pass would coalesce — so its
+ratios are floors.  The last column is the ceiling: the same validated
+code through LLVM at -O2 (the seventh cell, below), 51x to 971x, and
+3.9x, 50x and 1.7x over the naive AOT.
 
 ## The same figures in a zkVM
 
@@ -62,7 +68,9 @@ The same twelve binaries, executed by the Zisk zkVM's emulator
     mul chain     6123041    4492697   4082007  1856570  1316368  121085
     call tree     7833545    7360701   3669507  2451070  1120368  406085
 
-    ratios         1.0       1.4/1.1   1.5/2.1  3.3/3.2  4.7/7.0  50.6/19.3
+    ratio to interp/256
+    mul chain         1.0        1.4       1.5      3.3      4.7    50.6
+    call tree         1.0        1.1       2.1      3.2      7.0    19.3
 
 The matmul kernel was added later and has not been run in Zisk;
 `python3 harness.py zisk` adds its row.  Every count is the qemu
@@ -86,12 +94,13 @@ The interpreter cells pay everything a mainnet client pays: JUMPDEST
 analysis before the first instruction, a dynamic destination check at
 every jump, gas and stack bounds at every step, 256-bit arithmetic in
 four 64-bit limbs, computed-goto dispatch (the respectable technique;
-the baseline must not be a strawman).  The IR and AOT cells still meter
-gas — per basic block, precomputed at translation, summing to the
-same charges as the baseline's per-op metering — and keep the runtime
-checks validation cannot retire: stack overflow and return-stack
-depth, one compare each per call, none per instruction — exactly the
-division of labor the validation EIP specifies.  Not present in any
+the baseline must not be a strawman).  The IR, AOT and LLVM cells
+still meter gas — per basic block, precomputed at translation, summing
+to the same charges as the baseline's per-op metering — and keep the
+runtime checks validation cannot retire: stack overflow and
+return-stack depth, one compare each per call, none per instruction —
+exactly the division of labor the validation EIP specifies (what the
+optimizer then makes of those checks is described below).  Not present in any
 cell: state access and merklization.  The kernels touch no storage,
 so the table measures pure execution — the component these proposals
 change; on many real transactions storage dominates.
@@ -103,7 +112,7 @@ counts here are the recurring execution the network pays for.
 ## The prefix encoding
 
 EIP-7937 encodes the same 64-bit instructions as `0xC0` followed by
-the twin's opcode; EIP-12504 encodes them as single-byte opcodes.
+the twin's opcode; EIP-8442 encodes them as single-byte opcodes.
 `prefix_table.py` measures the two encodings against each other at all
 three tiers.  The PREFIX64 build of interp.c adds one handler, a
 second dispatch on the byte after the prefix, and runs every
@@ -119,7 +128,7 @@ Executed RISC-V instructions, exact:
     call tree   interpreted  8163147      7894441       7690303
                 register IR  3669063      2450626       2450626
                 compiled     1119924       405641        405641
-    matmul      interpreted 16239303      9644432       8513841
+    matmul      interpreted 16206323      9612582       8481991
                 register IR 12325272      4130334       4130334
                 compiled     4516353       536517        536517
 
@@ -133,11 +142,57 @@ for the mul chain, 127 against 120 for the call tree, 314 against
 from the table above because the PREFIX64 build is a different
 binary; within this table every interpreted cell is one binary.
 
+## The seventh cell: an optimizing compiler
+
+Mainnet clients cannot run an optimizing compiler at deploy: nothing
+in LLVM is bounded, and deposit gas is linear in bytes.  They can run
+one at build time: a precompile written as EVM code and compiled to
+native with the rest of the client, by the people who ship it,
+reviewed like the rest of the client.  And a chain that does not pay
+for compile time -- an L2 whose sequencer runs the binary while the
+fraud proof interprets the bytecode, a prover that establishes the
+binary once -- can run it at deploy.  This cell measures what it buys.
+`llvm.py` emits the validated code as LLVM IR from the same recovered
+facts aot.py spends: a stack slot is an alloca, a subroutine is a
+function, a jump is a branch, a 64-bit twin is an i64 operation on an
+i256 slot, trunc and zext.  Then `opt -O2` and `llc -O2` (LLVM 15) for
+the same RISC-V target, linked against the same runtime, counted in
+the same qemu.  Gas is charged per block exactly as in aot.py.
+Compilation is not counted; that is the point.  The cell has not been
+run in Zisk.
+
+What the optimizer did: inlined every subroutine, so the call tree's
+`f2(f1(f0(x)))` became `x + 4` and the depth and overflow checks
+folded to constants; promoted every slot to a register and narrowed
+every value to 64 bits -- no i256 survives in the optimized IR; and
+coalesced the `mv` chains.  The mul chain's loop is six instructions
+an iteration, the call tree's five, one of each the gas check.
+
+What it did with gas: the counter's final value is dead in this
+harness (nothing returns it), so only the trap decisions survive, and
+scalar evolution rewrote them.  The mul chain tests once, before the
+loop, whether 10^10 gas covers n iterations, then branches on that bit
+each iteration; the matmul keeps the counter and makes it the inner
+loop's induction variable.  On a chain the gas remaining is live at
+return, which costs one subtraction per call, not per block.  The
+optimizer did not merge checks across blocks: it cannot know that out
+of gas is all or nothing within a frame.  The front end does, and
+could.
+
+What is left in the matmul is byte order.  Its inner loop is 61
+instructions: two loads, a multiply, an add, the gas check, two bounds
+checks, the loop tests, and 45 shifts, masks and ors reversing the two
+loaded words from the EVM's big-endian memory.  With the Zbb extension
+(`rev8`) the matmul cell is 128578 -- 4.2x the AOT, 123x the baseline
+-- and the other two change by under 30 instructions.  An ISA choice
+for such a chain.
+
 ## Files
 
     evm64.py     EVM64 opcode remap over the yul-compiler
     aot.py       validated bytecode -> RISC-V assembly (both widths)
     ir.py        validated bytecode -> register IR (both widths)
+    llvm.py      validated bytecode -> LLVM IR (both widths), the seventh cell
     interp.c     baseline bytecode interpreter, both widths
     interp_ir.c  register-IR interpreter, block-level gas
     runtime.c    _start, syscalls, hex printer; keeps counts pure
@@ -149,10 +204,12 @@ binary; within this table every interpreted cell is one binary.
 Run `sh setup.sh` once, then `python3 harness.py` (or the phases
 `examples`, `counter`, `measure [substring]`), and `python3
 prefix_table.py` for the prefix table.  Every program runs in
-all six cells and every cell must produce the same result (the
+every cell and every cell must produce the same result (the
 64-bit cells modulo 2^64); the 256-bit cells are additionally checked
 against the pure-Python interpreter, and the fast TB-log counter is
-checked against plain singlestep counting.
+checked against plain singlestep counting.  The llvm/64 cell is built
+when `llc` is present (setup.sh fetches LLVM 15; `RV_LLVM` points
+elsewhere); `python3 llvm.py matmul 64` prints the IR it feeds LLVM.
 
 ## Caveats
 
