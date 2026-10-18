@@ -5,6 +5,8 @@ Cells:
   interp/64   EVM64 bytecode on the same interpreter — EVM64 alone
   aot/256     validated 7979 bytecode translated to RISC-V — validation alone
   aot/64      both proposals composed
+  llvm/64     both, through an optimizing compiler (llvm.py, opt, llc):
+              the ceiling, when LLVM with the RISC-V target is present
 
 The metric is executed RISC-V instructions, counted exactly by qemu
 (-singlestep -d nochain,exec).  RISC-V instruction count is the
@@ -37,6 +39,7 @@ from run7979 import execute                         # noqa: E402
 from evm64 import compile_yul64                     # noqa: E402
 from aot import Translate64, Translate256           # noqa: E402
 from ir import translate_ir, ir_ops_h               # noqa: E402
+from llvm import translate_llvm                     # noqa: E402
 import validator                            # noqa: E402
 from test_translator import EXAMPLES                # noqa: E402
 
@@ -47,6 +50,10 @@ GCC = os.environ.get("RV_GCC", (
 QEMU = os.environ.get("RV_QEMU", "/tmp/rv/usr/bin/qemu-riscv64")
 ZISKEMU = os.environ.get("RV_ZISKEMU",
                          "/tmp/zisk-src/target/release/ziskemu")
+LLVM = os.environ.get("RV_LLVM", "/tmp/rv/usr/lib/llvm-15/bin")
+HAVE_LLVM = os.path.exists(os.path.join(LLVM, "llc"))
+LLC_FLAGS = ("-O2 -mtriple=riscv64-unknown-linux-gnu -mattr=+m,+a,+f,+d,+c"
+             " -target-abi=lp64d").split()
 CFLAGS = "-O2 -static -nostdlib -nostartfiles -ffreestanding".split()
 ZFLAGS = ["-DZISK", "-mcmodel=medany"]
 BUILD = os.environ.get("RV_BUILD", "/tmp/rvbuild")
@@ -212,6 +219,26 @@ def build(tag, code, calldata, asm=None, ir_width=None, zisk=False,
     return out
 
 
+def build_llvm(tag, code, calldata, width, zisk=False):
+    """The seventh cell: validated code through llvm.py, then opt -O2
+    and llc -O2 — the optimizing compiler a chain that does not pay
+    for compile time could run, or a client could run offline on
+    precompiles written as EVM code.  Needs LLVM with the RISC-V
+    target (setup.sh fetches it).  Not yet run in Zisk."""
+    ll = os.path.join(BUILD, f"{tag}.ll")
+    with open(ll, "w") as f:
+        f.write(translate_llvm(code, width))
+    opt = os.path.join(BUILD, f"{tag}.opt.ll")
+    r = sh([os.path.join(LLVM, "opt"), "-O2", "-S",
+            "-mtriple=riscv64-unknown-linux-gnu", ll, "-o", opt])
+    assert r.returncode == 0, f"{tag}: {r.stderr}"
+    s = os.path.join(BUILD, f"{tag}.llc.s")
+    r = sh([os.path.join(LLVM, "llc")] + LLC_FLAGS +
+           (["-code-model=medium"] if zisk else []) + [opt, "-o", s])
+    assert r.returncode == 0, f"{tag}: {r.stderr}"
+    return build(tag, code, calldata, open(s).read(), zisk=zisk)
+
+
 def run_binary(path):
     r = sh([QEMU, path])
     return r.stdout.strip()
@@ -247,7 +274,7 @@ def count_instructions(path):
 
 
 def cells(name, src, calldata, zisk=False):
-    """Build all six binaries for one program; return {cell: path}."""
+    """Build every cell's binary for one program; return {cell: path}."""
     leg256 = compile_yul(src, "legacy")
     new256 = compile_yul(src, "7979")
     leg64 = compile_yul64(src, "legacy")
@@ -267,15 +294,17 @@ def cells(name, src, calldata, zisk=False):
                             Translate256(new256).translate(), zisk=z),
         "aot/64":     build(f"{t}_a64", new64, calldata,
                             Translate64(new64).translate(), zisk=z),
+        **({"llvm/64": build_llvm(f"{t}_l64", new64, calldata, 64, zisk=z)}
+           if HAVE_LLVM else {}),
     }
 
 
 CELL_ORDER = ["interp/256", "interp/64", "ir/256", "ir/64",
-              "aot/256", "aot/64"]
+              "aot/256", "aot/64"] + (["llvm/64"] if HAVE_LLVM else [])
 
 
 def check_examples():
-    """All 8 test_translator programs, all 4 cells, exact agreement."""
+    """All 8 test_translator programs, all cells, exact agreement."""
     failures = 0
     for name, src, cases in EXAMPLES:
         for calldata, expected in cases:
