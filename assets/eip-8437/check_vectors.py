@@ -2,7 +2,7 @@
 """Check EIP-8437 encoding fixtures and message rules on decoded values.
 
 Scalars are represented as Python integers. This is not an RLP decoder, proof
-verifier or client-state test suite; see conformance.md for the coverage boundary.
+verifier or client-state test suite.
 
 Requires Python 3.9+ and pycryptodome. Run with:
     python3 assets/eip-8437/check_vectors.py
@@ -175,7 +175,7 @@ def main():
     # A maximum-length announcement entry encodes in 38 bytes.
     assert len(rlp([MAX_WRAPPER_BYTES, bytes(32)])) == 38
 
-    # A1-A4: announcement count, fields and strict hash ordering.
+    # Announcement count, fields and strict hash ordering.
     announced = [[MAX_WRAPPER_BYTES, uint(i + 1, 32)] for i in range(65)]
     check_announcements([[1, bytes(32)]])
     check_announcements(announced[:64])
@@ -188,7 +188,7 @@ def main():
     expect_error("announcement hash", check_announcements, [[1, bytes(31)]])
     expect_error("announcement fields", check_announcements, [[1, bytes(32), b""]])
 
-    # Q1-Q4: request bounds, uniqueness and prior wrapper announcements.
+    # Request bounds, uniqueness and prior wrapper announcements.
     assert rlp([7, [bytes(32)]]).hex() == "e307e1a0" + "00" * 32
     max_id = 2**64 - 1
     hashes = [entry[1] for entry in announced]
@@ -203,7 +203,7 @@ def main():
     assert len(rlp(announced[:64])) == 2435
     assert len(rlp([max_id, hashes[:64]])) == 2127
 
-    # R1-R6: decoded response items, correlation, hashes, lengths and ordering.
+    # Decoded response items, correlation, hashes, lengths and ordering.
     mode0, mode1 = wrapper_items().values()
     items = [mode0, mode1]
     encoded = [rlp(item) for item in items]
@@ -223,7 +223,7 @@ def main():
     assert wrappers_response(7, encoded) == rlp([7, items])
     assert wrappers_response(7, encoded[1:]).hex() == "f9012407f90120" + encoded[1].hex()
 
-    # R7: three distinct fixtures with 1,000,000-byte synthetic proofs.
+    # Three distinct fixtures with 1,000,000-byte synthetic proofs.
     # Each fits the companion's provisional 1,310,720-byte proof bound; none is a valid proof.
     large_items = [[mode1[0], 1, [mode1[2][0], bytes([i]) * 1_000_000]] for i in range(3)]
     large = [rlp(item) for item in large_items]
@@ -235,7 +235,8 @@ def main():
     check_wrapper_response(7, large_hashes, large_lengths, [7, large_items[:2]])
     expect_error("response size", check_wrapper_response, 7, large_hashes, large_lengths, [7, large_items])
 
-    print("PASS: announcement and wrapper encoding vectors; A1-A4, Q1-Q4, R1-R7 transport checks. "
+    print("PASS: announcement and wrapper encoding vectors; "
+          "message count, ordering, response matching and packing checks. "
           "Proof validity and client-state sequences are not tested.")
 
 
