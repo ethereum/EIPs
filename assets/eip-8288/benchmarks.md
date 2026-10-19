@@ -15,7 +15,7 @@ The benchmark runs at the activation gas limit with headroom and again before an
 A leanSPHINCS dependency costs `LEANSPHINCS_VERIFICATION_GAS + LEANSTARK_VERIFICATION_GAS` (33,000) gas and a leanSTARK dependency `2 * LEANSTARK_VERIFICATION_GAS` (60,000), so gas bounds `dependencies(block)` to fewer than `gas_limit` divided by those costs. The gas-derived count rounds these bounds up:
 
 - leanSPHINCS: `ceil(gas_limit / (LEANSPHINCS_VERIFICATION_GAS + LEANSTARK_VERIFICATION_GAS))`;
-- leanSTARK, with `LEANSTARK_SCHEME` enabled: `ceil(gas_limit / (2 * LEANSTARK_VERIFICATION_GAS))`.
+- leanSTARK: `ceil(gas_limit / (2 * LEANSTARK_VERIFICATION_GAS))`.
 
 | Gas limit | leanSPHINCS | leanSTARK |
 | --------- | ----------- | --------- |
