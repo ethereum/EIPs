@@ -260,14 +260,18 @@ makes the call idempotent: the CL corrects the EL after reorgs, restarts or fail
 again, and an EL that restarted gets the set back at the next call.
 
 **What is sent.** The timestamp, fee recipient and target gas limit are the payload attributes the
-CL knows in advance: pre-execution needs them, and the gas limit also bounds how much is worth
-preparing. The values are those the CL would use if the slot were next; the payload attributes,
-sent later, are authoritative. The timestamp is sent rather than derived from the slot because the
-EL does not know the beacon chain's genesis time and slot length, and EIP-8198 would make the slot
-length a setting that can change at a fork. The parent block, `prevRandao` and the parent beacon
-block root are not known in advance; preparation that depends on them has to wait for the build.
-The base fee follows from the parent. The slot identifies the entry for logging and replacement,
-and matches the slot number of the payload attributes.
+CL knows in advance. Pre-execution needs the timestamp and the gas limit, and the gas limit also
+bounds how much is worth preparing. Most transactions do not depend on the fee recipient: an EL can
+pre-execute them with a placeholder and move the fee to the real recipient when it reuses the
+result, as some execution clients already do for pending transactions. Transactions that read
+`COINBASE` or touch the fee recipient's account need the real one. The values are those the CL would
+use if the slot were next; the payload attributes, sent later, are authoritative. The timestamp is
+sent rather than derived from the slot because the EL does not know the beacon chain's genesis time
+and slot length, and EIP-8198 would make the slot length a setting that can change at a fork. The
+parent block, `prevRandao` and the parent beacon block root are not known in advance; preparation
+that depends on them has to wait for the build. The base fee follows from the parent. The slot
+identifies the entry for logging and replacement, and matches the slot number of the payload
+attributes.
 
 **The bound.** EIP-7917 fixes the proposer lookahead for the current and next epoch, so a CL knows
 at most 64 proposals at a time, however many validators it runs. The bound is 256 so that a longer
