@@ -6,6 +6,7 @@ Requires Python 3.9+ and pycryptodome. Run with:
 """
 
 import json
+from hashlib import blake2s
 from pathlib import Path
 
 from Crypto.Hash import keccak
@@ -62,9 +63,9 @@ def encode_dep(scheme, data_hash, key):
     return bytes(31) + bytes([scheme]) + data_hash + key
 
 
-def placeholder_deps_hash(encoded_deps):
-    # Keccak-256 stands in for the fork's DEPS_HASH; only the encoding is normative.
-    return h(b"".join(encoded_deps))
+def deps_hash(encoded_deps):
+    # EIP-8288: unkeyed BLAKE2s-256 over concatenated 96-byte entries.
+    return blake2s(b"".join(encoded_deps), digest_size=32).digest()
 
 
 def wrapper_vectors():
@@ -77,8 +78,8 @@ def wrapper_vectors():
     }
     out = {
         "deps": [d.hex() for d in deps],
-        "placeholder_deps_hash": placeholder_deps_hash(deps).hex(),
-        "placeholder_empty_deps_hash": placeholder_deps_hash([]).hex(),
+        "deps_hash": deps_hash(deps).hex(),
+        "empty_deps_hash": deps_hash([]).hex(),
         "transactions": [x.hex() for x in hashes],
     }
     for name, body in bodies.items():
@@ -216,7 +217,7 @@ def main():
     expect_error(check_envelopes, requested, [a, b, c, a])
 
     print(f"PASS: {len(vectors)} vectors, content hashes, message encodings, response limits, "
-          f"pooled-envelope matching, wrapper placeholders; proof room at list ceilings {proof_room} bytes")
+          f"pooled-envelope matching, dependency digests; proof room at list ceilings {proof_room} bytes")
 
 
 if __name__ == "__main__":
