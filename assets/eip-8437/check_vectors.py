@@ -249,18 +249,22 @@ def main():
     assert wrappers_response(7, small) == splice(7, small)
     check_wrapper_response(7, small_hashes, small_metadata, [7, small_items])
 
-    # Four distinct fixtures with 1,000,000-byte synthetic proofs.
+    # Five distinct fixtures with 1,000,000-byte synthetic proofs.
     # Each fits the companion's provisional 1,310,720-byte proof bound; none is a valid proof.
-    large_items = [[mode1[0], 1, [mode1[2][0], bytes([i]) * 1_000_000]] for i in range(4)]
+    large_items = [[mode1[0], 1, [mode1[2][0], bytes([i]) * 1_000_000]] for i in range(5)]
     large = [rlp(item) for item in large_items]
     assert all(len(body) <= MAX_WRAPPER_BYTES for body in large)
     assert len(splice(7, large[:2])) <= SOFT_RESPONSE_LIMIT < len(splice(7, large[:3]))
     # Sender-side soft limits permit the final wrapper to overshoot, then stop.
     assert wrappers_response(7, large) == splice(7, large[:3])
+    assert len(wrappers_response(max_id, large)) < SOFT_RESPONSE_LIMIT + MAX_WRAPPER_BYTES
     large_hashes = [h(body) for body in large]
     large_metadata = {h(body): (1, len(body)) for body in large}
     check_wrapper_response(7, large_hashes, large_metadata, [7, large_items[:2]])
     check_wrapper_response(7, large_hashes, large_metadata, [7, large_items[:3]])
+    # The packing recommendation does not impose a receiver-side 4 MiB limit.
+    assert len(splice(7, large)) > SOFT_RESPONSE_LIMIT + MAX_WRAPPER_BYTES
+    check_wrapper_response(7, large_hashes, large_metadata, [7, large_items])
     # The individual wrapper ceiling remains a hard bound.
     oversized = [mode1[0], 1, [mode1[2][0], bytes(MAX_WRAPPER_BYTES)]]
     expect_error("wrapper length", check_wrapper_response, 7, [], {}, [7, [oversized]])
