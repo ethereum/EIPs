@@ -100,12 +100,13 @@ def check_announcements(entries):
     assert hashes == sorted(set(hashes)), "announcement order"
 
 
-def check_request(request_id, hashes, announced):
+def check_request(request_id, hashes, received_announcements, sent_announcements=()):
     assert isinstance(request_id, int) and 0 <= request_id < 2**64, "request id"
     assert 1 <= len(hashes) <= MAX_WRAPPERS_PER_REQUEST, "request count"
     assert all(isinstance(digest, bytes) and len(digest) == 32 for digest in hashes), "request hash"
     assert len(set(hashes)) == len(hashes), "request duplicates"
-    assert all(digest in announced for digest in hashes), "unannounced wrapper"
+    assert all(digest in received_announcements or digest in sent_announcements
+               for digest in hashes), "unannounced wrapper"
 
 
 def check_wrapper_response(request_id, requested, announced_metadata, reply):
@@ -222,6 +223,9 @@ def main():
     encoded = [rlp(item) for item in items]
     requested = [h(body) for body in encoded]
     metadata = {h(body): (item[1], len(body)) for item, body in zip(items, encoded)}
+    # Recover an evicted wrapper using our own earlier announcement, without a reverse one.
+    check_request(7, requested, {requested[0]}, {requested[1]})
+    expect_error("unannounced wrapper", check_request, 7, requested, {requested[0]})
     for returned in (items, items[:1], items[1:], []):
         check_wrapper_response(7, requested, metadata, [7, returned])
     expect_error("response id", check_wrapper_response, 7, requested, metadata, [8, items])
