@@ -12,7 +12,7 @@ requires: 8070, 8288
 
 ## Abstract
 
-This EIP modifies the 'eth' p2p protocol to support the recursive STARK proofs of [EIP-8288](./eip-8288.md). It adds two new messages, `GetRecursiveStarks` (0x14) and `RecursiveStarks` (0x15), enabling peers to request and serve proofs for synchronization.
+This EIP modifies the 'eth' p2p protocol to support the recursive STARK proofs of [EIP-8288](./eip-8288.md). It adds two new messages, `GetRecursiveStarks` (0x19) and `RecursiveStarks` (0x1a), enabling peers to request and serve proofs for synchronization.
 
 ## Motivation
 
@@ -48,7 +48,7 @@ A block without dependencies has an empty `recursive-stark`.
 
 ### New Protocol Messages
 
-#### GetRecursiveStarks (0x14)
+#### GetRecursiveStarks (0x19)
 
 ```
 [request-id: P, [blockhash₁: B_32, blockhash₂: B_32, ...]]
@@ -58,7 +58,7 @@ Request recursive STARKs for the given block hashes. The number of proofs that c
 
 Proofs are only available for blocks after [EIP-8288](./eip-8288.md) activation and within the retention period defined therein. Requests for unavailable proofs return empty entries.
 
-#### RecursiveStarks (0x15)
+#### RecursiveStarks (0x1a)
 
 ```
 [request-id: P, [recursive-stark₁, recursive-stark₂, ...]]
@@ -86,7 +86,7 @@ Proofs are transmitted via dedicated messages rather than extending block bodies
 
 ### Message IDs
 
-Message IDs 0x14 and 0x15 follow sequentially from the existing messages. `BlockAccessLists` (0x13), defined in [EIP-8159](./eip-8159.md), is the highest message ID in eth/71 and eth/72.
+Message IDs 0x19 and 0x1a follow the eth/72 messages `GetCells` (0x14) and `Cells` (0x15) of [EIP-8070](./eip-8070.md), leaving 0x16 through 0x18 to the other eth/73 messages proposed to activate at the same fork.
 
 ### Response Size Limit
 
@@ -94,7 +94,7 @@ The 2 MiB soft limit is consistent with other eth protocol responses (blocks, re
 
 ## Backwards Compatibility
 
-This EIP changes the eth protocol and requires rolling out a new version, eth/73. Supporting multiple protocol versions is standard practice. Rolling out eth/73 does not break older clients, as they can continue using earlier versions.
+This EIP changes the eth protocol and requires rolling out a new version, eth/73, which activates with [EIP-8288](./eip-8288.md). Other messages proposed for the same fork share this version rather than each introducing one, and the message IDs here are chosen not to overlap with them. Supporting multiple protocol versions is standard practice. Rolling out eth/73 does not break older clients, as they can continue using earlier versions.
 
 This EIP requires the hard fork that activates [EIP-8288](./eip-8288.md) for the header field extension. The new messages are only meaningful for blocks after that fork.
 
