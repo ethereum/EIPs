@@ -47,7 +47,7 @@ Counts are leanSPHINCS dependencies.
 
 ### Cold inclusion-list case
 
-Starting at view freeze with newly received lists, the builder retrieves `IL_COMMITTEE_SIZE` (16) committed proofs it does not hold, each over `MAX_DEPS_PER_IL_PROOF` (128) dependencies, then merges them with the running aggregate. These proofs were available to attesters before the proof deadline. Its inputs cover up to 2,048 inclusion-list dependencies plus the running aggregate's; its output is at most the gas-derived count. Include lists with only one covered dependency each, forcing the remaining 127 per proof to be discarded. Gas bounds only the output.
+Starting at view freeze with newly received lists, the builder retrieves `IL_COMMITTEE_SIZE` (16) committed proofs it does not hold, each over `MAX_DEPS_PER_IL_PROOF` (128) dependencies, then merges them with the running aggregate. These proofs were available to attesters before the proof deadline; the builder receives `PROOF_LATE` and includes their covered entries as for `VALID`. Its inputs cover up to 2,048 inclusion-list dependencies plus the running aggregate's; its output is at most the gas-derived count. Include lists with only one covered dependency each, forcing the remaining 127 per proof to be discarded. Gas bounds only the output.
 
 | Gas limit | Inclusion-list inputs | Running aggregate | Input dependencies in all | Output at most |
 | --------- | --------------------- | ----------------- | ------------------------- | -------------- |
@@ -121,7 +121,7 @@ These are reported, not required:
 
 ### Member proof reuse
 
-Compare retaining only large aggregates with a bounded selection of recent intermediate wrappers of at most 128 dependencies alongside them. Use the same transaction arrivals and list-selection policy, including selections spanning several wrappers. Report:
+Compare retaining only large aggregates with a bounded selection of recent intermediate wrappers of at most 128 dependencies alongside them, held through the next view freeze. Use the same transaction arrivals and list-selection policy, including selections spanning several wrappers. Report:
 
 - the fraction of selected lists covered by one retained proof without new proving;
 - retained proof and envelope bytes, added announcement and transfer traffic, and wrapper age;
