@@ -191,11 +191,18 @@ Specification:
    recipient or target gas limit changes. It MAY call it at any time.
 8. The CL MUST NOT include proposals of validators it does not run.
 
-### Capabilities
+### Optional support
 
-`engine_proposalLookaheadUpdatedV1` is added to the methods exchanged with
-`engine_exchangeCapabilities`. A CL MUST NOT call it on an EL that does not list it. A failed call
-MUST NOT affect the CL's other use of the Engine API.
+Support for the method is optional on both sides, and not tied to a fork.
+
+- An EL MAY implement the method. An EL that implements it MUST list it in the methods exchanged
+  with `engine_exchangeCapabilities`. It validates every call (item 2), and uses as many of the
+  proposals as it chooses, or none (item 3).
+- A CL MAY implement the method. It MUST NOT call it on an EL that does not list it, and SHOULD
+  call it as in item 7 on one that does.
+- If either side does not implement the method, nothing changes: the CL does not call it, and the
+  EL builds from `engine_forkchoiceUpdated` and the payload attributes, as before. A failed call
+  MUST NOT affect the CL's other use of the Engine API.
 
 ## Rationale
 
@@ -239,6 +246,12 @@ how to use it.
 - **Schedule, not authority.** The call informs; `engine_forkchoiceUpdated` decides. Keeping the
   two in separate methods is what lets the schedule be sent before the parent exists.
 
+**Why optional.** Nothing depends on the method for correctness. Every block is still built from
+`engine_forkchoiceUpdated` and its payload attributes, so clients that do not implement the method
+build exactly as today, and clients that do can ship it without waiting for a fork. Whether
+preparing pays, and how much, depends on each EL's design and hardware, so each EL decides whether
+to use the proposals.
+
 **Precedents.** The Engine API already passes the EL information from the CL that changes nothing
 in consensus, only how the EL runs: since Amsterdam, `engine_forkchoiceUpdatedV4` carries the CL's
 custody columns (`custodyColumns`) for the sparse blobpool. Methods that are optional and not tied
@@ -281,9 +294,8 @@ lookahead does not need a new version of the method; it only limits the size of 
 
 ## Backwards Compatibility
 
-The method is new and optional, and not tied to a fork. CLs call it only on ELs that list it in
-`engine_exchangeCapabilities`; ELs that do not implement it are unaffected. No other method
-changes.
+The method is new, optional on both sides and not tied to a fork (see Optional support): clients
+that do not implement it are unaffected. No other method changes.
 
 ## Test Cases
 
