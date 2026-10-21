@@ -38,7 +38,7 @@ The typical scenario described above assumes that there is at least one __BlockE
 
 In any other case the proof should be considered invalid.
 
-Note that rendering an epoch as a part of a log index Merkle tree requires the sibling of the rendered epoch's root node to be known. This is automatically true if a `BlockEntry` in the rendered epoch (the one after the boundary) is proven. Otherwise it is not always guaranteed, therefore if there is no __BlockEntry__ in the next epoch after a proven boundary then the first index entry of that epoch should be proven, either as a an __empty entry__, a __FalsePositiveLogEntry__ or a __TxEntry__. 
+Note that rendering an epoch as a part of a log index Merkle tree requires the sibling of the rendered epoch's root node to be known. This is automatically true if a `BlockEntry` in the rendered epoch (the one after the boundary) is proven. Otherwise it is not always guaranteed, therefore if there is no __BlockEntry__ in the next epoch after a proven boundary then the first index entry of that epoch should be proven, either as an __empty entry__, a __FalsePositiveLogEntry__ or a __TxEntry__. 
 
 #### CurrentMapProof (proofType = 0x02)
 

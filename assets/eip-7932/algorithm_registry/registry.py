@@ -13,6 +13,7 @@ class AlgorithmEntry():
     ALG_TYPE: uint8
     SIZE: uint32
     gas_cost: Callable[[bytes], uint64]
+    merge_detached_signature: Callable[[bytes, bytes], bytes]
     validate: Callable[[bytes], None]
     verify: Callable[[bytes, bytes], bytes]
 
@@ -38,7 +39,7 @@ def secp256k1_validate(signature: ByteVector[SECP256K1_SIGNATURE_SIZE]):
 
 
 class Secp256k1(AlgorithmEntry):
-    ALG_TYPE = 0xFF
+    ALG_TYPE = 0x00
     SIZE = 66
 
     def gas_cost(signing_data: bytes) -> uint64:
@@ -62,6 +63,10 @@ class Secp256k1(AlgorithmEntry):
         public_key = PublicKey(ecdsa.ecdsa_recover(signing_data, recover_sig, raw=True))
         uncompressed = public_key.serialize(compressed=False)
         return uncompressed
+    
+    def merge_detached_signature(detached_signature: bytes, _public_key: bytes) -> bytes:
+        # Secp256k1 uses recoverable signatures, this is a no-op.
+        return detached_signature
 
 
 algorithm_registry[Secp256k1.ALG_TYPE] = Secp256k1

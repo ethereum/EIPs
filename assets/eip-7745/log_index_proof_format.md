@@ -20,7 +20,7 @@ Note that the position and order of the proof nodes is not specified in the proo
 
 The `FilterRows` container contains all filter map row data included in the proof. For storage efficiency two different encodings are used: a general purpose one that supports long rows and partial storage of row data, and a compact one capable of fully storing limited size filter rows belonging to the same row index in a continuous range of adjacent filter maps.
 
-Note that the efficiency gain achieved by using the compact encoding wherever possible is very significant; with the current filter map parameters the global average of filter row lengths is 1 entry (3 bytes) and for these less populated rows it is a typical scenario that the proof encodes all rows of the same row index in an entire epoch (1024 maps). In a typical use case these rows might account for the major part of the log index proof data. EIP-7745 generally tries to achieve a reasonable balance between efficiency and complexity, and in this case optimizing the encoding of the most frequently occuring scenario with a relatively simple extra encoding format is justified.
+Note that the efficiency gain achieved by using the compact encoding wherever possible is very significant; with the current filter map parameters the global average of filter row lengths is 1 entry (3 bytes) and for these less populated rows it is a typical scenario that the proof encodes all rows of the same row index in an entire epoch (1024 maps). In a typical use case these rows might account for the major part of the log index proof data. EIP-7745 generally tries to achieve a reasonable balance between efficiency and complexity, and in this case optimizing the encoding of the most frequently occurring scenario with a relatively simple extra encoding format is justified.
 ```
 class FilterRows(Container):
     short_rows: List[ShortRows]
@@ -146,4 +146,5 @@ Proof nodes are tree nodes that are not known and also have no known descendants
 *: known nodes
 proof nodes: [5, 6, 14]
 ```
+
 

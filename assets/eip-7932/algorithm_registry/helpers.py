@@ -11,8 +11,11 @@ class ExecutionAddress(ByteVector[20]):
 
 
 def pubkey_to_address(public_key: bytes, algorithm_id: uint8) -> ExecutionAddress:
-    if algorithm_id == 0xFF: # Compatibility shim to ensure backwards compatibility
+    if algorithm_id == 0x00: # Compatibility shim to ensure backwards compatibility
         return ExecutionAddress(keccak(public_key[1:])[12:])
+
+    if len(public_key) == 63:
+        return ExecutionAddress(keccak(algorithm_id + b"\x00" + public_key)[12:])
 
     return ExecutionAddress(keccak(algorithm_id.to_bytes(1, "big") + public_key)[12:])
 

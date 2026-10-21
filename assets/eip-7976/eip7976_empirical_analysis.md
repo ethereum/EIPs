@@ -1,13 +1,13 @@
-# EIP-7976 Empirical Report
+# EIP-7976 Empirical Report (64/64 Pricing at the Floor)
 
 *The following represents a summary with empirical findings from analyzing EIP-7976's impact on transactions.*
-*Date: November, 2025*
+*Date: January, 2026*
 
 ## Dataset
 
-- **Period**: 150 days of Ethereum mainnet data (June-November 2025)
+- **Period**: 150 days of Ethereum mainnet data (August 2025 - January 2026)
 - **Blocks analyzed**: 1,080,000 blocks
-- **Total transactions**: 223,626,649
+- **Total transactions**: 245,624,335
 
 ## Overall Impact Metrics
 
@@ -15,21 +15,20 @@
 
 | Metric | Value |
 |--------|-------|
-| Total unaffected transactions | 220,322,233 (98.52%) |
-| Total affected transactions | 3,304,416 (1.48%) |
-| Transactions already affected by EIP-7623 | 2,808,580 (1.26%) |
-| New transactions affected by EIP-7976 only | 495,836 (0.22%) |
-| EIP-7623 overlap percentage | 85.0% |
+| Total unaffected transactions | 240,588,721 (97.95%) |
+| Total affected transactions | 5,035,614 (2.05%) |
+| Transactions already affected by EIP-7623 | 2,093,004 (0.85%) |
+| New transactions affected by EIP-7976 only | 2,942,610 (1.20%) |
+| EIP-7623 overlap percentage | 41.6% |
 
 ### Address Distribution
 
 | Metric | Value |
 |--------|-------|
-| Unique unaffected senders | 30,849,352 (98.4%) |
-| Unique affected senders | 503,397 (1.6%) |
-| Unique affected recipients | 711,303 (3.4%) |
-| Avg transactions per affected sender | 6.56 |
-| Avg transactions per affected recipient | 4.65 |
+| Unique affected senders | 636,577 |
+| Unique affected recipients | 521,874 |
+| Avg transactions per affected sender | 7.91 |
+| Avg transactions per affected recipient | 9.65 |
 
 ## Gas Usage Analysis (Affected Transactions)
 
@@ -37,11 +36,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Mean gas used | 86,968 |
-| Median gas used | 22,280 |
-| Average calldata bytes | 2,271 |
-| Average zero bytes | 889 |
-| Average non-zero bytes | 1,382 |
+| Mean gas used | 140,959 |
+| Median gas used | 38,031 |
+| Average calldata bytes | 3,460 |
+| Average zero bytes | 1,883 |
+| Average non-zero bytes | 1,577 |
 
 ## Most Affected Senders
 
@@ -49,49 +48,49 @@
 
 | Rank | Address | Transactions | Total Cost Increase (gas) | Avg Cost/Tx | Etherscan Link |
 |------|---------|--------------|---------------------------|-------------|----------------|
-| 1 | 0xe08cdadd44440e32ef153956a7ec40804a32dd74 | 1,941 | 9,617,746,280 | 4,955,047 | [View](https://etherscan.io/address/0xe08cdadd44440e32ef153956a7ec40804a32dd74) |
-| 2 | 0x54b839d988c9e712cd36cbf7c95dedc2b9f9ae6c | 21,616 | 9,347,719,424 | 432,444 | [View](https://etherscan.io/address/0x54b839d988c9e712cd36cbf7c95dedc2b9f9ae6c) |
-| 3 | 0xcbe6fbf5e3c427013688e04d0fde56705890c4be | 17,110 | 8,648,757,461 | 505,479 | [View](https://etherscan.io/address/0xcbe6fbf5e3c427013688e04d0fde56705890c4be) |
-| 4 | 0x148ee7daf16574cd020afa34cc658f8f3fbd2800 | 6,757 | 5,722,544,035 | 846,906 | [View](https://etherscan.io/address/0x148ee7daf16574cd020afa34cc658f8f3fbd2800) |
-| 5 | 0xfe325f97146124f3767bfa59899fa4177fd46d2f | 20,453 | 4,254,261,084 | 208,001 | [View](https://etherscan.io/address/0xfe325f97146124f3767bfa59899fa4177fd46d2f) |
-| 6 | 0x7804405f18e134c3c47d71ae02eb454d25722d88 | 699 | 3,176,420,025 | 4,544,234 | [View](https://etherscan.io/address/0x7804405f18e134c3c47d71ae02eb454d25722d88) |
-| 7 | 0xe2da046340e00264c4f0443243a0565007ae08ac | 5,311 | 3,168,185,085 | 596,532 | [View](https://etherscan.io/address/0xe2da046340e00264c4f0443243a0565007ae08ac) |
-| 8 | 0x7835fb36a8143a014a2c381363cd1a4dee586d2a | 2,413 | 3,010,568,114 | 1,247,645 | [View](https://etherscan.io/address/0x7835fb36a8143a014a2c381363cd1a4dee586d2a) |
-| 9 | 0xed9b8f05224b881a222ece2e20bd2f4bdb71d0f8 | 1,859 | 2,395,235,905 | 1,288,453 | [View](https://etherscan.io/address/0xed9b8f05224b881a222ece2e20bd2f4bdb71d0f8) |
-| 10 | 0xf2099c4783921f44ac988b67e743daefd4a00efd | 1,131 | 2,164,837,191 | 1,914,091 | [View](https://etherscan.io/address/0xf2099c4783921f44ac988b67e743daefd4a00efd) |
-| 11 | 0x570c531810ce02feb5eb2a9e1a2405464c82a7ec | 1,414 | 2,050,545,330 | 1,450,173 | [View](https://etherscan.io/address/0x570c531810ce02feb5eb2a9e1a2405464c82a7ec) |
-| 12 | 0xb947d63b578fb48233de4076407dd0498dcf36ab | 608 | 2,034,689,485 | 3,346,528 | [View](https://etherscan.io/address/0xb947d63b578fb48233de4076407dd0498dcf36ab) |
-| 13 | 0xf6309d5a91fa559cbf8f6ff3c5ec8fb67fe38577 | 702 | 1,848,495,220 | 2,633,184 | [View](https://etherscan.io/address/0xf6309d5a91fa559cbf8f6ff3c5ec8fb67fe38577) |
-| 14 | 0x980c1999f4e0878c4910d4a1de2123ef040be07b | 832 | 1,785,823,230 | 2,146,422 | [View](https://etherscan.io/address/0x980c1999f4e0878c4910d4a1de2123ef040be07b) |
-| 15 | 0x3f773dc3ccc70b3d2a549713ac8d556af949d4e8 | 974 | 1,713,010,497 | 1,758,737 | [View](https://etherscan.io/address/0x3f773dc3ccc70b3d2a549713ac8d556af949d4e8) |
-| 16 | 0x89b2c022a08aa8c849c30d5e72e147932b76b628 | 723 | 1,455,357,225 | 2,012,942 | [View](https://etherscan.io/address/0x89b2c022a08aa8c849c30d5e72e147932b76b628) |
-| 17 | 0x8934c6bfe73e8b43c78459744d7c373eedb10876 | 409 | 1,403,884,590 | 3,432,480 | [View](https://etherscan.io/address/0x8934c6bfe73e8b43c78459744d7c373eedb10876) |
-| 18 | 0x9a05d4bc192ba1c73b47011652adaded3add8308 | 623 | 1,351,546,475 | 2,169,416 | [View](https://etherscan.io/address/0x9a05d4bc192ba1c73b47011652adaded3add8308) |
-| 19 | 0x2c3b6e74be767cd9722cdf4a4ca08c6910012b0a | 311 | 1,301,603,445 | 4,185,220 | [View](https://etherscan.io/address/0x2c3b6e74be767cd9722cdf4a4ca08c6910012b0a) |
-| 20 | 0xf6624e1a9cb8143091fa6916fa56c1cf3bb1be64 | 404 | 1,152,839,500 | 2,853,563 | [View](https://etherscan.io/address/0xf6624e1a9cb8143091fa6916fa56c1cf3bb1be64) |
-| 21 | 0x8595753b4cbffba64cb2e8d167fd25a2d448b5fa | 422 | 892,776,365 | 2,115,583 | [View](https://etherscan.io/address/0x8595753b4cbffba64cb2e8d167fd25a2d448b5fa) |
-| 22 | 0xf3d021d51a725f5dbdce253248e826a8644be3c1 | 3,168 | 829,432,199 | 261,815 | [View](https://etherscan.io/address/0xf3d021d51a725f5dbdce253248e826a8644be3c1) |
-| 23 | 0x62815399f1bc394445ef9a47daed86b9061d9641 | 4,367 | 792,030,012 | 181,367 | [View](https://etherscan.io/address/0x62815399f1bc394445ef9a47daed86b9061d9641) |
-| 24 | 0xf70da97812cb96acdf810712aa562db8dfa3dbef | 1,140,536 | 790,076,999 | 692 | [View](https://etherscan.io/address/0xf70da97812cb96acdf810712aa562db8dfa3dbef) |
-| 25 | 0x0cad34b170a8e80b60f272d5ea9393f1b4cb7892 | 237 | 778,113,180 | 3,283,177 | [View](https://etherscan.io/address/0x0cad34b170a8e80b60f272d5ea9393f1b4cb7892) |
-| 26 | 0x4cae788442670a46fd371850b0727224fcd63799 | 245 | 750,445,410 | 3,063,042 | [View](https://etherscan.io/address/0x4cae788442670a46fd371850b0727224fcd63799) |
-| 27 | 0x3b17facdd5e8be0029a68e10743b4cf24f37d030 | 78 | 666,051,985 | 8,539,128 | [View](https://etherscan.io/address/0x3b17facdd5e8be0029a68e10743b4cf24f37d030) |
-| 28 | 0x30c2f77eaa93aace5e56ea4dcba5f21f794b58be | 183 | 605,419,645 | 3,308,304 | [View](https://etherscan.io/address/0x30c2f77eaa93aace5e56ea4dcba5f21f794b58be) |
-| 29 | 0xdfd3f1f53e8da33fff6851e7908ef472496d738a | 227 | 529,185,625 | 2,331,214 | [View](https://etherscan.io/address/0xdfd3f1f53e8da33fff6851e7908ef472496d738a) |
-| 30 | 0x09b96417602ed6ac76651f7a8c4860e60e3aa6d0 | 46,490 | 484,677,580 | 10,425 | [View](https://etherscan.io/address/0x09b96417602ed6ac76651f7a8c4860e60e3aa6d0) |
+| 1 | 0x54b839d988c9e712cd36cbf7c95dedc2b9f9ae6c | 44,296 | 100,215,386,242 | 2,262,402 | [View](https://etherscan.io/address/0x54b839d988c9e712cd36cbf7c95dedc2b9f9ae6c) |
+| 2 | 0xcbe6fbf5e3c427013688e04d0fde56705890c4be | 27,031 | 93,199,568,422 | 3,447,877 | [View](https://etherscan.io/address/0xcbe6fbf5e3c427013688e04d0fde56705890c4be) |
+| 3 | 0xe08cdadd44440e32ef153956a7ec40804a32dd74 | 3,360 | 24,782,661,408 | 7,375,792 | [View](https://etherscan.io/address/0xe08cdadd44440e32ef153956a7ec40804a32dd74) |
+| 4 | 0xc17ea94008d5a8ee86f120e092cd35a679166416 | 59,548 | 12,647,040,432 | 212,383 | [View](https://etherscan.io/address/0xc17ea94008d5a8ee86f120e092cd35a679166416) |
+| 5 | 0x148ee7daf16574cd020afa34cc658f8f3fbd2800 | 4,409 | 11,475,576,948 | 2,602,761 | [View](https://etherscan.io/address/0x148ee7daf16574cd020afa34cc658f8f3fbd2800) |
+| 6 | 0x16f09b37b20bfbb07130bba8226299926e39b488 | 14,598 | 9,858,634,629 | 675,341 | [View](https://etherscan.io/address/0x16f09b37b20bfbb07130bba8226299926e39b488) |
+| 7 | 0x6860c4ee678d847ae67771f2e5eea96ccb7fdf8d | 81,588 | 8,129,909,932 | 99,645 | [View](https://etherscan.io/address/0x6860c4ee678d847ae67771f2e5eea96ccb7fdf8d) |
+| 8 | 0xf4ceb19b2467ef784b5e83b863418c50997b1646 | 18,119 | 7,588,481,162 | 418,813 | [View](https://etherscan.io/address/0xf4ceb19b2467ef784b5e83b863418c50997b1646) |
+| 9 | 0x646c4fbdf82b5766c5eaf1fab9a8927fb5992d38 | 118,451 | 7,384,356,334 | 62,341 | [View](https://etherscan.io/address/0x646c4fbdf82b5766c5eaf1fab9a8927fb5992d38) |
+| 10 | 0x0373b1ed3b9e601bb8b17afde70b0ccab76a981d | 158,514 | 7,277,663,018 | 45,911 | [View](https://etherscan.io/address/0x0373b1ed3b9e601bb8b17afde70b0ccab76a981d) |
+| 11 | 0xe2da046340e00264c4f0443243a0565007ae08ac | 3,944 | 5,940,541,350 | 1,506,222 | [View](https://etherscan.io/address/0xe2da046340e00264c4f0443243a0565007ae08ac) |
+| 12 | 0xa7ec2be4ed79ef315b4301aeca424a2dfdeaf09a | 65,856 | 5,616,659,491 | 85,286 | [View](https://etherscan.io/address/0xa7ec2be4ed79ef315b4301aeca424a2dfdeaf09a) |
+| 13 | 0x7835fb36a8143a014a2c381363cd1a4dee586d2a | 2,887 | 5,601,056,603 | 1,940,095 | [View](https://etherscan.io/address/0x7835fb36a8143a014a2c381363cd1a4dee586d2a) |
+| 14 | 0xf2099c4783921f44ac988b67e743daefd4a00efd | 1,436 | 4,201,896,151 | 2,926,111 | [View](https://etherscan.io/address/0xf2099c4783921f44ac988b67e743daefd4a00efd) |
+| 15 | 0x7804405f18e134c3c47d71ae02eb454d25722d88 | 678 | 4,153,379,856 | 6,125,928 | [View](https://etherscan.io/address/0x7804405f18e134c3c47d71ae02eb454d25722d88) |
+| 16 | 0xfe9dcec48761d2826e3e3d95597462dfb281db79 | 48,221 | 4,047,228,659 | 83,930 | [View](https://etherscan.io/address/0xfe9dcec48761d2826e3e3d95597462dfb281db79) |
+| 17 | 0x1346d9c6315f6c23fe280b49ef215aebd49338b2 | 6,211 | 3,673,122,501 | 591,389 | [View](https://etherscan.io/address/0x1346d9c6315f6c23fe280b49ef215aebd49338b2) |
+| 18 | 0x5f62d006c10c009ff50c878cd6157ac861c99990 | 7,952 | 3,655,219,300 | 459,660 | [View](https://etherscan.io/address/0x5f62d006c10c009ff50c878cd6157ac861c99990) |
+| 19 | 0x3f773dc3ccc70b3d2a549713ac8d556af949d4e8 | 1,323 | 3,653,595,781 | 2,761,599 | [View](https://etherscan.io/address/0x3f773dc3ccc70b3d2a549713ac8d556af949d4e8) |
+| 20 | 0xc8a5849a02ad01b572a0108aebf5a0d27777a552 | 63,707 | 3,484,943,560 | 54,702 | [View](https://etherscan.io/address/0xc8a5849a02ad01b572a0108aebf5a0d27777a552) |
+| 21 | 0x30c2f77eaa93aace5e56ea4dcba5f21f794b58be | 687 | 3,326,641,119 | 4,842,272 | [View](https://etherscan.io/address/0x30c2f77eaa93aace5e56ea4dcba5f21f794b58be) |
+| 22 | 0xcbeb5d484b54498d3893a0c3eb790331962e9e9d | 7,602 | 2,716,498,081 | 357,339 | [View](https://etherscan.io/address/0xcbeb5d484b54498d3893a0c3eb790331962e9e9d) |
+| 23 | 0xd312535f0104a45ebd16cd29756fe9e6f8fe633c | 42,892 | 2,461,082,112 | 57,378 | [View](https://etherscan.io/address/0xd312535f0104a45ebd16cd29756fe9e6f8fe633c) |
+| 24 | 0xb947d63b578fb48233de4076407dd0498dcf36ab | 584 | 2,431,099,134 | 4,162,840 | [View](https://etherscan.io/address/0xb947d63b578fb48233de4076407dd0498dcf36ab) |
+| 25 | 0x1c9a7a489f62a75e276d3790ba92aaf12af13469 | 6,923 | 2,145,392,271 | 309,893 | [View](https://etherscan.io/address/0x1c9a7a489f62a75e276d3790ba92aaf12af13469) |
+| 26 | 0xf3d021d51a725f5dbdce253248e826a8644be3c1 | 3,693 | 2,063,909,478 | 558,870 | [View](https://etherscan.io/address/0xf3d021d51a725f5dbdce253248e826a8644be3c1) |
+| 27 | 0x2b4820042fe6a5b8ab01b29ede19203181d625fa | 18,285 | 1,880,349,910 | 102,835 | [View](https://etherscan.io/address/0x2b4820042fe6a5b8ab01b29ede19203181d625fa) |
+| 28 | 0xf6309d5a91fa559cbf8f6ff3c5ec8fb67fe38577 | 628 | 1,830,917,976 | 2,915,474 | [View](https://etherscan.io/address/0xf6309d5a91fa559cbf8f6ff3c5ec8fb67fe38577) |
+| 29 | 0x000cb000e880a92a8f383d69da2142a969b93de7 | 5,223 | 1,787,396,594 | 342,216 | [View](https://etherscan.io/address/0x000cb000e880a92a8f383d69da2142a969b93de7) |
+| 30 | 0x785cd82bb016c740d41ca9e0b1bacc3a2439dc0d | 23,798 | 1,666,264,939 | 70,017 | [View](https://etherscan.io/address/0x785cd82bb016c740d41ca9e0b1bacc3a2439dc0d) |
 
 ### Key Observations
 
-- **Top single address** (0xe08cdadd44440e32ef153956a7ec40804a32dd74) accounts for 9.6% of all additional costs with only 1,941 transactions
-- **Highest volume address** (0xf70da97812cb96acdf810712aa562db8dfa3dbef) has 1,140,536 affected transactions but only 692 gas average increase per transaction
-- **Highest per-transaction impact** (0x3b17facdd5e8be0029a68e10743b4cf24f37d030) shows 8.5M gas average increase per transaction
+- **Top single address** (0x54b839d988c9e712cd36cbf7c95dedc2b9f9ae6c) accounts for 19.6% of all additional costs with 44,296 transactions
+- **Highest volume address** (0x0373b1ed3b9e601bb8b17afde70b0ccab76a981d) has 158,514 affected transactions but only 45,911 gas average increase per transaction
+- **Highest per-transaction impact** (0xe08cdadd44440e32ef153956a7ec40804a32dd74) shows 7.4M gas average increase per transaction
 
 ### Cost Impact
 
 | Metric | Value |
 |--------|-------|
-| Mean cost increase per transaction | 30,287.65 gas units |
-| Median cost increase per transaction | 640 gas units |
+| Mean cost increase per transaction | 101,489.08 gas units |
+| Median cost increase per transaction | 11,444 gas units |
 
 ## Address Concentration Analysis
 
@@ -99,53 +98,53 @@
 
 | Address Group | Count | Percentage |
 |---------------|-------|------------|
-| 1 affected transaction | 293,132 | 58.23% |
-| ≤10 affected transactions | 492,333 | 97.80% |
-| ≤50 affected transactions | 502,047 | 99.73% |
-| ≤100 affected transactions | 502,640 | 99.85% |
-| ≤200 affected transactions | 502,894 | 99.90% |
-| ≤400 affected transactions | 503,041 | 99.93% |
+| 1 affected transaction | 388,216 | 60.98% |
+| ≤10 affected transactions | 611,619 | 96.08% |
+| ≤50 affected transactions | 632,916 | 99.43% |
+| ≤100 affected transactions | 634,730 | 99.71% |
+| ≤200 affected transactions | 635,491 | 99.83% |
+| ≤400 affected transactions | 635,926 | 99.90% |
 
 ### Transaction Volume Concentration
 
 | Top Addresses | % of Affected Transactions |
 |---------------|---------------------------|
-| Top 10 | 42.40% |
-| Top 20 | 46.89% |
-| Top 30 | 49.18% |
-| Top 40 | 50.87% |
-| Top 50 | 52.08% |
+| Top 10 | 26.79% |
+| Top 20 | 33.47% |
+| Top 30 | 37.17% |
+| Top 40 | 39.70% |
+| Top 50 | 41.76% |
 
 ### Transaction Volume by Percentiles
 
 | Address Percentile | % of Affected Transactions |
 |-------------------|---------------------------|
-| Top 10% | 53.17% |
-| Top 20% | 56.65% |
-| Top 30% | 58.52% |
-| Top 40% | 59.94% |
-| Top 50% | 61.03% |
+| Top 10% | 47.70% |
+| Top 20% | 54.00% |
+| Top 30% | 56.74% |
+| Top 40% | 58.57% |
+| Top 50% | 59.92% |
 
 ### Cost Impact Concentration
 
 | Top Addresses | % of Additional Costs |
 |---------------|----------------------|
-| Top 10 | 51.46% |
-| Top 20 | 67.55% |
-| Top 30 | 74.66% |
-| Top 40 | 78.46% |
-| Top 50 | 81.25% |
+| Top 10 | 55.28% |
+| Top 20 | 63.90% |
+| Top 30 | 68.26% |
+| Top 40 | 71.15% |
+| Top 50 | 73.64% |
 
 ### Cost Impact by Percentiles
 
 | Address Percentile | % of Additional Costs |
 |-------------------|----------------------|
-| Top 1% | 96.99% |
-| Top 10% | 98.98% |
-| Top 20% | 99.59% |
-| Top 30% | 99.81% |
-| Top 40% | 99.91% |
-| Top 50% | 99.95% |
+| Top 1% | 91.44% |
+| Top 10% | 97.31% |
+| Top 20% | 98.75% |
+| Top 30% | 99.40% |
+| Top 40% | 99.72% |
+| Top 50% | 99.87% |
 
 ## Method Analysis
 
@@ -153,66 +152,75 @@
 
 | Rank | Function Selector | Transactions | Total Cost Increase | Avg Cost/Tx | Method Name |
 |------|------------------|--------------|---------------------|-------------|-------------|
-| 1 | 0x5578ceae | 25,178 | 11,105,139,785 | 441,065 | registerContinuousMemoryPage(...) |
-| 2 | 0x538f9406 | 22,333 | 9,463,956,180 | 423,766 | updateState(uint256[],uint256[]) |
-| 3 | 0xf074ba62 | 5,416 | 7,851,409,934 | 1,449,669 | verifyCheckpointProofs(...) |
-| 4 | 0x46fa01fa | 2,714 | 7,039,378,930 | 2,593,645 | Unknown |
-| 5 | 0xb910e0f9 | 6,757 | 5,722,544,035 | 847,133 | Unknown |
-| 6 | 0x2217b211 | 5,348 | 3,177,136,180 | 594,095 | Unknown |
-| 7 | 0xc1bceb8c | 1,849 | 2,357,236,963 | 1,274,873 | Unknown |
-| 8 | 0xe85a6a28 | 12,971 | 1,862,516,315 | 143,591 | verifyFRI(...) |
-| 9 | 0x46fa040c | 296 | 1,570,922,320 | 5,307,844 | Unknown |
-| 10 | 0x46fa03a0 | 277 | 1,316,313,155 | 4,752,738 | Unknown |
-| 11 | 0x46fa01f4 | 423 | 1,081,763,690 | 2,557,536 | Unknown |
-| 12 | 0x46fa026d | 334 | 1,062,924,940 | 3,182,410 | Unknown |
-| 13 | 0x46fa01f0 | 410 | 1,041,783,285 | 2,541,179 | Unknown |
-| 14 | 0x6fadcf72 | 56,605 | 1,014,588,648 | 17,924 | forward(address,bytes) |
-| 15 | 0x623b223d | 4,213 | 924,216,060 | 219,423 | Unknown |
-| 16 | 0x46fa030d | 221 | 884,022,100 | 4,000,100 | Unknown |
-| 17 | 0x3fe317a6 | 5,559 | 827,995,875 | 148,925 | verifyMerkle(...) |
-| 18 | 0x46fa018f | 396 | 817,798,600 | 2,065,147 | Unknown |
-| 19 | 0x46fa0e3d | 43 | 802,503,595 | 18,662,874 | Unknown |
-| 20 | 0x46fa06b8 | 90 | 792,783,660 | 8,808,707 | Unknown |
+| 1 | 0x5578ceae | 28,355 | 94,835,044,230 | 3,343,786 | registerContinuousMemoryPage(...) |
+| 2 | 0x538f9406 | 27,826 | 93,972,171,674 | 3,377,149 | updateState(uint256[],uint256[]) |
+| 3 | 0x87201b41 | 70,794 | 26,600,051,568 | 375,772 | fulfillAvailableAdvancedOrders(...) |
+| 4 | 0x5e10b3f0 | 379,355 | 22,244,424,770 | 58,646 | workMyDirefulOwner(uint256,uint256) |
+| 5 | 0xfd9f1e10 | 191,576 | 18,205,559,712 | 95,012 | cancel(...) |
+| 6 | 0xf074ba62 | 3,827 | 9,634,717,355 | 2,517,565 | verifyCheckpointProofs(...) |
+| 7 | 0x09c5eabe | 42,105 | 8,765,393,130 | 208,186 | execute(bytes) |
+| 8 | 0x6fadcf72 | 72,208 | 5,516,170,528 | 76,366 | forward(address,bytes) |
+| 9 | 0xe85a6a28 | 16,654 | 4,985,983,858 | 299,377 | verifyFRI(...) |
+| 10 | 0x415e2848 | 74,876 | 3,076,701,516 | 41,091 | swap_6269342730() |
+| 11 | 0x3fe317a6 | 7,137 | 2,743,013,450 | 384,350 | verifyMerkle(...) |
+| 12 | 0x55944a42 | 35,064 | 2,610,534,480 | 74,445 | matchAdvancedOrders(...) |
+| 13 | 0x82ad56cb | 19,638 | 2,582,341,458 | 131,491 | aggregate3((address,bool,bytes)[]) |
+| 14 | 0xe7acab24 | 25,484 | 2,080,247,964 | 81,621 | fulfillAdvancedOrder(...) |
+| 15 | 0x13d79a0b | 21,713 | 1,555,462,876 | 71,652 | settleOrders(bytes) |
+| 16 | 0xbb2f45e1 | 4,214 | 1,061,775,096 | 251,964 | submitV1(...) |
+| 17 | 0x64971c46 | 13,972 | 1,002,671,000 | 71,750 | swap(...) |
+| 18 | 0x4c2c47bd | 630 | 931,755,480 | 1,478,976 | bulkRegisterValidator(...) |
 
 ### Key Methods by Category
 
 #### Zero-Knowledge Proof Systems
 
-- **registerContinuousMemoryPage**: 25,178 txs, avg 441,065 gas increase
-- **updateState**: 22,333 txs, avg 423,766 gas increase
-- **verifyCheckpointProofs**: 5,416 txs, avg 1,449,669 gas increase
-- **verifyFRI**: 12,971 txs, avg 143,591 gas increase
-- **verifyMerkle**: 5,559 txs, avg 148,925 gas increase
+- **registerContinuousMemoryPage**: 28,355 txs, avg 3,343,786 gas increase
+- **updateState**: 27,826 txs, avg 3,377,149 gas increase
+- **verifyCheckpointProofs**: 3,827 txs, avg 2,517,565 gas increase
+- **verifyFRI**: 16,654 txs, avg 299,377 gas increase
+- **verifyMerkle**: 7,137 txs, avg 384,350 gas increase
+
+#### NFT Marketplace Operations
+
+- **fulfillAvailableAdvancedOrders**: 70,794 txs, avg 375,772 gas increase
+- **matchAdvancedOrders**: 35,064 txs, avg 74,445 gas increase
+- **fulfillAdvancedOrder**: 25,484 txs, avg 81,621 gas increase
+- **cancel**: 191,576 txs, avg 95,012 gas increase
 
 #### Multi-signature/Proxy Operations
 
-- **forward**: 56,605 txs, avg 17,924 gas increase
+- **forward**: 72,208 txs, avg 76,366 gas increase
+- **execute**: 42,105 txs, avg 208,186 gas increase
+- **aggregate3**: 19,638 txs, avg 131,491 gas increase
 
 ## EIP-7623 Interaction Analysis
 
 ### Linear Cost Increase
 
-The analysis reveals that **85.0% of transactions affected by EIP-7976 are already impacted by EIP-7623**. This means:
+The analysis reveals that **41.6% of transactions affected by EIP-7976 are already impacted by EIP-7623**. This means:
 
-- **2,808,580 transactions** (1.26% of all transactions) will experience **linear cost increases** as calldata pricing moves from EIP-7623 rates to EIP-7976 rates
-- **495,836 transactions** (0.22% of all transactions) represent new impact from EIP-7976
+- **2,093,004 transactions** (0.85% of all transactions) will experience **linear cost increases** as calldata pricing moves from EIP-7623 rates to EIP-7976 rates
+- **2,942,610 transactions** (1.20% of all transactions) represent new impact from EIP-7976
 
 ### Pricing Structure Comparison
 
 | Byte Type | Current | EIP-7623 | EIP-7976 | 7623→7976 Increase |
 |-----------|---------|----------|----------|-------------------|
-| Zero bytes | 4 gas | 10 gas | 15 gas | +5 gas (50%) |
-| Non-zero bytes | 16 gas | 40 gas | 60 gas | +20 gas (50%) |
+| Zero bytes | 4 gas | 10 gas | 64 gas | +54 gas (540%) |
+| Non-zero bytes | 16 gas | 40 gas | 64 gas | +24 gas (60%) |
 
 
 ### Key Findings
 
-1. **High Concentration**: Cost impact is extremely concentrated with top 1% of addresses responsible for 96.99% of additional costs
+1. **High Concentration**: Cost impact is extremely concentrated with top 1% of addresses responsible for 91.44% of additional costs
 
-2. **EIP-7623 Linear Escalation**: Most affected transactions (85.0%) will see linear cost increases from existing EIP-7623 pricing
+2. **EIP-7623 Linear Escalation**: A significant portion of affected transactions (41.6%) will see linear cost increases from existing EIP-7623 pricing
 
-3. **Address Distribution**: 58.23% of affected addresses have only 1 affected transaction, indicating diverse but minimal user impact
+3. **Address Distribution**: 60.98% of affected addresses have only 1 affected transaction, indicating diverse but minimal user impact
 
-4. **Methods**: Impact is dominated by zero-knowledge proof operations, with additional impact from multi-signature/proxy operations
+4. **Methods**: Impact is dominated by zero-knowledge proof operations and NFT marketplace operations, with additional impact from multi-signature/proxy operations
 
-5. **Cost Variance**: Median increase (640 gas) vs mean increase (30,287.65 gas) shows high variance in impact severity
+5. **Cost Variance**: Median increase (11,444 gas) vs mean increase (101,489.08 gas) shows high variance in impact severity
+
+6. **Broader Impact**: With 64/64 pricing, 2.05% of transactions are affected (vs 1.48% with 15/60 pricing), representing a 38.5% increase in affected transaction count

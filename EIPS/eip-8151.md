@@ -1,0 +1,161 @@
+---
+eip: 8151
+title: Account Code Restricted ecRecover
+description: Restrict ecRecover results to accounts with empty code or a delegation indicator
+author: Liyi Guo (@colinlyguo), Nicolas Consigny (@nconsigny)
+discussions-to: https://ethereum-magicians.org/t/eip-8151-account-code-restricted-ecrecover/27690
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-02-09
+requires: 3607, 7702, 8038
+---
+
+## Abstract
+
+This EIP modifies the `ecRecover` precompile at address `0x0000000000000000000000000000000000000001` to apply the [EIP-3607](./eip-3607.md) account-code restriction, except for delegation indicators specified by [EIP-7702](./eip-7702.md). After performing ECDSA public key recovery, the precompile returns the recovered address only if its current raw account code is empty, or exactly an EIP-7702 delegation indicator. Otherwise, it returns empty output, the same result `ecRecover` already returns when recovery fails.
+
+## Motivation
+
+EOAs can use [EIP-7702](./eip-7702.md) as a bridge to post-quantum authorization. After migration, the account's non-empty code no longer matches the EIP-7702 delegation format `0xef0100 || delegate_address`, so [EIP-3607](./eip-3607.md) disables its ECDSA transaction authority at the protocol level. However, `ecRecover` ignores account state. A quantum-capable attacker deriving the old ECDSA private key could still authorize token transfers through contracts, including [ERC-20](./eip-20.md) `permit` implementations ([ERC-2612](./eip-2612.md)). This EIP applies the same rule to `ecRecover`: recovery returns empty output when the account has non-empty raw code that is not a valid EIP-7702 delegation indicator. As a result, after the account has migrated to post-quantum authorization, the old ECDSA private key can no longer be used for contract authorization that relies on `ecRecover`.
+
+## Specification
+
+### Modified `ecRecover` Behavior
+
+Starting at the activation of this EIP, the `ecRecover` precompile at address `0x0000000000000000000000000000000000000001` must perform the following steps. Recovery failure and a rejected code check both return empty output with `success = 1`.
+
+1. Consume `3000` gas. If the gas is insufficient, halt for out of gas.
+2. Perform ECDSA public key recovery from the input `(hash, v, r, s)` as currently specified. If recovery fails, return empty output.
+3. If recovery succeeds, compute the code-check cost from [EIP-8038](./eip-8038.md). Cold or warm comes from `accessed_addresses`, before the account is read. This is the pre-state gas check from [EIP-7928](./eip-7928.md).
+   - If `recovered_address` is absent from `accessed_addresses`, the account-access component is `COLD_ACCOUNT_ACCESS` (`3000` gas). Otherwise it is `WARM_ACCESS` (`100` gas).
+   - Add one `WARM_ACCESS` (`100` gas) as the code-query fee. Empty code does not waive this fee, and a code check that later rejects the account does not waive it either.
+4. Consume the code-check cost. If the gas is insufficient, halt for out of gas. This operation then makes no account access.
+5. Add `recovered_address` to `accessed_addresses`, record the account read specified below, and read its raw code.
+6. If that raw code is empty or exactly an EIP-7702 delegation indicator, return `recovered_address` left-padded to 32 bytes.
+7. Otherwise, return empty output.
+
+### Account Code Check
+
+The check uses the raw account code stored in state for `recovered_address`, without following a delegation indicator. An absent account is treated as having empty code.
+
+```python
+code = state.get_raw_code(recovered_address)
+is_permitted = len(code) == 0 or (len(code) == 23 and code[:3] == bytes.fromhex("ef0100"))
+```
+
+Thus, the recovered address is returned only when its raw code is empty or exactly `0xef0100 || delegate_address`.
+
+### Gas Cost
+
+When ECDSA recovery fails, no state access is performed and no fee is added to the base `3000` gas.
+
+When ECDSA recovery succeeds, the code-check cost is [EIP-8038](./eip-8038.md) `COLD_ACCOUNT_ACCESS` (`3000` gas) or `WARM_ACCESS` (`100` gas), plus one `WARM_ACCESS` (`100` gas) for the code query. That is `3100` gas cold and `200` gas warm. The total cost is `6100` gas cold and `3200` gas warm. The address is added to `accessed_addresses` only after this cost is paid, and it stays warm for later operations unless an enclosing scope reverts.
+
+### Block Access List
+
+When [EIP-7928](./eip-7928.md) is active, paying the code-check cost is an account read of `recovered_address`:
+
+- Record the read only after that cost is paid. An out-of-gas code check contributes no account access.
+- The read is the raw code of `recovered_address`. Its delegation target is not loaded.
+- If the account has no other changes, include it with empty change lists.
+- A rejected code check leaves the read in place. An outer scope that later reverts also leaves the read in place. A reverted scope restores `accessed_addresses` to its contents on entry to that scope. Accesses that already existed stay.
+
+## Rationale
+
+### Protocol-Level Modification
+
+Modifying `ecRecover` at the protocol level is chosen because many deployed contracts that rely on `ecRecover` for signature-based authorization (e.g., [ERC-20](./eip-20.md) `permit` implementations) are immutable and cannot be updated to check the recovered account's code. A protocol-level change ensures these existing contracts automatically apply the same restriction without requiring redeployment.
+
+### Empty Output on Failure
+
+Recovery failure and a rejected code check return empty output with `success = 1`.
+
+Current `ecRecover` returns empty output, with `RETURNDATASIZE == 0`, when `v` is malformed, `r` or `s` is out of range, or recovery fails. A 32-byte zero return would change that result. A caller that compares `mload(returndatasize())` with the authorized address would, when that address is the zero address, accept 32 zero bytes. A caller that rejects a signature because `RETURNDATASIZE` is `0` would accept the same 32 bytes. Empty output keeps a rejected account on the same path as recovery failure.
+
+An execution failure (`success = 0`) would break deployed contracts that wrap `ecRecover` with a low level `staticcall` and `require(success)`, turning an invalid signature into a revert.
+
+### Account Access Gas
+
+The base `3000` gas is charged once, before recovery. A failed recovery stops there.
+
+Successful recovery loads raw code, so it pays [EIP-8038](./eip-8038.md) `COLD_ACCOUNT_ACCESS` or `WARM_ACCESS`, plus one `WARM_ACCESS` for the code read, as `EXTCODESIZE` and `EXTCODECOPY` do. The account is loaded before the check can observe empty or disallowed code, so neither outcome waives the fee.
+
+The code-check fee is charged before the address is warmed, recorded, or read. Unpaid gas is an out-of-gas halt and adds no account access. Cold or warm is known from `accessed_addresses`.
+
+### Block Access List Recording
+
+The read uses the [EIP-7928](./eip-7928.md) rule for an accessed account: a read that has happened stays recorded if the code check rejects the account or an outer scope reverts. A reverted scope restores the warm set to its contents on entry. The precompile only reads, so an otherwise unchanged account has empty change lists.
+
+## Backwards Compatibility
+
+For addresses whose raw code is neither empty nor exactly an EIP-7702 delegation indicator, `ecRecover` now returns empty output where it previously returned the recovered address. Recovery failure still returns empty output and still costs `3000` gas.
+
+On every successful ECDSA recovery, the precompile charges `3100` gas for a cold address or `200` gas for a warm address on top of the base `3000`, for totals of `6100` and `3200`. Transactions that invoke `ecRecover` near their gas limit may fail with an out-of-gas error after activation. A call that forwards a fixed `3000` gas, such as `staticcall(3000, 1, ...)`, runs out of gas after activation whenever ECDSA recovery succeeds, even when the signature is valid. Increasing the transaction's total gas does not fix it. A paid code check also records the recovered address in the block access list when [EIP-7928](./eip-7928.md) is active. That record remains when the code check rejects the address or a later scope reverts.
+
+## Reference Implementation
+
+```python
+BASE_GAS = 3000
+COLD_ACCOUNT_ACCESS = 3000
+WARM_ACCESS = 100
+DELEGATION_PREFIX = b'\xef\x01\x00'
+DELEGATION_CODE_LEN = 23
+
+def code_check_cost(state, recovered_address):
+    # Cold or warm comes from accessed_addresses, before the account is read.
+    if recovered_address in state.accessed_addresses:
+        cost = WARM_ACCESS
+    else:
+        cost = COLD_ACCOUNT_ACCESS
+    cost += WARM_ACCESS
+    return cost
+
+def permits_ecrecover(state, recovered_address):
+    code = state.get_raw_code(recovered_address)
+    return len(code) == 0 or (len(code) == DELEGATION_CODE_LEN and code[:3] == DELEGATION_PREFIX)
+
+def record_account_read(state, recovered_address):
+    # Empty change lists when nothing else changed the account.
+    # An outer revert keeps this read and restores accessed_addresses
+    # to the scope's prior contents.
+    state.record_bal_account_read(recovered_address)
+
+def ecrecover(state, hash: bytes, v: int, r: int, s: int) -> bytes:
+    # consume_gas halts for out of gas.
+    state.consume_gas(BASE_GAS)
+
+    # None means recovery failure.
+    recovered_address = ecdsa_recover(hash, v, r, s)
+    if recovered_address is None:
+        return b""
+
+    state.consume_gas(code_check_cost(state, recovered_address))
+    state.accessed_addresses.add(recovered_address)
+    if state.eip_7928_active:
+        record_account_read(state, recovered_address)
+
+    if not permits_ecrecover(state, recovered_address):
+        return b""
+    return recovered_address.rjust(32, b'\x00')
+```
+
+## Security Considerations
+
+### Callers That Do Not Reject a Failed Recovery
+
+When an account fails the account-code check, `ecrecover` returns the same empty output used for an invalid signature, so contracts that already treat that result as failure continue to behave correctly. Callers that do not correctly reject a failed recovery may accept an invalid signature.
+
+### Application-Level ECDSA Verification
+
+This EIP only modifies the `ecrecover` precompile. Contracts that perform ECDSA recovery in application-level code (e.g., pure Solidity implementations) bypass the precompile and will not observe the account-code restriction.
+
+### Cross-Domain / L2 Fault Proof Implications
+
+Some systems re-execute `ecrecover` in a different context (different chain, different layer, or asynchronously at a later time) and assume it is a pure function of `(hash, v, r, s)`. Because this EIP introduces a read of the recovered account's current raw code, that assumption no longer holds.
+
+In particular, L2 fault proof systems that obtain the final `ecrecover` result by executing the L1 precompile may become incorrect when L1 and L2 state differ. An L2 adopting this EIP must recover the address and then apply the account-code check and the [EIP-8038](./eip-8038.md) access costs using its own raw account code and transaction access status. Systems that need recovery to remain independent of account state must use a separate secp256k1 recovery implementation instead of this precompile.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).

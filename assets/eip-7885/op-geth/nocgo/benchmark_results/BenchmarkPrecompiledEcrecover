@@ -1,0 +1,11 @@
+goos: linux
+goarch: amd64
+pkg: github.com/ethereum/go-ethereum/core/vm
+cpu: Intel(R) Xeon(R) CPU @ 2.20GHz
+BenchmarkPrecompiledEcrecover/-Gas=3000-4                  60457             57441 ns/op              3000 gas/op               52.22 mgas/s         352 B/op       6 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-4                  63729             58305 ns/op              3000 gas/op               51.45 mgas/s         352 B/op       6 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-4                  60895             57104 ns/op              3000 gas/op               52.53 mgas/s         352 B/op       6 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-4                  62613             57261 ns/op              3000 gas/op               52.39 mgas/s         352 B/op       6 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-4                  62107             58844 ns/op              3000 gas/op               50.98 mgas/s         352 B/op       6 allocs/op
+PASS
+ok      github.com/ethereum/go-ethereum/core/vm 20.881s
