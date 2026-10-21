@@ -35,7 +35,7 @@ Per-spec NNLS fits of `test_runtime_ms` against `opcount`, one row per (target o
 | `nethermind` | 1155 | 0.6416 | 7.747e-06 | 1.00e-03 | [7.305e-06, 8.208e-06] |
 | `reth` | 99 | 0.8305 | 7.01e-06 | 1.00e-03 | [6.317e-06, 7.706e-06] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -61,7 +61,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -87,7 +87,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -113,7 +113,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -139,7 +139,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -165,7 +165,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -204,7 +204,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.8646 | 1.32e-05 | 1.00e-03 | [1.29e-05, 1.351e-05] |
 | `reth` | 99 | 0.8431 | 8.962e-06 | 1.00e-03 | [8.178e-06, 9.826e-06] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -230,7 +230,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -256,7 +256,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -282,7 +282,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -308,7 +308,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -334,7 +334,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -373,7 +373,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.8847 | 1.011e-05 | 1.00e-03 | [9.904e-06, 1.031e-05] |
 | `reth` | 99 | 0.8527 | 7.02e-06 | 1.00e-03 | [6.409e-06, 7.626e-06] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -399,7 +399,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -425,7 +425,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -451,7 +451,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -477,7 +477,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -503,7 +503,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -540,7 +540,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.8955 | 1.122e-05 | 1.00e-03 | [1.102e-05, 1.142e-05] |
 | `reth` | 99 | 0.8484 | 9.667e-06 | 1.00e-03 | [8.782e-06, 1.059e-05] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -566,7 +566,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -592,7 +592,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -618,7 +618,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -644,7 +644,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -670,7 +670,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -707,7 +707,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9198 | 1.033e-05 | 1.00e-03 | [1.015e-05, 1.051e-05] |
 | `reth` | 99 | 0.8313 | 8.048e-06 | 1.00e-03 | [7.341e-06, 8.779e-06] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -733,7 +733,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -759,7 +759,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -785,7 +785,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -811,7 +811,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -837,7 +837,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -874,7 +874,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9012 | 6.91e-06 | 1.00e-03 | [6.797e-06, 7.034e-06] |
 | `reth` | 99 | 0.8596 | 6.34e-06 | 1.00e-03 | [5.802e-06, 6.885e-06] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -900,7 +900,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -926,7 +926,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -952,7 +952,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -978,7 +978,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1004,7 +1004,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1043,7 +1043,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9335 | 1.103e-05 | 1.00e-03 | [1.085e-05, 1.121e-05] |
 | `reth` | 99 | 0.8675 | 7.022e-06 | 1.00e-03 | [6.457e-06, 7.574e-06] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1069,7 +1069,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1095,7 +1095,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1121,7 +1121,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1147,7 +1147,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1173,7 +1173,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1210,7 +1210,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9136 | 1.238e-05 | 1.00e-03 | [1.217e-05, 1.258e-05] |
 | `reth` | 99 | 0.8589 | 1.058e-05 | 1.00e-03 | [9.658e-06, 1.152e-05] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1236,7 +1236,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1262,7 +1262,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1288,7 +1288,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1314,7 +1314,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1340,7 +1340,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1377,7 +1377,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9259 | 1.109e-05 | 1.00e-03 | [1.091e-05, 1.128e-05] |
 | `reth` | 99 | 0.8422 | 8.753e-06 | 1.00e-03 | [7.994e-06, 9.546e-06] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1403,7 +1403,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1429,7 +1429,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1455,7 +1455,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1481,7 +1481,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1507,7 +1507,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1544,7 +1544,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9146 | 8.104e-06 | 1.00e-03 | [7.961e-06, 8.245e-06] |
 | `reth` | 99 | 0.8655 | 6.348e-06 | 1.00e-03 | [5.832e-06, 6.881e-06] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1570,7 +1570,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1596,7 +1596,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1622,7 +1622,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1648,7 +1648,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1674,7 +1674,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1713,7 +1713,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9297 | 1.328e-05 | 1.00e-03 | [1.308e-05, 1.348e-05] |
 | `reth` | 99 | 0.8579 | 9.424e-06 | 1.00e-03 | [8.543e-06, 1.031e-05] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1739,7 +1739,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1765,7 +1765,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1791,7 +1791,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1817,7 +1817,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1843,7 +1843,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1882,7 +1882,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9081 | 3.349e-05 | 1.00e-03 | [3.286e-05, 3.411e-05] |
 | `reth` | 99 | 0.8533 | 1.684e-05 | 1.00e-03 | [1.539e-05, 1.832e-05] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1908,7 +1908,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1934,7 +1934,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1960,7 +1960,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1986,7 +1986,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2012,7 +2012,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2051,7 +2051,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 4620 | 0.6981 | 2.397e-05 | 1.00e-03 | [2.048e-05, 2.753e-05] |
 | `reth` | 396 | 0.5592 | 1.586e-05 | 1.00e-03 | [7.961e-06, 2.429e-05] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2078,7 +2078,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2105,7 +2105,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2132,7 +2132,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2159,7 +2159,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2186,7 +2186,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2224,7 +2224,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 4620 | 0.7005 | 2.444e-05 | 1.00e-03 | [2.1e-05, 2.794e-05] |
 | `reth` | 396 | 0.5698 | 1.625e-05 | 1.00e-03 | [7.498e-06, 2.462e-05] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2251,7 +2251,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2278,7 +2278,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2305,7 +2305,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2332,7 +2332,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2359,7 +2359,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2397,7 +2397,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 4620 | 0.6993 | 2.44e-05 | 1.00e-03 | [2.093e-05, 2.758e-05] |
 | `reth` | 396 | 0.5606 | 1.602e-05 | 1.00e-03 | [7.885e-06, 2.455e-05] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2424,7 +2424,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2451,7 +2451,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2478,7 +2478,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2505,7 +2505,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2532,7 +2532,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2570,7 +2570,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 4620 | 0.6992 | 2.408e-05 | 1.00e-03 | [2.071e-05, 2.76e-05] |
 | `reth` | 396 | 0.5645 | 1.527e-05 | 1.00e-03 | [7.06e-06, 2.302e-05] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2597,7 +2597,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2624,7 +2624,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2651,7 +2651,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2678,7 +2678,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2705,7 +2705,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2745,7 +2745,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.8773 | 0.006904 | 1.00e-03 | [0.006725, 0.007079] |
 | `reth` | 99 | 0.8359 | 0.006548 | 1.00e-03 | [0.005918, 0.007205] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2771,7 +2771,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2797,7 +2797,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2823,7 +2823,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2849,7 +2849,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2875,7 +2875,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2914,7 +2914,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 4620 | 0.9519 | 0.000156 | 1.00e-03 | [0.0001549, 0.0001572] |
 | `reth` | 396 | 0.9896 | 0.0003815 | 1.00e-03 | [0.0003779, 0.0003852] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2941,7 +2941,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2968,7 +2968,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2995,7 +2995,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3022,7 +3022,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3049,7 +3049,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3087,7 +3087,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 4620 | 0.9323 | 0.000165 | 1.00e-03 | [0.0001637, 0.0001663] |
 | `reth` | 396 | 0.9875 | 0.0003756 | 1.00e-03 | [0.0003718, 0.0003789] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3114,7 +3114,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3141,7 +3141,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3168,7 +3168,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3195,7 +3195,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3222,7 +3222,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3262,7 +3262,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9388 | 0.0009701 | 1.00e-03 | [0.0009563, 0.0009841] |
 | `reth` | 99 | 0.8538 | 0.0007585 | 1.00e-03 | [0.0006852, 0.000828] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3288,7 +3288,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3314,7 +3314,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3340,7 +3340,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3366,7 +3366,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3392,7 +3392,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3431,7 +3431,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9356 | 0.001486 | 1.00e-03 | [0.001462, 0.001508] |
 | `reth` | 99 | 0.8454 | 0.001013 | 1.00e-03 | [0.0009255, 0.001108] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3457,7 +3457,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3483,7 +3483,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3509,7 +3509,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3535,7 +3535,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3561,7 +3561,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3600,7 +3600,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9168 | 0.0004388 | 1.00e-03 | [0.000431, 0.0004464] |
 | `reth` | 99 | 0.867 | 0.0005895 | 1.00e-03 | [0.0005412, 0.0006379] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3626,7 +3626,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3652,7 +3652,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3678,7 +3678,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3704,7 +3704,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3730,7 +3730,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3767,7 +3767,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.918 | 0.0002005 | 1.00e-03 | [0.0001975, 0.0002034] |
 | `reth` | 99 | 0.9867 | 0.0003772 | 1.00e-03 | [0.0003692, 0.0003854] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3793,7 +3793,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3819,7 +3819,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3845,7 +3845,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3871,7 +3871,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3897,7 +3897,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3934,7 +3934,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9088 | 0.0002669 | 1.00e-03 | [0.0002618, 0.0002717] |
 | `reth` | 99 | 0.9774 | 0.0003535 | 1.00e-03 | [0.0003448, 0.0003627] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3960,7 +3960,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3986,7 +3986,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4012,7 +4012,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4038,7 +4038,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4064,7 +4064,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4101,7 +4101,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.9282 | 0.0004714 | 1.00e-03 | [0.0004634, 0.000479] |
 | `reth` | 99 | 0.8591 | 0.0006084 | 1.00e-03 | [0.0005562, 0.0006598] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4127,7 +4127,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4153,7 +4153,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4179,7 +4179,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4205,7 +4205,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4231,7 +4231,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4268,7 +4268,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.944 | 0.0007578 | 1.00e-03 | [0.0007472, 0.0007689] |
 | `reth` | 99 | 0.8362 | 0.0009582 | 1.00e-03 | [0.00087, 0.001044] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4294,7 +4294,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4320,7 +4320,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4346,7 +4346,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4372,7 +4372,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4398,7 +4398,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4437,7 +4437,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 5775 | 0.9343 | 0.0664 | 1.00e-03 | [0.06508, 0.06772] |
 | `reth` | 495 | 0.8172 | 0.04688 | 1.00e-03 | [0.04257, 0.05164] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4464,7 +4464,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4491,7 +4491,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4518,7 +4518,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4545,7 +4545,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4572,7 +4572,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4610,7 +4610,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 5775 | 0.9466 | 0.05277 | 1.00e-03 | [0.05145, 0.05397] |
 | `reth` | 495 | 0.8392 | 0.08247 | 1.00e-03 | [0.07785, 0.08735] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4637,7 +4637,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4664,7 +4664,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4691,7 +4691,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4718,7 +4718,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4745,7 +4745,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4785,7 +4785,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.8769 | 0.2157 | 1.00e-03 | [0.2104, 0.2211] |
 | `reth` | 99 | 0.8398 | 0.1978 | 1.00e-03 | [0.1799, 0.2152] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4811,7 +4811,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4837,7 +4837,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4863,7 +4863,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4889,7 +4889,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4915,7 +4915,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4952,7 +4952,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.8628 | 0.234 | 1.00e-03 | [0.2277, 0.2399] |
 | `reth` | 99 | 0.8355 | 0.1966 | 1.00e-03 | [0.178, 0.2139] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -4978,7 +4978,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5004,7 +5004,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5030,7 +5030,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5056,7 +5056,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5082,7 +5082,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5121,7 +5121,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.8816 | 0.008589 | 1.00e-03 | [0.008375, 0.008796] |
 | `reth` | 99 | 0.8427 | 0.008424 | 1.00e-03 | [0.007627, 0.009186] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5147,7 +5147,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5173,7 +5173,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5199,7 +5199,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5225,7 +5225,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5251,7 +5251,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5288,7 +5288,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 | `nethermind` | 1155 | 0.8835 | 0.008746 | 1.00e-03 | [0.008526, 0.008972] |
 | `reth` | 99 | 0.8658 | 0.008419 | 1.00e-03 | [0.007681, 0.00912] |
 
-<details><summary>besu — NNLS regression summary</summary>
+<details markdown="1"><summary>besu — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5314,7 +5314,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>erigon — NNLS regression summary</summary>
+<details markdown="1"><summary>erigon — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5340,7 +5340,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>ethrex — NNLS regression summary</summary>
+<details markdown="1"><summary>ethrex — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5366,7 +5366,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>geth — NNLS regression summary</summary>
+<details markdown="1"><summary>geth — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5392,7 +5392,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>nethermind — NNLS regression summary</summary>
+<details markdown="1"><summary>nethermind — NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -5418,7 +5418,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary>reth — NNLS regression summary</summary>
+<details markdown="1"><summary>reth — NNLS regression summary</summary>
 
 ```
 ==============================================================================

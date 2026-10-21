@@ -16,7 +16,7 @@ memory use is identical.
 execute(code, calldata) -> (status, returndata, gas_used) where
 status is "return", "stop", "revert", or a halt reason.
 """
-CALLSUB, CALLDEST, RETURNSUB = 0xB0, 0xB1, 0xB2
+CALLSUB, CALLDEST, RETURNSUB = 0xBC, 0xBB, 0xBF
 U256 = (1 << 256) - 1
 
 
