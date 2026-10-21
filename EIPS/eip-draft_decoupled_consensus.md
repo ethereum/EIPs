@@ -1,0 +1,99 @@
+---
+eip: TBD
+title: Decoupled Consensus
+description: Separate available-chain voting from finality voting to improve reorg resilience and enable faster finality.
+author: Francesco D'Amato (@fradamt), Roberto Saltini (@saltiniroberto), Yann Vonlanthen (@yannvon), Mikhail Kalinin (@mkalinin), Ben Edgington (@benjaminion)
+discussions-to: TBD
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-10-21
+---
+
+## Abstract
+
+This EIP replaces the beacon chain's coupled fork-choice and finality voting with an available-chain protocol and a separate finality gadget. Validators cast head votes and finality attestations as separate duties. The available chain uses recent head votes to select a head and confirm blocks, while locks protect confirmations when votes are missing. The finality gadget justifies and finalizes blocks at quorum-driven logical heights, with attestations sent on a separate round schedule.
+
+## Motivation
+
+There are three reasons to replace the beacon chain's combination of Casper the Friendly Finality Gadget (Casper FFG) and latest message driven GHOST (LMD-GHOST), known as Gasper.
+
+First, preparing the consensus layer for post-quantum cryptography requires flexibility in how votes are signed, aggregated, and propagated. Separating available-chain voting from finality voting allows their different latency and throughput requirements to be addressed independently. This proposal does not select a post-quantum signature scheme.
+
+Second, LMD-GHOST retains validators' latest votes without a fixed age limit, allowing attackers to withhold votes and release them strategically to influence fork choice. Improving reorg resilience requires limiting the influence of old votes while protecting recently confirmed blocks when participation drops.
+
+Third, finality currently depends on epoch-based votes that are coupled to slot-by-slot fork choice. Decoupling allows finality votes to be propagated and aggregated over a separately configured round, potentially much faster than at present. Earlier finality limits the period during which blocks can be reorganized and improves user experience. The initial target is at least a fourfold reduction in time to finality, subject to parameter selection and analysis.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+
+The work-in-progress specification is in the decoupled-consensus feature of the consensus specifications: [specs/_features/dc](https://github.com/ethereum/consensus-specs/tree/decoupled-consensus/specs/_features/dc).
+
+### Duties
+
+Head votes and finality attestations MUST be separate messages, propagated and processed separately. A block carries an available-chain payload of previous-slot head votes and a separate list of finality attestations. A received finality attestation is added to an inclusion pool; only inclusion in an accepted block changes the finality chain state.
+
+### Available chain
+
+In each slot, a small available-chain committee of approximately 512 validators is selected to cast head votes. A validator's selection probability is proportional to its effective balance.
+
+The available chain selects proposal parents and voting heads and exposes a confirmed tip. It has its own votes, state, and block payload. Fork choice uses votes from a recent slot, with specified receipt cutoffs and proposer-carried votes (called view-merge) to reconcile validators' views.
+
+Expiring locks anchor fork choice and protect confirmations when votes are missing. A block is fast-locked when a confirmation update locks it based on timely, non-equivocating head votes from at least half of the full committee for that slot. Recent votes for conflicting blocks can move locks back to an ancestor. The confirmed tip extends the finalized chain, but its guarantees depend on network timing and participation.
+
+### Finality gadget
+
+Finality is driven by attestations from the entire validator set. These attestations are collected in finality rounds, on a schedule separate from head voting and epoch boundaries.
+
+The finality gadget maintains accepted blocks, per-block chain state, and justification and finalization records. Its attestations carry a target vote or timeout at a logical height, optionally accompanied by a finality vote for an earlier justified target.
+
+Included attestations advance heights and justify or finalize targets when the corresponding quorum of at least two-thirds of active stake is reached. A quorum counting both target votes and timeouts can advance a height without justification after a specified delay. These transitions are driven by attestations included in blocks and do not wait for epoch boundaries.
+
+Conflicting attestations are slashable, with the precise conditions, evidence formats, and penalties still to be specified. Pre-fork attestations remain slashable under Casper FFG, including surround votes, through a legacy attester-slashing operation.
+
+### Composition
+
+The finality gadget supplies the available chain with a frame containing the accepted tree extending finality, a fork-choice root, and viable heads. Proposal and voting heads MUST respect this frame. The frame uses the latest justification and the frontier height, the greatest logical height in any accepted block's chain state, to constrain fork choice. When competing branches contest the latest justification at the frontier height, fork choice starts from finality and requires heads at that height, instead of always starting from the latest justified block. A block is viable if its chain-state height meets the minimum: the frontier height during a contest, and one below it otherwise. Viable heads are viable blocks extending the fork-choice root; the viable tree consists of the paths from that root to those heads. A node's finality advances only to a compatible finalized candidate with a viable descendant.
+
+When a finality attestation is due, the available chain supplies the deepest block in the viable tree fast-locked by the confirmation update at that time, together with a head extending it. When no qualifying source exists, a validator MUST NOT produce a finality attestation.
+
+After a restart, a node preserves finality state, signing records, available-chain locks, and the recorded confirmation, without extending lock deadlines. It rebuilds the remaining available-chain state and waits until it has been awake since at least the start of the previous slot before voting, proposing, unlocking, updating confirmations, or supplying a finality voting source.
+
+TBD: Complete the Ethereum integration, including committee selection and stake weighting, timing and lock parameters, vote encoding and aggregation, rewards and penalties, inactivity leak, and fork transition rules. Specify the parameters and assumptions supporting the initial fourfold reduction in time to finality.
+
+## Rationale
+
+Separating the voting paths allows finality attestations to use bandwidth throughout the voting round, with more time for propagation and aggregation than head votes. Quorums advance finality as votes are included in blocks. Rounds can be shortened without redesigning slot-by-slot block production.
+
+Restricting fork choice to recent votes limits the opportunity to accumulate withheld voting weight, which has proved difficult to defend against in LMD-GHOST. Expiring locks protect confirmed blocks when votes are missing, while expiration and unlocking allow recovery when network conditions change. The explicit interface between the two protocols constrains their interaction.
+
+Sampling a small head-vote committee reduces the work of collecting signatures within a slot. It also introduces sampling risk and makes a smaller set of validators a potential denial-of-service target. Private selection using a verifiable random function (VRF) is one option being explored; neither the selection mechanism nor the committee size is fixed here.
+
+Replacing proposer boost with view-merge improves fork-choice security against balancing and reorg attacks.
+
+Changing the overall validator rewards budget is not a goal of this proposal. Incentives for the separate available-chain and finality duties will fit within the existing total rewards budget for a given total active stake. The allocation of rewards between duties may change while preserving that budget.
+
+Decoupling also leaves room for later changes to signature schemes, aggregation, and available-chain committees. Post-quantum signatures, shorter slots, validator consolidation, validator-set rotation, and single-round finality require separate specifications.
+
+## Backwards Compatibility
+
+This change requires a consensus-layer hard fork. Consensus clients and validator clients must support the new voting duties, block and state formats, and fork-choice rules.
+
+The fork must initialize the new finality and available-chain states from the pre-fork chain and preserve accountability for pre-fork votes, including Casper FFG surround votes. The mapping of old checkpoints and signing records, handling of legacy slashing evidence, checkpoint sync, and validator and node API changes remain TBD.
+
+## Test Cases
+
+TBD: Add executable consensus test vectors for the complete state transition, frame contests, view-merge, cutoff boundaries, lock creation and expiration, unlocking and vetoes, restarts, delayed and equivocating messages, and the fork transition.
+
+## Security Considerations
+
+Available-chain confirmations depend on network timing and participation assumptions and do not provide the guarantees of finality. Lock duration, receipt cutoffs, and committee selection require analysis under delayed messages, equivocation, and changing participation.
+
+Receipt cutoffs, tick ordering, view-merge, equivocation handling, and the waiting period after a restart affect security. Losing receipt history and immediately resuming duties can produce views inconsistent with those of continuously running nodes. Finality signing locks and available-chain locks have different lifetimes and purposes; expiring an available-chain lock does not release a finality signing restriction.
+
+TBD: Complete the safety, liveness, and accountable-safety analysis, including validator set changes, inactivity leak, recovery after network partitions, and resource limits for vote processing and block inclusion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
