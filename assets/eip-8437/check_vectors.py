@@ -128,6 +128,22 @@ def check_wrapper_response(request_id, requested, announced_metadata, reply):
         previous = positions[digest]
 
 
+def check_pooled_response(requested, announced_metadata, envelopes):
+    # Dependency-bearing envelopes use the ordinary EIP-2718 encoding, not
+    # the blob network-wrapper encoding. Metadata is optional on wrapper recovery.
+    positions = {digest: i for i, digest in enumerate(requested)}
+    previous = -1
+    for envelope in envelopes:
+        digest = h(envelope)
+        assert digest in positions, "pooled response hash"
+        assert positions[digest] > previous, "pooled response order"
+        if digest in announced_metadata:
+            tx_type, size = announced_metadata[digest]
+            assert envelope[0] == tx_type, "pooled announced type"
+            assert len(envelope) == size, "pooled announced size"
+        previous = positions[digest]
+
+
 def wrappers_response(request_id, wrappers):
     # A wrapper is embedded as its RLP item: splice its exact bytes into the list.
     served = []
@@ -243,6 +259,24 @@ def main():
     assert wrappers_response(7, encoded) == rlp([7, items])
     assert wrappers_response(7, encoded[1:]).hex() == "f9012407f90120" + encoded[1].hex()
 
+    # Synthetic typed envelopes test pooled-response correlation, not tx validity.
+    envelopes = [bytes([0x06]) + rlp([i]) for i in range(3)]
+    tx_hashes = [h(envelope) for envelope in envelopes]
+    tx_metadata = {h(envelope): (0x06, len(envelope)) for envelope in envelopes}
+    for returned in (envelopes, envelopes[1:], envelopes[::2], []):
+        check_pooled_response(tx_hashes, tx_metadata, returned)
+        check_pooled_response(tx_hashes, {}, returned)  # No transaction announcement.
+    expect_error("pooled response order", check_pooled_response,
+                 tx_hashes, tx_metadata, envelopes[::-1])
+    expect_error("pooled response order", check_pooled_response,
+                 tx_hashes, tx_metadata, envelopes[:1] * 2)
+    expect_error("pooled response hash", check_pooled_response,
+                 tx_hashes, tx_metadata, [bytes([0x06]) + rlp([99])])
+    for reason, wrong in (("pooled announced type", (0x05, len(envelopes[0]))),
+                          ("pooled announced size", (0x06, len(envelopes[0]) + 1))):
+        expect_error(reason, check_pooled_response, tx_hashes,
+                     {**tx_metadata, tx_hashes[0]: wrong}, envelopes)
+
     # A full 64-hash request can be satisfied in one response for small wrappers.
     small_items = [[[h(b"small transaction %d" % i)], 0, mode0[2]] for i in range(64)]
     small = [rlp(item) for item in small_items]
@@ -274,7 +308,7 @@ def main():
     expect_error("wrapper length", check_wrapper_response, 7, [], {}, [7, [oversized]])
 
     print("PASS: announcement and wrapper encoding vectors; "
-          "message count, ordering, metadata matching and response packing checks. "
+          "message count, ordering, metadata matching, pooled-envelope recovery and response packing checks. "
           "Proof validity and client-state sequences are not tested.")
 
 
