@@ -67,73 +67,136 @@ Per-client proposed gas for each parameter. Cells are colored by `log2(proposed 
 
 ## Worst-case provenance per gas param
 
-One collapsible block per gas parameter showing every per-client candidate that the worst-case selector saw. Rows are model combos (the source regression's `test_name`, `target_opcode`, `model_coef_name`, and any `model_by` factors — components constant within a parameter are dropped from the label). Cells carry each candidate's proposed gas; the cell the per-client selector picked is outlined in black. Colors are `log2(proposed / current)` against that parameter's baseline on a per-parameter symmetric scale.
+One collapsible block per gas parameter showing every per-client candidate that the worst-case selector saw. Rows are model combos (the source regression's `test_name`, `target_opcode`, `model_coef_name`, and any `model_by` factors — components constant within a parameter are dropped from the label). Cells carry each candidate's proposed gas; bold values mark the cell the per-client selector picked.
 
 _Single-combo parameters omitted (see proposal table for the sole estimation): `OPCODE_DIV`, `OPCODE_SDIV`, `OPCODE_ADDMOD`, `OPCODE_MULMOD`, `PRECOMPILE_ECRECOVER`, `PRECOMPILE_BLS_G1ADD`, `PRECOMPILE_BLS_G2ADD`._
 
-<details>
+<details markdown="1">
 <summary><code>OPCODE_MOD</code> — 4 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `63` | 2 | 1 | 1 | 1 | 1 | 1 |
+| `127` | **2** | **2** | **2** | **2** | 2 | 1 |
+| `191` | 2 | 2 | 1 | 2 | **2** | **1** |
+| `255` | 2 | 2 | 1 | 2 | 2 | 1 |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>OPCODE_SMOD</code> — 4 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `63` | 2 | 1 | 1 | 1 | 1 | 1 |
+| `127` | **3** | **2** | **2** | **2** | 2 | 1 |
+| `191` | 2 | 2 | 1 | 2 | **2** | **2** |
+| `255` | 2 | 2 | 1 | 2 | 2 | 1 |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>OPCODE_KECCAK256_BASE</code> — 4 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `0` | 10 | **8** | 2 | 9 | 3 | 2 |
+| `32` | 11 | 8 | 2 | 9 | 3 | 2 |
+| `256` | **12** | 8 | **2** | 9 | 3 | 2 |
+| `1024` | 11 | 8 | 2 | **9** | **3** | **2** |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>OPCODE_KECCAK256_PER_WORD</code> — 4 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `0` | **2** | **2** | 2 | 2 | 3 | 2 |
+| `32` | 2 | 2 | 2 | **2** | 3 | 2 |
+| `256` | 2 | 2 | **2** | 2 | 3 | 2 |
+| `1024` | 2 | 2 | 2 | 2 | **3** | **2** |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>PRECOMPILE_BLAKE2F_BASE</code> — 2 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `test_blake2f_benchmark` | 34 | 60 | 5 | 11 | 16 | **39** |
+| `test_blake2f_uncachable` | **41** | **94** | **6** | **14** | **17** | 38 |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>PRECOMPILE_BLAKE2F_PER_ROUND</code> — 2 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `test_blake2f_benchmark` | 1 | **1** | **1** | **1** | 1 | **0** |
+| `test_blake2f_uncachable` | **1** | 1 | 1 | 1 | **1** | 0 |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>PRECOMPILE_ECADD</code> — 5 combos × 6 clients</summary>
 
+| Label | Combo |
+| --- | --- |
+| `M1` | test_name=test_alt_bn128 / target_opcode=ECADD / model_coef_name=target_coef / param_bn128=add |
+| `M2` | test_name=test_alt_bn128 / target_opcode=ECADD / model_coef_name=target_coef / param_bn128=add_infinities |
+| `M3` | test_name=test_alt_bn128 / target_opcode=ECADD / model_coef_name=target_coef / param_bn128=add_negative |
+| `M4` | test_name=test_alt_bn128 / target_opcode=ECADD / model_coef_name=target_coef / param_bn128=double |
+| `M5` | test_name=test_alt_bn128_uncachable / target_opcode=ECADD / model_coef_name=target_coef |
+
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `M1` | 62 | 72 | 58 | 39 | 44 | 59 |
+| `M2` | 37 | 58 | 15 | 11 | 21 | 38 |
+| `M3` | 39 | 58 | 21 | 17 | 27 | 36 |
+| `M4` | 66 | 72 | 59 | 41 | 48 | 61 |
+| `M5` | **90** | **108** | **91** | **61** | **76** | **96** |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>PRECOMPILE_ECPAIRING_BASE</code> — 2 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `test_alt_bn128_benchmark` | 4593 | **5023** | 4762 | **4431** | **6641** | 4688 |
+| `test_ec_pairing` | **5106** | 4746 | **8182** | 4134 | 5277 | **8247** |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>PRECOMPILE_ECPAIRING_PER_POINT</code> — 2 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `test_alt_bn128_benchmark` | 2622 | 2965 | 5890 | 2647 | 10230 | 5796 |
+| `test_ec_pairing` | **3314** | **3986** | **6162** | **3918** | **11712** | **6080** |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>PRECOMPILE_POINT_EVALUATION</code> — 2 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `test_point_evaluation` | 17308 | 17849 | 23631 | **19795** | 21566 | **19784** |
+| `test_point_evaluation_uncachable` | **20841** | **19423** | **23825** | 19224 | **23399** | 19664 |
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code>PRECOMPILE_P256VERIFY</code> — 2 combos × 6 clients</summary>
 
+| Combo | besu | erigon | ethrex | geth | nethermind | reth |
+| --- | --- | --- | --- | --- | --- | --- |
+| `test_p256verify` | 834 | 1405 | 3804 | 1169 | 859 | **843** |
+| `test_p256verify_uncachable` | **1090** | **1411** | **3814** | **1184** | **875** | 842 |
 
 </details>
 
@@ -149,7 +212,7 @@ _None._
 
 ### Missing glue adjustments
 
-<details>
+<details markdown="1">
 <summary><b>Priced glue opcodes with a poor fit</b> — 28 (glue_opcode, client) fits skipped</summary>
 
 `p_value >= glue_contribution_p_value_threshold` (0.05) or `rsquared < glue_contribution_rsquared_threshold` (0.5) — the contribution of these (glue_opcode, client) fits was **skipped** when computing the glue adjustment, so the listed gas params carry a target coefficient that is not net of this glue opcode's runtime on the affected clients. See `glue_opcodes_autogenerated_report.md` for per-fit metrics.
@@ -186,7 +249,7 @@ Rows where the winning fit's p-value exceeded `modeling.poor_fit_p_value_thresho
 
 ### Other weak candidates
 
-<details>
+<details markdown="1">
 <summary><code>PRECOMPILE_BLAKE2F_PER_ROUND</code> — 1 weak combo</summary>
 
 | Test | Target opcode | Coef | Combo | Failing clients |
