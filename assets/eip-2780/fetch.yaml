@@ -1,0 +1,7 @@
+query:
+  fork: amsterdam
+  run_id_pattern: '.*-bal-full-aot|(?!.*besu-bal-full$).*-bal-full'
+  start_date: 2026-09-25
+  end_date: 2026-10-13
+  suites:
+    - 22c2404b9ce3f47c # jochemnet-glamsterdam-devnet-8-stateful-repricing
