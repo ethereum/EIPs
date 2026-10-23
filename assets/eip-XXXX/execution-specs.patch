@@ -1,10 +1,10 @@
-diff --git a/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_99999.py b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_99999.py
+diff --git a/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_XXXX.py b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_XXXX.py
 new file mode 100644
 --- /dev/null
-+++ b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_99999.py
++++ b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_XXXX.py
 @@ -0,0 +1,28 @@
 +"""
-+Draft EIP (number to be assigned; 99999 is a placeholder): RESERVOIR
++Draft EIP (number to be assigned; XXXX is a placeholder): RESERVOIR
 +opcode (0x4d), pushing the state gas budget that GAS does not report.
 +"""
 +
@@ -15,7 +15,7 @@ new file mode 100644
 +from ....base_fork import BaseFork
 +
 +
-+class EIP99999(BaseFork):
++class EIPXXXX(BaseFork):
 +    """RESERVOIR opcode (placeholder EIP number)."""
 +
 +    @classmethod
@@ -24,13 +24,13 @@ new file mode 100644
 +    ) -> Dict[OpcodeBase, int | Callable[[OpcodeBase], int]]:
 +        """Add RESERVOIR opcode gas cost."""
 +        gas_costs = cls.gas_costs()
-+        base_map = super(EIP99999, cls).opcode_gas_map()
++        base_map = super(EIPXXXX, cls).opcode_gas_map()
 +        return {**base_map, Opcodes.RESERVOIR: gas_costs.BASE}
 +
 +    @classmethod
 +    def valid_opcodes(cls) -> List[Opcodes]:
 +        """Add RESERVOIR opcode."""
-+        return [Opcodes.RESERVOIR] + super(EIP99999, cls).valid_opcodes()
++        return [Opcodes.RESERVOIR] + super(EIPXXXX, cls).valid_opcodes()
 diff --git a/packages/testing/src/execution_testing/vm/opcodes.py b/packages/testing/src/execution_testing/vm/opcodes.py
 --- a/packages/testing/src/execution_testing/vm/opcodes.py
 +++ b/packages/testing/src/execution_testing/vm/opcodes.py
