@@ -1,8 +1,9 @@
 ---
+eip: TBD
 title: RESERVOIR Opcode
 description: Adds an EVM opcode that exposes the remaining state gas unavailable through GAS.
 author: Javad Rajabzadeh (@ja7ad)
-discussions-to:
+discussions-to: TBD
 status: Draft
 type: Standards Track
 category: Core
