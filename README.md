@@ -43,9 +43,11 @@ It is possible to run the EIP validator locally:
 
 Make sure to add cargo's `bin` directory to your environment (typically `$HOME/.cargo/bin` in your `PATH` environment variable)
 
+Run the following commands from the repository root. Replace `EIPS/eip-1559.md` with the proposal file you want to check.
+
 ```sh
 cargo install eipw
-eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
+eipw --config ./config/eipw.toml EIPS/eip-1559.md
 ```
 
 ## Build the status page locally
