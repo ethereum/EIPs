@@ -131,7 +131,7 @@ def gti_vector(root: U256, index, height: Uint) -> U256:
     """
     Returns the generalized tree index of a vector item.
     """
-    return root << height + index
+    return (root << height) + index
 
 
 def gti_merge(index, sub_index: U256) -> U256:
