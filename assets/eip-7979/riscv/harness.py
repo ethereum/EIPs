@@ -68,10 +68,14 @@ def word(v):
     return v.to_bytes(32, "big")
 
 
-# Measurement kernels: workloads big enough that counts are signal.
-# matmul: two 16x16 matrices of 64-bit values in memory, a word per
-# element, their product by a dot-product subroutine, and a checksum.
-# Values wrap modulo the word size; the oracle below wraps with them.
+# Measurement kernels: workloads big enough that counts are signal,
+# each exercising a different part of the machine.  Values wrap modulo
+# the word size; the oracles below wrap with them.
+#   mul chain      the multiplier and the ALU on a dependent chain
+#   call tree      calls and returns: seven of each per iteration
+#   xorshift       the shifter and the logic unit: the hash mixer's mix
+#   euclid         the divider, in a data-dependent loop, called per pair
+#   store and sum  the memory unit alone: n words stored, then summed
 def mulchain_oracle(n, mask):
     s = 0
     for i in range(n):
@@ -86,17 +90,27 @@ def calls_oracle(n, mask):
     return s
 
 
-def matmul_oracle(n, mask):
-    a = [[(i + j + 1) & mask for j in range(n)] for i in range(n)]
-    b = [[(i * j + 1) & mask for j in range(n)] for i in range(n)]
-    h = 0
-    for i in range(n):
-        for j in range(n):
-            s = 0
-            for k in range(n):
-                s = (s + a[i][k] * b[k][j]) & mask
-            h = (h * 31 + s) & mask
-    return h
+def xorshift_oracle(n, mask):
+    x = 0x5851F42D4C957F2D
+    for _ in range(n):
+        x ^= (x << 13) & mask
+        x ^= x >> 7
+        x ^= (x << 17) & mask
+    return x
+
+
+def euclid_oracle(n, mask):
+    s = 0
+    for i in range(1, n):
+        a, b = i * i + 1, 3 * i + 7
+        while b:
+            a, b = b, a % b
+        s = (s + a) & mask
+    return s
+
+
+def sum_oracle(n, mask):
+    return (n * (n + 1) // 2) & mask
 
 
 KERNELS = [
@@ -123,32 +137,49 @@ KERNELS = [
         }
     }""", word(1500), calls_oracle, 1500),
 
-    ("matmul", """{
-        let n := calldataload(0)
-        for { let i := 0 } lt(i, n) { i := add(i, 1) } {
-            for { let j := 0 } lt(j, n) { j := add(j, 1) } {
-                mstore(mul(add(mul(i, n), j), 32), add(add(i, j), 1))
-                mstore(add(0x2000, mul(add(mul(i, n), j), 32)), add(mul(i, j), 1))
-            }
-        }
-        for { let i := 0 } lt(i, n) { i := add(i, 1) } {
-            for { let j := 0 } lt(j, n) { j := add(j, 1) } {
-                mstore(add(0x4000, mul(add(mul(i, n), j), 32)), dot(i, j, n))
-            }
-        }
-        let h := 0
-        for { let i := 0 } lt(i, mul(n, n)) { i := add(i, 1) } {
-            h := add(mul(h, 31), mload(add(0x4000, mul(i, 32))))
-        }
-        mstore(0, h)
+    ("xorshift", """{
+        mstore(0, mix(calldataload(0)))
         return(0, 32)
-        function dot(i, j, n) -> s {
-            for { let k := 0 } lt(k, n) { k := add(k, 1) } {
-                s := add(s, mul(mload(mul(add(mul(i, n), k), 32)),
-                                mload(add(0x2000, mul(add(mul(k, n), j), 32)))))
+        function mix(n) -> x {
+            x := 0x5851f42d4c957f2d
+            for { let i := 0 } lt(i, n) { i := add(i, 1) } {
+                x := xor(x, shl(13, x))
+                x := xor(x, shr(7, x))
+                x := xor(x, shl(17, x))
             }
         }
-    }""", word(16), matmul_oracle, 16),
+    }""", word(3000), xorshift_oracle, 3000),
+
+    ("euclid", """{
+        mstore(0, gcds(calldataload(0)))
+        return(0, 32)
+        function gcd(a, b) -> g {
+            for {} b {} {
+                let t := mod(a, b)
+                a := b
+                b := t
+            }
+            g := a
+        }
+        function gcds(n) -> s {
+            for { let i := 1 } lt(i, n) { i := add(i, 1) } {
+                s := add(s, gcd(add(mul(i, i), 1), add(mul(i, 3), 7)))
+            }
+        }
+    }""", word(1000), euclid_oracle, 1000),
+
+    ("store and sum", """{
+        mstore(0, sum(calldataload(0)))
+        return(0, 32)
+        function sum(n) -> s {
+            for { let i := 0 } lt(i, n) { i := add(i, 1) } {
+                mstore(mul(i, 32), add(i, 1))
+            }
+            for { let i := 0 } lt(i, n) { i := add(i, 1) } {
+                s := add(s, mload(mul(i, 32)))
+            }
+        }
+    }""", word(3000), sum_oracle, 3000),
 ]
 
 

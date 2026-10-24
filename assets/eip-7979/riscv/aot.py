@@ -644,6 +644,13 @@ class Translate256(Translator):
                        f"sd t0, {self.at(at - 1, limb)}")
             return
 
+        if op in (0x1B, 0x1C):           # SHL, SHR: shift (top) applied to next
+            self.load_slot(at - 1, self.A)
+            self.load_slot(at - 2, self.B)
+            self.e("call __shl256" if op == 0x1B else "call __shr256")
+            self.store_slot(at - 2, self.B)
+            return
+
         two_ops = op in (0x01, 0x03, 0x04, 0x06, 0x10, 0x11, 0x12, 0x13,
                          0x14, 0x16, 0x17, 0x18)
         if not two_ops:
@@ -772,3 +779,44 @@ class Translate256(Translator):
                 self.e(f"srli t0, t6, {8 * (7 - b)}",
                        f"sb t0, {base + b}(t4)")
         self.e("ret")
+
+        # __shl256, __shr256: shift the value in a0..a3 (B) by the
+        # amount in t0..t3 (A); result in a0..a3.  An amount of 256 or
+        # more, or with any high limb set, yields zero.  The limb shift
+        # is a four-way branch, the bit shift carries across limbs with
+        # (x >> 1) >> (63 - b), which is x >> (64 - b) without a
+        # 64-bit shift when b is zero.
+        for name, left in (("__shl256", True), ("__shr256", False)):
+            zero, w1, w2, bits = (f".L{name}_zero", f".L{name}_w1",
+                                  f".L{name}_w2", f".L{name}_bits")
+            self.label(name)
+            self.e("or t4, t1, t2", "or t4, t4, t3", f"bnez t4, {zero}",
+                   "li t4, 256", f"bgeu t0, t4, {zero}",
+                   "srli t4, t0, 6", "andi t5, t0, 63",
+                   f"beqz t4, {bits}",
+                   "li t6, 1", f"beq t4, t6, {w1}",
+                   "li t6, 2", f"beq t4, t6, {w2}")
+            if left:
+                self.e("mv a3, a0", "li a2, 0", "li a1, 0", "li a0, 0",
+                       f"j {bits}", f"{w2}:",
+                       "mv a3, a1", "mv a2, a0", "li a1, 0", "li a0, 0",
+                       f"j {bits}", f"{w1}:",
+                       "mv a3, a2", "mv a2, a1", "mv a1, a0", "li a0, 0",
+                       f"{bits}:", "li t6, 63", "sub t6, t6, t5")
+                for hi, lo in (("a3", "a2"), ("a2", "a1"), ("a1", "a0")):
+                    self.e(f"srli t4, {lo}, 1", "srl t4, t4, t6",
+                           f"sll {hi}, {hi}, t5", f"or {hi}, {hi}, t4")
+                self.e("sll a0, a0, t5", "ret")
+            else:
+                self.e("mv a0, a3", "li a1, 0", "li a2, 0", "li a3, 0",
+                       f"j {bits}", f"{w2}:",
+                       "mv a0, a2", "mv a1, a3", "li a2, 0", "li a3, 0",
+                       f"j {bits}", f"{w1}:",
+                       "mv a0, a1", "mv a1, a2", "mv a2, a3", "li a3, 0",
+                       f"{bits}:", "li t6, 63", "sub t6, t6, t5")
+                for lo, hi in (("a0", "a1"), ("a1", "a2"), ("a2", "a3")):
+                    self.e(f"slli t4, {hi}, 1", "sll t4, t4, t6",
+                           f"srl {lo}, {lo}, t5", f"or {lo}, {lo}, t4")
+                self.e("srl a3, a3, t5", "ret")
+            self.e(f"{zero}:", "li a0, 0", "li a1, 0", "li a2, 0", "li a3, 0",
+                   "ret")
