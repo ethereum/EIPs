@@ -300,7 +300,7 @@ func TestDecLn(t *testing.T) {
 		gas = 0
 		out.Ln(&tt.a, PRECISION, &tt.steps, &gas)
 
-		if !out.eq(&tt.b, PRECISION) {
+		if !out.eq(&tt.b, PRECISION, &gas) {
 			t.Fatal(tt.a, out, tt.b)
 		}
 	}
