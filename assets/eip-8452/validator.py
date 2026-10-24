@@ -11,9 +11,9 @@ entered as a call, and the instruction after the CALLSUBV is the
 return point of every one of them -- so Constraint 4, one stack offset
 per instruction, requires every destination to have the same net
 stack effect.  A table is named by exactly one instruction, so its
-entries are paid for by its own bytes and validation stays within
-EIP-8337's measured worst case however tables are shared.  The
-sequential scan is unchanged: the instructions carry no immediate
+entries are edges paid for by its own bytes, at most one per two,
+and validation stays linear within EIP-8337's measured worst case.
+The sequential scan is unchanged: the instructions carry no immediate
 data, and a table is ordinary bytes placed, like any data, where
 execution does not reach them.
 
