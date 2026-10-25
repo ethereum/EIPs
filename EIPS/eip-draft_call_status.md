@@ -27,7 +27,7 @@ The EVM knows at every frame boundary whether the frame halted, and it can carry
 
 | Constant | Value |
 |---|---|
-| `CALLSTATUS_OPCODE` | `0x4D` |
+| `CALLSTATUS_OPCODE` | `0xA5` |
 | `CALLSTATUS_GAS` | `2` |
 
 ### Status values
@@ -66,7 +66,7 @@ No other instruction changes the registers, and `CALLSTATUS` does not reset them
 
 ### The `CALLSTATUS` instruction
 
-`CALLSTATUS` (`0x4D`) pops no value from the stack and pushes the value of the `call_status` register of the executing frame. It charges `CALLSTATUS_GAS`. It is allowed in a static context. It fails with a stack overflow in the usual way.
+`CALLSTATUS` (`0xA5`) pops no value from the stack and pushes the value of the `call_status` register of the executing frame. It charges `CALLSTATUS_GAS`. It is allowed in a static context. It fails with a stack overflow in the usual way.
 
 ### Relation to the success flag and the return data
 
@@ -102,7 +102,7 @@ A register costs nothing for calls whose status is never read, keeps the stack e
 
 ### Opcode number
 
-`0x4D` is in the range of instructions that read information about the environment of the frame, next to `SELFBALANCE`, `BASEFEE` and `BLOBHASH`. The number is tentative and may change to avoid a collision.
+`0xA5` is the first unused number after the `LOG` instructions, a range that other new instructions also use. The numbers next to the environment instructions, `0x4B` to `0x4F`, all have open proposals. The number is tentative and may change to avoid a collision.
 
 ### Interaction with multidimensional gas
 
@@ -110,7 +110,7 @@ With state creation metered separately from execution, a frame may draw part of 
 
 ## Backwards Compatibility
 
-`0x4D` is currently an undefined instruction, so any deployed code that executes it halts exceptionally. No deployed contract can depend on that outcome in a way this EIP changes, as with every instruction added at an undefined opcode. The instruction is not a `PUSH`, so jump destination analysis does not change. The behaviour of the call instructions, their gas costs and the return data buffer are unchanged. The registers are frame-local and need no journaling: a child's registers are read by the parent at the child's completion, and end with the child.
+`0xA5` is currently an undefined instruction, so any deployed code that executes it halts exceptionally. No deployed contract can depend on that outcome in a way this EIP changes, as with every instruction added at an undefined opcode. The instruction is not a `PUSH`, so jump destination analysis does not change. The behaviour of the call instructions, their gas costs and the return data buffer are unchanged. The registers are frame-local and need no journaling: a child's registers are read by the parent at the child's completion, and end with the child.
 
 ## Test Cases
 
