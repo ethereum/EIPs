@@ -492,7 +492,13 @@ def main():
         assert check_wrapper_response(7, [digest], meta, reply) == [digest]
         # Eviction leads to a fresh full request, not a transaction fetch.
         check_request(8, [digest], {digest}, full=1)
-        assert check_wrapper_response(8, [digest], meta, reply_for(8, [item]), full=1) == []
+        for full in (0, 1):
+            # A minimal client can serve full bytes and receive without a cache.
+            assert check_wrapper_response(8, [digest], meta, reply_for(8, [item]), full=full) == []
+        decoded_compact = decode(rlp(compact), strict=True)
+        decoded_full = decode(rlp(item), strict=True)
+        assert all(isinstance(entry, list) and len(entry) == 1 for entry in decoded_compact[0])
+        assert all(isinstance(entry, bytes) for entry in decoded_full[0])
         expect_error("reference in full response", check_wrapper_response, 7, [digest], meta, reply, 1, cache)
         assert compact_wrapper(item, set()) == item
         mixed = compact_wrapper(item, {h(item[0][0])})
