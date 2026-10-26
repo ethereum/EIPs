@@ -2,7 +2,7 @@
 title: CALLSTATUS instruction
 description: Instruction that returns whether the last call of the frame succeeded, reverted or halted, and whether a halt occurred below it
 author: Stavros Vlachakis (@svlachakis)
-discussions-to: https://ethereum-magicians.org/t/TBD
+discussions-to: https://ethereum-magicians.org/t/eip-draft-callstatus-instruction/30085
 status: Draft
 type: Standards Track
 category: Core
