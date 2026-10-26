@@ -43,7 +43,7 @@ Mixed tier fits first subtract the estimated time spent on upstream partner opco
 
 ### Cycle glue: joint fit, besu
 
-<details><summary>Joint NNLS regression summary</summary>
+<details markdown="1"><summary>Joint NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -72,49 +72,49 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATASIZE</code>, nobs=63173, runtime_ms=5.045e-06, p=1.00e-03, R²=0.9875</summary>
+<details markdown="1"><summary><code>CALLDATASIZE</code>, nobs=63173, runtime_ms=5.045e-06, p=1.00e-03, R²=0.9875</summary>
 
 
 
 
 </details>
 
-<details><summary><code>DUP</code>, nobs=63173, runtime_ms=2.342e-06, p=1.00e-03, R²=0.9875</summary>
+<details markdown="1"><summary><code>DUP</code>, nobs=63173, runtime_ms=2.342e-06, p=1.00e-03, R²=0.9875</summary>
 
 
 
 
 </details>
 
-<details><summary><code>GAS</code>, nobs=63173, runtime_ms=4.155e-06, p=1.00e-03, R²=0.9875</summary>
+<details markdown="1"><summary><code>GAS</code>, nobs=63173, runtime_ms=4.155e-06, p=1.00e-03, R²=0.9875</summary>
 
 
 
 
 </details>
 
-<details><summary><code>MLOAD</code>, nobs=63173, runtime_ms=1.328e-05, p=1.00e-03, R²=0.9875</summary>
+<details markdown="1"><summary><code>MLOAD</code>, nobs=63173, runtime_ms=1.328e-05, p=1.00e-03, R²=0.9875</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH</code>, nobs=63173, runtime_ms=3.123e-06, p=1.00e-03, R²=0.9875</summary>
+<details markdown="1"><summary><code>PUSH</code>, nobs=63173, runtime_ms=3.123e-06, p=1.00e-03, R²=0.9875</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH0</code>, nobs=63173, runtime_ms=2.242e-06, p=1.00e-03, R²=0.9875</summary>
+<details markdown="1"><summary><code>PUSH0</code>, nobs=63173, runtime_ms=2.242e-06, p=1.00e-03, R²=0.9875</summary>
 
 
 
 
 </details>
 
-<details><summary><code>STATICCALL</code>, nobs=63173, runtime_ms=0.0008686, p=1.00e-03, R²=0.9875</summary>
+<details markdown="1"><summary><code>STATICCALL</code>, nobs=63173, runtime_ms=0.0008686, p=1.00e-03, R²=0.9875</summary>
 
 
 
@@ -123,7 +123,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Pure glue, besu
 
-<details><summary><code>ISZERO</code>, nobs=1067, runtime_ms=6.097e-06, p=1.00e-03, R²=0.9869</summary>
+<details markdown="1"><summary><code>ISZERO</code>, nobs=1067, runtime_ms=6.097e-06, p=1.00e-03, R²=0.9869</summary>
 
 ```
 ==============================================================================
@@ -149,7 +149,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPDEST</code>, nobs=1067, runtime_ms=1.205e-06, p=1.00e-03, R²=0.8849</summary>
+<details markdown="1"><summary><code>JUMPDEST</code>, nobs=1067, runtime_ms=1.205e-06, p=1.00e-03, R²=0.8849</summary>
 
 ```
 ==============================================================================
@@ -175,7 +175,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SWAP</code>, nobs=17072, runtime_ms=3.562e-06, p=1.00e-03, R²=0.9695</summary>
+<details markdown="1"><summary><code>SWAP</code>, nobs=17072, runtime_ms=3.562e-06, p=1.00e-03, R²=0.9695</summary>
 
 ```
 ==============================================================================
@@ -203,7 +203,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier A), besu
 
-<details><summary><code>ADD</code>, nobs=1067, runtime_ms=1.629e-05, p=1.00e-03, R²=0.9788</summary>
+<details markdown="1"><summary><code>ADD</code>, nobs=1067, runtime_ms=1.629e-05, p=1.00e-03, R²=0.9788</summary>
 
 ```
 ==============================================================================
@@ -229,7 +229,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>AND</code>, nobs=1067, runtime_ms=1.05e-05, p=1.00e-03, R²=0.9462</summary>
+<details markdown="1"><summary><code>AND</code>, nobs=1067, runtime_ms=1.05e-05, p=1.00e-03, R²=0.9462</summary>
 
 ```
 ==============================================================================
@@ -255,7 +255,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATACOPY</code>, nobs=25608, runtime_ms=2.36e-05, p=1.00e-03, R²=0.7204</summary>
+<details markdown="1"><summary><code>CALLDATACOPY</code>, nobs=25608, runtime_ms=2.36e-05, p=1.00e-03, R²=0.7204</summary>
 
 ```
 ==============================================================================
@@ -281,7 +281,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATALOAD</code>, nobs=4268, runtime_ms=3.431e-05, p=1.00e-03, R²=0.03926</summary>
+<details markdown="1"><summary><code>CALLDATALOAD</code>, nobs=4268, runtime_ms=3.431e-05, p=1.00e-03, R²=0.03926</summary>
 
 ```
 ==============================================================================
@@ -307,7 +307,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>DIV</code>, nobs=1067, runtime_ms=2.324e-05, p=1.00e-03, R²=0.981</summary>
+<details markdown="1"><summary><code>DIV</code>, nobs=1067, runtime_ms=2.324e-05, p=1.00e-03, R²=0.981</summary>
 
 ```
 ==============================================================================
@@ -333,7 +333,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>EXP</code>, nobs=1067, runtime_ms=0.00229, p=1.00e-03, R²=0.9693</summary>
+<details markdown="1"><summary><code>EXP</code>, nobs=1067, runtime_ms=0.00229, p=1.00e-03, R²=0.9693</summary>
 
 ```
 ==============================================================================
@@ -359,7 +359,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>GT</code>, nobs=1067, runtime_ms=4.46e-05, p=1.00e-03, R²=0.9835</summary>
+<details markdown="1"><summary><code>GT</code>, nobs=1067, runtime_ms=4.46e-05, p=1.00e-03, R²=0.9835</summary>
 
 ```
 ==============================================================================
@@ -385,7 +385,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPI</code>, nobs=1067, runtime_ms=9.852e-06, p=1.00e-03, R²=0.9715</summary>
+<details markdown="1"><summary><code>JUMPI</code>, nobs=1067, runtime_ms=9.852e-06, p=1.00e-03, R²=0.9715</summary>
 
 ```
 ==============================================================================
@@ -411,7 +411,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>LT</code>, nobs=1067, runtime_ms=3.649e-05, p=1.00e-03, R²=0.3061</summary>
+<details markdown="1"><summary><code>LT</code>, nobs=1067, runtime_ms=3.649e-05, p=1.00e-03, R²=0.3061</summary>
 
 ```
 ==============================================================================
@@ -437,7 +437,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE</code>, nobs=5335, runtime_ms=2.707e-05, p=1.00e-03, R²=0.9774</summary>
+<details markdown="1"><summary><code>MSTORE</code>, nobs=5335, runtime_ms=2.707e-05, p=1.00e-03, R²=0.9774</summary>
 
 ```
 ==============================================================================
@@ -463,7 +463,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE8</code>, nobs=5335, runtime_ms=1.553e-05, p=1.00e-03, R²=0.9703</summary>
+<details markdown="1"><summary><code>MSTORE8</code>, nobs=5335, runtime_ms=1.553e-05, p=1.00e-03, R²=0.9703</summary>
 
 ```
 ==============================================================================
@@ -489,7 +489,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MUL</code>, nobs=1067, runtime_ms=1.39e-05, p=1.00e-03, R²=0.8203</summary>
+<details markdown="1"><summary><code>MUL</code>, nobs=1067, runtime_ms=1.39e-05, p=1.00e-03, R²=0.8203</summary>
 
 ```
 ==============================================================================
@@ -515,7 +515,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>PC</code>, nobs=1067, runtime_ms=5.074e-06, p=1.00e-03, R²=0.9801</summary>
+<details markdown="1"><summary><code>PC</code>, nobs=1067, runtime_ms=5.074e-06, p=1.00e-03, R²=0.9801</summary>
 
 ```
 ==============================================================================
@@ -541,7 +541,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>RETURNDATASIZE</code>, nobs=4268, runtime_ms=7.389e-06, p=1.00e-03, R²=0.9842</summary>
+<details markdown="1"><summary><code>RETURNDATASIZE</code>, nobs=4268, runtime_ms=7.389e-06, p=1.00e-03, R²=0.9842</summary>
 
 ```
 ==============================================================================
@@ -567,7 +567,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SELFBALANCE</code>, nobs=1067, runtime_ms=2.344e-05, p=1.00e-03, R²=0.9871</summary>
+<details markdown="1"><summary><code>SELFBALANCE</code>, nobs=1067, runtime_ms=2.344e-05, p=1.00e-03, R²=0.9871</summary>
 
 ```
 ==============================================================================
@@ -593,7 +593,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SUB</code>, nobs=1067, runtime_ms=1.727e-05, p=1.00e-03, R²=0.9882</summary>
+<details markdown="1"><summary><code>SUB</code>, nobs=1067, runtime_ms=1.727e-05, p=1.00e-03, R²=0.9882</summary>
 
 ```
 ==============================================================================
@@ -621,7 +621,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier B), besu
 
-<details><summary><code>JUMP</code>, nobs=1067, runtime_ms=3.687e-05, p=1.00e-03, R²=0.987</summary>
+<details markdown="1"><summary><code>JUMP</code>, nobs=1067, runtime_ms=3.687e-05, p=1.00e-03, R²=0.987</summary>
 
 ```
 ==============================================================================
@@ -647,7 +647,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>KECCAK256</code>, nobs=17072, runtime_ms=4.594e-05, p=1.00e-03, R²=0.1016</summary>
+<details markdown="1"><summary><code>KECCAK256</code>, nobs=17072, runtime_ms=4.594e-05, p=1.00e-03, R²=0.1016</summary>
 
 ```
 ==============================================================================
@@ -708,7 +708,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Cycle glue: joint fit, erigon
 
-<details><summary>Joint NNLS regression summary</summary>
+<details markdown="1"><summary>Joint NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -737,49 +737,49 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATASIZE</code>, nobs=64482, runtime_ms=1.63e-06, p=1.00e-03, R²=0.7937</summary>
+<details markdown="1"><summary><code>CALLDATASIZE</code>, nobs=64482, runtime_ms=1.63e-06, p=1.00e-03, R²=0.7937</summary>
 
 
 
 
 </details>
 
-<details><summary><code>DUP</code>, nobs=64482, runtime_ms=1.901e-06, p=1.00e-03, R²=0.7937</summary>
+<details markdown="1"><summary><code>DUP</code>, nobs=64482, runtime_ms=1.901e-06, p=1.00e-03, R²=0.7937</summary>
 
 
 
 
 </details>
 
-<details><summary><code>GAS</code>, nobs=64482, runtime_ms=1.655e-06, p=1.00e-03, R²=0.7937</summary>
+<details markdown="1"><summary><code>GAS</code>, nobs=64482, runtime_ms=1.655e-06, p=1.00e-03, R²=0.7937</summary>
 
 
 
 
 </details>
 
-<details><summary><code>MLOAD</code>, nobs=64482, runtime_ms=4.443e-06, p=1.00e-03, R²=0.7937</summary>
+<details markdown="1"><summary><code>MLOAD</code>, nobs=64482, runtime_ms=4.443e-06, p=1.00e-03, R²=0.7937</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH</code>, nobs=64482, runtime_ms=2.966e-06, p=1.00e-03, R²=0.7937</summary>
+<details markdown="1"><summary><code>PUSH</code>, nobs=64482, runtime_ms=2.966e-06, p=1.00e-03, R²=0.7937</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH0</code>, nobs=64482, runtime_ms=1.633e-06, p=1.00e-03, R²=0.7937</summary>
+<details markdown="1"><summary><code>PUSH0</code>, nobs=64482, runtime_ms=1.633e-06, p=1.00e-03, R²=0.7937</summary>
 
 
 
 
 </details>
 
-<details><summary><code>STATICCALL</code>, nobs=64482, runtime_ms=5.864e-05, p=1.00e-03, R²=0.7937</summary>
+<details markdown="1"><summary><code>STATICCALL</code>, nobs=64482, runtime_ms=5.864e-05, p=1.00e-03, R²=0.7937</summary>
 
 
 
@@ -788,7 +788,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Pure glue, erigon
 
-<details><summary><code>ISZERO</code>, nobs=1089, runtime_ms=1.575e-06, p=1.00e-03, R²=0.5326</summary>
+<details markdown="1"><summary><code>ISZERO</code>, nobs=1089, runtime_ms=1.575e-06, p=1.00e-03, R²=0.5326</summary>
 
 ```
 ==============================================================================
@@ -814,7 +814,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPDEST</code>, nobs=1089, runtime_ms=1.207e-06, p=1.00e-03, R²=0.4256</summary>
+<details markdown="1"><summary><code>JUMPDEST</code>, nobs=1089, runtime_ms=1.207e-06, p=1.00e-03, R²=0.4256</summary>
 
 ```
 ==============================================================================
@@ -840,7 +840,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SWAP</code>, nobs=17424, runtime_ms=1.937e-06, p=1.00e-03, R²=0.8104</summary>
+<details markdown="1"><summary><code>SWAP</code>, nobs=17424, runtime_ms=1.937e-06, p=1.00e-03, R²=0.8104</summary>
 
 ```
 ==============================================================================
@@ -868,7 +868,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier A), erigon
 
-<details><summary><code>ADD</code>, nobs=1089, runtime_ms=3.378e-06, p=1.00e-03, R²=0.4558</summary>
+<details markdown="1"><summary><code>ADD</code>, nobs=1089, runtime_ms=3.378e-06, p=1.00e-03, R²=0.4558</summary>
 
 ```
 ==============================================================================
@@ -894,7 +894,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>AND</code>, nobs=1089, runtime_ms=3.398e-06, p=1.00e-03, R²=0.4912</summary>
+<details markdown="1"><summary><code>AND</code>, nobs=1089, runtime_ms=3.398e-06, p=1.00e-03, R²=0.4912</summary>
 
 ```
 ==============================================================================
@@ -920,7 +920,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATACOPY</code>, nobs=26136, runtime_ms=1.032e-05, p=1.00e-03, R²=0.9594</summary>
+<details markdown="1"><summary><code>CALLDATACOPY</code>, nobs=26136, runtime_ms=1.032e-05, p=1.00e-03, R²=0.9594</summary>
 
 ```
 ==============================================================================
@@ -946,7 +946,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATALOAD</code>, nobs=4356, runtime_ms=5.138e-05, p=1.00e-03, R²=0.1927</summary>
+<details markdown="1"><summary><code>CALLDATALOAD</code>, nobs=4356, runtime_ms=5.138e-05, p=1.00e-03, R²=0.1927</summary>
 
 ```
 ==============================================================================
@@ -972,7 +972,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>DIV</code>, nobs=1089, runtime_ms=1.413e-05, p=1.00e-03, R²=0.9243</summary>
+<details markdown="1"><summary><code>DIV</code>, nobs=1089, runtime_ms=1.413e-05, p=1.00e-03, R²=0.9243</summary>
 
 ```
 ==============================================================================
@@ -998,7 +998,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>EXP</code>, nobs=1089, runtime_ms=0.0006888, p=1.00e-03, R²=0.981</summary>
+<details markdown="1"><summary><code>EXP</code>, nobs=1089, runtime_ms=0.0006888, p=1.00e-03, R²=0.981</summary>
 
 ```
 ==============================================================================
@@ -1024,7 +1024,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>GT</code>, nobs=1089, runtime_ms=3.455e-06, p=1.00e-03, R²=0.505</summary>
+<details markdown="1"><summary><code>GT</code>, nobs=1089, runtime_ms=3.455e-06, p=1.00e-03, R²=0.505</summary>
 
 ```
 ==============================================================================
@@ -1050,7 +1050,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPI</code>, nobs=1089, runtime_ms=4.681e-06, p=1.00e-03, R²=0.8555</summary>
+<details markdown="1"><summary><code>JUMPI</code>, nobs=1089, runtime_ms=4.681e-06, p=1.00e-03, R²=0.8555</summary>
 
 ```
 ==============================================================================
@@ -1076,7 +1076,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>LT</code>, nobs=1089, runtime_ms=3.465e-06, p=1.00e-03, R²=0.5108</summary>
+<details markdown="1"><summary><code>LT</code>, nobs=1089, runtime_ms=3.465e-06, p=1.00e-03, R²=0.5108</summary>
 
 ```
 ==============================================================================
@@ -1102,7 +1102,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE</code>, nobs=5445, runtime_ms=6.85e-06, p=1.00e-03, R²=0.4373</summary>
+<details markdown="1"><summary><code>MSTORE</code>, nobs=5445, runtime_ms=6.85e-06, p=1.00e-03, R²=0.4373</summary>
 
 ```
 ==============================================================================
@@ -1128,7 +1128,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE8</code>, nobs=5445, runtime_ms=7.129e-06, p=1.00e-03, R²=0.7473</summary>
+<details markdown="1"><summary><code>MSTORE8</code>, nobs=5445, runtime_ms=7.129e-06, p=1.00e-03, R²=0.7473</summary>
 
 ```
 ==============================================================================
@@ -1154,7 +1154,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MUL</code>, nobs=1089, runtime_ms=5.275e-06, p=1.00e-03, R²=0.5413</summary>
+<details markdown="1"><summary><code>MUL</code>, nobs=1089, runtime_ms=5.275e-06, p=1.00e-03, R²=0.5413</summary>
 
 ```
 ==============================================================================
@@ -1180,7 +1180,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>PC</code>, nobs=1089, runtime_ms=1.751e-06, p=1.00e-03, R²=0.9798</summary>
+<details markdown="1"><summary><code>PC</code>, nobs=1089, runtime_ms=1.751e-06, p=1.00e-03, R²=0.9798</summary>
 
 ```
 ==============================================================================
@@ -1206,7 +1206,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>RETURNDATASIZE</code>, nobs=4356, runtime_ms=2.9e-06, p=1.00e-03, R²=0.8139</summary>
+<details markdown="1"><summary><code>RETURNDATASIZE</code>, nobs=4356, runtime_ms=2.9e-06, p=1.00e-03, R²=0.8139</summary>
 
 ```
 ==============================================================================
@@ -1232,7 +1232,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SELFBALANCE</code>, nobs=1089, runtime_ms=1.928e-06, p=1.00e-03, R²=0.9613</summary>
+<details markdown="1"><summary><code>SELFBALANCE</code>, nobs=1089, runtime_ms=1.928e-06, p=1.00e-03, R²=0.9613</summary>
 
 ```
 ==============================================================================
@@ -1258,7 +1258,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SUB</code>, nobs=1089, runtime_ms=3.417e-06, p=1.00e-03, R²=0.4848</summary>
+<details markdown="1"><summary><code>SUB</code>, nobs=1089, runtime_ms=3.417e-06, p=1.00e-03, R²=0.4848</summary>
 
 ```
 ==============================================================================
@@ -1286,7 +1286,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier B), erigon
 
-<details><summary><code>JUMP</code>, nobs=1089, runtime_ms=8.02e-06, p=1.00e-03, R²=0.5586</summary>
+<details markdown="1"><summary><code>JUMP</code>, nobs=1089, runtime_ms=8.02e-06, p=1.00e-03, R²=0.5586</summary>
 
 ```
 ==============================================================================
@@ -1312,7 +1312,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>KECCAK256</code>, nobs=17424, runtime_ms=5.972e-06, p=1.00e-03, R²=0.002552</summary>
+<details markdown="1"><summary><code>KECCAK256</code>, nobs=17424, runtime_ms=5.972e-06, p=1.00e-03, R²=0.002552</summary>
 
 ```
 ==============================================================================
@@ -1373,7 +1373,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Cycle glue: joint fit, ethrex
 
-<details><summary>Joint NNLS regression summary</summary>
+<details markdown="1"><summary>Joint NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -1402,49 +1402,49 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATASIZE</code>, nobs=6655, runtime_ms=6.443e-07, p=1.00e-03, R²=0.9571</summary>
+<details markdown="1"><summary><code>CALLDATASIZE</code>, nobs=6655, runtime_ms=6.443e-07, p=1.00e-03, R²=0.9571</summary>
 
 
 
 
 </details>
 
-<details><summary><code>DUP</code>, nobs=6655, runtime_ms=6.648e-07, p=1.00e-03, R²=0.9571</summary>
+<details markdown="1"><summary><code>DUP</code>, nobs=6655, runtime_ms=6.648e-07, p=1.00e-03, R²=0.9571</summary>
 
 
 
 
 </details>
 
-<details><summary><code>GAS</code>, nobs=6655, runtime_ms=6.681e-07, p=1.00e-03, R²=0.9571</summary>
+<details markdown="1"><summary><code>GAS</code>, nobs=6655, runtime_ms=6.681e-07, p=1.00e-03, R²=0.9571</summary>
 
 
 
 
 </details>
 
-<details><summary><code>MLOAD</code>, nobs=6655, runtime_ms=1.705e-06, p=1.00e-03, R²=0.9571</summary>
+<details markdown="1"><summary><code>MLOAD</code>, nobs=6655, runtime_ms=1.705e-06, p=1.00e-03, R²=0.9571</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH</code>, nobs=6655, runtime_ms=8.316e-07, p=1.00e-03, R²=0.9571</summary>
+<details markdown="1"><summary><code>PUSH</code>, nobs=6655, runtime_ms=8.316e-07, p=1.00e-03, R²=0.9571</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH0</code>, nobs=6655, runtime_ms=5.945e-07, p=1.00e-03, R²=0.9571</summary>
+<details markdown="1"><summary><code>PUSH0</code>, nobs=6655, runtime_ms=5.945e-07, p=1.00e-03, R²=0.9571</summary>
 
 
 
 
 </details>
 
-<details><summary><code>STATICCALL</code>, nobs=6655, runtime_ms=0.000132, p=1.00e-03, R²=0.9571</summary>
+<details markdown="1"><summary><code>STATICCALL</code>, nobs=6655, runtime_ms=0.000132, p=1.00e-03, R²=0.9571</summary>
 
 
 
@@ -1453,7 +1453,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Pure glue, ethrex
 
-<details><summary><code>ISZERO</code>, nobs=110, runtime_ms=7.251e-07, p=1.00e-03, R²=0.8973</summary>
+<details markdown="1"><summary><code>ISZERO</code>, nobs=110, runtime_ms=7.251e-07, p=1.00e-03, R²=0.8973</summary>
 
 ```
 ==============================================================================
@@ -1479,7 +1479,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPDEST</code>, nobs=110, runtime_ms=5.06e-07, p=1.00e-03, R²=0.8625</summary>
+<details markdown="1"><summary><code>JUMPDEST</code>, nobs=110, runtime_ms=5.06e-07, p=1.00e-03, R²=0.8625</summary>
 
 ```
 ==============================================================================
@@ -1505,7 +1505,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SWAP</code>, nobs=1760, runtime_ms=8.804e-07, p=1.00e-03, R²=0.8673</summary>
+<details markdown="1"><summary><code>SWAP</code>, nobs=1760, runtime_ms=8.804e-07, p=1.00e-03, R²=0.8673</summary>
 
 ```
 ==============================================================================
@@ -1533,7 +1533,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier A), ethrex
 
-<details><summary><code>ADD</code>, nobs=110, runtime_ms=1.734e-06, p=1.00e-03, R²=0.931</summary>
+<details markdown="1"><summary><code>ADD</code>, nobs=110, runtime_ms=1.734e-06, p=1.00e-03, R²=0.931</summary>
 
 ```
 ==============================================================================
@@ -1559,7 +1559,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>AND</code>, nobs=110, runtime_ms=1.297e-06, p=1.00e-03, R²=0.9075</summary>
+<details markdown="1"><summary><code>AND</code>, nobs=110, runtime_ms=1.297e-06, p=1.00e-03, R²=0.9075</summary>
 
 ```
 ==============================================================================
@@ -1585,7 +1585,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATACOPY</code>, nobs=2640, runtime_ms=3.997e-06, p=1.00e-03, R²=0.9228</summary>
+<details markdown="1"><summary><code>CALLDATACOPY</code>, nobs=2640, runtime_ms=3.997e-06, p=1.00e-03, R²=0.9228</summary>
 
 ```
 ==============================================================================
@@ -1611,7 +1611,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATALOAD</code>, nobs=440, runtime_ms=2.655e-05, p=1.00e-03, R²=0.1755</summary>
+<details markdown="1"><summary><code>CALLDATALOAD</code>, nobs=440, runtime_ms=2.655e-05, p=1.00e-03, R²=0.1755</summary>
 
 ```
 ==============================================================================
@@ -1637,7 +1637,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>DIV</code>, nobs=110, runtime_ms=1.365e-05, p=1.00e-03, R²=0.9453</summary>
+<details markdown="1"><summary><code>DIV</code>, nobs=110, runtime_ms=1.365e-05, p=1.00e-03, R²=0.9453</summary>
 
 ```
 ==============================================================================
@@ -1663,7 +1663,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>EXP</code>, nobs=110, runtime_ms=0.001842, p=1.00e-03, R²=0.963</summary>
+<details markdown="1"><summary><code>EXP</code>, nobs=110, runtime_ms=0.001842, p=1.00e-03, R²=0.963</summary>
 
 ```
 ==============================================================================
@@ -1689,7 +1689,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>GT</code>, nobs=110, runtime_ms=1.75e-06, p=1.00e-03, R²=0.9602</summary>
+<details markdown="1"><summary><code>GT</code>, nobs=110, runtime_ms=1.75e-06, p=1.00e-03, R²=0.9602</summary>
 
 ```
 ==============================================================================
@@ -1715,7 +1715,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPI</code>, nobs=110, runtime_ms=2.236e-06, p=1.00e-03, R²=0.8041</summary>
+<details markdown="1"><summary><code>JUMPI</code>, nobs=110, runtime_ms=2.236e-06, p=1.00e-03, R²=0.8041</summary>
 
 ```
 ==============================================================================
@@ -1741,7 +1741,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>LT</code>, nobs=110, runtime_ms=1.722e-06, p=1.00e-03, R²=0.9513</summary>
+<details markdown="1"><summary><code>LT</code>, nobs=110, runtime_ms=1.722e-06, p=1.00e-03, R²=0.9513</summary>
 
 ```
 ==============================================================================
@@ -1767,7 +1767,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE</code>, nobs=550, runtime_ms=2.483e-06, p=1.00e-03, R²=0.9367</summary>
+<details markdown="1"><summary><code>MSTORE</code>, nobs=550, runtime_ms=2.483e-06, p=1.00e-03, R²=0.9367</summary>
 
 ```
 ==============================================================================
@@ -1793,7 +1793,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE8</code>, nobs=550, runtime_ms=2.556e-06, p=1.00e-03, R²=0.9476</summary>
+<details markdown="1"><summary><code>MSTORE8</code>, nobs=550, runtime_ms=2.556e-06, p=1.00e-03, R²=0.9476</summary>
 
 ```
 ==============================================================================
@@ -1819,7 +1819,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MUL</code>, nobs=110, runtime_ms=3.245e-06, p=1.00e-03, R²=0.6291</summary>
+<details markdown="1"><summary><code>MUL</code>, nobs=110, runtime_ms=3.245e-06, p=1.00e-03, R²=0.6291</summary>
 
 ```
 ==============================================================================
@@ -1845,7 +1845,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>PC</code>, nobs=110, runtime_ms=7.961e-07, p=1.00e-03, R²=0.9233</summary>
+<details markdown="1"><summary><code>PC</code>, nobs=110, runtime_ms=7.961e-07, p=1.00e-03, R²=0.9233</summary>
 
 ```
 ==============================================================================
@@ -1871,7 +1871,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>RETURNDATASIZE</code>, nobs=440, runtime_ms=1.2e-06, p=1.00e-03, R²=0.864</summary>
+<details markdown="1"><summary><code>RETURNDATASIZE</code>, nobs=440, runtime_ms=1.2e-06, p=1.00e-03, R²=0.864</summary>
 
 ```
 ==============================================================================
@@ -1897,7 +1897,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SELFBALANCE</code>, nobs=110, runtime_ms=1.032e-05, p=1.00e-03, R²=0.9602</summary>
+<details markdown="1"><summary><code>SELFBALANCE</code>, nobs=110, runtime_ms=1.032e-05, p=1.00e-03, R²=0.9602</summary>
 
 ```
 ==============================================================================
@@ -1923,7 +1923,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SUB</code>, nobs=110, runtime_ms=1.697e-06, p=1.00e-03, R²=0.9043</summary>
+<details markdown="1"><summary><code>SUB</code>, nobs=110, runtime_ms=1.697e-06, p=1.00e-03, R²=0.9043</summary>
 
 ```
 ==============================================================================
@@ -1951,7 +1951,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier B), ethrex
 
-<details><summary><code>JUMP</code>, nobs=110, runtime_ms=4.197e-06, p=1.00e-03, R²=0.945</summary>
+<details markdown="1"><summary><code>JUMP</code>, nobs=110, runtime_ms=4.197e-06, p=1.00e-03, R²=0.945</summary>
 
 ```
 ==============================================================================
@@ -1977,7 +1977,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>KECCAK256</code>, nobs=1760, runtime_ms=0, p=1.00e+00, R²=0</summary>
+<details markdown="1"><summary><code>KECCAK256</code>, nobs=1760, runtime_ms=0, p=1.00e+00, R²=0</summary>
 
 ```
 ==============================================================================
@@ -2038,7 +2038,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Cycle glue: joint fit, geth
 
-<details><summary>Joint NNLS regression summary</summary>
+<details markdown="1"><summary>Joint NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2067,49 +2067,49 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATASIZE</code>, nobs=94391, runtime_ms=1.796e-06, p=1.00e-03, R²=0.9151</summary>
+<details markdown="1"><summary><code>CALLDATASIZE</code>, nobs=94391, runtime_ms=1.796e-06, p=1.00e-03, R²=0.9151</summary>
 
 
 
 
 </details>
 
-<details><summary><code>DUP</code>, nobs=94391, runtime_ms=1.997e-06, p=1.00e-03, R²=0.9151</summary>
+<details markdown="1"><summary><code>DUP</code>, nobs=94391, runtime_ms=1.997e-06, p=1.00e-03, R²=0.9151</summary>
 
 
 
 
 </details>
 
-<details><summary><code>GAS</code>, nobs=94391, runtime_ms=1.784e-06, p=1.00e-03, R²=0.9151</summary>
+<details markdown="1"><summary><code>GAS</code>, nobs=94391, runtime_ms=1.784e-06, p=1.00e-03, R²=0.9151</summary>
 
 
 
 
 </details>
 
-<details><summary><code>MLOAD</code>, nobs=94391, runtime_ms=5.65e-06, p=1.00e-03, R²=0.9151</summary>
+<details markdown="1"><summary><code>MLOAD</code>, nobs=94391, runtime_ms=5.65e-06, p=1.00e-03, R²=0.9151</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH</code>, nobs=94391, runtime_ms=3.155e-06, p=1.00e-03, R²=0.9151</summary>
+<details markdown="1"><summary><code>PUSH</code>, nobs=94391, runtime_ms=3.155e-06, p=1.00e-03, R²=0.9151</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH0</code>, nobs=94391, runtime_ms=1.669e-06, p=1.00e-03, R²=0.9151</summary>
+<details markdown="1"><summary><code>PUSH0</code>, nobs=94391, runtime_ms=1.669e-06, p=1.00e-03, R²=0.9151</summary>
 
 
 
 
 </details>
 
-<details><summary><code>STATICCALL</code>, nobs=94391, runtime_ms=0.0002389, p=1.00e-03, R²=0.9151</summary>
+<details markdown="1"><summary><code>STATICCALL</code>, nobs=94391, runtime_ms=0.0002389, p=1.00e-03, R²=0.9151</summary>
 
 
 
@@ -2118,7 +2118,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Pure glue, geth
 
-<details><summary><code>ISZERO</code>, nobs=1595, runtime_ms=1.887e-06, p=1.00e-03, R²=0.9354</summary>
+<details markdown="1"><summary><code>ISZERO</code>, nobs=1595, runtime_ms=1.887e-06, p=1.00e-03, R²=0.9354</summary>
 
 ```
 ==============================================================================
@@ -2144,7 +2144,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPDEST</code>, nobs=1595, runtime_ms=1.292e-06, p=1.00e-03, R²=0.8414</summary>
+<details markdown="1"><summary><code>JUMPDEST</code>, nobs=1595, runtime_ms=1.292e-06, p=1.00e-03, R²=0.8414</summary>
 
 ```
 ==============================================================================
@@ -2170,7 +2170,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SWAP</code>, nobs=25520, runtime_ms=2.268e-06, p=1.00e-03, R²=0.9496</summary>
+<details markdown="1"><summary><code>SWAP</code>, nobs=25520, runtime_ms=2.268e-06, p=1.00e-03, R²=0.9496</summary>
 
 ```
 ==============================================================================
@@ -2198,7 +2198,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier A), geth
 
-<details><summary><code>ADD</code>, nobs=1595, runtime_ms=4.503e-06, p=1.00e-03, R²=0.9124</summary>
+<details markdown="1"><summary><code>ADD</code>, nobs=1595, runtime_ms=4.503e-06, p=1.00e-03, R²=0.9124</summary>
 
 ```
 ==============================================================================
@@ -2224,7 +2224,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>AND</code>, nobs=1595, runtime_ms=4.417e-06, p=1.00e-03, R²=0.9084</summary>
+<details markdown="1"><summary><code>AND</code>, nobs=1595, runtime_ms=4.417e-06, p=1.00e-03, R²=0.9084</summary>
 
 ```
 ==============================================================================
@@ -2250,7 +2250,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATACOPY</code>, nobs=38280, runtime_ms=1.153e-05, p=1.00e-03, R²=0.977</summary>
+<details markdown="1"><summary><code>CALLDATACOPY</code>, nobs=38280, runtime_ms=1.153e-05, p=1.00e-03, R²=0.977</summary>
 
 ```
 ==============================================================================
@@ -2276,7 +2276,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATALOAD</code>, nobs=6380, runtime_ms=2.461e-05, p=1.00e-03, R²=0.07049</summary>
+<details markdown="1"><summary><code>CALLDATALOAD</code>, nobs=6380, runtime_ms=2.461e-05, p=1.00e-03, R²=0.07049</summary>
 
 ```
 ==============================================================================
@@ -2302,7 +2302,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>DIV</code>, nobs=1595, runtime_ms=1.439e-05, p=1.00e-03, R²=0.9789</summary>
+<details markdown="1"><summary><code>DIV</code>, nobs=1595, runtime_ms=1.439e-05, p=1.00e-03, R²=0.9789</summary>
 
 ```
 ==============================================================================
@@ -2328,7 +2328,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>EXP</code>, nobs=1595, runtime_ms=0.0007158, p=1.00e-03, R²=0.9822</summary>
+<details markdown="1"><summary><code>EXP</code>, nobs=1595, runtime_ms=0.0007158, p=1.00e-03, R²=0.9822</summary>
 
 ```
 ==============================================================================
@@ -2354,7 +2354,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>GT</code>, nobs=1595, runtime_ms=3.969e-06, p=1.00e-03, R²=0.8474</summary>
+<details markdown="1"><summary><code>GT</code>, nobs=1595, runtime_ms=3.969e-06, p=1.00e-03, R²=0.8474</summary>
 
 ```
 ==============================================================================
@@ -2380,7 +2380,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPI</code>, nobs=1595, runtime_ms=5.576e-06, p=1.00e-03, R²=0.837</summary>
+<details markdown="1"><summary><code>JUMPI</code>, nobs=1595, runtime_ms=5.576e-06, p=1.00e-03, R²=0.837</summary>
 
 ```
 ==============================================================================
@@ -2406,7 +2406,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>LT</code>, nobs=1595, runtime_ms=4.358e-06, p=1.00e-03, R²=0.9362</summary>
+<details markdown="1"><summary><code>LT</code>, nobs=1595, runtime_ms=4.358e-06, p=1.00e-03, R²=0.9362</summary>
 
 ```
 ==============================================================================
@@ -2432,7 +2432,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE</code>, nobs=7975, runtime_ms=8.479e-06, p=1.00e-03, R²=0.9406</summary>
+<details markdown="1"><summary><code>MSTORE</code>, nobs=7975, runtime_ms=8.479e-06, p=1.00e-03, R²=0.9406</summary>
 
 ```
 ==============================================================================
@@ -2458,7 +2458,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE8</code>, nobs=7975, runtime_ms=7.851e-06, p=1.00e-03, R²=0.9251</summary>
+<details markdown="1"><summary><code>MSTORE8</code>, nobs=7975, runtime_ms=7.851e-06, p=1.00e-03, R²=0.9251</summary>
 
 ```
 ==============================================================================
@@ -2484,7 +2484,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MUL</code>, nobs=1595, runtime_ms=5.359e-06, p=1.00e-03, R²=0.9461</summary>
+<details markdown="1"><summary><code>MUL</code>, nobs=1595, runtime_ms=5.359e-06, p=1.00e-03, R²=0.9461</summary>
 
 ```
 ==============================================================================
@@ -2510,7 +2510,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>PC</code>, nobs=1595, runtime_ms=1.98e-06, p=1.00e-03, R²=0.9472</summary>
+<details markdown="1"><summary><code>PC</code>, nobs=1595, runtime_ms=1.98e-06, p=1.00e-03, R²=0.9472</summary>
 
 ```
 ==============================================================================
@@ -2536,7 +2536,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>RETURNDATASIZE</code>, nobs=6380, runtime_ms=5.368e-06, p=1.00e-03, R²=0.8652</summary>
+<details markdown="1"><summary><code>RETURNDATASIZE</code>, nobs=6380, runtime_ms=5.368e-06, p=1.00e-03, R²=0.8652</summary>
 
 ```
 ==============================================================================
@@ -2562,7 +2562,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SELFBALANCE</code>, nobs=1595, runtime_ms=1.233e-05, p=1.00e-03, R²=0.9702</summary>
+<details markdown="1"><summary><code>SELFBALANCE</code>, nobs=1595, runtime_ms=1.233e-05, p=1.00e-03, R²=0.9702</summary>
 
 ```
 ==============================================================================
@@ -2588,7 +2588,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SUB</code>, nobs=1595, runtime_ms=4.347e-06, p=1.00e-03, R²=0.9147</summary>
+<details markdown="1"><summary><code>SUB</code>, nobs=1595, runtime_ms=4.347e-06, p=1.00e-03, R²=0.9147</summary>
 
 ```
 ==============================================================================
@@ -2616,7 +2616,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier B), geth
 
-<details><summary><code>JUMP</code>, nobs=1595, runtime_ms=9.644e-06, p=1.00e-03, R²=0.8032</summary>
+<details markdown="1"><summary><code>JUMP</code>, nobs=1595, runtime_ms=9.644e-06, p=1.00e-03, R²=0.8032</summary>
 
 ```
 ==============================================================================
@@ -2642,7 +2642,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>KECCAK256</code>, nobs=25520, runtime_ms=3.778e-05, p=1.00e-03, R²=0.1168</summary>
+<details markdown="1"><summary><code>KECCAK256</code>, nobs=25520, runtime_ms=3.778e-05, p=1.00e-03, R²=0.1168</summary>
 
 ```
 ==============================================================================
@@ -2703,7 +2703,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Cycle glue: joint fit, nethermind
 
-<details><summary>Joint NNLS regression summary</summary>
+<details markdown="1"><summary>Joint NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -2732,49 +2732,49 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATASIZE</code>, nobs=98208, runtime_ms=4.521e-07, p=1.00e-03, R²=0.8723</summary>
+<details markdown="1"><summary><code>CALLDATASIZE</code>, nobs=98208, runtime_ms=4.521e-07, p=1.00e-03, R²=0.8723</summary>
 
 
 
 
 </details>
 
-<details><summary><code>DUP</code>, nobs=98208, runtime_ms=3.413e-07, p=1.00e-03, R²=0.8723</summary>
+<details markdown="1"><summary><code>DUP</code>, nobs=98208, runtime_ms=3.413e-07, p=1.00e-03, R²=0.8723</summary>
 
 
 
 
 </details>
 
-<details><summary><code>GAS</code>, nobs=98208, runtime_ms=3.689e-07, p=1.00e-03, R²=0.8723</summary>
+<details markdown="1"><summary><code>GAS</code>, nobs=98208, runtime_ms=3.689e-07, p=1.00e-03, R²=0.8723</summary>
 
 
 
 
 </details>
 
-<details><summary><code>MLOAD</code>, nobs=98208, runtime_ms=1.923e-06, p=1.00e-03, R²=0.8723</summary>
+<details markdown="1"><summary><code>MLOAD</code>, nobs=98208, runtime_ms=1.923e-06, p=1.00e-03, R²=0.8723</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH</code>, nobs=98208, runtime_ms=5.851e-07, p=1.00e-03, R²=0.8723</summary>
+<details markdown="1"><summary><code>PUSH</code>, nobs=98208, runtime_ms=5.851e-07, p=1.00e-03, R²=0.8723</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH0</code>, nobs=98208, runtime_ms=2.964e-07, p=1.00e-03, R²=0.8723</summary>
+<details markdown="1"><summary><code>PUSH0</code>, nobs=98208, runtime_ms=2.964e-07, p=1.00e-03, R²=0.8723</summary>
 
 
 
 
 </details>
 
-<details><summary><code>STATICCALL</code>, nobs=98208, runtime_ms=0.0002937, p=1.00e-03, R²=0.8723</summary>
+<details markdown="1"><summary><code>STATICCALL</code>, nobs=98208, runtime_ms=0.0002937, p=1.00e-03, R²=0.8723</summary>
 
 
 
@@ -2783,7 +2783,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Pure glue, nethermind
 
-<details><summary><code>ISZERO</code>, nobs=1661, runtime_ms=5.57e-07, p=1.00e-03, R²=0.4845</summary>
+<details markdown="1"><summary><code>ISZERO</code>, nobs=1661, runtime_ms=5.57e-07, p=1.00e-03, R²=0.4845</summary>
 
 ```
 ==============================================================================
@@ -2809,7 +2809,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPDEST</code>, nobs=1661, runtime_ms=3.782e-07, p=1.00e-03, R²=0.7618</summary>
+<details markdown="1"><summary><code>JUMPDEST</code>, nobs=1661, runtime_ms=3.782e-07, p=1.00e-03, R²=0.7618</summary>
 
 ```
 ==============================================================================
@@ -2835,7 +2835,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SWAP</code>, nobs=26576, runtime_ms=6.042e-07, p=1.00e-03, R²=0.6358</summary>
+<details markdown="1"><summary><code>SWAP</code>, nobs=26576, runtime_ms=6.042e-07, p=1.00e-03, R²=0.6358</summary>
 
 ```
 ==============================================================================
@@ -2863,7 +2863,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier A), nethermind
 
-<details><summary><code>ADD</code>, nobs=1661, runtime_ms=1.462e-06, p=1.00e-03, R²=0.8833</summary>
+<details markdown="1"><summary><code>ADD</code>, nobs=1661, runtime_ms=1.462e-06, p=1.00e-03, R²=0.8833</summary>
 
 ```
 ==============================================================================
@@ -2889,7 +2889,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>AND</code>, nobs=1661, runtime_ms=1.192e-06, p=1.00e-03, R²=0.8966</summary>
+<details markdown="1"><summary><code>AND</code>, nobs=1661, runtime_ms=1.192e-06, p=1.00e-03, R²=0.8966</summary>
 
 ```
 ==============================================================================
@@ -2915,7 +2915,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATACOPY</code>, nobs=39864, runtime_ms=4.034e-06, p=1.00e-03, R²=0.7819</summary>
+<details markdown="1"><summary><code>CALLDATACOPY</code>, nobs=39864, runtime_ms=4.034e-06, p=1.00e-03, R²=0.7819</summary>
 
 ```
 ==============================================================================
@@ -2941,7 +2941,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATALOAD</code>, nobs=6644, runtime_ms=1.757e-05, p=1.00e-03, R²=0.09259</summary>
+<details markdown="1"><summary><code>CALLDATALOAD</code>, nobs=6644, runtime_ms=1.757e-05, p=1.00e-03, R²=0.09259</summary>
 
 ```
 ==============================================================================
@@ -2967,7 +2967,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>DIV</code>, nobs=1661, runtime_ms=5.535e-06, p=1.00e-03, R²=0.5437</summary>
+<details markdown="1"><summary><code>DIV</code>, nobs=1661, runtime_ms=5.535e-06, p=1.00e-03, R²=0.5437</summary>
 
 ```
 ==============================================================================
@@ -2993,7 +2993,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>EXP</code>, nobs=1661, runtime_ms=0, p=1.00e+00, R²=0</summary>
+<details markdown="1"><summary><code>EXP</code>, nobs=1661, runtime_ms=0, p=1.00e+00, R²=0</summary>
 
 ```
 ==============================================================================
@@ -3019,7 +3019,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>GT</code>, nobs=1661, runtime_ms=1.467e-06, p=1.00e-03, R²=0.9421</summary>
+<details markdown="1"><summary><code>GT</code>, nobs=1661, runtime_ms=1.467e-06, p=1.00e-03, R²=0.9421</summary>
 
 ```
 ==============================================================================
@@ -3045,7 +3045,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPI</code>, nobs=1661, runtime_ms=2.292e-06, p=1.00e-03, R²=0.8969</summary>
+<details markdown="1"><summary><code>JUMPI</code>, nobs=1661, runtime_ms=2.292e-06, p=1.00e-03, R²=0.8969</summary>
 
 ```
 ==============================================================================
@@ -3071,7 +3071,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>LT</code>, nobs=1661, runtime_ms=1.437e-06, p=1.00e-03, R²=0.9415</summary>
+<details markdown="1"><summary><code>LT</code>, nobs=1661, runtime_ms=1.437e-06, p=1.00e-03, R²=0.9415</summary>
 
 ```
 ==============================================================================
@@ -3097,7 +3097,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE</code>, nobs=8305, runtime_ms=2.749e-06, p=1.00e-03, R²=0.9276</summary>
+<details markdown="1"><summary><code>MSTORE</code>, nobs=8305, runtime_ms=2.749e-06, p=1.00e-03, R²=0.9276</summary>
 
 ```
 ==============================================================================
@@ -3123,7 +3123,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE8</code>, nobs=8305, runtime_ms=2.757e-06, p=1.00e-03, R²=0.9166</summary>
+<details markdown="1"><summary><code>MSTORE8</code>, nobs=8305, runtime_ms=2.757e-06, p=1.00e-03, R²=0.9166</summary>
 
 ```
 ==============================================================================
@@ -3149,7 +3149,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MUL</code>, nobs=1661, runtime_ms=4.259e-06, p=1.00e-03, R²=0.9519</summary>
+<details markdown="1"><summary><code>MUL</code>, nobs=1661, runtime_ms=4.259e-06, p=1.00e-03, R²=0.9519</summary>
 
 ```
 ==============================================================================
@@ -3175,7 +3175,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>PC</code>, nobs=1661, runtime_ms=6.116e-07, p=1.00e-03, R²=0.8791</summary>
+<details markdown="1"><summary><code>PC</code>, nobs=1661, runtime_ms=6.116e-07, p=1.00e-03, R²=0.8791</summary>
 
 ```
 ==============================================================================
@@ -3201,7 +3201,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>RETURNDATASIZE</code>, nobs=6644, runtime_ms=9.423e-07, p=1.00e-03, R²=0.8028</summary>
+<details markdown="1"><summary><code>RETURNDATASIZE</code>, nobs=6644, runtime_ms=9.423e-07, p=1.00e-03, R²=0.8028</summary>
 
 ```
 ==============================================================================
@@ -3227,7 +3227,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SELFBALANCE</code>, nobs=1661, runtime_ms=3.767e-06, p=1.00e-03, R²=0.9394</summary>
+<details markdown="1"><summary><code>SELFBALANCE</code>, nobs=1661, runtime_ms=3.767e-06, p=1.00e-03, R²=0.9394</summary>
 
 ```
 ==============================================================================
@@ -3253,7 +3253,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SUB</code>, nobs=1661, runtime_ms=2.023e-06, p=1.00e-03, R²=0.8617</summary>
+<details markdown="1"><summary><code>SUB</code>, nobs=1661, runtime_ms=2.023e-06, p=1.00e-03, R²=0.8617</summary>
 
 ```
 ==============================================================================
@@ -3281,7 +3281,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier B), nethermind
 
-<details><summary><code>JUMP</code>, nobs=1661, runtime_ms=2.931e-06, p=1.00e-03, R²=0.7711</summary>
+<details markdown="1"><summary><code>JUMP</code>, nobs=1661, runtime_ms=2.931e-06, p=1.00e-03, R²=0.7711</summary>
 
 ```
 ==============================================================================
@@ -3307,7 +3307,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>KECCAK256</code>, nobs=26576, runtime_ms=0, p=1.00e+00, R²=0</summary>
+<details markdown="1"><summary><code>KECCAK256</code>, nobs=26576, runtime_ms=0, p=1.00e+00, R²=0</summary>
 
 ```
 ==============================================================================
@@ -3368,7 +3368,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Cycle glue: joint fit, reth
 
-<details><summary>Joint NNLS regression summary</summary>
+<details markdown="1"><summary>Joint NNLS regression summary</summary>
 
 ```
 ==============================================================================
@@ -3397,49 +3397,49 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATASIZE</code>, nobs=56023, runtime_ms=8.685e-07, p=1.00e-03, R²=0.7803</summary>
+<details markdown="1"><summary><code>CALLDATASIZE</code>, nobs=56023, runtime_ms=8.685e-07, p=1.00e-03, R²=0.7803</summary>
 
 
 
 
 </details>
 
-<details><summary><code>DUP</code>, nobs=56023, runtime_ms=5.92e-07, p=1.00e-03, R²=0.7803</summary>
+<details markdown="1"><summary><code>DUP</code>, nobs=56023, runtime_ms=5.92e-07, p=1.00e-03, R²=0.7803</summary>
 
 
 
 
 </details>
 
-<details><summary><code>GAS</code>, nobs=56023, runtime_ms=7.167e-07, p=1.00e-03, R²=0.7803</summary>
+<details markdown="1"><summary><code>GAS</code>, nobs=56023, runtime_ms=7.167e-07, p=1.00e-03, R²=0.7803</summary>
 
 
 
 
 </details>
 
-<details><summary><code>MLOAD</code>, nobs=56023, runtime_ms=2.045e-06, p=1.00e-03, R²=0.7803</summary>
+<details markdown="1"><summary><code>MLOAD</code>, nobs=56023, runtime_ms=2.045e-06, p=1.00e-03, R²=0.7803</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH</code>, nobs=56023, runtime_ms=6.92e-07, p=1.00e-03, R²=0.7803</summary>
+<details markdown="1"><summary><code>PUSH</code>, nobs=56023, runtime_ms=6.92e-07, p=1.00e-03, R²=0.7803</summary>
 
 
 
 
 </details>
 
-<details><summary><code>PUSH0</code>, nobs=56023, runtime_ms=5.795e-07, p=1.00e-03, R²=0.7803</summary>
+<details markdown="1"><summary><code>PUSH0</code>, nobs=56023, runtime_ms=5.795e-07, p=1.00e-03, R²=0.7803</summary>
 
 
 
 
 </details>
 
-<details><summary><code>STATICCALL</code>, nobs=56023, runtime_ms=8.121e-05, p=1.00e-03, R²=0.7803</summary>
+<details markdown="1"><summary><code>STATICCALL</code>, nobs=56023, runtime_ms=8.121e-05, p=1.00e-03, R²=0.7803</summary>
 
 
 
@@ -3448,7 +3448,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Pure glue, reth
 
-<details><summary><code>ISZERO</code>, nobs=946, runtime_ms=1.733e-06, p=1.00e-03, R²=0.9283</summary>
+<details markdown="1"><summary><code>ISZERO</code>, nobs=946, runtime_ms=1.733e-06, p=1.00e-03, R²=0.9283</summary>
 
 ```
 ==============================================================================
@@ -3474,7 +3474,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPDEST</code>, nobs=946, runtime_ms=5.286e-07, p=1.00e-03, R²=0.9638</summary>
+<details markdown="1"><summary><code>JUMPDEST</code>, nobs=946, runtime_ms=5.286e-07, p=1.00e-03, R²=0.9638</summary>
 
 ```
 ==============================================================================
@@ -3500,7 +3500,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SWAP</code>, nobs=15136, runtime_ms=6.168e-07, p=1.00e-03, R²=0.6087</summary>
+<details markdown="1"><summary><code>SWAP</code>, nobs=15136, runtime_ms=6.168e-07, p=1.00e-03, R²=0.6087</summary>
 
 ```
 ==============================================================================
@@ -3528,7 +3528,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier A), reth
 
-<details><summary><code>ADD</code>, nobs=946, runtime_ms=1.476e-06, p=1.00e-03, R²=0.9394</summary>
+<details markdown="1"><summary><code>ADD</code>, nobs=946, runtime_ms=1.476e-06, p=1.00e-03, R²=0.9394</summary>
 
 ```
 ==============================================================================
@@ -3554,7 +3554,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>AND</code>, nobs=946, runtime_ms=1.415e-06, p=1.00e-03, R²=0.9245</summary>
+<details markdown="1"><summary><code>AND</code>, nobs=946, runtime_ms=1.415e-06, p=1.00e-03, R²=0.9245</summary>
 
 ```
 ==============================================================================
@@ -3580,7 +3580,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATACOPY</code>, nobs=22704, runtime_ms=4.241e-06, p=1.00e-03, R²=0.9118</summary>
+<details markdown="1"><summary><code>CALLDATACOPY</code>, nobs=22704, runtime_ms=4.241e-06, p=1.00e-03, R²=0.9118</summary>
 
 ```
 ==============================================================================
@@ -3606,7 +3606,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>CALLDATALOAD</code>, nobs=3784, runtime_ms=0, p=1.00e+00, R²=1.11e-16</summary>
+<details markdown="1"><summary><code>CALLDATALOAD</code>, nobs=3784, runtime_ms=0, p=1.00e+00, R²=1.11e-16</summary>
 
 ```
 ==============================================================================
@@ -3632,7 +3632,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>DIV</code>, nobs=946, runtime_ms=1.067e-05, p=1.00e-03, R²=0.9476</summary>
+<details markdown="1"><summary><code>DIV</code>, nobs=946, runtime_ms=1.067e-05, p=1.00e-03, R²=0.9476</summary>
 
 ```
 ==============================================================================
@@ -3658,7 +3658,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>EXP</code>, nobs=946, runtime_ms=0.0006835, p=1.00e-03, R²=0.9599</summary>
+<details markdown="1"><summary><code>EXP</code>, nobs=946, runtime_ms=0.0006835, p=1.00e-03, R²=0.9599</summary>
 
 ```
 ==============================================================================
@@ -3684,7 +3684,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>GT</code>, nobs=946, runtime_ms=1.557e-06, p=1.00e-03, R²=0.9486</summary>
+<details markdown="1"><summary><code>GT</code>, nobs=946, runtime_ms=1.557e-06, p=1.00e-03, R²=0.9486</summary>
 
 ```
 ==============================================================================
@@ -3710,7 +3710,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>JUMPI</code>, nobs=946, runtime_ms=2.255e-06, p=1.00e-03, R²=0.9359</summary>
+<details markdown="1"><summary><code>JUMPI</code>, nobs=946, runtime_ms=2.255e-06, p=1.00e-03, R²=0.9359</summary>
 
 ```
 ==============================================================================
@@ -3736,7 +3736,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>LT</code>, nobs=946, runtime_ms=3.08e-06, p=1.00e-03, R²=0.6899</summary>
+<details markdown="1"><summary><code>LT</code>, nobs=946, runtime_ms=3.08e-06, p=1.00e-03, R²=0.6899</summary>
 
 ```
 ==============================================================================
@@ -3762,7 +3762,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE</code>, nobs=4730, runtime_ms=3.655e-06, p=1.00e-03, R²=0.3993</summary>
+<details markdown="1"><summary><code>MSTORE</code>, nobs=4730, runtime_ms=3.655e-06, p=1.00e-03, R²=0.3993</summary>
 
 ```
 ==============================================================================
@@ -3788,7 +3788,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MSTORE8</code>, nobs=4730, runtime_ms=2.186e-06, p=1.00e-03, R²=0.9256</summary>
+<details markdown="1"><summary><code>MSTORE8</code>, nobs=4730, runtime_ms=2.186e-06, p=1.00e-03, R²=0.9256</summary>
 
 ```
 ==============================================================================
@@ -3814,7 +3814,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>MUL</code>, nobs=946, runtime_ms=2.269e-06, p=1.00e-03, R²=0.9441</summary>
+<details markdown="1"><summary><code>MUL</code>, nobs=946, runtime_ms=2.269e-06, p=1.00e-03, R²=0.9441</summary>
 
 ```
 ==============================================================================
@@ -3840,7 +3840,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>PC</code>, nobs=946, runtime_ms=9.372e-07, p=1.00e-03, R²=0.6985</summary>
+<details markdown="1"><summary><code>PC</code>, nobs=946, runtime_ms=9.372e-07, p=1.00e-03, R²=0.6985</summary>
 
 ```
 ==============================================================================
@@ -3866,7 +3866,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>RETURNDATASIZE</code>, nobs=3784, runtime_ms=1.398e-06, p=1.00e-03, R²=0.9506</summary>
+<details markdown="1"><summary><code>RETURNDATASIZE</code>, nobs=3784, runtime_ms=1.398e-06, p=1.00e-03, R²=0.9506</summary>
 
 ```
 ==============================================================================
@@ -3892,7 +3892,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SELFBALANCE</code>, nobs=946, runtime_ms=8.157e-06, p=1.00e-03, R²=0.9606</summary>
+<details markdown="1"><summary><code>SELFBALANCE</code>, nobs=946, runtime_ms=8.157e-06, p=1.00e-03, R²=0.9606</summary>
 
 ```
 ==============================================================================
@@ -3918,7 +3918,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>SUB</code>, nobs=946, runtime_ms=1.577e-06, p=1.00e-03, R²=0.9326</summary>
+<details markdown="1"><summary><code>SUB</code>, nobs=946, runtime_ms=1.577e-06, p=1.00e-03, R²=0.9326</summary>
 
 ```
 ==============================================================================
@@ -3946,7 +3946,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ### Mixed glue (tier B), reth
 
-<details><summary><code>JUMP</code>, nobs=946, runtime_ms=4.242e-06, p=1.00e-03, R²=0.9527</summary>
+<details markdown="1"><summary><code>JUMP</code>, nobs=946, runtime_ms=4.242e-06, p=1.00e-03, R²=0.9527</summary>
 
 ```
 ==============================================================================
@@ -3972,7 +3972,7 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 </details>
 
-<details><summary><code>KECCAK256</code>, nobs=15136, runtime_ms=0, p=1.00e+00, R²=0</summary>
+<details markdown="1"><summary><code>KECCAK256</code>, nobs=15136, runtime_ms=0, p=1.00e+00, R²=0</summary>
 
 ```
 ==============================================================================
