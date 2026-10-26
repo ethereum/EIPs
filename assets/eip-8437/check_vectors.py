@@ -113,28 +113,28 @@ def wrapper_items():
                   for i in range(2))
     envelopes = sorted((transaction(i) for i in range(2)), key=transaction_hash)
     return {
-        "mode0": [0, deps, [b"witness 0", b"witness 1"], envelopes],
-        "mode1": [1, deps, b"aggregate proof", envelopes],
-        "blob_mode1": [1, deps, b"aggregate proof", sorted(
-            envelopes + [FRAME_TX_TYPE + rlp(blob_transaction())], key=transaction_hash)],
+        "mode0": [envelopes, 0, [deps, [b"witness 0", b"witness 1"]]],
+        "mode1": [envelopes, 1, [deps, b"aggregate proof"]],
+        "blob_mode1": [sorted(envelopes + [FRAME_TX_TYPE + rlp(blob_transaction())],
+                              key=transaction_hash), 1, [deps, b"aggregate proof"]],
     }
 
 
 def wrapper_vectors():
     items = wrapper_items()
     out = {
-        "deps": [d.hex() for d in items["mode0"][1]],
-        "transactions": [x.hex() for x in items["mode0"][3]],
+        "deps": [d.hex() for d in items["mode0"][2][0]],
+        "transactions": [x.hex() for x in items["mode0"][0]],
     }
     for name, item in items.items():
         body = rlp(item)
-        announcement = describe(item[0], body)
+        announcement = describe(item[1], body)
         out[name] = {
             "body": body.hex(),
             "content_hash": announcement[2].hex(),
             "announcement_rlp": rlp(announcement).hex(),
             "response_rlp": rlp([7, [item]]).hex(),
-            "transaction_hashes": [transaction_hash(tx).hex() for tx in item[3]],
+            "transaction_hashes": [transaction_hash(tx).hex() for tx in item[0]],
         }
     return out
 
@@ -162,8 +162,10 @@ def check_request(request_id, hashes, received_announcements):
 def check_wrapper_shape(item):
     # Envelope structure and blob metadata binding are checked; EIP-8141
     # execution, dependency-union equality and cryptographic validity are not.
-    assert isinstance(item, list) and len(item) == 4, "wrapper fields"
-    mode, deps, proof, envelopes = item
+    assert isinstance(item, list) and len(item) == 3, "wrapper fields"
+    envelopes, mode, content = item
+    assert isinstance(content, list) and len(content) == 2, "wrapper content"
+    deps, proof = content
     assert isinstance(mode, int) and mode in (0, 1), "wrapper mode"
     assert isinstance(deps, list) and deps, "wrapper dependencies"
     assert all(isinstance(dep, bytes) and len(dep) == 96 for dep in deps), "dependency length"
@@ -193,7 +195,7 @@ def check_wrapper_response(request_id, requested, announced_metadata, reply):
         assert positions[digest] > previous, "response order"
         check_wrapper_shape(item)
         mode, length = announced_metadata[digest]
-        assert item[0] == mode, "announced mode"
+        assert item[1] == mode, "announced mode"
         assert len(body) == length, "announced length"
         previous = positions[digest]
 
@@ -297,19 +299,25 @@ def main():
     mode0, mode1, blob_mode1 = wrapper_items().values()
     for item in (mode0, mode1, blob_mode1):
         check_wrapper_shape(item)
-    expect_error("wrapper fields", check_wrapper_shape, mode1[:3])
-    expect_error("wrapper envelopes", check_wrapper_shape, mode1[:3] + [[]])
-    expect_error("transaction envelope", check_wrapper_shape, mode1[:3] + [[bytes(32)]])
-    expect_error("transaction envelope", check_wrapper_shape, mode1[:3] + [[[1, 2]]])
-    expect_error("transaction order", check_wrapper_shape, mode1[:3] + [mode1[3][::-1]])
-    expect_error("transaction order", check_wrapper_shape, mode1[:3] + [[mode1[3][0]] * 2])
-    expect_error("wrapper dependencies", check_wrapper_shape, [1, [], mode1[2], mode1[3]])
+        decoded = decode(rlp(item), strict=True)
+        assert len(decoded) == 3 and decoded[0] == item[0]
+        assert decoded[1] == (b"\x01" if item[1] else b"")
+        assert decoded[2] == item[2]
+    expect_error("wrapper fields", check_wrapper_shape, mode1[:2])
+    expect_error("wrapper content", check_wrapper_shape, [mode1[0], 1, mode1[2][:1]])
+    expect_error("wrapper fields", check_wrapper_shape, [1, mode1[2][0], mode1[2][1], mode1[0]])
+    expect_error("wrapper envelopes", check_wrapper_shape, [[], *mode1[1:]])
+    expect_error("transaction envelope", check_wrapper_shape, [[bytes(32)], *mode1[1:]])
+    expect_error("transaction envelope", check_wrapper_shape, [[[1, 2]], *mode1[1:]])
+    expect_error("transaction order", check_wrapper_shape, [mode1[0][::-1], *mode1[1:]])
+    expect_error("transaction order", check_wrapper_shape, [[mode1[0][0]] * 2, *mode1[1:]])
+    expect_error("wrapper dependencies", check_wrapper_shape, [mode1[0], 1, [[], mode1[2][1]]])
 
     # Decoded response items, correlation, hashes, lengths and ordering.
     items = [mode0, mode1, blob_mode1]
     encoded = [rlp(item) for item in items]
     requested = [h(body) for body in encoded]
-    metadata = {h(body): (item[0], len(body)) for item, body in zip(items, encoded)}
+    metadata = {h(body): (item[1], len(body)) for item, body in zip(items, encoded)}
     check_request(7, requested, set(requested))
     expect_error("unannounced wrapper", check_request, 7, requested, {requested[0]})
     held = dict(zip(requested, encoded))
@@ -324,19 +332,19 @@ def main():
     expect_error("embedded wrapper", check_wrapper_response, 7, requested, metadata, [7, encoded])
     expect_error("response order", check_wrapper_response, 7, requested, metadata, [7, items[::-1]])
     expect_error("response order", check_wrapper_response, 7, requested, metadata, [7, [mode0, mode0]])
-    for altered in ([1, mode1[1], b"aggregate proog", mode1[3]],
-                    mode1[:3] + [[transaction(99)]],
-                    mode1[:3] + [mode1[3][:1]]):
+    for altered in ([mode1[0], 1, [mode1[2][0], b"aggregate proog"]],
+                    [[transaction(99)], *mode1[1:]],
+                    [mode1[0][:1], *mode1[1:]]):
         expect_error("response hash", check_wrapper_response, 7, requested, metadata, [7, [altered]])
     wrong_length = {**metadata, requested[0]: (0, len(encoded[0]) + 1)}
     expect_error("announced length", check_wrapper_response, 7, requested, wrong_length, [7, [mode0]])
     for i, item in enumerate(items):
-        wrong_mode = {**metadata, requested[i]: (1 - item[0], len(encoded[i]))}
+        wrong_mode = {**metadata, requested[i]: (1 - item[1], len(encoded[i]))}
         expect_error("announced mode", check_wrapper_response, 7, requested, wrong_mode, [7, [item]])
     assert wrappers_response(7, encoded) == rlp([7, items])
 
     # A full 32-hash request can be satisfied in one response for small wrappers.
-    small_items = [[0, mode0[1], mode0[2], [transaction(i)]] for i in range(32)]
+    small_items = [[[transaction(i)], 0, mode0[2]] for i in range(32)]
     small = [rlp(item) for item in small_items]
     small_hashes = [h(body) for body in small]
     small_metadata = {h(body): (0, len(body)) for body in small}
@@ -347,12 +355,12 @@ def main():
 
     # Byte-derived transaction count: no independent 4,096-envelope ceiling.
     many_envelopes = sorted((transaction(i) for i in range(4097)), key=transaction_hash)
-    many = [1, mode1[1], mode1[2], many_envelopes]
+    many = [many_envelopes, 1, mode1[2]]
     many_body = rlp(many)
     check_wrapper_response(7, [h(many_body)], {h(many_body): (1, len(many_body))}, [7, [many]])
 
     # Five fixtures with 1,000,000-byte synthetic proofs; none is a valid proof.
-    large_items = [[1, mode1[1], bytes([i]) * 1_000_000, mode1[3]] for i in range(5)]
+    large_items = [[mode1[0], 1, [mode1[2][0], bytes([i]) * 1_000_000]] for i in range(5)]
     large = [rlp(item) for item in large_items]
     assert all(len(body) <= MAX_WRAPPER_BYTES for body in large)
     assert len(splice(7, large[:2])) <= SOFT_RESPONSE_LIMIT < len(splice(7, large[:3]))
@@ -373,7 +381,7 @@ def main():
     for _ in range(5):
         tx_body = transaction_body(0)
         tx_body[3] = [bytes(payload_size)]
-        at_limit = [1, mode1[1], proof, [FRAME_TX_TYPE + rlp(tx_body)]]
+        at_limit = [[FRAME_TX_TYPE + rlp(tx_body)], 1, [mode1[2][0], proof]]
         body = rlp(at_limit)
         if len(body) == MAX_WRAPPER_BYTES:
             break
@@ -383,7 +391,7 @@ def main():
     assert wrappers_response(max_id, [body, encoded[0]]) == splice(max_id, [body])
     assert len(splice(max_id, [body])) > SOFT_RESPONSE_LIMIT  # Response framing only.
     tx_body[3] = [bytes(payload_size + 1)]
-    oversized = [1, mode1[1], proof, [FRAME_TX_TYPE + rlp(tx_body)]]
+    oversized = [[FRAME_TX_TYPE + rlp(tx_body)], 1, [mode1[2][0], proof]]
     assert len(rlp(oversized)) == MAX_WRAPPER_BYTES + 1
     expect_error("wrapper length", check_wrapper_response, 7, [], {}, [7, [oversized]])
 
@@ -395,11 +403,11 @@ def main():
     altered_proofs = [bytes([42]) * 48] + blob[4][1:]
     altered_blob = FRAME_TX_TYPE + rlp(blob[:4] + [altered_proofs])
     assert transaction_hash(altered_blob) == tx_hash
-    assert h(rlp(mode1[:3] + [[blob_encoded]])) != h(rlp(mode1[:3] + [[altered_blob]]))
-    expect_error("transaction order", check_wrapper_shape, mode1[:3] + [[blob_encoded, altered_blob]])
-    raw_hash_order = sorted(blob_mode1[3], key=h)
-    assert raw_hash_order != blob_mode1[3]
-    expect_error("transaction order", check_wrapper_shape, mode1[:3] + [raw_hash_order])
+    assert h(rlp([[blob_encoded], *mode1[1:]])) != h(rlp([[altered_blob], *mode1[1:]]))
+    expect_error("transaction order", check_wrapper_shape, [[blob_encoded, altered_blob], *mode1[1:]])
+    raw_hash_order = sorted(blob_mode1[0], key=h)
+    assert raw_hash_order != blob_mode1[0]
+    expect_error("transaction order", check_wrapper_shape, [raw_hash_order, *mode1[1:]])
     for value in (b"", [bytes(131072)]):
         expect_error("blob data elision", transaction_hash, FRAME_TX_TYPE + rlp(blob[:2] + [value] + blob[3:]))
     expect_error("missing blob metadata", transaction_hash, FRAME_TX_TYPE + rlp(blob[0]))
