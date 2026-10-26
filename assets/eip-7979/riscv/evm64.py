@@ -1,4 +1,5 @@
-"""EVM64 as pure opcode addition: no modes, no prefixes.
+"""EVM64 as pure opcode addition: no modes, no prefixes -- and, for
+measurement against it, the EIP-7937 prefix encoding of the same set.
 
 The 64-bit twin of an arithmetic or comparison opcode x in
 0x01..0x1C is 0xC0+x, operating modulo 2^64; CALLDATALOAD64=0xE0,
@@ -53,3 +54,52 @@ class Compiler64(Compiler):
 def compile_yul64(src, mode="7979"):
     """Compile a Yul-subset source text to EVM64 bytecode."""
     return Compiler64(mode).program(Parser(src).parse())
+
+
+# EIP-7937 encoding of the same instruction set: C0 then the twin's own
+# opcode (the memory twins after their own opcodes 0x35, 0x51, 0x52).
+PREFIX_OF = {v: k for k, v in TWIN.items()}
+
+
+class Compiler64Prefix(Compiler64):
+    def assemble(self):
+        out, i, src = [], 0, self.out
+        while i < len(src):
+            item = src[i]
+            i += 1
+            if isinstance(item, tuple):             # LABEL / PUSHLBL
+                out.append(item)
+                continue
+            if item in TWIN:
+                out.extend((0xC0, item))
+            else:
+                out.append(item)
+            if 0x5F < item <= 0x7F:                 # skip PUSH data
+                n = item - 0x5F
+                out.extend(src[i:i + n])
+                i += n
+        self.out = out
+        return Compiler.assemble(self)
+
+
+def compile_yul64_prefix(src, mode="7979"):
+    """Compile a Yul-subset source text to prefix-encoded EVM64 bytecode."""
+    return Compiler64Prefix(mode).program(Parser(src).parse())
+
+
+class PrefixedCode(bytes):
+    """Prefix-encoded bytecode, read by the translators as if single-byte:
+    code[pc] at a 0xC0 yields the twin's single-byte opcode, and
+    size_of() steps over both bytes.  Positions are unchanged, so the
+    PUSHed destinations in the code stay valid.  Slices and iteration
+    are raw, as PUSH data must be."""
+    prefixed = True
+
+    def raw(self, i):
+        return bytes.__getitem__(self, i)
+
+    def __getitem__(self, i):
+        v = bytes.__getitem__(self, i)
+        if isinstance(i, int) and v == 0xC0:
+            return TWIN[bytes.__getitem__(self, i + 1)]
+        return v
