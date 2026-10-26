@@ -375,8 +375,8 @@ def main():
     check_wrapper_response(7, large_hashes, large_metadata, [7, large_items])
 
     # Fill the wrapper to exactly 2 MiB with proof and synthetic envelope bytes.
-    # The proof remains at its 1.25 MiB ceiling; RLP overhead counts toward the cap.
-    proof = bytes(1_310_720)
+    # Use a 1.5 MiB proof fixture; only the complete wrapper has a byte ceiling.
+    proof = bytes(1_572_864)
     payload_size = MAX_WRAPPER_BYTES - len(proof) - 1024
     for _ in range(5):
         tx_body = transaction_body(0)
