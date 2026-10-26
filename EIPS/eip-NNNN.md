@@ -209,7 +209,7 @@ The following figures were measured with the reference implementation against a 
 | 50 | 2,634,392 | 1,059,175 | 945,665 | 1,365,241 |
 | 100 | 5,277,491 | 1,877,504 | 1,637,590 | 2,515,764 |
 
-The loop column is from the many-blobs run; the general-shape loop differs from it by under `0.5%` at every `n`. Savings for the shared-value shapes grow from `9%` to `12%` at `n = 5` to roughly `65%` to `69%` at `n = 100`; the general shape, with its larger `LHS` MSM, saves `23%` at `n = 10` and about `53%` at `n = 100`. The per-`n` measurements are in [`gas_many_blobs_one_point.csv`](../assets/eip-draft_batched_kzg/gas_many_blobs_one_point.csv), [`gas_one_blob_many_points.csv`](../assets/eip-draft_batched_kzg/gas_one_blob_many_points.csv) and [`gas_general.csv`](../assets/eip-draft_batched_kzg/gas_general.csv) in this proposal's assets.
+The loop column is from the many-blobs run; the general-shape loop differs from it by under `0.5%` at every `n`. Savings for the shared-value shapes grow from `9%` to `12%` at `n = 5` to roughly `65%` to `69%` at `n = 100`; the general shape, with its larger `LHS` MSM, saves `23%` at `n = 10` and about `53%` at `n = 100`. The per-`n` measurements are in [`gas_many_blobs_one_point.csv`](../assets/eip-NNNN/gas_many_blobs_one_point.csv), [`gas_one_blob_many_points.csv`](../assets/eip-NNNN/gas_one_blob_many_points.csv) and [`gas_general.csv`](../assets/eip-NNNN/gas_general.csv) in this proposal's assets.
 
 ## Backwards Compatibility
 
@@ -219,15 +219,15 @@ The technique introduces no protocol change and affects no consensus rule; it is
 
 One fixture per shape is included in this proposal's assets, each a set of valid claims in the 128-byte encoding with proofs produced by a standard KZG library, large enough to take the batched path rather than the small-batch fallback.
 
-- [`multi_point_one_blob_128.json`](../assets/eip-draft_batched_kzg/fixtures/multi_point_one_blob_128.json): six openings of one blob at six distinct points, for the one-blob shape.
-- [`multi_blob_one_point_z1_6_128.json`](../assets/eip-draft_batched_kzg/fixtures/multi_blob_one_point_z1_6_128.json): three blobs opened at the shared point `z = 1`, each listed twice, for the many-blobs shape; a repeated blob is a valid input.
-- [`multi_blob_multi_point_128.json`](../assets/eip-draft_batched_kzg/fixtures/multi_blob_multi_point_128.json): seven claims over three blobs at five distinct points, for the general shape.
+- [`multi_point_one_blob_128.json`](../assets/eip-NNNN/fixtures/multi_point_one_blob_128.json): six openings of one blob at six distinct points, for the one-blob shape.
+- [`multi_blob_one_point_z1_6_128.json`](../assets/eip-NNNN/fixtures/multi_blob_one_point_z1_6_128.json): three blobs opened at the shared point `z = 1`, each listed twice, for the many-blobs shape; a repeated blob is a valid input.
+- [`multi_blob_multi_point_128.json`](../assets/eip-NNNN/fixtures/multi_blob_multi_point_128.json): seven claims over three blobs at five distinct points, for the general shape.
 
 Each fixture is expected to be accepted as given. Each is expected to be rejected when any single `y_i` is altered, when any proof is replaced by the G1 generator, when two proofs of the same blob are exchanged, when a commitment is presented under a versioned hash it does not bind to, when any scalar is greater than or equal to `q`, when any point has a length other than 128 bytes, when the array lengths disagree, and when the batch is empty. The shared point `z = 0`, which zeroes the `RHS` slot of the `LHS` MSM, and commitments or proofs at infinity are also expected to be accepted when the underlying openings are valid.
 
 ## Reference Implementation
 
-A Solidity implementation is included in this proposal's assets. [`Bls12381.sol`](../assets/eip-draft_batched_kzg/Bls12381.sol) wraps the EIP-2537 precompiles and implements the point compression used for versioned hash binding; [`BlobVerifier.sol`](../assets/eip-draft_batched_kzg/BlobVerifier.sol) implements all three shapes with their threshold fallbacks, and the single-opening path through the point evaluation precompile. The core of the many-blobs shape, with encoding details omitted, reads as follows:
+A Solidity implementation is included in this proposal's assets. [`Bls12381.sol`](../assets/eip-NNNN/Bls12381.sol) wraps the EIP-2537 precompiles and implements the point compression used for versioned hash binding; [`BlobVerifier.sol`](../assets/eip-NNNN/BlobVerifier.sol) implements all three shapes with their threshold fallbacks, and the single-opening path through the point evaluation precompile. The core of the many-blobs shape, with encoding details omitted, reads as follows:
 
 ```python
 def verify_many_blobs_one_point(hs, Cs, z, ys, proofs):
