@@ -5,6 +5,8 @@ Cells:
   interp/64   EVM64 bytecode on the same interpreter — EVM64 alone
   aot/256     validated 7979 bytecode translated to RISC-V — validation alone
   aot/64      both proposals composed
+  llvm/64     both, through an optimizing compiler (llvm.py, opt, llc):
+              the ceiling, when LLVM with the RISC-V target is present
 
 The metric is executed RISC-V instructions, counted exactly by qemu
 (-singlestep -d nochain,exec).  RISC-V instruction count is the
@@ -37,6 +39,7 @@ from run7979 import execute                         # noqa: E402
 from evm64 import compile_yul64                     # noqa: E402
 from aot import Translate64, Translate256           # noqa: E402
 from ir import translate_ir, ir_ops_h               # noqa: E402
+from llvm import translate_llvm                     # noqa: E402
 import validator                            # noqa: E402
 from test_translator import EXAMPLES                # noqa: E402
 
@@ -47,6 +50,10 @@ GCC = os.environ.get("RV_GCC", (
 QEMU = os.environ.get("RV_QEMU", "/tmp/rv/usr/bin/qemu-riscv64")
 ZISKEMU = os.environ.get("RV_ZISKEMU",
                          "/tmp/zisk-src/target/release/ziskemu")
+LLVM = os.environ.get("RV_LLVM", "/tmp/rv/usr/lib/llvm-15/bin")
+HAVE_LLVM = os.path.exists(os.path.join(LLVM, "llc"))
+LLC_FLAGS = ("-O2 -mtriple=riscv64-unknown-linux-gnu -mattr=+m,+a,+f,+d,+c"
+             " -target-abi=lp64d").split()
 CFLAGS = "-O2 -static -nostdlib -nostartfiles -ffreestanding".split()
 ZFLAGS = ["-DZISK", "-mcmodel=medany"]
 BUILD = os.environ.get("RV_BUILD", "/tmp/rvbuild")
@@ -61,8 +68,14 @@ def word(v):
     return v.to_bytes(32, "big")
 
 
-# Measurement kernels: workloads big enough that counts are signal.
-# Values wrap modulo the word size; the oracle below wraps with them.
+# Measurement kernels: workloads big enough that counts are signal,
+# each exercising a different part of the machine.  Values wrap modulo
+# the word size; the oracles below wrap with them.
+#   mul chain      the multiplier and the ALU on a dependent chain
+#   call tree      calls and returns: seven of each per iteration
+#   xorshift       the shifter and the logic unit: the hash mixer's mix
+#   euclid         the divider, in a data-dependent loop, called per pair
+#   store and sum  the memory unit alone: n words stored, then summed
 def mulchain_oracle(n, mask):
     s = 0
     for i in range(n):
@@ -75,6 +88,29 @@ def calls_oracle(n, mask):
     for i in range(n):
         s = (s + i + 4) & mask
     return s
+
+
+def xorshift_oracle(n, mask):
+    x = 0x5851F42D4C957F2D
+    for _ in range(n):
+        x ^= (x << 13) & mask
+        x ^= x >> 7
+        x ^= (x << 17) & mask
+    return x
+
+
+def euclid_oracle(n, mask):
+    s = 0
+    for i in range(1, n):
+        a, b = i * i + 1, 3 * i + 7
+        while b:
+            a, b = b, a % b
+        s = (s + a) & mask
+    return s
+
+
+def sum_oracle(n, mask):
+    return (n * (n + 1) // 2) & mask
 
 
 KERNELS = [
@@ -100,6 +136,50 @@ KERNELS = [
             }
         }
     }""", word(1500), calls_oracle, 1500),
+
+    ("xorshift", """{
+        mstore(0, mix(calldataload(0)))
+        return(0, 32)
+        function mix(n) -> x {
+            x := 0x5851f42d4c957f2d
+            for { let i := 0 } lt(i, n) { i := add(i, 1) } {
+                x := xor(x, shl(13, x))
+                x := xor(x, shr(7, x))
+                x := xor(x, shl(17, x))
+            }
+        }
+    }""", word(3000), xorshift_oracle, 3000),
+
+    ("euclid", """{
+        mstore(0, gcds(calldataload(0)))
+        return(0, 32)
+        function gcd(a, b) -> g {
+            for {} b {} {
+                let t := mod(a, b)
+                a := b
+                b := t
+            }
+            g := a
+        }
+        function gcds(n) -> s {
+            for { let i := 1 } lt(i, n) { i := add(i, 1) } {
+                s := add(s, gcd(add(mul(i, i), 1), add(mul(i, 3), 7)))
+            }
+        }
+    }""", word(1000), euclid_oracle, 1000),
+
+    ("store and sum", """{
+        mstore(0, sum(calldataload(0)))
+        return(0, 32)
+        function sum(n) -> s {
+            for { let i := 0 } lt(i, n) { i := add(i, 1) } {
+                mstore(mul(i, 32), add(i, 1))
+            }
+            for { let i := 0 } lt(i, n) { i := add(i, 1) } {
+                s := add(s, mload(mul(i, 32)))
+            }
+        }
+    }""", word(3000), sum_oracle, 3000),
 ]
 
 
@@ -118,6 +198,10 @@ def compile_objects(zisk=False):
         r = sh(GCC + CFLAGS + extra0 + ["-Wall", "-c", "-o", obj,
                                         os.path.join(HERE, src)])
         assert r.returncode == 0, r.stderr
+    obj = os.path.join(BUILD, f"interp_p{suffix}.o")
+    r = sh(GCC + CFLAGS + extra0 + ["-Wall", "-DPREFIX64", "-c", "-o", obj,
+                                    os.path.join(HERE, "interp.c")])
+    assert r.returncode == 0, r.stderr
     for obj, extra in ((f"interp_ir256{suffix}.o", []),
                        (f"interp_ir64{suffix}.o", ["-DWIDTH64"])):
         r = sh(GCC + CFLAGS + extra0 + ["-Wall", "-I", BUILD, "-c", "-o",
@@ -136,7 +220,8 @@ def prog_data(code, calldata):
             f"const u64 CALLDATA_LEN = {len(calldata)};\n")
 
 
-def build(tag, code, calldata, asm=None, ir_width=None, zisk=False):
+def build(tag, code, calldata, asm=None, ir_width=None, zisk=False,
+          prefix=False):
     """Link a bytecode-interpreter binary (default), an AOT binary
     (asm given), or an IR-interpreter binary (ir_width given) — for
     qemu, or for the Zisk zkVM (zisk=True)."""
@@ -158,10 +243,31 @@ def build(tag, code, calldata, asm=None, ir_width=None, zisk=False):
             f.write(translate_ir(code))
         parts += [pi, os.path.join(BUILD, f"interp_ir{ir_width}{suffix}.o")]
     else:
-        parts.append(os.path.join(BUILD, f"interp{suffix}.o"))
+        parts.append(os.path.join(
+            BUILD, f"interp{'_p' if prefix else ''}{suffix}.o"))
     r = sh(GCC + CFLAGS + extra + ["-I", BUILD, "-o", out] + parts)
     assert r.returncode == 0, f"{tag}: {r.stderr}"
     return out
+
+
+def build_llvm(tag, code, calldata, width, zisk=False):
+    """The seventh cell: validated code through llvm.py, then opt -O2
+    and llc -O2 — the optimizing compiler a chain that does not pay
+    for compile time could run, or a client could run offline on
+    precompiles written as EVM code.  Needs LLVM with the RISC-V
+    target (setup.sh fetches it).  Not yet run in Zisk."""
+    ll = os.path.join(BUILD, f"{tag}.ll")
+    with open(ll, "w") as f:
+        f.write(translate_llvm(code, width))
+    opt = os.path.join(BUILD, f"{tag}.opt.ll")
+    r = sh([os.path.join(LLVM, "opt"), "-O2", "-S",
+            "-mtriple=riscv64-unknown-linux-gnu", ll, "-o", opt])
+    assert r.returncode == 0, f"{tag}: {r.stderr}"
+    s = os.path.join(BUILD, f"{tag}.llc.s")
+    r = sh([os.path.join(LLVM, "llc")] + LLC_FLAGS +
+           (["-code-model=medium"] if zisk else []) + [opt, "-o", s])
+    assert r.returncode == 0, f"{tag}: {r.stderr}"
+    return build(tag, code, calldata, open(s).read(), zisk=zisk)
 
 
 def run_binary(path):
@@ -199,7 +305,7 @@ def count_instructions(path):
 
 
 def cells(name, src, calldata, zisk=False):
-    """Build all six binaries for one program; return {cell: path}."""
+    """Build every cell's binary for one program; return {cell: path}."""
     leg256 = compile_yul(src, "legacy")
     new256 = compile_yul(src, "7979")
     leg64 = compile_yul64(src, "legacy")
@@ -219,15 +325,17 @@ def cells(name, src, calldata, zisk=False):
                             Translate256(new256).translate(), zisk=z),
         "aot/64":     build(f"{t}_a64", new64, calldata,
                             Translate64(new64).translate(), zisk=z),
+        **({"llvm/64": build_llvm(f"{t}_l64", new64, calldata, 64, zisk=z)}
+           if HAVE_LLVM else {}),
     }
 
 
 CELL_ORDER = ["interp/256", "interp/64", "ir/256", "ir/64",
-              "aot/256", "aot/64"]
+              "aot/256", "aot/64"] + (["llvm/64"] if HAVE_LLVM else [])
 
 
 def check_examples():
-    """All 8 test_translator programs, all 4 cells, exact agreement."""
+    """All 8 test_translator programs, all cells, exact agreement."""
     failures = 0
     for name, src, cases in EXAMPLES:
         for calldata, expected in cases:
