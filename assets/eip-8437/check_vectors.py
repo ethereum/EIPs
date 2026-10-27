@@ -135,7 +135,8 @@ def wrapper_vectors():
             "announcement_rlp": rlp(announcement).hex(),
             "response_rlp": rlp(reply_for(7, [item])).hex(),
             "compact_response_rlp": rlp([7, [[announcement[2], compact_wrapper(item, {h(tx) for tx in item[0]})]]]).hex(),
-            "full_request_rlp": rlp([8, 1, [announcement[2]]]).hex(),
+            "compact_request_rlp": rlp([7, 1, [announcement[2]]]).hex(),
+            "full_request_rlp": rlp([8, 0, [announcement[2]]]).hex(),
             "encoding_hashes": [h(tx).hex() for tx in item[0]],
             "transaction_hashes": [transaction_hash(tx).hex() for tx in item[0]],
         }
@@ -154,8 +155,8 @@ def check_announcements(entries):
     assert hashes == sorted(set(hashes)), "announcement order"
 
 
-def check_request(request_id, hashes, received_announcements, full=0):
-    assert type(full) is int and full in (0, 1), "request full flag"
+def check_request(request_id, hashes, received_announcements, compact=0):
+    assert type(compact) is int and compact in (0, 1), "request compact flag"
     assert isinstance(request_id, int) and 0 <= request_id < 2**64, "request id"
     assert 1 <= len(hashes) <= MAX_WRAPPERS_PER_REQUEST, "request count"
     assert all(isinstance(digest, bytes) and len(digest) == 32 for digest in hashes), "request hash"
@@ -195,7 +196,7 @@ def compact_wrapper(item, delivered):
     return [txs, *item[1:]]
 
 
-def reconstruct(item, full, cache, length):
+def reconstruct(item, compact, cache, length):
     assert isinstance(item, list) and len(item) == 3, "wrapper fields"
     assert isinstance(item[0], list), "wrapper envelopes"
     assert 1 <= len(rlp(item)) <= length <= MAX_WRAPPER_BYTES, "wrapper length"
@@ -204,7 +205,7 @@ def reconstruct(item, full, cache, length):
     expanded_size = len(rlp(item))
     for entry in item[0]:
         if isinstance(entry, list):
-            assert not full, "reference in full response"
+            assert compact == 1, "reference in full response"
             assert len(entry) == 1 and isinstance(entry[0], bytes) and len(entry[0]) == 32, "encoding reference"
             tx = cache.get(entry[0])
             if tx is None:
@@ -224,7 +225,7 @@ def reconstruct(item, full, cache, length):
     return result
 
 
-def check_wrapper_response(request_id, requested, announced_metadata, reply, full=0, cache=None):
+def check_wrapper_response(request_id, requested, announced_metadata, reply, compact=0, cache=None):
     assert isinstance(reply, list) and len(reply) == 2, "response fields"
     assert reply[0] == request_id, "response id"
     assert isinstance(reply[1], list), "response fields"
@@ -238,7 +239,7 @@ def check_wrapper_response(request_id, requested, announced_metadata, reply, ful
         assert positions[digest] > previous, "response order"
         previous = positions[digest]
         mode, length = announced_metadata[digest]
-        item = reconstruct(wire_item, full, cache or {}, length)
+        item = reconstruct(wire_item, compact, cache or {}, length)
         assert wire_item[1] == mode, "announced mode"
         if item is None:
             retries.append(digest)
@@ -332,10 +333,10 @@ def main():
 
     # Request bounds, uniqueness and received announcements; IDs need not increase.
     assert rlp([7, 0, [bytes(32)]]).hex() == "e40780e1a0" + "00" * 32
-    for full in (0, 1):
-        check_request(7, [bytes(32)], {bytes(32)}, full)
-    for full in (-1, 2, b"", True):
-        expect_error("request full flag", check_request, 7, [bytes(32)], {bytes(32)}, full)
+    for flag in (0, 1):
+        check_request(7, [bytes(32)], {bytes(32)}, flag)
+    for flag in (-1, 2, b"", True):
+        expect_error("request compact flag", check_request, 7, [bytes(32)], {bytes(32)}, flag)
     max_id = 2**64 - 1
     hashes = [entry[2] for entry in announced]
     check_request(max_id, hashes[:32], set(hashes))
@@ -487,41 +488,41 @@ def main():
         compact = compact_wrapper(item, set(cache))
         assert len(rlp(compact)) < len(rlp(item))
         reply = [7, [[digest, compact]]]
-        assert reconstruct(compact, 0, cache, meta[digest][1]) == item
-        assert check_wrapper_response(7, [digest], meta, reply, cache=cache) == []
-        assert check_wrapper_response(7, [digest], meta, reply) == [digest]
+        assert reconstruct(compact, 1, cache, meta[digest][1]) == item
+        assert check_wrapper_response(7, [digest], meta, reply, compact=1, cache=cache) == []
+        assert check_wrapper_response(7, [digest], meta, reply, compact=1) == [digest]
         # Eviction leads to a fresh full request, not a transaction fetch.
-        check_request(8, [digest], {digest}, full=1)
-        for full in (0, 1):
+        check_request(8, [digest], {digest}, compact=0)
+        for flag in (0, 1):
             # A minimal client can serve full bytes and receive without a cache.
-            assert check_wrapper_response(8, [digest], meta, reply_for(8, [item]), full=full) == []
+            assert check_wrapper_response(8, [digest], meta, reply_for(8, [item]), compact=flag) == []
         decoded_compact = decode(rlp(compact), strict=True)
         decoded_full = decode(rlp(item), strict=True)
         assert all(isinstance(entry, list) and len(entry) == 1 for entry in decoded_compact[0])
         assert all(isinstance(entry, bytes) for entry in decoded_full[0])
-        expect_error("reference in full response", check_wrapper_response, 7, [digest], meta, reply, 1, cache)
+        expect_error("reference in full response", check_wrapper_response, 7, [digest], meta, reply, 0, cache)
         assert compact_wrapper(item, set()) == item
         mixed = compact_wrapper(item, {h(item[0][0])})
         assert isinstance(mixed[0][0], list) and isinstance(mixed[0][1], bytes)
-        assert check_wrapper_response(7, [digest], meta, [7, [[digest, mixed]]], cache=cache) == []
+        assert check_wrapper_response(7, [digest], meta, [7, [[digest, mixed]]], compact=1, cache=cache) == []
         partial_cache = dict(cache)
         del partial_cache[h(item[0][0])]
-        assert check_wrapper_response(7, [digest], meta, reply, cache=partial_cache) == [digest]
+        assert check_wrapper_response(7, [digest], meta, reply, compact=1, cache=partial_cache) == [digest]
         wrong_cache = {**cache, h(item[0][0]): transaction(999)}
-        expect_error("encoding hash", check_wrapper_response, 7, [digest], meta, reply, 0, wrong_cache)
+        expect_error("encoding hash", check_wrapper_response, 7, [digest], meta, reply, 1, wrong_cache)
         malformed = [[[bytes(31)], *compact[0][1:]], *compact[1:]]
         expect_error("encoding reference", check_wrapper_response, 7, [digest], meta,
-                     [7, [[digest, malformed]]], 0, cache)
+                     [7, [[digest, malformed]]], 1, cache)
         false_digest = h(b"false canonical wrapper")
         expect_error("response hash", check_wrapper_response, 7, [false_digest],
-                     {false_digest: meta[digest]}, [7, [[false_digest, compact]]], 0, cache)
+                     {false_digest: meta[digest]}, [7, [[false_digest, compact]]], 1, cache)
     # Same consensus transaction hash does not identify the exact blob encoding.
     assert h(blob_encoded) != h(altered_blob)
     assert compact_wrapper([[blob_encoded], *mode1[1:]], {h(altered_blob)})[0] == [blob_encoded]
     # The compact byte count cannot bypass the canonical 2 MiB bound.
     compact_oversized = compact_wrapper(oversized, {h(tx) for tx in oversized[0]})
     assert len(rlp(compact_oversized)) < MAX_WRAPPER_BYTES
-    expect_error("wrapper length", reconstruct, compact_oversized, 0,
+    expect_error("wrapper length", reconstruct, compact_oversized, 1,
                  {h(tx): tx for tx in oversized[0]}, MAX_WRAPPER_BYTES)
 
     print("PASS: announcement, full-envelope and sparse-blob wrapper encoding vectors; "
