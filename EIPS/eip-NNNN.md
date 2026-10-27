@@ -1,4 +1,5 @@
 ---
+eip: 8457
 title: Batched KZG Point Evaluation via EIP-2537
 description: Verify many EIP-4844 blob openings with one pairing check by composing the BLS12-381 G1 MSM and pairing precompiles
 author: Marko Lazic (@markolazic01) <markolazic01@gmail.com>, Cristian Conache (@conache) <cconache@gmail.com>
