@@ -2,7 +2,7 @@
 title: Batched KZG Point Evaluation via EIP-2537
 description: Verify many EIP-4844 blob openings with one pairing check by composing the BLS12-381 G1 MSM and pairing precompiles
 author: Marko Lazic (@markolazic01) <markolazic01@gmail.com>, Cristian Conache (@conache) <cconache@gmail.com>
-discussions-to: https://ethereum-magicians.org/t/eip-xxxx-batch-kzg-point-evaluation-via-bls12-381-precompile-composition/28534
+discussions-to: https://ethereum-magicians.org/t/eip-8457-batched-kzg-point-evaluation-via-eip-2537/28534
 status: Draft
 type: Informational
 created: 2026-07-06
