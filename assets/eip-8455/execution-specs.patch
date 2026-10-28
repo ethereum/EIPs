@@ -1,11 +1,11 @@
-diff --git a/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_99999.py b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_99999.py
+diff --git a/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_8455.py b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_8455.py
 new file mode 100644
 --- /dev/null
-+++ b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_99999.py
++++ b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_8455.py
 @@ -0,0 +1,28 @@
 +"""
-+Draft EIP (number to be assigned; 99999 is a placeholder): RESERVOIR
-+opcode (0x4d), pushing the state gas budget that GAS does not report.
++EIP-8455: RESERVOIR opcode (0x4d), pushing the state gas budget that GAS
++does not report.
 +"""
 +
 +from typing import Callable, Dict, List
@@ -15,8 +15,8 @@ new file mode 100644
 +from ....base_fork import BaseFork
 +
 +
-+class EIP99999(BaseFork):
-+    """RESERVOIR opcode (placeholder EIP number)."""
++class EIP8455(BaseFork):
++    """RESERVOIR opcode (EIP-8455)."""
 +
 +    @classmethod
 +    def opcode_gas_map(
@@ -24,13 +24,13 @@ new file mode 100644
 +    ) -> Dict[OpcodeBase, int | Callable[[OpcodeBase], int]]:
 +        """Add RESERVOIR opcode gas cost."""
 +        gas_costs = cls.gas_costs()
-+        base_map = super(EIP99999, cls).opcode_gas_map()
++        base_map = super(EIP8455, cls).opcode_gas_map()
 +        return {**base_map, Opcodes.RESERVOIR: gas_costs.BASE}
 +
 +    @classmethod
 +    def valid_opcodes(cls) -> List[Opcodes]:
 +        """Add RESERVOIR opcode."""
-+        return [Opcodes.RESERVOIR] + super(EIP99999, cls).valid_opcodes()
++        return [Opcodes.RESERVOIR] + super(EIP8455, cls).valid_opcodes()
 diff --git a/packages/testing/src/execution_testing/vm/opcodes.py b/packages/testing/src/execution_testing/vm/opcodes.py
 --- a/packages/testing/src/execution_testing/vm/opcodes.py
 +++ b/packages/testing/src/execution_testing/vm/opcodes.py
@@ -145,7 +145,7 @@ diff --git a/tests/bogota/eip_reservoir/test_reservoir.py b/tests/bogota/eip_res
 new file mode 100644
 --- /dev/null
 +++ b/tests/bogota/eip_reservoir/test_reservoir.py
-@@ -0,0 +1,364 @@
+@@ -0,0 +1,471 @@
 +"""
 +Tests for the draft RESERVOIR opcode (0x4d): the state gas budget that
 +GAS does not report. Reservoir-model cases (EIP-8037 transactions) are
@@ -160,10 +160,17 @@ new file mode 100644
 +    Account,
 +    Alloc,
 +    AuthorizationTuple,
++    Block,
++    BlockchainTestFiller,
++    BuilderDepositRequest,
++    BuilderExitRequest,
++    ConsolidationRequest,
++    Environment,
 +    Bytecode,
 +    Op,
 +    StateTestFiller,
 +    Transaction,
++    WithdrawalRequest,
 +    compute_create_address,
 +    compute_create2_address,
 +)
@@ -510,3 +517,103 @@ new file mode 100644
 +               post={caller: Account(storage={**SLOTS, 0: child_seen, 1: caller_after,
 +                                              2: gas_rose, 3: 1}),
 +                     shared: Account(storage={})})
++
++
++# --------------------------------------------------------------------------
++# System calls
++# --------------------------------------------------------------------------
++SYSTEM_RESERVOIR = 16 * SS  # STORAGE_SET x SYSTEM_MAX_SSTORES_PER_CALL
++
++
++@pytest.mark.pre_alloc_mutable
++@pytest.mark.parametrize("system_contract", [
++    pytest.param(0x000F3DF6D732807EF1319FB7B8BB8522D0BEAC02, id="beacon"),
++    pytest.param(0x0000F90827F1C53A10CB7A02335B175320002935, id="history"),
++    pytest.param(WithdrawalRequest.system_contract_address, id="withdrawals"),
++    pytest.param(ConsolidationRequest.system_contract_address, id="consolidations"),
++    pytest.param(BuilderDepositRequest.system_contract_address, id="builder_deposit"),
++    pytest.param(BuilderExitRequest.system_contract_address, id="builder_exit"),
++])
++def test_system_call(blockchain_test: BlockchainTestFiller, pre: Alloc, system_contract: int) -> None:
++    """
++    A system call reads its own reservoir, STORAGE_SET x
++    SYSTEM_MAX_SSTORES_PER_CALL, independently of any transaction. Slot 0 is
++    the first read, slot 1 the read after one new slot is created, slot 2
++    the read in a child frame.
++    """
++    address = Address(system_contract)
++    child = pre.deploy_contract(returner())
++    code = (rec(0) + Op.SSTORE(FRESH, 1) + rec(1)
++            + Op.MSTORE(0, 0) + Op.POP(Op.CALL(Op.GAS, child, 0, 0, 0, 0, 32)) + rec(2, Op.MLOAD(0))
++            + Op.STOP)
++    pre.update_account(address, code=code, storage=SLOTS)
++    probe = pre.deploy_contract(rec(0) + Op.STOP, storage=SLOTS)
++    blockchain_test(
++        pre=pre,
++        genesis_environment=Environment(gas_limit=120_000_000),
++        blocks=[Block(txs=[legacy_tx(pre, probe)])],
++        post={address: Account(storage={**SLOTS, 0: SYSTEM_RESERVOIR, 1: SYSTEM_RESERVOIR - SS,
++                                        2: SYSTEM_RESERVOIR - SS, FRESH: 1}),
++              probe: Account(storage={**SLOTS, 0: R})},
++    )
++
++
++# --------------------------------------------------------------------------
++# Bundle ledger: signed per-operation measurements reconcile
++# --------------------------------------------------------------------------
++OFFSET = 1 << 128  # keeps every stored result non-zero, so instrumentation never clears a slot
++
++
++def enc(x: int) -> int:
++    return x + OFFSET
++
++
++@legacy
++@pytest.mark.parametrize("variant,r,m1,m2", [
++    ("create_clear", R, 116_195, -94_545),
++    ("create_clear", 0, 116_195, -94_545),
++    ("create_keep", R, 116_195, 3_044),
++    ("none", R, 3_044, 3_044),
++], ids=["create_clear", "create_clear_below_cap", "create_keep", "control"])
++def test_bundle_ledger(state_test: StateTestFiller, pre: Alloc, variant: str, r: int,
++                       m1: int, m2: int) -> None:
++    """
++    An EntryPoint-like caller meters two operations with GAS + RESERVOIR and
++    stores the signed deltas. Operation 1 creates a slot in a shared
++    contract; operation 2 clears it. Slots 0..3 hold op1 dGAS, op1
++    dRESERVOIR, op2 dGAS, op2 dRESERVOIR (before minus after, each plus
++    2**128 so that no stored value is zero); slots 4 and 5 hold the
++    per-operation sums with the same offset. The sums are
++    the same with and without a reservoir; only the split differs.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH))) + Op.STOP)
++    call_shared = Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP
++    op1 = pre.deploy_contract(Op.STOP if variant == "none" else call_shared)
++    op2 = pre.deploy_contract(call_shared if variant == "create_clear" else Op.STOP)
++
++    def meter(target, base):
++        return (Op.MSTORE(base, Op.GAS) + Op.MSTORE(base + 0x20, Op.RESERVOIR)
++                + Op.POP(Op.CALL(Op.GAS, target, 0, 0, 0, 0, 0))
++                + Op.MSTORE(base + 0x40, Op.GAS) + Op.MSTORE(base + 0x60, Op.RESERVOIR))
++
++    def d(a, b):
++        return Op.ADD(Op.SUB(Op.MLOAD(a), Op.MLOAD(b)), OFFSET)
++
++    code = (meter(op1, 0x00) + meter(op2, 0x80)
++            + rec(0, d(0x00, 0x40)) + rec(1, d(0x20, 0x60))
++            + rec(2, d(0x80, 0xC0)) + rec(3, d(0xA0, 0xE0))
++            + rec(4, Op.SUB(Op.ADD(Op.SLOAD(0), Op.SLOAD(1)), OFFSET))
++            + rec(5, Op.SUB(Op.ADD(Op.SLOAD(2), Op.SLOAD(3)), OFFSET))
++            + Op.STOP)
++    bundler = pre.deploy_contract(code, storage=SLOTS)
++    if variant == "none":
++        g1, s1, g2, s2 = m1, 0, m2, 0
++    elif variant == "create_keep":
++        g1, s1, g2, s2 = (m1 - SS, SS, m2, 0) if r else (m1, 0, m2, 0)
++    else:
++        g1, s1, g2, s2 = (m1 - SS, SS, m2 + SS, -SS) if r else (m1, 0, m2, 0)
++    state_test(pre=pre, tx=legacy_tx(pre, bundler, r),
++               post={bundler: Account(storage={**SLOTS, 0: enc(g1), 1: enc(s1),
++                                               2: enc(g2), 3: enc(s2),
++                                               4: enc(m1), 5: enc(m2)}),
++                     shared: Account(storage={FRESH: 1} if variant == "create_keep" else {})})
