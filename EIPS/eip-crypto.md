@@ -482,7 +482,7 @@ The leanXMSS specification proves 127 bits of classical strong unforgeability in
 
 ### VRF uniqueness and unpredictability
 
-Each index has a single output unless the validator finds a Keccak-256 collision among the hashes of its tree. With 32-byte nodes, generic collision search costs about `2**128` hash evaluations classically and about `2**85` with the Brassard–Høyer–Tapp algorithm. Outputs stay unpredictable to others until opened, by the preimage resistance of Keccak-256: an opening reveals the leaf of its sibling index, not its output. A leaked leaf secret lets others predict the output at its index, but not change it.
+Each index has a single output unless the validator finds a Keccak-256 collision among the hashes of its tree. With 32-byte nodes, generic collision search costs about `2**128` hash evaluations classically and about `2**85` quantumly with the Brassard–Høyer–Tapp algorithm. Outputs stay unpredictable to others until opened, by the preimage resistance of Keccak-256: an opening reveals the leaf of its sibling index, not its output. A leaked leaf secret lets others predict the output at its index, but not change it.
 
 ### Domain separation
 
