@@ -16,4 +16,4 @@ This directory contains a reference implementation of the `RESERVOIR` opcode and
 ./reproduce.sh
 ```
 
-The fixtures are written to `reservoir-repro/fixtures`. Filling produces 35 test cases in state test and blockchain test formats.
+The fixtures are written to `reservoir-repro/fixtures`. Filling produces 37 test cases in state test and blockchain test formats.

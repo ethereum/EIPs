@@ -145,7 +145,7 @@ diff --git a/tests/bogota/eip_reservoir/test_reservoir.py b/tests/bogota/eip_res
 new file mode 100644
 --- /dev/null
 +++ b/tests/bogota/eip_reservoir/test_reservoir.py
-@@ -0,0 +1,333 @@
+@@ -0,0 +1,364 @@
 +"""
 +Tests for the draft RESERVOIR opcode (0x4d): the state gas budget that
 +GAS does not report. Reservoir-model cases (EIP-8037 transactions) are
@@ -479,3 +479,34 @@ new file mode 100644
 +    tx = frame_tx(pre.fund_eoa(), default_frame(target=probe, gas_limit=500_000, state_gas_limit=S))
 +    state_test(pre=pre, tx=tx, post={probe: Account(storage={**SLOTS, 0: S - SS, 1: S - SS}),
 +                                     child: Account(storage={FRESH: 1})})
++
++
++@legacy
++@pytest.mark.parametrize("r,child_seen,caller_after,gas_rose",
++                         [(R, R, R, 0), (0, SS, 0, 1)], ids=["reservoir", "below_cap"])
++def test_cross_frame_refill_merge(state_test: StateTestFiller, pre: Alloc, r: int,
++                                  child_seen: int, caller_after: int, gas_rose: int) -> None:
++    """
++    The caller creates a slot in E (a first call), then calls E again to
++    clear it. The refill lands in the second child's reservoir; on return
++    the EIP-8037 merge step moves it to gas_left when gas_left paid for the
++    slot. Stored: slot 0 = RESERVOIR in the clearing child, slot 1 = the
++    caller's RESERVOIR after it, slot 2 = 1 if the caller's GAS rose across
++    the call, slot 3 = 1 if GAS + RESERVOIR rose across the call.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH)))
++                                 + Op.MSTORE(0, Op.RESERVOIR) + Op.RETURN(0, 32))
++    code = (Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0))
++            + Op.MSTORE(0x20, Op.GAS) + Op.MSTORE(0x40, Op.RESERVOIR)
++            + Op.MSTORE(0, 0) + Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 32))
++            + Op.MSTORE(0x60, Op.GAS) + Op.MSTORE(0x80, Op.RESERVOIR)
++            + rec(0, Op.MLOAD(0)) + rec(1, Op.MLOAD(0x80))
++            + rec(2, Op.GT(Op.MLOAD(0x60), Op.MLOAD(0x20)))
++            + rec(3, Op.GT(Op.ADD(Op.MLOAD(0x60), Op.MLOAD(0x80)),
++                           Op.ADD(Op.MLOAD(0x20), Op.MLOAD(0x40))))
++            + Op.STOP)
++    caller = pre.deploy_contract(code, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, caller, r),
++               post={caller: Account(storage={**SLOTS, 0: child_seen, 1: caller_after,
++                                              2: gas_rose, 3: 1}),
++                     shared: Account(storage={})})
