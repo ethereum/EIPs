@@ -121,9 +121,8 @@ def wrapper_items():
 
 
 def coverage(item):
-    # Test-only stand-in for get_deps_hash: Keccak over 64-byte SPHINCS claims.
-    # EIP-8288 DEPS_HASH is TBD; this is NOT a protocol hash selection.
-    deps_hash = h(b"".join(dep[32:] for dep in item[2][0]))
+    # Wire hints bind full triples, independently of the circuit digest.
+    deps_hash = h(b"".join(item[2][0]))
     txs_hash = h(b"".join(transaction_hash(tx) for tx in item[0]))
     return deps_hash, txs_hash
 
@@ -246,7 +245,7 @@ def reconstruct(item, compact, cache, length):
     return result
 
 
-def check_wrapper_response(request_id, requested, announced_metadata, reply, compact=0, cache=None):
+def check_wrapper_response(request_id, requested, announced_metadata, reply, compact=0, cache=None, verify=None):
     assert isinstance(reply, list) and len(reply) == 2, "response fields"
     assert reply[0] == request_id, "response id"
     assert isinstance(reply[1], list), "response fields"
@@ -269,10 +268,12 @@ def check_wrapper_response(request_id, requested, announced_metadata, reply, com
         assert h(body) == digest, "response hash"
         check_wrapper_shape(item)
         assert len(body) == length, "announced length"
-        # Production clients check these after cryptographic wrapper validation.
+        # Check wire hints before any proof-verification work.
         actual_deps, actual_txs = coverage(item)
         assert actual_deps == deps_hash, "announced dependency hash"
         assert actual_txs == txs_hash, "announced transaction hash"
+        if verify is not None:
+            assert verify(item), "proof verification"
     return retries
 
 
@@ -445,6 +446,29 @@ def main():
         wrong[index] = bytes(32)
         expect_error(reason, check_wrapper_response, 7, requested,
                      {**metadata, requested[1]: tuple(wrong)}, reply_for(7, [mode1]))
+    # A false hint is rejected even when the proof would fail verification.
+    # Stubs test ordering only, not cryptographic correctness.
+    verification_calls = []
+    def invalid_proof(item):
+        verification_calls.append(item)
+        return False
+    for index, reason in [(2, "announced dependency hash"), (3, "announced transaction hash")]:
+        wrong = list(metadata[requested[1]])
+        wrong[index] = bytes(32)
+        expect_error(reason, check_wrapper_response, 7, requested,
+                     {**metadata, requested[1]: tuple(wrong)}, reply_for(7, [mode1]),
+                     0, None, invalid_proof)
+        assert verification_calls == []
+    expect_error("proof verification", check_wrapper_response, 7, requested, metadata,
+                 reply_for(7, [mode1]), 0, None, invalid_proof)
+    assert verification_calls == [mode1]
+    # Changing a scheme changes the wire digest, even if claim/key bytes match.
+    changed_deps = [bytes(31) + b"\x11" + dep[32:] for dep in mode1[2][0]]
+    changed_scheme = [mode1[0], 1, [changed_deps, mode1[2][1]]]
+    assert coverage(changed_scheme)[0] != coverage(mode1)[0]
+    # Different verifier outcomes cannot change hints over the same bytes.
+    check_wrapper_response(7, requested, metadata, reply_for(7, [mode1]),
+                           verify=lambda item: True)
     assert wrappers_response(7, encoded) == rlp(reply_for(7, items))
 
     # A full 32-hash request can be satisfied in one response for small wrappers.
