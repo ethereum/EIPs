@@ -145,7 +145,7 @@ diff --git a/tests/bogota/eip_reservoir/test_reservoir.py b/tests/bogota/eip_res
 new file mode 100644
 --- /dev/null
 +++ b/tests/bogota/eip_reservoir/test_reservoir.py
-@@ -0,0 +1,471 @@
+@@ -0,0 +1,567 @@
 +"""
 +Tests for the draft RESERVOIR opcode (0x4d): the state gas budget that
 +GAS does not report. Reservoir-model cases (EIP-8037 transactions) are
@@ -617,3 +617,99 @@ new file mode 100644
 +                                               2: enc(g2), 3: enc(s2),
 +                                               4: enc(m1), 5: enc(m2)}),
 +                     shared: Account(storage={FRESH: 1} if variant == "create_keep" else {})})
++
++
++# --------------------------------------------------------------------------
++# A caller bounds a child's reservoir use by reverting a wrapper frame
++# --------------------------------------------------------------------------
++@legacy
++def test_bounded_child(state_test: StateTestFiller, pre: Alloc) -> None:
++    """
++    An EntryPoint-like caller runs each operation inside a wrapper frame that
++    reads RESERVOIR before and after the operation and reverts when the
++    decrease exceeds a limit of one slot. The rollback of EIP-8037 restores
++    the reservoir, so the caller sees no change for the rejected operation.
++    Slots: 0 = 2**128 * wrapper success + wrapper output for op A (one slot),
++    1 = caller's RESERVOIR after op A, 2 = the same for op B (two slots;
++    the output is op B's own RESERVOIR reading, passed through the revert),
++    3 = caller's RESERVOIR after op B.
++    """
++    limit = SS
++    op_a = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.STOP)
++    op_b = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.SSTORE(FRESH + 1, 1)
++                               + Op.MSTORE(0, Op.RESERVOIR) + Op.RETURN(0, 32))
++
++    def wrapper_code(dest: int) -> Bytecode:
++        return (Op.MSTORE(0x20, Op.RESERVOIR)
++                + Op.MSTORE(0, 0)
++                + Op.POP(Op.CALL(Op.GAS, Op.CALLDATALOAD(0), 0, 0, 0, 0, 32))
++                + Op.MSTORE(0x60, Op.MLOAD(0))
++                + Op.MSTORE(0x40, Op.SUB(Op.MLOAD(0x20), Op.RESERVOIR))
++                + Op.JUMPI(Op.PUSH2(dest), Op.GT(Op.MLOAD(0x40), limit))
++                + Op.RETURN(0x40, 32)
++                + Op.JUMPDEST + Op.REVERT(0x60, 32))
++
++    dest = len(wrapper_code(0)) - len(Op.JUMPDEST + Op.REVERT(0x60, 32))
++    wrapper = pre.deploy_contract(wrapper_code(dest))
++
++    def run(target, slot_result: int, slot_after: int) -> Bytecode:
++        return (Op.MSTORE(0, target) + Op.MSTORE(0x20, 0)
++                + Op.MSTORE(0x40, Op.CALL(Op.GAS, wrapper, 0, 0, 32, 0x20, 32))
++                + Op.SSTORE(slot_result, Op.ADD(Op.MUL(Op.MLOAD(0x40), 1 << 128), Op.MLOAD(0x20)))
++                + rec(slot_after))
++
++    caller = pre.deploy_contract(run(op_a, 0, 1) + run(op_b, 2, 3) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, caller),
++               post={caller: Account(storage={**SLOTS, 0: (1 << 128) + SS, 1: R - SS,
++                                              2: R - 3 * SS, 3: R - SS}),
++                     op_a: Account(storage={FRESH: 1}), op_b: Account(storage={})})
++
++
++# --------------------------------------------------------------------------
++# Refill visibility by frame depth (EntryPoint-shaped: top -> inner -> op)
++# --------------------------------------------------------------------------
++@legacy
++@pytest.mark.parametrize("r", [R, 0], ids=["reservoir", "below_cap"])
++def test_refill_two_levels(state_test: StateTestFiller, pre: Alloc, r: int) -> None:
++    """
++    A top frame runs each operation through an inner frame that meters it
++    with GAS and RESERVOIR, as an ERC-4337 EntryPoint does in innerHandleOp.
++    Op 1 creates a slot in a shared contract, op 2 clears it. The refill for
++    op 2 is credited where the outstanding charge is: with gas_left funding
++    (R = 0) that is the top frame, so the inner frame sees it only in
++    RESERVOIR and the top frame sees it in GAS after the inner call returns.
++    Slots (offset 2**128): 0 = inner dGAS for op 2, 1 = inner dRESERVOIR for
++    op 2, 2 = top dGAS across the inner call for op 2, 3 = top dRESERVOIR
++    across it.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH))) + Op.STOP)
++    op = pre.deploy_contract(Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP)
++    # inner: meters the op given in calldata, returns (dGAS, dRESERVOIR) + OFFSET
++    inner = pre.deploy_contract(
++        Op.MSTORE(0, Op.GAS) + Op.MSTORE(0x20, Op.RESERVOIR)
++        + Op.POP(Op.CALL(Op.GAS, Op.CALLDATALOAD(0), 0, 0, 0, 0, 0))
++        + Op.MSTORE(0x40, Op.GAS) + Op.MSTORE(0x60, Op.RESERVOIR)
++        + Op.MSTORE(0x80, Op.ADD(Op.SUB(Op.MLOAD(0), Op.MLOAD(0x40)), OFFSET))
++        + Op.MSTORE(0xA0, Op.ADD(Op.SUB(Op.MLOAD(0x20), Op.MLOAD(0x60)), OFFSET))
++        + Op.RETURN(0x80, 64))
++
++    def run(record: bool) -> Bytecode:
++        code = (Op.MSTORE(0, op)
++                + Op.MSTORE(0x20, Op.GAS) + Op.MSTORE(0x40, Op.RESERVOIR)
++                + Op.POP(Op.CALL(Op.GAS, inner, 0, 0, 32, 0x80, 64))
++                + Op.MSTORE(0x60, Op.GAS) + Op.MSTORE(0xC0, Op.RESERVOIR))
++        if record:
++            code += (rec(0, Op.MLOAD(0x80)) + rec(1, Op.MLOAD(0xA0))
++                     + rec(2, Op.ADD(Op.SUB(Op.MLOAD(0x20), Op.MLOAD(0x60)), OFFSET))
++                     + rec(3, Op.ADD(Op.SUB(Op.MLOAD(0x40), Op.MLOAD(0xC0)), OFFSET)))
++        return code
++
++    top = pre.deploy_contract(run(False) + run(True) + Op.STOP, storage=SLOTS)
++    inner_gas = 478   # execution gas of op 2 as seen by the inner frame
++    top_gas = 704     # execution gas of the inner call as seen by the top frame
++    if r:
++        post = {0: enc(inner_gas), 1: enc(-SS), 2: enc(top_gas), 3: enc(-SS)}
++    else:
++        post = {0: enc(inner_gas), 1: enc(-SS), 2: enc(top_gas - SS), 3: enc(0)}
++    state_test(pre=pre, tx=legacy_tx(pre, top, r),
++               post={top: Account(storage={**SLOTS, **post}), shared: Account(storage={})})

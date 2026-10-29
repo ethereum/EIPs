@@ -16,7 +16,7 @@ This directory contains a reference implementation of the `RESERVOIR` opcode and
 ./reproduce.sh
 ```
 
-The fixtures are written to `reservoir-repro/fixtures`. Filling produces 47 test cases in state test and blockchain test formats.
+The fixtures are written to `reservoir-repro/fixtures`. Filling produces 49 test cases in state test and blockchain test formats.
 
 The blockchain tests for system calls and the EIP-8141 frame transaction cases run on the execution specifications only; `reproduce.sh` skips them for go-ethereum.
 
@@ -26,8 +26,8 @@ The fillers cover the following contexts. Every successful read costs 2 executio
 
 | Context | `RESERVOIR` returns | Filler |
 | --- | --- | --- |
-| EIP-8037 transaction with `tx.gas` at most `TX_MAX_GAS_LIMIT` | `0` until a refill lands in the reservoir | `test_read[below_cap]`, `test_cross_frame_refill_merge[below_cap]` |
-| EIP-8037 transaction with `tx.gas` above the cap | The frame's `state_gas_reservoir` | `test_read`, `test_new_slot_charge`, `test_child_*`, `test_create_*` |
+| EIP-8037 transaction with `tx.gas` at most `TX_MAX_GAS_LIMIT` | `0` until a refill lands in the reservoir | `test_read[below_cap]`, `test_cross_frame_refill_merge[below_cap]`, `test_refill_two_levels[below_cap]` |
+| EIP-8037 transaction with `tx.gas` above the cap | The frame's `state_gas_reservoir` | `test_read`, `test_new_slot_charge`, `test_child_*`, `test_create_*`, `test_bounded_child` |
 | EIP-8037 system call | `STORAGE_SET × SYSTEM_MAX_SSTORES_PER_CALL = 1,566,720` at entry | `test_system_call` |
 | EIP-8141 frame transaction | The frame's `state_gas_left`, equal to `TXPARAM(0x0C)` | `test_frame_*`, `test_portability_frame` |
 | Before activation | Undefined opcode, exceptional halt | not filled; `0x4d` is `INVALID`-equivalent in Amsterdam |
