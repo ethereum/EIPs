@@ -1,0 +1,8 @@
+{
+  "name": "eip-8455-entrypoint-bytecode",
+  "private": true,
+  "dependencies": {
+    "@openzeppelin/contracts": "5.0.2",
+    "solc": "0.8.23"
+  }
+}

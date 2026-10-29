@@ -16,9 +16,9 @@ This directory contains a reference implementation of the `RESERVOIR` opcode and
 ./reproduce.sh
 ```
 
-The fixtures are written to `reservoir-repro/fixtures`. Filling produces 49 test cases in state test and blockchain test formats.
+The fixtures are written to `reservoir-repro/fixtures`. Filling produces 53 test cases in state test and blockchain test formats.
 
-The blockchain tests for system calls and the EIP-8141 frame transaction cases run on the execution specifications only; `reproduce.sh` skips them for go-ethereum.
+The blockchain tests for system calls and the EIP-8141 frame transaction cases run on the execution specifications only; `reproduce.sh` skips them for go-ethereum. `test_entrypoint.py` runs the two-operation example against the deployed ERC-4337 EntryPoint v0.7 bytecode; see [`entrypoint/README.md`](./entrypoint/README.md) for how the bytecode is produced.
 
 ## Execution contexts
 
@@ -46,3 +46,20 @@ The fillers cover the following contexts. Every successful read costs 2 executio
 | control (no state change) | 3,044 | 0 | 3,044 | 3,044 | 0 | 3,044 | 94,264 |
 
 The per-operation sums do not depend on which pool funded the slot. Relative to the control, the sums rise by 15,562 for create-and-clear and by 113,151 for create-only, which equal the additional gas the transaction uses before the refund counter. "Tx gas used" is after the refund counter: the create-and-clear transaction is refunded a further 10,000 for restoring the slot, which neither opcode reports. The execution components depend on this test's bytecode and on the gas schedule of the pinned revision.
+
+## Deployed EntryPoint v0.7
+
+`test_entrypoint_v07_two_ops` submits one `handleOps` bundle of two user operations to the EntryPoint v0.7.0 runtime bytecode, compiled with the repository's Solidity settings. The runtime is installed in the fixture pre-state with the `SenderCreator` immutable resolved to the fixture's deployed address and the constructor-initialized storage (`ReentrancyGuard._status = 1`) supplied explicitly; the EntryPoint constructor itself is not executed as a deployment transaction. No accounting logic or control flow is replaced by a wrapper: the tested `handleOps` → `innerHandleOp` → `_postExecution` path is the production implementation. The accounts are minimal `IAccount` stubs that accept every operation and pay their prefund. Operation 1 creates a slot in a shared contract and operation 2 clears it. The table gives `actualGas` as the EntryPoint charged it, inferred from its `deposits` mapping as `(PREFUND - finalDeposit) / GAS_PRICE` with `GAS_PRICE = 10`; each account starts with no deposit and pays exactly its prefund during validation, so the final deposit is the refund of `_postExecution`, and the value includes the unused-gas penalty. The test also pins the two `UserOperationEvent` logs: `success = true`, the `userOpHash` computed as `getUserOpHash` does, the sender, and `actualGasUsed` equal to the deposit-inferred value.
+
+| Variant | op 1 | op 2 |
+| --- | --- | --- |
+| create, clear; `R = 500,000` | 138,225 | 124,740 |
+| create, clear; `tx.gas ≤ TX_MAX_GAS_LIMIT` | 324,273 | 222,660 |
+| create only; `R = 500,000` | 138,225 | 124,740 |
+| control, no slot created; `R = 500,000` | 138,225 | 124,740 |
+
+`handleOps` succeeds in every variant, both operations report `success = true`, and no charge wraps. In the create-and-clear sequence the refill for the cleared slot is handled differently in the two configurations, and neither reaches operation 2's `actualGas`: below the cap it reaches `gas_left` in the outer `handleOps` frame only after `innerHandleOp` has computed `actualGas`; with sufficient reservoir capacity it returns to the reservoir and stays invisible to `gasleft()`.
+
+With `R = 500,000` the reservoir has enough capacity for every state charge in the bundle, and the EntryPoint's `gasleft()`-based accounting does not observe reservoir-funded state gas; the create, create-and-clear and control variants therefore produce identical per-operation charges. This is conditional on the capacity: once the reservoir is exhausted, further state charges draw on `gas_left` and become visible. In the create-and-clear variant the measured windows incur 293,760 in gross state-gas charges, 195,840 for operation 1 (its nonce slot and the shared slot) and 97,920 for operation 2 (its nonce slot); clearing the shared slot returns 97,920 to the reservoir, so the bundle's net consumption from those charges is 195,840. None of it is attributed to either account; it is paid by the bundler. The deposit write after the measurement is paid by the bundler in all variants, as it is today.
+
+Without a reservoir the charges appear in `actualGas`: operation 1 pays 2 × 97,920 less the 10 % unused-gas penalty on the execution-phase slot (9,792), and operation 2 pays its nonce slot. The result is evidence for the tested two-operation bundle on the v0.7 runtime, not a compatibility guarantee across EntryPoint versions, account implementations or operation sequences.

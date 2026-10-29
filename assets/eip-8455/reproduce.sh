@@ -29,7 +29,7 @@ curl -sL "https://codeload.github.com/ethereum/go-ethereum/tar.gz/$GETH_SHA" | t
 cd "go-ethereum-$GETH_SHA"
 patch -p1 < "$HERE/go-ethereum.patch"
 go test ./core/vm/...
-for f in "$WORK"/fixtures/state_tests/for_bogota/bogota/eip_reservoir/reservoir/*.json; do
+for f in "$WORK"/fixtures/state_tests/for_bogota/bogota/eip_reservoir/*/*.json; do
   case "$(basename "$f")" in
     frame_*|portability_frame*) continue ;;
   esac
