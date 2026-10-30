@@ -2,7 +2,7 @@
 title: Permanent EOA Delegation Opt-Out
 description: Allow EOAs to permanently disable delegation while retaining ordinary transaction origination.
 author: nicolashw (@nicolashw) <nicolaspuran96@gmail.com>
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/eip-draft-permanent-eoa-delegation-opt-out-disable-eip-7702/30134
 status: Draft
 type: Standards Track
 category: Core
