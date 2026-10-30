@@ -1,0 +1,1091 @@
+{
+  "title": "engine_proposalLookaheadUpdatedV1 test vectors",
+  "description": "Each vector is a request and the outcome an EL must return for it, whatever calls came before: the result null, or an error code. Only the code is checked; error messages differ between clients. Timestamps follow mainnet's genesis time (1606824023) and 12-second slots unless a vector says otherwise; an EL does not check them against a slot length.",
+  "vectors": [
+    {
+      "name": "two-proposals",
+      "description": "Two proposals, one in the current epoch and one in the next, by validators with different fee recipients and target gas limits.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12d", "timestamp": "0x6adffe73", "suggestedFeeRecipient": "0x2222222222222222222222222222222222222222", "targetGasLimit": "0xbebc200"}
+          ]
+        ]
+      },
+      "expected": {
+        "result": null
+      }
+    },
+    {
+      "name": "one-proposal",
+      "description": "A single proposal.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "result": null
+      }
+    },
+    {
+      "name": "empty",
+      "description": "No proposals: the call clears the set.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          []
+        ]
+      },
+      "expected": {
+        "result": null
+      }
+    },
+    {
+      "name": "max-entries",
+      "description": "256 proposals, the most a call may carry (more than EIP-7917's lookahead allows today).",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd100", "timestamp": "0x6adffc57", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd101", "timestamp": "0x6adffc63", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd102", "timestamp": "0x6adffc6f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd103", "timestamp": "0x6adffc7b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd104", "timestamp": "0x6adffc87", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd105", "timestamp": "0x6adffc93", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd106", "timestamp": "0x6adffc9f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd107", "timestamp": "0x6adffcab", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd108", "timestamp": "0x6adffcb7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd109", "timestamp": "0x6adffcc3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10a", "timestamp": "0x6adffccf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10b", "timestamp": "0x6adffcdb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10c", "timestamp": "0x6adffce7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10e", "timestamp": "0x6adffcff", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10f", "timestamp": "0x6adffd0b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd110", "timestamp": "0x6adffd17", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd111", "timestamp": "0x6adffd23", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd112", "timestamp": "0x6adffd2f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd113", "timestamp": "0x6adffd3b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd114", "timestamp": "0x6adffd47", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd115", "timestamp": "0x6adffd53", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd116", "timestamp": "0x6adffd5f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd117", "timestamp": "0x6adffd6b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd118", "timestamp": "0x6adffd77", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd119", "timestamp": "0x6adffd83", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11a", "timestamp": "0x6adffd8f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11b", "timestamp": "0x6adffd9b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11c", "timestamp": "0x6adffda7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11d", "timestamp": "0x6adffdb3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11e", "timestamp": "0x6adffdbf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11f", "timestamp": "0x6adffdcb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd120", "timestamp": "0x6adffdd7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd121", "timestamp": "0x6adffde3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd122", "timestamp": "0x6adffdef", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd123", "timestamp": "0x6adffdfb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd124", "timestamp": "0x6adffe07", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd125", "timestamp": "0x6adffe13", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd126", "timestamp": "0x6adffe1f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd127", "timestamp": "0x6adffe2b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd128", "timestamp": "0x6adffe37", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd129", "timestamp": "0x6adffe43", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12a", "timestamp": "0x6adffe4f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12b", "timestamp": "0x6adffe5b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12c", "timestamp": "0x6adffe67", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12d", "timestamp": "0x6adffe73", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12e", "timestamp": "0x6adffe7f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12f", "timestamp": "0x6adffe8b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd130", "timestamp": "0x6adffe97", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd131", "timestamp": "0x6adffea3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd132", "timestamp": "0x6adffeaf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd133", "timestamp": "0x6adffebb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd134", "timestamp": "0x6adffec7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd135", "timestamp": "0x6adffed3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd136", "timestamp": "0x6adffedf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd137", "timestamp": "0x6adffeeb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd138", "timestamp": "0x6adffef7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd139", "timestamp": "0x6adfff03", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13a", "timestamp": "0x6adfff0f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13b", "timestamp": "0x6adfff1b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13c", "timestamp": "0x6adfff27", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13d", "timestamp": "0x6adfff33", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13e", "timestamp": "0x6adfff3f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13f", "timestamp": "0x6adfff4b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd140", "timestamp": "0x6adfff57", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd141", "timestamp": "0x6adfff63", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd142", "timestamp": "0x6adfff6f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd143", "timestamp": "0x6adfff7b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd144", "timestamp": "0x6adfff87", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd145", "timestamp": "0x6adfff93", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd146", "timestamp": "0x6adfff9f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd147", "timestamp": "0x6adfffab", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd148", "timestamp": "0x6adfffb7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd149", "timestamp": "0x6adfffc3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14a", "timestamp": "0x6adfffcf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14b", "timestamp": "0x6adfffdb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14c", "timestamp": "0x6adfffe7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14d", "timestamp": "0x6adffff3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14e", "timestamp": "0x6adfffff", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14f", "timestamp": "0x6ae0000b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd150", "timestamp": "0x6ae00017", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd151", "timestamp": "0x6ae00023", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd152", "timestamp": "0x6ae0002f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd153", "timestamp": "0x6ae0003b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd154", "timestamp": "0x6ae00047", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd155", "timestamp": "0x6ae00053", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd156", "timestamp": "0x6ae0005f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd157", "timestamp": "0x6ae0006b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd158", "timestamp": "0x6ae00077", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd159", "timestamp": "0x6ae00083", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15a", "timestamp": "0x6ae0008f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15b", "timestamp": "0x6ae0009b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15c", "timestamp": "0x6ae000a7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15d", "timestamp": "0x6ae000b3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15e", "timestamp": "0x6ae000bf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15f", "timestamp": "0x6ae000cb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd160", "timestamp": "0x6ae000d7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd161", "timestamp": "0x6ae000e3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd162", "timestamp": "0x6ae000ef", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd163", "timestamp": "0x6ae000fb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd164", "timestamp": "0x6ae00107", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd165", "timestamp": "0x6ae00113", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd166", "timestamp": "0x6ae0011f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd167", "timestamp": "0x6ae0012b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd168", "timestamp": "0x6ae00137", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd169", "timestamp": "0x6ae00143", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16a", "timestamp": "0x6ae0014f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16b", "timestamp": "0x6ae0015b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16c", "timestamp": "0x6ae00167", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16d", "timestamp": "0x6ae00173", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16e", "timestamp": "0x6ae0017f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16f", "timestamp": "0x6ae0018b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd170", "timestamp": "0x6ae00197", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd171", "timestamp": "0x6ae001a3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd172", "timestamp": "0x6ae001af", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd173", "timestamp": "0x6ae001bb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd174", "timestamp": "0x6ae001c7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd175", "timestamp": "0x6ae001d3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd176", "timestamp": "0x6ae001df", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd177", "timestamp": "0x6ae001eb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd178", "timestamp": "0x6ae001f7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd179", "timestamp": "0x6ae00203", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17a", "timestamp": "0x6ae0020f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17b", "timestamp": "0x6ae0021b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17c", "timestamp": "0x6ae00227", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17d", "timestamp": "0x6ae00233", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17e", "timestamp": "0x6ae0023f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17f", "timestamp": "0x6ae0024b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd180", "timestamp": "0x6ae00257", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd181", "timestamp": "0x6ae00263", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd182", "timestamp": "0x6ae0026f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd183", "timestamp": "0x6ae0027b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd184", "timestamp": "0x6ae00287", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd185", "timestamp": "0x6ae00293", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd186", "timestamp": "0x6ae0029f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd187", "timestamp": "0x6ae002ab", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd188", "timestamp": "0x6ae002b7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd189", "timestamp": "0x6ae002c3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18a", "timestamp": "0x6ae002cf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18b", "timestamp": "0x6ae002db", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18c", "timestamp": "0x6ae002e7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18d", "timestamp": "0x6ae002f3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18e", "timestamp": "0x6ae002ff", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18f", "timestamp": "0x6ae0030b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd190", "timestamp": "0x6ae00317", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd191", "timestamp": "0x6ae00323", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd192", "timestamp": "0x6ae0032f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd193", "timestamp": "0x6ae0033b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd194", "timestamp": "0x6ae00347", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd195", "timestamp": "0x6ae00353", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd196", "timestamp": "0x6ae0035f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd197", "timestamp": "0x6ae0036b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd198", "timestamp": "0x6ae00377", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd199", "timestamp": "0x6ae00383", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19a", "timestamp": "0x6ae0038f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19b", "timestamp": "0x6ae0039b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19c", "timestamp": "0x6ae003a7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19d", "timestamp": "0x6ae003b3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19e", "timestamp": "0x6ae003bf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19f", "timestamp": "0x6ae003cb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a0", "timestamp": "0x6ae003d7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a1", "timestamp": "0x6ae003e3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a2", "timestamp": "0x6ae003ef", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a3", "timestamp": "0x6ae003fb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a4", "timestamp": "0x6ae00407", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a5", "timestamp": "0x6ae00413", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a6", "timestamp": "0x6ae0041f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a7", "timestamp": "0x6ae0042b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a8", "timestamp": "0x6ae00437", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a9", "timestamp": "0x6ae00443", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1aa", "timestamp": "0x6ae0044f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ab", "timestamp": "0x6ae0045b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ac", "timestamp": "0x6ae00467", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ad", "timestamp": "0x6ae00473", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ae", "timestamp": "0x6ae0047f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1af", "timestamp": "0x6ae0048b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b0", "timestamp": "0x6ae00497", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b1", "timestamp": "0x6ae004a3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b2", "timestamp": "0x6ae004af", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b3", "timestamp": "0x6ae004bb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b4", "timestamp": "0x6ae004c7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b5", "timestamp": "0x6ae004d3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b6", "timestamp": "0x6ae004df", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b7", "timestamp": "0x6ae004eb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b8", "timestamp": "0x6ae004f7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b9", "timestamp": "0x6ae00503", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ba", "timestamp": "0x6ae0050f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1bb", "timestamp": "0x6ae0051b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1bc", "timestamp": "0x6ae00527", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1bd", "timestamp": "0x6ae00533", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1be", "timestamp": "0x6ae0053f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1bf", "timestamp": "0x6ae0054b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c0", "timestamp": "0x6ae00557", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c1", "timestamp": "0x6ae00563", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c2", "timestamp": "0x6ae0056f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c3", "timestamp": "0x6ae0057b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c4", "timestamp": "0x6ae00587", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c5", "timestamp": "0x6ae00593", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c6", "timestamp": "0x6ae0059f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c7", "timestamp": "0x6ae005ab", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c8", "timestamp": "0x6ae005b7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c9", "timestamp": "0x6ae005c3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ca", "timestamp": "0x6ae005cf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1cb", "timestamp": "0x6ae005db", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1cc", "timestamp": "0x6ae005e7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1cd", "timestamp": "0x6ae005f3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ce", "timestamp": "0x6ae005ff", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1cf", "timestamp": "0x6ae0060b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d0", "timestamp": "0x6ae00617", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d1", "timestamp": "0x6ae00623", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d2", "timestamp": "0x6ae0062f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d3", "timestamp": "0x6ae0063b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d4", "timestamp": "0x6ae00647", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d5", "timestamp": "0x6ae00653", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d6", "timestamp": "0x6ae0065f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d7", "timestamp": "0x6ae0066b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d8", "timestamp": "0x6ae00677", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d9", "timestamp": "0x6ae00683", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1da", "timestamp": "0x6ae0068f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1db", "timestamp": "0x6ae0069b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1dc", "timestamp": "0x6ae006a7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1dd", "timestamp": "0x6ae006b3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1de", "timestamp": "0x6ae006bf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1df", "timestamp": "0x6ae006cb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e0", "timestamp": "0x6ae006d7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e1", "timestamp": "0x6ae006e3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e2", "timestamp": "0x6ae006ef", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e3", "timestamp": "0x6ae006fb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e4", "timestamp": "0x6ae00707", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e5", "timestamp": "0x6ae00713", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e6", "timestamp": "0x6ae0071f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e7", "timestamp": "0x6ae0072b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e8", "timestamp": "0x6ae00737", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e9", "timestamp": "0x6ae00743", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ea", "timestamp": "0x6ae0074f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1eb", "timestamp": "0x6ae0075b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ec", "timestamp": "0x6ae00767", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ed", "timestamp": "0x6ae00773", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ee", "timestamp": "0x6ae0077f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ef", "timestamp": "0x6ae0078b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f0", "timestamp": "0x6ae00797", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f1", "timestamp": "0x6ae007a3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f2", "timestamp": "0x6ae007af", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f3", "timestamp": "0x6ae007bb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f4", "timestamp": "0x6ae007c7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f5", "timestamp": "0x6ae007d3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f6", "timestamp": "0x6ae007df", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f7", "timestamp": "0x6ae007eb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f8", "timestamp": "0x6ae007f7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f9", "timestamp": "0x6ae00803", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fa", "timestamp": "0x6ae0080f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fb", "timestamp": "0x6ae0081b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fc", "timestamp": "0x6ae00827", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fd", "timestamp": "0x6ae00833", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fe", "timestamp": "0x6ae0083f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ff", "timestamp": "0x6ae0084b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "result": null
+      }
+    },
+    {
+      "name": "past-entries",
+      "description": "Entries already in the past, here the genesis slot and slot 1, are well-formed: the EL may ignore them, but the call succeeds.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0x0", "timestamp": "0x5fc63057", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0x1", "timestamp": "0x5fc63063", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "result": null
+      }
+    },
+    {
+      "name": "slot-length-change",
+      "description": "Timestamps 12 seconds apart and then 8, as across a fork that shortens the slot (EIP-8198): the EL checks only that timestamps increase, not their spacing.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd11e", "timestamp": "0x6adffdbf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11f", "timestamp": "0x6adffdcb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd120", "timestamp": "0x6adffdd3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd121", "timestamp": "0x6adffddb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "result": null
+      }
+    },
+    {
+      "name": "max-values",
+      "description": "The largest 64-bit values.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xffffffffffffffff", "timestamp": "0xffffffffffffffff", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0xffffffffffffffff"}
+          ]
+        ]
+      },
+      "expected": {
+        "result": null
+      }
+    },
+    {
+      "name": "uppercase-hex",
+      "description": "Upper-case hex digits, which the Engine API's encoding allows in QUANTITY and DATA.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xECD10D", "timestamp": "0x6ADFFCF3", "suggestedFeeRecipient": "0xABABABABABABABABABABABABABABABABABABABAB", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "result": null
+      }
+    },
+    {
+      "name": "too-many-entries",
+      "description": "257 proposals, otherwise well-formed.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd100", "timestamp": "0x6adffc57", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd101", "timestamp": "0x6adffc63", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd102", "timestamp": "0x6adffc6f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd103", "timestamp": "0x6adffc7b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd104", "timestamp": "0x6adffc87", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd105", "timestamp": "0x6adffc93", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd106", "timestamp": "0x6adffc9f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd107", "timestamp": "0x6adffcab", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd108", "timestamp": "0x6adffcb7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd109", "timestamp": "0x6adffcc3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10a", "timestamp": "0x6adffccf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10b", "timestamp": "0x6adffcdb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10c", "timestamp": "0x6adffce7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10e", "timestamp": "0x6adffcff", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10f", "timestamp": "0x6adffd0b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd110", "timestamp": "0x6adffd17", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd111", "timestamp": "0x6adffd23", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd112", "timestamp": "0x6adffd2f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd113", "timestamp": "0x6adffd3b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd114", "timestamp": "0x6adffd47", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd115", "timestamp": "0x6adffd53", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd116", "timestamp": "0x6adffd5f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd117", "timestamp": "0x6adffd6b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd118", "timestamp": "0x6adffd77", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd119", "timestamp": "0x6adffd83", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11a", "timestamp": "0x6adffd8f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11b", "timestamp": "0x6adffd9b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11c", "timestamp": "0x6adffda7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11d", "timestamp": "0x6adffdb3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11e", "timestamp": "0x6adffdbf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd11f", "timestamp": "0x6adffdcb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd120", "timestamp": "0x6adffdd7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd121", "timestamp": "0x6adffde3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd122", "timestamp": "0x6adffdef", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd123", "timestamp": "0x6adffdfb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd124", "timestamp": "0x6adffe07", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd125", "timestamp": "0x6adffe13", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd126", "timestamp": "0x6adffe1f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd127", "timestamp": "0x6adffe2b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd128", "timestamp": "0x6adffe37", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd129", "timestamp": "0x6adffe43", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12a", "timestamp": "0x6adffe4f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12b", "timestamp": "0x6adffe5b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12c", "timestamp": "0x6adffe67", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12d", "timestamp": "0x6adffe73", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12e", "timestamp": "0x6adffe7f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12f", "timestamp": "0x6adffe8b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd130", "timestamp": "0x6adffe97", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd131", "timestamp": "0x6adffea3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd132", "timestamp": "0x6adffeaf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd133", "timestamp": "0x6adffebb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd134", "timestamp": "0x6adffec7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd135", "timestamp": "0x6adffed3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd136", "timestamp": "0x6adffedf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd137", "timestamp": "0x6adffeeb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd138", "timestamp": "0x6adffef7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd139", "timestamp": "0x6adfff03", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13a", "timestamp": "0x6adfff0f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13b", "timestamp": "0x6adfff1b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13c", "timestamp": "0x6adfff27", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13d", "timestamp": "0x6adfff33", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13e", "timestamp": "0x6adfff3f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd13f", "timestamp": "0x6adfff4b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd140", "timestamp": "0x6adfff57", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd141", "timestamp": "0x6adfff63", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd142", "timestamp": "0x6adfff6f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd143", "timestamp": "0x6adfff7b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd144", "timestamp": "0x6adfff87", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd145", "timestamp": "0x6adfff93", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd146", "timestamp": "0x6adfff9f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd147", "timestamp": "0x6adfffab", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd148", "timestamp": "0x6adfffb7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd149", "timestamp": "0x6adfffc3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14a", "timestamp": "0x6adfffcf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14b", "timestamp": "0x6adfffdb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14c", "timestamp": "0x6adfffe7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14d", "timestamp": "0x6adffff3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14e", "timestamp": "0x6adfffff", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd14f", "timestamp": "0x6ae0000b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd150", "timestamp": "0x6ae00017", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd151", "timestamp": "0x6ae00023", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd152", "timestamp": "0x6ae0002f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd153", "timestamp": "0x6ae0003b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd154", "timestamp": "0x6ae00047", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd155", "timestamp": "0x6ae00053", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd156", "timestamp": "0x6ae0005f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd157", "timestamp": "0x6ae0006b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd158", "timestamp": "0x6ae00077", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd159", "timestamp": "0x6ae00083", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15a", "timestamp": "0x6ae0008f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15b", "timestamp": "0x6ae0009b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15c", "timestamp": "0x6ae000a7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15d", "timestamp": "0x6ae000b3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15e", "timestamp": "0x6ae000bf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd15f", "timestamp": "0x6ae000cb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd160", "timestamp": "0x6ae000d7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd161", "timestamp": "0x6ae000e3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd162", "timestamp": "0x6ae000ef", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd163", "timestamp": "0x6ae000fb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd164", "timestamp": "0x6ae00107", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd165", "timestamp": "0x6ae00113", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd166", "timestamp": "0x6ae0011f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd167", "timestamp": "0x6ae0012b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd168", "timestamp": "0x6ae00137", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd169", "timestamp": "0x6ae00143", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16a", "timestamp": "0x6ae0014f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16b", "timestamp": "0x6ae0015b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16c", "timestamp": "0x6ae00167", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16d", "timestamp": "0x6ae00173", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16e", "timestamp": "0x6ae0017f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd16f", "timestamp": "0x6ae0018b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd170", "timestamp": "0x6ae00197", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd171", "timestamp": "0x6ae001a3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd172", "timestamp": "0x6ae001af", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd173", "timestamp": "0x6ae001bb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd174", "timestamp": "0x6ae001c7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd175", "timestamp": "0x6ae001d3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd176", "timestamp": "0x6ae001df", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd177", "timestamp": "0x6ae001eb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd178", "timestamp": "0x6ae001f7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd179", "timestamp": "0x6ae00203", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17a", "timestamp": "0x6ae0020f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17b", "timestamp": "0x6ae0021b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17c", "timestamp": "0x6ae00227", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17d", "timestamp": "0x6ae00233", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17e", "timestamp": "0x6ae0023f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd17f", "timestamp": "0x6ae0024b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd180", "timestamp": "0x6ae00257", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd181", "timestamp": "0x6ae00263", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd182", "timestamp": "0x6ae0026f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd183", "timestamp": "0x6ae0027b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd184", "timestamp": "0x6ae00287", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd185", "timestamp": "0x6ae00293", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd186", "timestamp": "0x6ae0029f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd187", "timestamp": "0x6ae002ab", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd188", "timestamp": "0x6ae002b7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd189", "timestamp": "0x6ae002c3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18a", "timestamp": "0x6ae002cf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18b", "timestamp": "0x6ae002db", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18c", "timestamp": "0x6ae002e7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18d", "timestamp": "0x6ae002f3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18e", "timestamp": "0x6ae002ff", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd18f", "timestamp": "0x6ae0030b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd190", "timestamp": "0x6ae00317", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd191", "timestamp": "0x6ae00323", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd192", "timestamp": "0x6ae0032f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd193", "timestamp": "0x6ae0033b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd194", "timestamp": "0x6ae00347", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd195", "timestamp": "0x6ae00353", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd196", "timestamp": "0x6ae0035f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd197", "timestamp": "0x6ae0036b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd198", "timestamp": "0x6ae00377", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd199", "timestamp": "0x6ae00383", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19a", "timestamp": "0x6ae0038f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19b", "timestamp": "0x6ae0039b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19c", "timestamp": "0x6ae003a7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19d", "timestamp": "0x6ae003b3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19e", "timestamp": "0x6ae003bf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd19f", "timestamp": "0x6ae003cb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a0", "timestamp": "0x6ae003d7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a1", "timestamp": "0x6ae003e3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a2", "timestamp": "0x6ae003ef", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a3", "timestamp": "0x6ae003fb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a4", "timestamp": "0x6ae00407", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a5", "timestamp": "0x6ae00413", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a6", "timestamp": "0x6ae0041f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a7", "timestamp": "0x6ae0042b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a8", "timestamp": "0x6ae00437", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1a9", "timestamp": "0x6ae00443", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1aa", "timestamp": "0x6ae0044f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ab", "timestamp": "0x6ae0045b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ac", "timestamp": "0x6ae00467", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ad", "timestamp": "0x6ae00473", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ae", "timestamp": "0x6ae0047f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1af", "timestamp": "0x6ae0048b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b0", "timestamp": "0x6ae00497", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b1", "timestamp": "0x6ae004a3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b2", "timestamp": "0x6ae004af", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b3", "timestamp": "0x6ae004bb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b4", "timestamp": "0x6ae004c7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b5", "timestamp": "0x6ae004d3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b6", "timestamp": "0x6ae004df", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b7", "timestamp": "0x6ae004eb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b8", "timestamp": "0x6ae004f7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1b9", "timestamp": "0x6ae00503", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ba", "timestamp": "0x6ae0050f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1bb", "timestamp": "0x6ae0051b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1bc", "timestamp": "0x6ae00527", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1bd", "timestamp": "0x6ae00533", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1be", "timestamp": "0x6ae0053f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1bf", "timestamp": "0x6ae0054b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c0", "timestamp": "0x6ae00557", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c1", "timestamp": "0x6ae00563", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c2", "timestamp": "0x6ae0056f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c3", "timestamp": "0x6ae0057b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c4", "timestamp": "0x6ae00587", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c5", "timestamp": "0x6ae00593", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c6", "timestamp": "0x6ae0059f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c7", "timestamp": "0x6ae005ab", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c8", "timestamp": "0x6ae005b7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1c9", "timestamp": "0x6ae005c3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ca", "timestamp": "0x6ae005cf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1cb", "timestamp": "0x6ae005db", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1cc", "timestamp": "0x6ae005e7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1cd", "timestamp": "0x6ae005f3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ce", "timestamp": "0x6ae005ff", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1cf", "timestamp": "0x6ae0060b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d0", "timestamp": "0x6ae00617", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d1", "timestamp": "0x6ae00623", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d2", "timestamp": "0x6ae0062f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d3", "timestamp": "0x6ae0063b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d4", "timestamp": "0x6ae00647", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d5", "timestamp": "0x6ae00653", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d6", "timestamp": "0x6ae0065f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d7", "timestamp": "0x6ae0066b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d8", "timestamp": "0x6ae00677", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1d9", "timestamp": "0x6ae00683", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1da", "timestamp": "0x6ae0068f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1db", "timestamp": "0x6ae0069b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1dc", "timestamp": "0x6ae006a7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1dd", "timestamp": "0x6ae006b3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1de", "timestamp": "0x6ae006bf", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1df", "timestamp": "0x6ae006cb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e0", "timestamp": "0x6ae006d7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e1", "timestamp": "0x6ae006e3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e2", "timestamp": "0x6ae006ef", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e3", "timestamp": "0x6ae006fb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e4", "timestamp": "0x6ae00707", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e5", "timestamp": "0x6ae00713", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e6", "timestamp": "0x6ae0071f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e7", "timestamp": "0x6ae0072b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e8", "timestamp": "0x6ae00737", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1e9", "timestamp": "0x6ae00743", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ea", "timestamp": "0x6ae0074f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1eb", "timestamp": "0x6ae0075b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ec", "timestamp": "0x6ae00767", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ed", "timestamp": "0x6ae00773", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ee", "timestamp": "0x6ae0077f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ef", "timestamp": "0x6ae0078b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f0", "timestamp": "0x6ae00797", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f1", "timestamp": "0x6ae007a3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f2", "timestamp": "0x6ae007af", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f3", "timestamp": "0x6ae007bb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f4", "timestamp": "0x6ae007c7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f5", "timestamp": "0x6ae007d3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f6", "timestamp": "0x6ae007df", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f7", "timestamp": "0x6ae007eb", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f8", "timestamp": "0x6ae007f7", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1f9", "timestamp": "0x6ae00803", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fa", "timestamp": "0x6ae0080f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fb", "timestamp": "0x6ae0081b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fc", "timestamp": "0x6ae00827", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fd", "timestamp": "0x6ae00833", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1fe", "timestamp": "0x6ae0083f", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd1ff", "timestamp": "0x6ae0084b", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd200", "timestamp": "0x6ae00857", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -38004
+        }
+      }
+    },
+    {
+      "name": "missing-slot",
+      "description": "An entry without slot.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "missing-timestamp",
+      "description": "An entry without timestamp.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "missing-fee-recipient",
+      "description": "An entry without suggestedFeeRecipient.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "missing-target-gas-limit",
+      "description": "An entry without targetGasLimit.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "fee-recipient-null",
+      "description": "suggestedFeeRecipient is null: all fields are required and not nullable.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": null, "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "slot-json-number",
+      "description": "slot is a JSON number, not a QUANTITY string.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": 15520013, "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "slot-leading-zero",
+      "description": "slot has a leading zero, which QUANTITY does not allow.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0x0ecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "timestamp-empty",
+      "description": "timestamp is 0x, which encodes no value.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "timestamp-no-prefix",
+      "description": "timestamp lacks the 0x prefix.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "gas-limit-over-64-bits",
+      "description": "targetGasLimit is 2^64, one more than 64 bits hold.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x10000000000000000"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "fee-recipient-19-bytes",
+      "description": "suggestedFeeRecipient is 19 bytes.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x11111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "fee-recipient-21-bytes",
+      "description": "suggestedFeeRecipient is 21 bytes.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x111111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "fee-recipient-odd-length",
+      "description": "suggestedFeeRecipient has an odd number of hex digits.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "fee-recipient-not-hex",
+      "description": "suggestedFeeRecipient holds characters that are not hex digits.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0xzz11111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "malformed-after-valid",
+      "description": "A well-formed entry, then a malformed one: the EL validates the whole request, so the call fails and the set is left unchanged.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12d", "timestamp": "0x6adffe73", "suggestedFeeRecipient": "0x22222222222222222222222222222222222222", "targetGasLimit": "0xbebc200"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "slot-repeats",
+      "description": "two-proposals with the second slot equal to the first.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10d", "timestamp": "0x6adffe73", "suggestedFeeRecipient": "0x2222222222222222222222222222222222222222", "targetGasLimit": "0xbebc200"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "slot-decreases",
+      "description": "Slots that decrease while the timestamps increase.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd12d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd10d", "timestamp": "0x6adffe73", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "timestamp-repeats",
+      "description": "Slots that increase, with the same timestamp.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "timestamp-decreases",
+      "description": "Timestamps that decrease while the slots increase.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          [
+            {"slot": "0xecd10d", "timestamp": "0x6adffe73", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"},
+            {"slot": "0xecd12d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+          ]
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "proposals-not-array",
+      "description": "A single entry passed as an object, not as an array of one.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          {"slot": "0xecd10d", "timestamp": "0x6adffcf3", "suggestedFeeRecipient": "0x1111111111111111111111111111111111111111", "targetGasLimit": "0x3938700"}
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "proposals-null",
+      "description": "proposals is null: an empty array, not null, clears the set.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": [
+          null
+        ]
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    },
+    {
+      "name": "no-params",
+      "description": "The proposals parameter is missing.",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "engine_proposalLookaheadUpdatedV1",
+        "params": []
+      },
+      "expected": {
+        "error": {
+          "code": -32602
+        }
+      }
+    }
+  ]
+}
