@@ -156,7 +156,7 @@ Opt-out removes only protocol delegation capability. A private-key holder can st
 
 A stolen key can also permanently opt out, disabling delegation-dependent recovery or wallet functionality. Wallets and signers should require an explicit irreversible-action confirmation and distinguish this form from ordinary self-transfers and delegation clearing. Contract-held assets that require the old delegate's code to access may become inaccessible; retained storage does not preserve that functionality. Existing approvals, signed application messages, and other external permissions are not revoked.
 
-Before inclusion, an attacker may invalidate or pre-empt opt-out using the compromised key or an earlier authorization. It provides no retroactive protection, and a reorganization removing the opt-out also removes its effect. Permanence applies to the resulting canonical state under these consensus rules, not to an off-chain signature or an unconfirmed transaction. Users need to verify the raw marker in finalized state before relying on it.
+Before inclusion, an attacker may invalidate or preempt opt-out using the compromised key or an earlier authorization. It provides no retroactive protection, and a reorganization removing the opt-out also removes its effect. Permanence applies to the resulting canonical state under these consensus rules, not to an off-chain signature or an unconfirmed transaction. Users need to verify the raw marker in finalized state before relying on it.
 
 ## Copyright
 
