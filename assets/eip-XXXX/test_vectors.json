@@ -1,7 +1,0 @@
-{
-  "backend": "TestLeanVM-NON_PRODUCTION",
-  "blob_byte_length": 2048,
-  "blob_merkle_root": "0x17c93358a0c4865d38a13ad7e33effa666684e011b1d7126d4d4f116e8b8c0ae",
-  "blob_versioned_hash": "0x0288780bf8379522e88a6812dedd71efab8df120308589bb14a7dd2d2382aedc",
-  "leanda_data_hash": "0x23afcc5a8c5c8f4d0fadb70ec15eb9a2e5f86ac96b7146f6df50e5cb5927acc7"
-}

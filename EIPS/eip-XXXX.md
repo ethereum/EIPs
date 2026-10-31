@@ -625,8 +625,6 @@ Applications that submit blobs must migrate to EIP-8141 blob-carrying frame tran
 
 ## Test Cases
 
-The files in [`../assets/eip-XXXX/`](../assets/eip-XXXX/) contain interface-level guest tests and blob-gas arithmetic checks. They are not a binary-field or cryptographic conformance suite.
-
 Activation requires vectors covering commitment and digest encoding, Merkle authentication, serialization, fee accounting, and fork boundaries; end-to-end LeanDA and EIP-8288 proof tests; and benchmarks for proof generation, aggregation, validation, and PeerDAS network roles.
 
 ## Security Considerations
