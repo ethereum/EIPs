@@ -1,0 +1,642 @@
+---
+eip: XXXX
+title: Post-Quantum PeerDAS and Variable-Size Blobs
+description: Introduces post-quantum STARK proofs and variable-sized blobs that replace KZG in PeerDAS
+author: Tau (@frisitano)
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-10-26
+requires: 4844, 7594, 7892, 8070, 8136, 8141, 8288
+---
+
+## Abstract
+
+This EIP introduces a post-quantum data-availability construction for PeerDAS. It replaces KZG blob commitments with hash-based Merkle commitments and uses a STARK to prove both the Reed–Solomon encoding relation and the correct derivation of each Merkle commitment. PeerDAS retains its existing column custody and sampling mechanisms, but sampled cells are authenticated using Merkle authentication paths instead of KZG proofs. This EIP also allows blobs to have power-of-two byte lengths. It represents blob-carrying transactions as [EIP-8141](./eip-8141.md) frame transactions and introduces a LeanDA scheme for [EIP-8288](./eip-8288.md) to instantiate data-availability dependency frames. These dependency frames are satisfied using the block-level recursive STARK construction defined in [EIP-8288](./eip-8288.md).
+
+This EIP does not change column custody assignments, sampling, subnet allocation, or recovery thresholds.
+
+## Motivation
+
+This EIP addresses two limitations of the current blob and PeerDAS construction:
+
+- **Post-Quantum Proofs.** PeerDAS currently authenticates blobs and cells using KZG commitments, whose security relies on elliptic-curve assumptions and a trusted setup. A cryptographically relevant quantum computer would break the elliptic-curve assumptions underlying KZG. Hash-based Merkle authentication and transparent STARK proofs provide a path that can be instantiated entirely from post-quantum assumptions.
+
+- **Variable-Size Blobs.** Fixed-size blobs force a sender with less than one blob of data either to pay for unused capacity or to delay publication while batching additional data. Variable-sized blobs remove this cost–latency tradeoff by letting senders publish and pay for the capacity they need. The fee rule retains one gas unit per blob byte and adds a fixed charge for the Merkle tree used in place of each KZG commitment.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+
+### Terminology
+
+This EIP uses the following data-availability terms:
+
+- **Blob.** A byte string representing a rate-1/2 additive Reed–Solomon codeword.
+
+- **Cell.** One of the `NUMBER_OF_COLUMNS` equal-length byte slices a blob is divided into for its Merkle commitment. Cell `i` from every blob belongs to PeerDAS column `i`.
+
+- **Cell byte length.** The number of bytes in one cell. All cells within a blob have the same byte length, but different blobs may have different cell byte lengths. Blobs therefore vary over the supported power-of-two sizes while preserving a fixed number of PeerDAS columns.
+
+- **Blob Commitment.** A (Merkle root, byte length) tuple that commits to a blob.
+
+- **Versioned Hash.** A 32-byte identifier derived from a blob commitment and returned by the EVM `BLOBHASH` opcode.
+
+- **STARK.** A transparent proof system used here to prove execution of the guest program.
+
+- **Guest Program.** The logical statement over a public input and private input that a STARK proves.
+
+- **LEANDA_SCHEME.** The protocol-reserved [EIP-8288](./eip-8288.md) verification scheme for proofs of the LeanDA guest program.
+
+### Constants
+
+| Name | Value | Definition |
+| - | - | - |
+| `NUMBER_OF_COLUMNS` | `128` | Number of PeerDAS columns and Merkle cells per blob |
+| `PQ_VERSION` | `0x02` | Version byte for post-quantum blob versioned hashes |
+| `MAX_BLOBS_PER_TX` | `6` | Maximum number of blobs referenced by one transaction |
+| `MIN_BLOB_BYTES` | `2048` | Minimum permitted blob byte length |
+| `MAX_BLOB_BYTES` | `524288` | Maximum permitted blob byte length |
+| `MAX_CELL_BYTES` | `4096` | Maximum permitted cell byte length |
+| `MAX_BLOB_BYTES_PER_TX` | `786432` | Maximum combined byte length of all blobs in one transaction |
+| `MERKLE_DEPTH` | `7` | Depth of the 128-leaf blob Merkle tree |
+| `HASH_BYTES` | `32` | Byte length of a Keccak-256 digest |
+| `NUMBER_OF_INTERNAL_NODES` | `127` | Number of internal nodes in the 128-leaf blob Merkle tree |
+| `FIXED_MERKLE_BYTES_SIZE` | `4064` | Accounted byte size of the 127 internal Merkle nodes |
+| `FULL_BLOB_GAS` | `135136` | Blob gas charged for one legacy-sized blob and its Merkle tree |
+| `LEANDA_SCHEME` | `0x12` | EIP-8288 scheme identifier for the LeanDA guest program |
+| `LEANDA_PUBLIC_INPUT_V1` | `b"LEANDA_PUBLIC_INPUT_V1"` | Domain tag for the canonical LeanDA public-input encoding |
+| `LEANDA_GUEST_VERIFICATION_KEY_HASH` | `TBD` | EIP-8288 verification-key hash for the LeanDA guest program |
+
+### Cryptographic primitives
+
+- **Hash function.** All hashes introduced by this EIP use `keccak256`, the Keccak-256 hash function of the execution layer.
+
+- **Lean Ethereum.** The cryptographic libraries reused across the Ethereum protocol to instantiate STARK constructions.
+
+### Variable-Size Blobs
+
+The permitted blob byte lengths are defined by:
+
+```python
+def is_valid_blob_byte_length(blob_byte_length: uint64) -> bool:
+    return (
+        MIN_BLOB_BYTES <= blob_byte_length <= MAX_BLOB_BYTES
+        and is_power_of_two(blob_byte_length)
+        and blob_byte_length % NUMBER_OF_COLUMNS == 0
+    )
+```
+
+A blob is divided into `NUMBER_OF_COLUMNS` equal-length cells. Varying the blob byte length changes the byte length of each cell while the number of cells remains fixed. The `keccak256` hash of cell `i` is leaf `i` of the binary Merkle tree, whose depth is `MERKLE_DEPTH` and whose root is the blob's `blob_merkle_root`. A cell is authenticated against that root using its Merkle authentication path.
+
+### Guest Program
+
+The guest program is used to generate data-availability proofs using the Lean Ethereum stack. At a high level, proof generation follows this flow:
+
+1. The host supplies an ordered batch of blobs via private input and their associated claimed commitments as public input.
+2. The guest computes each blob's Merkle root.
+3. The guest validates each blob's field encoding and Reed–Solomon relation.
+4. The guest asserts that the claimed blob commitments match the computed commitments.
+
+#### Private Input
+
+The private input contains an ordered batch of blobs:
+
+```python
+class Blob:
+    # The blob's raw byte string.
+    data: Bytes
+
+
+class PrivateInput:
+    # A list of input blobs.
+    blobs: list[Blob]
+```
+
+#### Public Input
+
+The guest public input is defined as:
+
+```python
+class BlobCommitment:
+    # The Merkle root that commits to the blob data.
+    blob_merkle_root: Bytes32
+    # The byte length of the blob.
+    blob_byte_length: Uint64
+
+
+class PublicInput:
+    # A list of blob commitments derived from the private input blobs.
+    blob_commitments: list[BlobCommitment]
+```
+
+#### Guest validation
+
+```python
+# Non-normative interface. The Lean Ethereum cryptography specifications
+# define the Reed–Solomon membership check.
+def verify_reed_solomon_relation(
+    data: Bytes,
+    blob_merkle_root: Bytes32,
+) -> bool:
+    ...
+
+
+def verify_blob(blob: Blob) -> BlobCommitment:
+    blob_byte_length = len(blob.data)
+    assert is_valid_blob_byte_length(blob_byte_length)
+
+    blob_merkle_root = compute_blob_merkle_root(blob.data)
+    assert verify_reed_solomon_relation(blob.data, blob_merkle_root)
+    return BlobCommitment(blob_merkle_root, blob_byte_length)
+
+
+def run_guest(public_input: PublicInput, private_input: PrivateInput) -> None:
+    assert public_input == PublicInput(
+        blob_commitments=[verify_blob(blob) for blob in private_input.blobs]
+    )
+```
+
+Any failed assertion makes the guest invocation invalid.
+
+### Execution Layer
+
+This EIP modifies [EIP-8141](./eip-8141.md) frame transactions to replace `blob_versioned_hashes` with `blob_commitments` and leverages [EIP-8288](./eip-8288.md) to instantiate data-availability dependency frames. It does not introduce a new transaction type or blob-specific frame mode.
+
+Blob-carrying frame transactions follow this flow:
+
+- A user constructs and signs a blob-carrying frame transaction with a data-availability dependency frame.
+- The user submits the signed transaction and blob data to the transaction pool.
+- A proof producer generates the LeanDA proof required by the transaction's dependency frame.
+- Blob data may be disseminated before payload inclusion, with Merkle authentication paths authenticating individual cells.
+- [EIP-8288](./eip-8288.md) folds the required LeanDA proof into its block-level recursive aggregate.
+- The execution payload contains the blob-carrying frame transaction, and the execution payload bid carries its blob commitments.
+
+#### Frame Transaction Blob Commitments
+
+The [EIP-8141](./eip-8141.md) frame transaction `blob_versioned_hashes` field is replaced with an ordered `blob_commitments` list:
+
+```python
+class FrameTransaction:
+    chain_id: uint64
+    nonce: uint256
+    sender: Address
+    frames: list[Frame]
+    signatures: list[FrameSignature]
+    fees: TransactionFees
+    blob_commitments: list[BlobCommitment]
+```
+
+The RLP payload encodes these fields in the order shown, with `blob_commitments` occupying the final field position previously occupied by `blob_versioned_hashes`. Each `BlobCommitment` is encoded as the RLP list `[blob_merkle_root, blob_byte_length]`, where `blob_merkle_root` is exactly 32 bytes and `blob_byte_length` is a `uint64` encoded as a canonical RLP integer. The list MUST preserve blob order. EIP-8141's existing transaction signature hash therefore commits to each blob Merkle root and byte length. An empty `blob_commitments` list denotes a frame transaction that carries no blobs. A blob-carrying frame transaction is valid only if:
+
+```python
+tx_blob_bytes = 0
+
+assert 0 < len(tx.blob_commitments) <= MAX_BLOBS_PER_TX
+for commitment in tx.blob_commitments:
+    assert is_valid_blob_byte_length(commitment.blob_byte_length)
+    tx_blob_bytes += commitment.blob_byte_length
+
+assert tx_blob_bytes <= MAX_BLOB_BYTES_PER_TX
+```
+
+#### Versioned Hash
+
+The versioned hash of a commitment is:
+
+```python
+def blob_commitment_to_versioned_hash(
+    commitment: BlobCommitment,
+) -> Bytes32:
+    digest = keccak256(
+        commitment.blob_merkle_root
+        + uint64_le(commitment.blob_byte_length)
+    )
+    return Bytes32(bytes([PQ_VERSION]) + digest[1:])
+```
+
+#### BLOBHASH Opcode
+
+`BLOBHASH(index)` returns the versioned hash derived from `tx.blob_commitments[index]`, or zero when the index is out of range. [EIP-8141](./eip-8141.md) `TXPARAM_BLOB_COUNT` returns `len(tx.blob_commitments)`.
+
+#### [EIP-8288](./eip-8288.md) Data-Availability Dependency Frames
+
+This EIP adds `LEANDA_SCHEME` to the scheme identifiers accepted in [EIP-8288](./eip-8288.md) dependency verification frames. `LEANDA_SCHEME` is a protocol-reserved profile of the leanSTARK verifier. Its `verification_key_hash` MUST equal `LEANDA_GUEST_VERIFICATION_KEY_HASH`:
+
+```python
+def verify_leanda_dependency(
+    data_hash: Bytes32,
+    verification_key_hash: Bytes32,
+    witness: Bytes,
+) -> bool:
+    return (
+        verification_key_hash == LEANDA_GUEST_VERIFICATION_KEY_HASH
+        and verify_leanSTARK(
+            (data_hash,),
+            verification_key_hash,
+            witness,
+        )
+    )
+```
+
+EIP-8288's `get_deps_hash` is extended to dependency lists containing `LEANDA_SCHEME`. LeanDA dependencies use EIP-8288's existing `(data_hash, verification_key_hash)` dependency-digest encoding. For EIP-8288 gas accounting and dependency limits, `LEANDA_SCHEME` is treated as a leanSTARK dependency.
+
+The canonical encoding of the LeanDA public input is:
+
+```python
+def encode_leanda_public_input(public_input: PublicInput) -> Bytes:
+    blob_commitments = public_input.blob_commitments
+    return (
+        LEANDA_PUBLIC_INPUT_V1
+        + uint64_le(len(blob_commitments))
+        + b"".join(
+            commitment.blob_merkle_root
+            + uint64_le(commitment.blob_byte_length)
+            for commitment in blob_commitments
+        )
+    )
+
+
+def leanda_data_hash(public_input: PublicInput) -> Bytes32:
+    return keccak256(encode_leanda_public_input(public_input))
+```
+
+The required LeanDA dependency for a blob-carrying frame transaction is:
+
+```python
+def required_leanda_dependency(tx: FrameTransaction) -> Dependency:
+    public_input = PublicInput(
+        blob_commitments=tx.blob_commitments,
+    )
+    return (
+        LEANDA_SCHEME,
+        leanda_data_hash(public_input),
+        LEANDA_GUEST_VERIFICATION_KEY_HASH,
+    )
+```
+
+Every frame transaction with a non-empty `blob_commitments` list MUST declare `required_leanda_dependency(tx)` in an [EIP-8288](./eip-8288.md) dependency verification frame. It MAY share that frame with other dependencies. The dependency is included in `dependencies(tx)` using EIP-8288's existing parsing, deduplication, and sorting rules.
+
+An execution block containing a blob-carrying frame transaction is validated under [EIP-8288](./eip-8288.md)'s block-validity rules. Its `block_deps_hash` MUST equal `get_deps_hash(dependencies(block))`, and its recursive STARK MUST verify against that digest and EIP-8288's fixed protocol-level `AGGREGATED_VK`. This verification covers every required data-availability dependency frame.
+
+#### Blob Gas and Block Limits
+
+One blob-gas unit is charged for each accounted byte:
+
+```python
+def blob_gas(commitment: BlobCommitment) -> uint64:
+    return (
+        commitment.blob_byte_length
+        + NUMBER_OF_INTERNAL_NODES * HASH_BYTES
+    )
+
+
+def transaction_blob_gas(tx: FrameTransaction) -> uint64:
+    return sum(
+        blob_gas(commitment)
+        for commitment in tx.blob_commitments
+    )
+```
+
+The fixed `FIXED_MERKLE_BYTES_SIZE` charge accounts for one complete set of unique internal nodes in the blob's Merkle tree. It is a stable accounting convention and does not represent the exact number of authentication-path bytes transmitted in every networking scenario.
+
+Where [EIP-8141](./eip-8141.md) calculates the blob gas reserved and paid for by a frame transaction, it MUST use `transaction_blob_gas(tx)` instead of `len(tx.blob_versioned_hashes) * GAS_PER_BLOB`.
+
+At activation, the active [EIP-7892](./eip-7892.md) schedule is converted to the new blob-gas units:
+
+```python
+def ceil_div(numerator: uint64, denominator: uint64) -> uint64:
+    return (numerator + denominator - 1) // denominator
+
+
+target_blob_gas = blob_schedule.target * FULL_BLOB_GAS
+max_blob_gas = blob_schedule.max * FULL_BLOB_GAS
+base_fee_update_fraction = ceil_div(
+    blob_schedule.base_fee_update_fraction * FULL_BLOB_GAS,
+    GAS_PER_BLOB,
+)
+```
+
+`GAS_PER_BLOB` is the [EIP-4844](./eip-4844.md) value `131072`. Scaling `base_fee_update_fraction` preserves the existing fee response per legacy-equivalent blob. The EIP-7892 excess-blob-gas calculation MUST use `target_blob_gas`, and its blob-base-fee calculation MUST use the scaled `base_fee_update_fraction`. The header field types and `MIN_BASE_FEE_PER_BLOB_GAS` are unchanged.
+
+The sum of `transaction_blob_gas(tx)` over all blob-carrying frame transactions in a block MUST be at most `max_blob_gas` and MUST equal the block header's `blob_gas_used`.
+
+#### Sparse Blobpool
+
+This EIP introduces `eth/73`, extending the [EIP-8070](./eip-8070.md) `eth/72` protocol. The 128-bit `cell_mask` continues to identify available or requested column indices. In `NewPooledTransactionHashes`, the mask applies to every blob of every announced blob-carrying frame transaction.
+
+`GetPooledTransactions` and `PooledTransactions` use the ordinary signed [EIP-8141](./eip-8141.md) frame-transaction encoding. The signed `blob_commitments` list supplies the Merkle roots and blob byte lengths. The [EIP-7594](./eip-7594.md) type-3 transaction wrapper and its `blobs`, `commitments`, and `cell_proofs` fields are not used.
+
+The `GetCells` request retains the EIP-8070 schema:
+
+```text
+[[transaction_hash_0: B_32, ...], cell_mask: B_16]
+```
+
+`eth/73` replaces the fixed-size EIP-8070 `Cells` response with the following RLP structures:
+
+```text
+BlobCells = [
+    cells: [B, ...],
+    authentication_paths: [[B_32, ...], ...],
+]
+
+TransactionCells = [BlobCells, ...]
+
+Cells = [
+    [transaction_hash_0: B_32, ...],
+    transaction_cells: [TransactionCells, ...],
+    cell_mask: B_16,
+]
+```
+
+The transaction hashes and `TransactionCells` values MUST have equal lengths and matching order. For each transaction, its `BlobCells` values MUST have the same length and order as its signed `blob_commitments` list. Within each `BlobCells`, cells MUST be ordered by ascending set-bit index in the response `cell_mask`. The response mask MUST be nonzero and MUST be a subset of the requested mask. It applies uniformly to every returned `BlobCells` value.
+
+For each returned cell, the receiver MUST derive its expected byte length as `commitment.blob_byte_length // NUMBER_OF_COLUMNS` and reject a cell with any other length.
+
+If the response mask is not all ones, each `authentication_paths` list MUST contain one path per returned cell in the same order. Every path MUST contain exactly `MERKLE_DEPTH` ordered `Bytes32` sibling hashes, and the receiver MUST verify each cell against the corresponding `blob_merkle_root`.
+
+If the response mask is all ones, each `authentication_paths` list MUST be empty. The receiver MUST reconstruct the complete blob Merkle tree from the 128 returned cells and verify that its root equals the corresponding `blob_merkle_root`.
+
+#### Engine API
+
+This EIP adds `engine_getBlobsV5`, which retains the `engine_getBlobsV4` request parameters:
+
+- `versioned_blob_hashes`: an ordered list of blob versioned hashes;
+- `indices_bitarray`: a 128-bit mask selecting cell indices; and
+- timeout: 500 milliseconds.
+
+The response is an ordered list containing one `BlobCellsAndPathsV1` value or `null` for each requested versioned hash. A `null` value indicates that the execution client does not hold the requested blob.
+
+```python
+class BlobCellsAndPathsV1:
+    # Exactly NUMBER_OF_COLUMNS entries. An unrequested or unavailable cell
+    # is represented by None.
+    blob_cells: list[Bytes | None]
+
+    # Empty when every cell is returned. Otherwise, exactly
+    # NUMBER_OF_COLUMNS entries parallel to blob_cells.
+    authentication_paths: list[list[Bytes32] | None]
+```
+
+If all `NUMBER_OF_COLUMNS` cells are returned, `authentication_paths` MUST be empty. The consensus client MUST reconstruct the complete blob Merkle tree and verify its root against the `BlobCommitment` corresponding to the requested versioned hash.
+
+Otherwise, `authentication_paths` MUST contain exactly `NUMBER_OF_COLUMNS` entries. Entry `i` MUST contain exactly `MERKLE_DEPTH` ordered sibling hashes when `blob_cells[i]` is present and MUST be `null` when `blob_cells[i]` is `null`. The consensus client MUST verify every returned cell against the corresponding `BlobCommitment`. It MUST also verify that each returned cell has byte length `commitment.blob_byte_length // NUMBER_OF_COLUMNS`.
+
+The `engine_forkchoiceUpdatedV4` `custodyColumns` parameter introduced by EIP-8070 is unchanged.
+
+### Consensus Layer
+
+The consensus layer replaces KZG commitments in the execution payload bid with `BlobCommitment` values and replaces KZG proofs in data-column sidecars with Merkle authentication paths.
+
+#### Types and Containers
+
+The consensus-layer `BlobCommitment` has the same fields and widths as the execution-layer value:
+
+```python
+class BlobCommitment(Container):
+    blob_merkle_root: Bytes32
+    blob_byte_length: Uint64
+
+
+class BlobCommitments(ProgressiveList[BlobCommitment]):
+    pass
+
+
+class Cell(ByteList):
+    LIMIT = MAX_CELL_BYTES
+
+
+class MerklePath(Vector[Bytes32]):
+    LENGTH = MERKLE_DEPTH
+
+
+class AuthenticationPaths(ProgressiveList[MerklePath]):
+    pass
+```
+
+`ExecutionPayloadBid.blob_kzg_commitments` is replaced with `blob_commitments`:
+
+```python
+class ExecutionPayloadBid(ProgressiveContainer):
+    ACTIVE_FIELDS = active_fields(width=13)
+
+    parent_block_hash: Hash32
+    parent_block_root: Root
+    block_hash: Hash32
+    prev_randao: Bytes32
+    fee_recipient: ExecutionAddress
+    gas_limit: Uint64
+    builder_index: BuilderIndex
+    slot: Slot
+    value: Gwei
+    execution_payment: Gwei
+    blob_commitments: BlobCommitments
+    execution_requests_root: Root
+    inclusion_list_bits: InclusionListBits
+```
+
+`DataColumnSidecar` replaces its KZG proofs with authentication paths ordered by blob commitment:
+
+```python
+class DataColumnSidecar(Container):
+    index: ColumnIndex
+    column: DataColumn
+    authentication_paths: AuthenticationPaths
+    slot: Slot
+    beacon_block_root: Root
+```
+
+#### Payload Binding
+
+The builder MUST set `bid.blob_commitments` to the commitments returned with the execution payload, preserving transaction and blob order. Every commitment MUST satisfy `is_valid_blob_byte_length` and the sum of `blob_gas(commitment)` over the bid MUST NOT exceed the active `max_blob_gas`.
+
+The maximum number of commitments that consensus-layer SSZ containers and networking limits must support is:
+
+```python
+maximum_scheduled_blob_gas = max(
+    entry.max * FULL_BLOB_GAS
+    for entry in BLOB_SCHEDULE
+)
+max_blob_commitments_per_block = (
+    maximum_scheduled_blob_gas
+    // (MIN_BLOB_BYTES + FIXED_MERKLE_BYTES_SIZE)
+)
+```
+
+When validating the execution payload, the consensus client MUST derive the Engine API `versionedHashes` list from `bid.blob_commitments` in order:
+
+```python
+versioned_hashes = [
+    blob_commitment_to_versioned_hash(commitment)
+    for commitment in bid.blob_commitments
+]
+```
+
+The consensus client supplies this list in the `NewPayload` request. The execution client MUST validate it against the ordered blob commitments in the payload's signed transactions.
+
+#### Data-Column Sidecars
+
+For each commitment in `bid.blob_commitments`, a data-column sidecar contains the cell at `sidecar.index` and its `MerklePath` at the same list position. A sidecar therefore satisfies:
+
+```python
+def compute_root_from_path(
+    cell: Cell,
+    column_index: ColumnIndex,
+    path: MerklePath,
+) -> Bytes32:
+    value = keccak256(cell)
+    position = int(column_index)
+    for sibling in path:
+        if position % 2 == 0:
+            value = keccak256(value + sibling)
+        else:
+            value = keccak256(sibling + value)
+        position //= 2
+    return value
+
+
+def verify_data_column_sidecar(
+    sidecar: DataColumnSidecar,
+    blob_commitments: BlobCommitments,
+) -> bool:
+    if sidecar.index >= NUMBER_OF_COLUMNS:
+        return False
+    if len(sidecar.column) == 0:
+        return False
+    if len(sidecar.column) != len(blob_commitments):
+        return False
+    if len(sidecar.authentication_paths) != len(blob_commitments):
+        return False
+
+    for cell, path, commitment in zip(
+        sidecar.column,
+        sidecar.authentication_paths,
+        blob_commitments,
+    ):
+        if not is_valid_blob_byte_length(commitment.blob_byte_length):
+            return False
+        if len(cell) * NUMBER_OF_COLUMNS != commitment.blob_byte_length:
+            return False
+        if (
+            compute_root_from_path(cell, sidecar.index, path)
+            != commitment.blob_merkle_root
+        ):
+            return False
+
+    return True
+```
+
+The `MerklePath` type enforces exactly `MERKLE_DEPTH` sibling hashes. The full-blob path omission used by the execution-layer blobpool does not apply to `DataColumnSidecar`, because each sidecar contains only one cell from each blob.
+
+Builders MUST construct one sidecar for each column index. Within every sidecar, cells and authentication paths MUST follow `bid.blob_commitments` order. Existing PeerDAS custody-group mapping, column-subnet mapping, sampling count, recovery threshold, gossip timing, retention, and request/response rules continue to apply.
+
+
+#### Cell-level deltas
+
+The [EIP-8136](./eip-8136.md) `CellsBitList` continues to contain one bit for each blob commitment in a column. `PartialDataColumnSidecar.kzg_proofs` is replaced with `authentication_paths`:
+
+```python
+class PartialDataColumnSidecar(Container):
+    cells_present_bitmap: CellsBitList
+    partial_column: DataColumn
+    authentication_paths: AuthenticationPaths
+```
+
+The bitmap length MUST equal `len(bid.blob_commitments)`. Set bits select commitments in ascending blob index. The partial column and authentication-path list MUST both contain exactly one entry per set bit in that order.
+
+```python
+def verify_partial_data_column_sidecar(
+    sidecar: PartialDataColumnSidecar,
+    column_index: ColumnIndex,
+    blob_commitments: BlobCommitments,
+) -> bool:
+    if column_index >= NUMBER_OF_COLUMNS:
+        return False
+    if len(sidecar.cells_present_bitmap) != len(blob_commitments):
+        return False
+
+    blob_indices = [
+        blob_index
+        for blob_index, present in enumerate(sidecar.cells_present_bitmap)
+        if present
+    ]
+    if len(blob_indices) == 0:
+        return False
+    if len(sidecar.partial_column) != len(blob_indices):
+        return False
+    if len(sidecar.authentication_paths) != len(blob_indices):
+        return False
+
+    for blob_index, cell, path in zip(
+        blob_indices,
+        sidecar.partial_column,
+        sidecar.authentication_paths,
+    ):
+        commitment = blob_commitments[blob_index]
+        if not is_valid_blob_byte_length(commitment.blob_byte_length):
+            return False
+        if len(cell) * NUMBER_OF_COLUMNS != commitment.blob_byte_length:
+            return False
+        if (
+            compute_root_from_path(cell, column_index, path)
+            != commitment.blob_merkle_root
+        ):
+            return False
+
+    return True
+```
+
+Authentication paths remain required when every bitmap bit is set because the message contains one column, not every cell of each blob. The commitments are obtained from the execution payload bid associated with the partial-message group; they are not duplicated in a partial sidecar or header. EIP-8136's parts metadata, group ID, topic, partial-message negotiation, eager and pull behavior, and peer-scoring rules are unchanged.
+
+## Rationale
+
+### Post-quantum commitments
+
+Merkle commitments replace the elliptic-curve assumptions and trusted setup of KZG with hash-based authentication. The LeanDA guest proves the Reed–Solomon relation and correct commitment derivation, while `LEANDA_SCHEME` allows [EIP-8288](./eip-8288.md) to fold these proofs into its block aggregate.
+
+### Blob-local Merkle trees
+
+Each Merkle tree commits to one blob rather than one block column. Anyone holding a blob can derive and seed any of its cells and authentication paths without waiting for the other blobs or their ordering to be finalized. A tree over a block column would make each path depend on that column's final blob set and ordering.
+
+### Variable-size blobs
+
+Keeping 128 cells per blob preserves the PeerDAS column structure while allowing cell byte lengths to vary. Signing the blob byte length prevents a root from being interpreted under a different blob size. Blob gas charges the blob bytes plus a fixed internal-node allowance, providing stable byte-based accounting without attempting to reproduce each peer's wire usage.
+
+## Backwards Compatibility
+
+This EIP is a consensus-breaking change activated at a fork. Block, transaction, and sidecar decoding is selected by the fork under which the block was produced. Pre-fork blocks, type-3 transactions, KZG transaction wrappers, and KZG data-column sidecars remain valid under their original rules.
+
+At and after activation:
+
+- [EIP-4844](./eip-4844.md) type-3 KZG transactions and legacy KZG blob-carrying frame transactions are invalid for inclusion;
+- transaction pools MUST remove those ineligible transactions;
+- blob-carrying [EIP-8141](./eip-8141.md) frame transactions MUST carry signed `BlobCommitment` values and declare `required_leanda_dependency(tx)`;
+- a block MUST NOT mix KZG and post-quantum blobs; and
+- data-column sidecars MUST use the Merkle authentication-path format defined by this EIP. KZG sidecars MUST be rejected for post-fork blocks.
+
+The [EIP-8070](./eip-8070.md) `eth/72` protocol retains its KZG-era semantics. Post-fork post-quantum blob announcements and cell exchange require `eth/73`. A peer negotiated on an older protocol version may remain connected and exchange unaffected data, but it cannot announce or serve post-quantum blob cells.
+
+`engine_getBlobsV4` retains its KZG response semantics. Consensus clients MUST use `engine_getBlobsV5` for post-quantum blobs. Fork-aware Engine API and consensus-layer decoding MUST NOT interpret one response or sidecar format as the other.
+
+The [EIP-8136](./eip-8136.md) partial-message extension retains its bitmap and negotiation semantics, but it MUST NOT fall back to KZG authentication for post-fork data.
+
+Applications that submit blobs must migrate to EIP-8141 blob-carrying frame transactions with signed `BlobCommitment` values and a LeanDA dependency frame. The associated witness is verified through the [EIP-8288](./eip-8288.md) recursive aggregate.
+
+## Test Cases
+
+The files in [`../assets/eip-XXXX/`](../assets/eip-XXXX/) contain interface-level guest tests and blob-gas arithmetic checks. They are not a binary-field or cryptographic conformance suite.
+
+Activation requires vectors covering commitment and digest encoding, Merkle authentication, serialization, fee accounting, and fork boundaries; end-to-end LeanDA and EIP-8288 proof tests; and benchmarks for proof generation, aggregation, validation, and PeerDAS network roles.
+
+## Security Considerations
+
+The post-quantum claim is conditional on Keccak-256, the leanVM STARK, the LeanDA guest, and the complete [EIP-8288](./eip-8288.md) recursion path meeting the coordinated security target.
+
+The STARK proves correct encoding and commitment derivation, not data availability. Availability continues to depend on PeerDAS custody, sampling, reconstruction, and networking assumptions.
+
+Clients must bind each proof to the signed root and byte length, enforce all size and list bounds before allocating or hashing, and reject malformed authentication paths. Merkle authentication paths increase bandwidth and denial-of-service exposure relative to KZG proofs.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
