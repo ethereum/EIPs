@@ -2,7 +2,7 @@
 eip: XXXX
 title: Post-Quantum PeerDAS and Variable-Size Blobs
 description: Introduces post-quantum STARK proofs and variable-sized blobs that replace KZG in PeerDAS
-author: Francesco Risitano (@frisitano)
+author: Francesco Risitano (@frisitano), Thomas Coratger (@tcoratger), Tom Wambsgans (@TomWambsgans)
 status: Draft
 type: Standards Track
 category: Core
