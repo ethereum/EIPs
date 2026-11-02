@@ -2,7 +2,7 @@
 title: Post-Quantum Material Registration
 description: Execution layer triggered registration of opaque post-quantum material for validators in the beacon state
 author: Potuz (@potuz)
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/thread-to-discuss-eip-pq-migration/30186
 status: Draft
 type: Standards Track
 category: Core
