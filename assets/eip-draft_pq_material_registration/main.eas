@@ -1,0 +1,386 @@
+;;; Post-quantum material registration request contract.
+;;;
+;;; An EIP-7685 request contract in the style of EIP-7002 / EIP-7251. A caller
+;;; (expected to be the execution address in a validator's withdrawal
+;;; credentials) submits a 48-byte validator public key followed by 32 bytes of
+;;; opaque post-quantum material. The contract charges the EIP-7002 style
+;;; dynamic fee, queues a record of
+;;;
+;;;     source_address (20) ++ validator_pubkey (48) ++ pq_data (32)
+;;;
+;;; and, when called by the system address at the end of a block, dequeues up
+;;; to MAX_PER_BLOCK records and returns them concatenated. The consensus layer
+;;; checks that source_address controls the validator.
+;;;
+;;; The queue and storage layout are identical to the EIP-7251 consolidation
+;;; request contract. Following the EIP-8282 builder request contracts, the fee
+;;; charged on a write also counts the requests already added in the current
+;;; block, and a system call with non-empty calldata disables the queue by
+;;; setting the excess inhibitor.
+
+#pragma target "prague"
+
+;;; ----------------------------------------------------------------------------
+;;; CONSTANTS ------------------------------------------------------------------
+;;; ----------------------------------------------------------------------------
+
+#define SYSTEM_ADDR = .address(0xfffffffffffffffffffffffffffffffffffffffe)
+
+#define SLOT_EXCESS = 0
+#define SLOT_COUNT = 1
+
+#define QUEUE_HEAD = 2
+#define QUEUE_TAIL = 3
+#define QUEUE_OFFSET = 4
+
+#define MIN_FEE = 1
+#define TARGET_PER_BLOCK = 8
+#define MAX_PER_BLOCK = 16
+#define FEE_UPDATE_FRACTION = 17
+#define EXCESS_INHIBITOR = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+
+#define INPUT_SIZE = 80    ; the size of (pubkey ++ pq_data)
+#define RECORD_SIZE = 100  ; the size of (address ++ pubkey ++ pq_data)
+#define SLOTS_PER_ITEM = 4 ; (addr, pk[0:32], pk[32:48]++data[0:16], data[16:32])
+
+;;; ----------------------------------------------------------------------------
+;;; PROGRAM START --------------------------------------------------------------
+;;; ----------------------------------------------------------------------------
+
+    ;; Dispatch to the system subroutine if called by the system address.
+    caller                 ; [caller]
+    push SYSTEM_ADDR       ; [sysaddr, caller]
+    eq                     ; [sysaddr == caller]
+    jumpi @read_requests   ; []
+
+;;; ----------------------------------------------------------------------------
+;;; USER SUBROUTINE ------------------------------------------------------------
+;;; ----------------------------------------------------------------------------
+
+    ;; Load the persisted excess.
+    push SLOT_EXCESS       ; [excess_slot]
+    sload                  ; [excess]
+
+    ;; Revert while the inhibitor is set (before the fork, or while disabled).
+    dup1                   ; [excess, excess]
+    push EXCESS_INHIBITOR  ; [inhibitor, excess, excess]
+    eq                     ; [inhibitor == excess, excess]
+    jumpi @revert          ; [excess]
+
+    ;; Include the requests already added in this block: if the block count
+    ;; exceeds TARGET_PER_BLOCK, add the difference to the excess.
+    push SLOT_COUNT        ; [count_slot, excess]
+    sload                  ; [count, excess]
+    push TARGET_PER_BLOCK  ; [target, count, excess]
+    dup2                   ; [count, target, count, excess]
+    gt                     ; [count > target, count, excess]
+    jumpi @bump_excess     ; [count, excess]
+
+    pop                    ; [excess]
+    jump @compute_user_fee ; [excess]
+
+bump_excess:               ; [count, excess]
+    push TARGET_PER_BLOCK  ; [target, count, excess]
+    swap1                  ; [count, target, excess]
+    sub                    ; [count-target, excess]
+    add                    ; [excess+count-target]
+
+compute_user_fee:          ; [excess]
+    push FEE_UPDATE_FRACTION ; [update_fraction, excess]
+    swap1                  ; [excess, update_fraction]
+    push MIN_FEE           ; [min_fee, excess, update_fraction]
+
+#include "fake_expo.eas"
+
+    ;; If calldatasize matches the expected input size, add the request.
+    calldatasize           ; [calldatasize, req_fee]
+    push INPUT_SIZE        ; [INPUT_SIZE, calldatasize, req_fee]
+    eq                     ; [INPUT_SIZE == calldatasize, req_fee]
+    jumpi @handle_input    ; [req_fee]
+
+    ;; Otherwise calldatasize must be zero (fee getter).
+    calldatasize           ; [calldatasize, req_fee]
+    jumpi @revert          ; [req_fee]
+
+    ;; Reject any value on the read path to prevent lost funds.
+    callvalue              ; [value, req_fee]
+    jumpi @revert          ; [req_fee]
+
+    ;; Return req_fee.
+    push 0                 ; [0, req_fee]
+    mstore                 ; []
+    push 32                ; [32]
+    push 0                 ; [0, 32]
+    return                 ; []
+
+handle_input:
+    ;; Write path. Input layout:
+    ;;
+    ;;  +--------+---------+
+    ;;  | pubkey | pq_data |
+    ;;  +--------+---------+
+    ;;      48        32
+
+    ;; Check that the value covers the fee.
+    callvalue              ; [callvalue, req_fee]
+    lt                     ; [callvalue < req_fee]
+    jumpi @revert          ; []
+
+    ;; Increment the per-block request count.
+    push SLOT_COUNT
+    sload                  ; [req_count]
+    push 1                 ; [1, req_count]
+    add                    ; [req_count+1]
+    push SLOT_COUNT
+    sstore                 ; []
+
+    ;; Compute the base storage slot of the new queue item.
+    push QUEUE_TAIL        ; [tail_idx_slot]
+    sload                  ; [tail_idx]
+    dup1                   ; [tail_idx, tail_idx]
+    push SLOTS_PER_ITEM    ; [slots, tail_idx, tail_idx]
+    mul                    ; [slots*tail_idx, tail_idx]
+    push QUEUE_OFFSET
+    add                    ; [slot, tail_idx]
+
+    ;; Slot 0: source address.
+    caller                 ; [caller, slot, ..]
+    dup2                   ; [slot, caller, slot, ..]
+    sstore                 ; [slot, ..]
+    push 1                 ; [1, slot, ..]
+    add                    ; [slot, ..]
+
+    ;; Slot 1: pubkey[0:32].
+    push 0                 ; [0, slot, ..]
+    calldataload           ; [pubkey[0:32], slot, ..]
+    dup2                   ; [slot, pubkey[0:32], slot, ..]
+    sstore                 ; [slot, ..]
+    push 1                 ; [1, slot, ..]
+    add                    ; [slot, ..]
+
+    ;; Slot 2: pubkey[32:48] ++ pq_data[0:16].
+    push 32                ; [32, slot, ..]
+    calldataload           ; [pubkey[32:48] ++ pq_data[0:16], slot, ..]
+    dup2                   ; [slot, pubkey[32:48] ++ pq_data[0:16], slot, ..]
+    sstore                 ; [slot, ..]
+    push 1                 ; [1, slot, ..]
+    add                    ; [slot, ..]
+
+    ;; Slot 3: pq_data[16:32] ++ 16 zero bytes (calldataload zero-pads).
+    push 64                ; [64, slot, ..]
+    calldataload           ; [pq_data[16:32] ++ 0x00..00, slot, ..]
+    swap1                  ; [slot, pq_data[16:32] ++ 0x00..00, ..]
+    sstore                 ; [..]
+
+    ;; Assemble the log record: caller ++ calldata.
+    caller                 ; [caller, ..]
+    push 96                ; [96, caller, ..]
+    shl                    ; [caller<<96, ..]
+    push 0                 ; [0, caller<<96, ..]
+    mstore                 ; [..]
+    push INPUT_SIZE        ; [size, ..]
+    push 0                 ; [ost, size, ..]
+    push 20                ; [dest, ost, size, ..]
+    calldatacopy           ; [..]
+
+    ;; Log the record.
+    push RECORD_SIZE       ; [size, ..]
+    push 0                 ; [idx, size, ..]
+    log0                   ; [..]
+
+    ;; Advance the queue tail.
+    push 1                 ; [1, tail_idx]
+    add                    ; [tail_idx+1]
+    push QUEUE_TAIL        ; [tail_idx_slot, tail_idx+1]
+    sstore                 ; []
+
+    stop
+
+;;; ----------------------------------------------------------------------------
+;;; SYSTEM SUBROUTINE ----------------------------------------------------------
+;;; ----------------------------------------------------------------------------
+;;;
+;;; Dequeue up to MAX_PER_BLOCK records and return them as a contiguous byte
+;;; array of RECORD_SIZE byte records:
+;;;
+;;;  +------+--------+---------+
+;;;  | addr | pubkey | pq_data |
+;;;  +------+--------+---------+
+;;;     20      48        32
+;;;
+;;; Then update the excess accumulator and reset the per-block count.
+
+read_requests:
+    ;; count = tail - head
+    push QUEUE_TAIL        ; [tail_idx_slot]
+    sload                  ; [tail_idx]
+    push QUEUE_HEAD        ; [head_idx_slot, tail_idx]
+    sload                  ; [head_idx, tail_idx]
+    dup1                   ; [head_idx, head_idx, tail_idx]
+    dup3                   ; [tail_idx, head_idx, head_idx, tail_idx]
+    sub                    ; [count, head_idx, tail_idx]
+
+    ;; count = min(count, MAX_PER_BLOCK)
+    dup1                   ; [count, count, head_idx, tail_idx]
+    push MAX_PER_BLOCK     ; [max, count, count, head_idx, tail_idx]
+    gt                     ; [max > count, count, head_idx, tail_idx]
+    jumpi @begin_loop      ; [count, head_idx, tail_idx]
+    pop                    ; [head_idx, tail_idx]
+    push MAX_PER_BLOCK     ; [count, head_idx, tail_idx]
+
+begin_loop:
+    push 0                 ; [i, count, head_idx, tail_idx]
+
+accum_loop:
+    ;; Exit when i == count.
+    dup2                   ; [count, i, count, head_idx, tail_idx]
+    dup2                   ; [i, count, i, count, head_idx, tail_idx]
+    eq                     ; [i == count, i, count, head_idx, tail_idx]
+    jumpi @update_head     ; [i, count, head_idx, tail_idx]
+
+    ;; slotbase = QUEUE_OFFSET + (head_idx + i) * SLOTS_PER_ITEM
+    dup3                   ; [head_idx, i, ..]
+    dup2                   ; [i, head_idx, i, ..]
+    add                    ; [i+head_idx, i, ..]
+    push SLOTS_PER_ITEM    ; [4, i+head_idx, i, ..]
+    mul                    ; [4*(i+head_idx), i, ..]
+    push QUEUE_OFFSET      ; [offset, 4*(i+head_idx), i, ..]
+    add                    ; [slotbase, i, ..]
+
+    ;; offset = i * RECORD_SIZE
+    dup2                   ; [i, slotbase, i, ..]
+    push RECORD_SIZE       ; [size, i, slotbase, i, ..]
+    mul                    ; [offset, slotbase, i, ..]
+
+    ;; mem[offset:offset+20] = addr
+    dup2                   ; [slotbase, offset, slotbase, ..]
+    sload                  ; [addr, offset, slotbase, ..]
+    push 96                ; [96, addr, offset, slotbase, ..]
+    shl                    ; [addr<<96, offset, slotbase, ..]
+    dup2                   ; [offset, addr<<96, offset, slotbase, ..]
+    mstore                 ; [offset, slotbase, ..]
+    push 20                ; [20, offset, slotbase, ..]
+    add                    ; [offset+20, slotbase, ..]
+
+    ;; mem[offset+20:offset+52] = pubkey[0:32]
+    dup2                   ; [slotbase, offset, slotbase, ..]
+    push 1                 ; [1, slotbase, offset, slotbase, ..]
+    add                    ; [slot, offset, slotbase, ..]
+    sload                  ; [pk1, offset, slotbase, ..]
+    dup2                   ; [offset, pk1, offset, slotbase, ..]
+    mstore                 ; [offset, slotbase, ..]
+    push 32                ; [32, offset, slotbase, ..]
+    add                    ; [offset+32, slotbase, ..]
+
+    ;; mem[offset+52:offset+84] = pubkey[32:48] ++ pq_data[0:16]
+    dup2                   ; [slotbase, offset, slotbase, ..]
+    push 2                 ; [2, slotbase, offset, slotbase, ..]
+    add                    ; [slot, offset, slotbase, ..]
+    sload                  ; [pk2_d1, offset, slotbase, ..]
+    dup2                   ; [offset, pk2_d1, offset, slotbase, ..]
+    mstore                 ; [offset, slotbase, ..]
+    push 32                ; [32, offset, slotbase, ..]
+    add                    ; [offset+32, slotbase, ..]
+
+    ;; mem[offset+84:offset+100] = pq_data[16:32]. The 16 trailing zero bytes
+    ;; spill into the next record, which overwrites them, or past the returned
+    ;; range.
+    swap1                  ; [slotbase, offset, ..]
+    push 3                 ; [3, slotbase, offset, ..]
+    add                    ; [slot, offset, ..]
+    sload                  ; [d2, offset, ..]
+    swap1                  ; [offset, d2, ..]
+    mstore                 ; [i, count, head_idx, tail_idx]
+
+    ;; i += 1
+    push 1                 ; [1, i, ..]
+    add                    ; [i+1, ..]
+    jump @accum_loop       ; [i, count, head_idx, tail_idx]
+
+update_head:               ; [i, count, head_idx, tail_idx]
+    swap2                  ; [head_idx, count, i, tail_idx]
+    add                    ; [new_head_idx, count, tail_idx]
+
+    ;; If the queue is now empty, reset head and tail.
+    dup1                   ; [new_head_idx, new_head_idx, count, tail_idx]
+    swap3                  ; [tail_idx, new_head_idx, count, new_head_idx]
+    eq                     ; [new_head_idx == tail_idx, count, new_head_idx]
+    jumpi @reset_queue     ; [count, new_head_idx]
+
+    ;; Otherwise store the new head.
+    swap1                  ; [new_head_idx, count]
+    push QUEUE_HEAD        ; [head_idx_slot, new_head_idx, count]
+    sstore                 ; [count]
+    jump @update_excess    ; [count]
+
+reset_queue:
+    swap1                  ; [new_head_idx, count]
+    pop                    ; [count]
+    push 0                 ; [0, count]
+    push QUEUE_HEAD        ; [head_slot, 0, count]
+    sstore                 ; [count]
+    push 0                 ; [0, count]
+    push QUEUE_TAIL        ; [tail_slot, 0, count]
+    sstore                 ; [count]
+
+update_excess:
+    ;; A system call with any calldata disables the queue by storing the
+    ;; inhibitor into the excess slot.
+    calldatasize           ; [calldatasize, count]
+    jumpi @set_inhibitor   ; [count]
+
+    push SLOT_EXCESS       ; [excess_slot, count]
+    sload                  ; [excess, count]
+    push SLOT_COUNT        ; [count_slot, excess, count]
+    sload                  ; [req_count, excess, count]
+
+    ;; If the inhibitor is set (first system call after activation, or the
+    ;; queue was disabled), reset the excess to zero, enabling the queue.
+    dup2                   ; [excess, req_count, excess, count]
+    push EXCESS_INHIBITOR  ; [inhibitor, excess, req_count, excess, count]
+    eq                     ; [inhibitor == excess, req_count, excess, count]
+    jumpi @zero_excess     ; [req_count, excess, count]
+
+    ;; new_excess = max(0, excess + req_count - TARGET_PER_BLOCK)
+    push TARGET_PER_BLOCK  ; [target, req_count, excess, count]
+    dup3                   ; [excess, target, req_count, excess, count]
+    dup3                   ; [req_count, excess, target, req_count, excess, count]
+    add                    ; [req_count+excess, target, req_count, excess, count]
+    gt                     ; [req_count+excess > target, req_count, excess, count]
+    jumpi @compute_excess  ; [req_count, excess, count]
+
+zero_excess:               ; [req_count, excess, count]
+    pop                    ; [excess, count]
+    pop                    ; [count]
+    push 0                 ; [0, count]
+    jump @store_excess     ; [0, count]
+
+compute_excess:            ; [req_count, excess, count]
+    add                    ; [req_count+excess, count]
+    push TARGET_PER_BLOCK  ; [target, req_count+excess, count]
+    swap1                  ; [req_count+excess, target, count]
+    sub                    ; [new_excess, count]
+    jump @store_excess     ; [new_excess, count]
+
+set_inhibitor:             ; [count]
+    push EXCESS_INHIBITOR  ; [new_excess, count]
+
+store_excess:
+    push SLOT_EXCESS       ; [excess_slot, new_excess, count]
+    sstore                 ; [count]
+
+    ;; Reset the per-block request count.
+    push 0                 ; [0, count]
+    push SLOT_COUNT        ; [count_slot, 0, count]
+    sstore                 ; [count]
+
+    ;; Return count * RECORD_SIZE bytes.
+    push RECORD_SIZE       ; [record_size, count]
+    mul                    ; [size]
+    push 0                 ; [0, size]
+    return                 ; []
+
+revert:                    ; [...]
+    push 0                 ; [size]
+    push 0                 ; [offset, size]
+    revert                 ; []

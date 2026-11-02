@@ -1,0 +1,18 @@
+;;; Constructor for the PQ material registration request contract.
+
+    ;; Store 0xff..ff as the initial excess so that no request can be queued
+    ;; before the fork activates (the first system call resets it to zero).
+    push (1 << 256) - 1  ; [excess]
+    push 0               ; [slot, excess]
+    sstore               ; []
+
+    ;; Copy and return the runtime code.
+    push len(code)       ; [len]
+    dup1                 ; [len, len]
+    push @code           ; [codeOffset, len, len]
+    push 0               ; [dest, codeOffset, len, len]
+    codecopy             ; [len]
+    push 0               ; [ptr, len]
+    return               ; []
+
+#bytes code: assemble("main.eas")
