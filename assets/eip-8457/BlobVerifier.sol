@@ -18,17 +18,13 @@ library BlobVerifier {
     uint256 internal constant COMMITMENT_LENGTH = 48;
     uint256 internal constant PROOF_LENGTH = 48;
 
-    /// @dev Number of field elements in a blob polynomial (4096).
-    ///      First 32 bytes of the expected precompile output.
-    // bytes32 internal constant FIELD_ELEMENTS_PER_BLOB = bytes32(uint256(4096));
-
     /// @dev BLS12-381 scalar field modulus.
     ///      Second 32 bytes of the expected precompile output.
     uint256 internal constant BLS_MODULUS =
         52435875175126190479447740508185965837690552500527637822603658699938581184513;
 
-    // @dev The precompile expected output on success:
-    // keccak(FIELD_ELEMENTS_PER_BLOB + BLS_MODULUS)
+    /// @dev keccak256 of the fixed success output of the point evaluation precompile:
+    ///      abi.encodePacked(uint256(4096), BLS_MODULUS), i.e. FIELD_ELEMENTS_PER_BLOB ‖ BLS_MODULUS.
     bytes32 internal constant POINT_EVALUATION_PRECOMPILE_OUTPUT =
         0xb2157d3a40131b14c4c675335465dffde802f0ce5218ad012284d7f275d1b37c;
 
