@@ -2,7 +2,7 @@
 title: SLOTDURATION Opcode
 description: Opcode to get the duration of the current slot, in milliseconds
 author: Hadrien Croubois (@amxx)
-discussions-to: https://ethereum-magicians.org/t/TODO
+discussions-to: https://ethereum-magicians.org/t/slotduration-opcode/30276
 status: Draft
 type: Standards Track
 category: Core
