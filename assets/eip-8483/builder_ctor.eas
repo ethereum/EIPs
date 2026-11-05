@@ -1,0 +1,16 @@
+;;; Constructor for the builder PQ material registration request contract.
+
+    ;; No initial storage is written: the excess starts at zero, so requests
+    ;; can be queued as soon as the contract is deployed, before the fork that
+    ;; starts draining them.
+
+    ;; Copy and return the runtime code.
+    push len(code)       ; [len]
+    dup1                 ; [len, len]
+    push @code           ; [codeOffset, len, len]
+    push 0               ; [dest, codeOffset, len, len]
+    codecopy             ; [len]
+    push 0               ; [ptr, len]
+    return               ; []
+
+#bytes code: assemble("builder.eas")
