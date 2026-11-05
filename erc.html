@@ -2,6 +2,9 @@
 layout: page
 title: ERC
 ---
-
 {% assign eips=site.pages|where:"type","Standards Track"|where:"category","ERC"|where_exp:"page","page.url contains '/EIPS/'" %}
+<div id="eip-listing-container">
 {% include eiptable.html eips=eips %}
+</div>
+<div id="eip-load-more-sentinel" class="eip-load-more-sentinel"></div>
+{% include infinite-scroll-table.html %}
