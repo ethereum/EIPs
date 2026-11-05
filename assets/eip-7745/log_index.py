@@ -148,7 +148,6 @@ def log_index_add_log_entries(
     Adds address and topic entries to the current filter map and a log entry to
     the index entries tree according to the given list of log events.
     """
-    log_index = Uint(0)
     for log in logs:
         prepare_index(log_index, Uint(len(log.topics) + 1))
         add_to_filter_maps(log_index, map_value_hash_address(log.address))
