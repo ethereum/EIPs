@@ -23,7 +23,7 @@ The matching set shrinks over time: [EIP-161](../../EIPS/eip-161.md)'s "empty" p
 
 The procedure is implementation-agnostic; the Geth-specific scanner below is one instantiation. The check can be reproduced from scratch on any client without relying on the source code referenced here: and targets Mainnet:
 
-1. **Replay all blocks from genesis up to the Spurious Dragon fork block (2,675,000)**, configured to record accounts (and, optionally, storage keys) *by their preimage*: i.e. the original 20-byte address (and 32-byte slot key), not only the `keccak256` hashes the Merkle Patricia Trie keys on. The address preimage is required for clients keying the trie by preimage and to construct the block access list (BAL) entry for the irregular nonce bump. Slot preimages are not needed for the state transition; they are recorded only as supporting evidence that each targeted account satisfies `storageRoot != EmptyRootHash`.
+1. **Replay all blocks from genesis up to the Spurious Dragon fork block (2,675,000)**, configured to record accounts (and, optionally, storage keys) *by their preimage*: i.e. the original 20-byte address (and 32-byte slot key), not only the `keccak256` hashes the Merkle Patricia Trie keys on. The address preimage is required for clients keying the trie by preimage and to construct the block access list (BAL) entry for the irregular nonce bump. Slot preimages are not needed for the state transition; they are recorded, together with the slot values, only as supporting evidence that each targeted account satisfies `storageRoot != EmptyRootHash`, and so that the accounts can be reproduced in a test or devnet genesis.
 2. **At the fork-block post-state, iterate every account** and keep those satisfying the predicate (`nonce == 0`, `codeHash == EmptyCodeHash`, `storageRoot != EmptyRootHash`). For each match, enumerate its non-zero storage slots, recording both the slot key and its hash.
 3. **Filter against current Mainnet state** via `eth_getProof(address, [], "latest")` against any RPC node. Keep an entry iff the live response still satisfies the predicate (`nonce == 0`, `codeHash == EmptyCodeHash`, `storageHash != EmptyRootHash`). Surviving entries form the EIP's normative list.
 
@@ -50,14 +50,20 @@ Output schema (one JSON object per line):
 }
 ```
 
-The published [targeted-accounts.json](./targeted-accounts.json) is the same schema, additionally decorated with `currentStorageHash` (from `eth_getProof`) and packed into a JSON array.
+The published [targeted-accounts.json](./targeted-accounts.json) is the same schema, packed into a JSON array and additionally decorated with `currentStorageHash` (from `eth_getProof`) per account and `value` (the 32-byte slot value, from `eth_getProof`) per storage entry. The storage of a targeted account cannot change (the account has no code, so nothing can `SSTORE` to it, and no creation can land on it; see the Security Considerations of the EIP), so the values are the same at the Spurious Dragon block, at the block they were read, and at the fork block. With the values in the file, the storage root of every entry can be rebuilt offline from the file alone.
 
 ## Verification
 
 Two checks against Mainnet `latest`:
 
 1. **Liveness filter** (`eth_getProof(address, [], "latest")`): keeps the 28 accounts that still satisfy the predicate. This is the step from `S(2,675,000)` to `S(latest)`.
-2. **Storage-root reconstruction**: for each survivor, `eth_getProof(address, [our_slot_keys], "latest")` returns the live values; rebuild the storage MPT from `(keccak256(slot), rlp(stripLeadingZeros(value)))` pairs and compare to the `storageHash` Mainnet reports. All 28 survivors verify, which proves the slot list is complete and consistent with live state.
+2. **Storage-root reconstruction**: for each survivor, `eth_getProof(address, [our_slot_keys], "latest")` returns the live values; rebuild the storage MPT from `(keccak256(slot), rlp(stripLeadingZeros(value)))` pairs and compare to the `storageHash` Mainnet reports. All 28 survivors verify, which proves the slot list is complete and consistent with live state. The values returned by this step are the `value` fields in [targeted-accounts.json](./targeted-accounts.json), so the reconstruction can be repeated from the file without an RPC.
+
+## Devnet prestate
+
+[mainnet-prestate-alloc.json](./mainnet-prestate-alloc.json) contains the 28 targeted accounts in genesis `alloc` format (`balance`, `nonce`, `storage`), so that a devnet can start from exactly the Mainnet shape of these accounts and activate the EIP with the Mainnet list. Nonce (`0`), code (empty) and storage are fixed, as explained above. Balances can grow through plain value transfers; the file records the balances at Mainnet block 26,178,891 (hash `0xfb43394839fb306fdc95f31559bf54840bb5638517aae8b040e3eb5c6ea60b56`), the block at which the storage values were read. The balance plays no role in the transition, so a devnet can use these balances as-is or refresh them.
+
+To use it: merge the object into the `alloc` of the devnet genesis, and configure the 28 addresses as the EIP's account list in the devnet chain configuration. The genesis must not allocate code to these accounts, otherwise they no longer satisfy the predicate and the list requirement is violated.
 
 ## Reproduction
 
@@ -85,5 +91,6 @@ The scan is deterministic per snapshot iteration; running it on a clean datadir 
 
 ## Files
 
-- [targeted-accounts.json](./targeted-accounts.json): 28-entry survivor set on `latest` (the EIP's normative list).
+- [targeted-accounts.json](./targeted-accounts.json): 28-entry survivor set on `latest` (the EIP's normative list), with slot keys, key hashes and values.
+- [mainnet-prestate-alloc.json](./mainnet-prestate-alloc.json): the same 28 accounts as a genesis `alloc` fragment, for devnets and test chains.
 - [zero-nonce-matches.jsonl](./zero-nonce-matches.jsonl): 224-entry boundary-block superset.

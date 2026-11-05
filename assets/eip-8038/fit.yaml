@@ -1,0 +1,55 @@
+version: 1
+
+# Configuration for the supporting EIP report.
+anchor_rate: 75000000
+
+clients:
+  - besu
+  - erigon
+  - ethrex
+  - geth
+  - nethermind
+  - reth
+
+gas_costs:
+  fork: osaka
+
+new_params:
+  COLD_ACCOUNT_NOCODE_ACCESS: 2600
+  COLD_ACCOUNT_CODE_ACCESS: 2600
+  # Combined access+write costs fit directly from the write-only fixtures; the
+  # write deltas are recovered below in `derived`. COLD_STORAGE_WRITE is already
+  # a raw osaka field (=5000), so it is not redeclared here.
+  COLD_ACCOUNT_NOCODE_WRITE: 9300
+  COLD_ACCOUNT_CODE_WRITE: 9300
+  # Baselines kept for the report's current-gas diff column.
+  ACCOUNT_WRITE: 6700
+  STORAGE_WRITE: 2800
+
+output:
+  plots: false
+
+glue_adjustment:
+  enabled: true
+
+derived:
+  # Write deltas: combined cold-write minus the cold access, floored at 0.
+  STORAGE_WRITE: "max(0, COLD_STORAGE_WRITE - COLD_STORAGE_ACCESS)"
+  ACCOUNT_WRITE: "max(0, COLD_ACCOUNT_CODE_WRITE - COLD_ACCOUNT_CODE_ACCESS, COLD_ACCOUNT_NOCODE_WRITE - COLD_ACCOUNT_NOCODE_ACCESS)"
+
+models:
+  presets:
+    # --- Storage access (SSTORE, SLOAD) ---
+    - cold_storage_sload
+    - cold_storage_sstore_access
+    - cold_storage_sstore_write
+
+    # --- Warm access
+    - warm_account_access
+    - warm_storage_access_sload
+
+    # --- Account access (CALL, CALLCODE, BALANCE, SELFDESTRUCT, EXT*) ---
+    - cold_account_nocode_access
+    - cold_account_nocode_write
+    - cold_account_code_access
+    - cold_account_code_write
