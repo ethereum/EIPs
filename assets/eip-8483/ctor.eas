@@ -1,10 +1,8 @@
 ;;; Constructor for the PQ material registration request contract.
 
-    ;; Store 0xff..ff as the initial excess so that no request can be queued
-    ;; before the fork activates (the first system call resets it to zero).
-    push (1 << 256) - 1  ; [excess]
-    push 0               ; [slot, excess]
-    sstore               ; []
+    ;; No initial storage is written: the excess starts at zero, so requests
+    ;; can be queued as soon as the contract is deployed, before the fork that
+    ;; starts draining them.
 
     ;; Copy and return the runtime code.
     push len(code)       ; [len]

@@ -13,10 +13,15 @@
 ;;; checks that source_address controls the validator.
 ;;;
 ;;; The queue follows the EIP-7251 consolidation request contract, with one
-;;; more storage slot per item. Following the EIP-8282 builder request contracts, the fee
-;;; charged on a write also counts the requests already added in the current
-;;; block, and a system call with non-empty calldata disables the queue by
-;;; setting the excess inhibitor.
+;;; more storage slot per item. Unlike EIP-7002, EIP-7251 and EIP-8282, the fee
+;;; state is updated on the write path rather than by the system call: the
+;;; first write in a block folds the previous active block's count into the
+;;; excess and decays it by TARGET_PER_BLOCK for every elapsed block. The fee
+;;; therefore depends only on how fast requests are added, not on whether the
+;;; system call is running, so registrations can be queued before the fork that
+;;; starts draining them. At most MAX_ADDS_PER_BLOCK requests can be added per
+;;; block. As in EIP-8282, a system call with non-empty calldata disables the
+;;; queue by setting the excess inhibitor.
 
 #pragma target "prague"
 
@@ -31,11 +36,13 @@
 
 #define QUEUE_HEAD = 2
 #define QUEUE_TAIL = 3
-#define QUEUE_OFFSET = 4
+#define SLOT_LAST_BLOCK = 4
+#define QUEUE_OFFSET = 5
 
 #define MIN_FEE = 1
-#define TARGET_PER_BLOCK = 8
-#define MAX_PER_BLOCK = 16
+#define TARGET_PER_BLOCK = 128
+#define MAX_ADDS_PER_BLOCK = 256
+#define MAX_PER_BLOCK = 1024
 #define FEE_UPDATE_FRACTION = 17
 #define EXCESS_INHIBITOR = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 
@@ -61,54 +68,95 @@
     push SLOT_EXCESS       ; [excess_slot]
     sload                  ; [excess]
 
-    ;; Revert while the inhibitor is set (before the fork, or while disabled).
+    ;; Revert while the inhibitor is set (the queue is disabled).
     dup1                   ; [excess, excess]
     push EXCESS_INHIBITOR  ; [inhibitor, excess, excess]
     eq                     ; [inhibitor == excess, excess]
     jumpi @revert          ; [excess]
 
-    ;; Include the requests already added in this block: if the block count
-    ;; exceeds TARGET_PER_BLOCK, add the difference to the excess.
+    ;; Load the count of requests added in the last active block.
     push SLOT_COUNT        ; [count_slot, excess]
     sload                  ; [count, excess]
-    push TARGET_PER_BLOCK  ; [target, count, excess]
-    dup2                   ; [count, target, count, excess]
-    gt                     ; [count > target, count, excess]
-    jumpi @bump_excess     ; [count, excess]
+    push SLOT_LAST_BLOCK   ; [last_slot, count, excess]
+    sload                  ; [last, count, excess]
+    dup1                   ; [last, last, count, excess]
+    number                 ; [number, last, last, count, excess]
+    eq                     ; [number == last, last, count, excess]
+    jumpi @same_block      ; [last, count, excess]
 
-    pop                    ; [excess]
-    jump @compute_user_fee ; [excess]
+    ;; First request of this block: roll the fee state forward.
+    ;;   excess = max(0, excess + count - TARGET_PER_BLOCK * (number - last))
+    ;;   count = 0
+    number                 ; [number, last, count, excess]
+    sub                    ; [elapsed, count, excess]
+    push TARGET_PER_BLOCK  ; [target, elapsed, count, excess]
+    mul                    ; [decay, count, excess]
+    swap2                  ; [excess, count, decay]
+    add                    ; [excess+count, decay]
+    dup2                   ; [decay, excess+count, decay]
+    dup2                   ; [excess+count, decay, excess+count, decay]
+    gt                     ; [excess+count > decay, excess+count, decay]
+    jumpi @decay_excess    ; [excess+count, decay]
 
-bump_excess:               ; [count, excess]
-    push TARGET_PER_BLOCK  ; [target, count, excess]
-    swap1                  ; [count, target, excess]
-    sub                    ; [count-target, excess]
-    add                    ; [excess+count-target]
+    pop                    ; [decay]
+    pop                    ; []
+    push 0                 ; [excess]
+    jump @new_block        ; [excess]
 
-compute_user_fee:          ; [excess]
-    push FEE_UPDATE_FRACTION ; [update_fraction, excess]
-    swap1                  ; [excess, update_fraction]
-    push MIN_FEE           ; [min_fee, excess, update_fraction]
+decay_excess:              ; [excess+count, decay]
+    sub                    ; [excess]
+
+new_block:                 ; [excess]
+    push 0                 ; [count, excess]
+    swap1                  ; [excess, count]
+    jump @compute_user_fee ; [excess, count]
+
+same_block:                ; [last, count, excess]
+    pop                    ; [count, excess]
+    swap1                  ; [excess, count]
+
+compute_user_fee:          ; [excess, count]
+    ;; Include the requests already added in this block: if the block count
+    ;; exceeds TARGET_PER_BLOCK, add the difference to the exponent.
+    push TARGET_PER_BLOCK  ; [target, excess, count]
+    dup3                   ; [count, target, excess, count]
+    gt                     ; [count > target, excess, count]
+    jumpi @bump_exponent   ; [excess, count]
+
+    dup1                   ; [excess, excess, count]
+    jump @fee              ; [excess, excess, count]
+
+bump_exponent:             ; [excess, count]
+    push TARGET_PER_BLOCK  ; [target, excess, count]
+    dup3                   ; [count, target, excess, count]
+    sub                    ; [count-target, excess, count]
+    dup2                   ; [excess, count-target, excess, count]
+    add                    ; [exponent, excess, count]
+
+fee:                       ; [exponent, excess, count]
+    push FEE_UPDATE_FRACTION ; [update_fraction, exponent, excess, count]
+    swap1                  ; [exponent, update_fraction, excess, count]
+    push MIN_FEE           ; [min_fee, exponent, update_fraction, excess, count]
 
 #include "fake_expo.eas"
 
     ;; If calldatasize matches the expected input size, add the request.
-    calldatasize           ; [calldatasize, req_fee]
-    push INPUT_SIZE        ; [INPUT_SIZE, calldatasize, req_fee]
-    eq                     ; [INPUT_SIZE == calldatasize, req_fee]
-    jumpi @handle_input    ; [req_fee]
+    calldatasize           ; [calldatasize, req_fee, excess, count]
+    push INPUT_SIZE        ; [INPUT_SIZE, calldatasize, req_fee, excess, count]
+    eq                     ; [INPUT_SIZE == calldatasize, req_fee, excess, count]
+    jumpi @handle_input    ; [req_fee, excess, count]
 
     ;; Otherwise calldatasize must be zero (fee getter).
-    calldatasize           ; [calldatasize, req_fee]
-    jumpi @revert          ; [req_fee]
+    calldatasize           ; [calldatasize, req_fee, excess, count]
+    jumpi @revert          ; [req_fee, excess, count]
 
     ;; Reject any value on the read path to prevent lost funds.
-    callvalue              ; [value, req_fee]
-    jumpi @revert          ; [req_fee]
+    callvalue              ; [value, req_fee, excess, count]
+    jumpi @revert          ; [req_fee, excess, count]
 
     ;; Return req_fee.
-    push 0                 ; [0, req_fee]
-    mstore                 ; []
+    push 0                 ; [0, req_fee, excess, count]
+    mstore                 ; [excess, count]
     push 32                ; [32]
     push 0                 ; [0, 32]
     return                 ; []
@@ -122,16 +170,26 @@ handle_input:
     ;;      48        64
 
     ;; Check that the value covers the fee.
-    callvalue              ; [callvalue, req_fee]
-    lt                     ; [callvalue < req_fee]
-    jumpi @revert          ; []
+    callvalue              ; [callvalue, req_fee, excess, count]
+    lt                     ; [callvalue < req_fee, excess, count]
+    jumpi @revert          ; [excess, count]
 
-    ;; Increment the per-block request count.
-    push SLOT_COUNT
-    sload                  ; [req_count]
-    push 1                 ; [1, req_count]
-    add                    ; [req_count+1]
-    push SLOT_COUNT
+    ;; Enforce the per-block limit on added requests.
+    push MAX_ADDS_PER_BLOCK ; [max_adds, excess, count]
+    dup3                   ; [count, max_adds, excess, count]
+    lt                     ; [count < max_adds, excess, count]
+    iszero                 ; [count >= max_adds, excess, count]
+    jumpi @revert          ; [excess, count]
+
+    ;; Persist the fee state: excess, count+1 and the current block number.
+    push SLOT_EXCESS       ; [excess_slot, excess, count]
+    sstore                 ; [count]
+    push 1                 ; [1, count]
+    add                    ; [count+1]
+    push SLOT_COUNT        ; [count_slot, count+1]
+    sstore                 ; []
+    number                 ; [number]
+    push SLOT_LAST_BLOCK   ; [last_slot, number]
     sstore                 ; []
 
     ;; Compute the base storage slot of the new queue item.
@@ -216,7 +274,7 @@ handle_input:
 ;;;  +------+--------+---------+
 ;;;     20      48        64
 ;;;
-;;; Then update the excess accumulator and reset the per-block count.
+;;; Then handle the excess inhibitor.
 
 read_requests:
     ;; count = tail - head
@@ -342,56 +400,34 @@ reset_queue:
     sstore                 ; [count]
 
 update_excess:
-    ;; A system call with any calldata disables the queue by storing the
-    ;; inhibitor into the excess slot.
+    ;; The fee state is maintained by the write path. The system call only
+    ;; manages the inhibitor: any calldata disables the queue, and a call with
+    ;; empty calldata re-enables a disabled queue.
     calldatasize           ; [calldatasize, count]
     jumpi @set_inhibitor   ; [count]
 
     push SLOT_EXCESS       ; [excess_slot, count]
     sload                  ; [excess, count]
-    push SLOT_COUNT        ; [count_slot, excess, count]
-    sload                  ; [req_count, excess, count]
+    push EXCESS_INHIBITOR  ; [inhibitor, excess, count]
+    eq                     ; [inhibitor == excess, count]
+    iszero                 ; [inhibitor != excess, count]
+    jumpi @return_records  ; [count]
 
-    ;; If the inhibitor is set (first system call after activation, or the
-    ;; queue was disabled), reset the excess to zero, enabling the queue.
-    dup2                   ; [excess, req_count, excess, count]
-    push EXCESS_INHIBITOR  ; [inhibitor, excess, req_count, excess, count]
-    eq                     ; [inhibitor == excess, req_count, excess, count]
-    jumpi @zero_excess     ; [req_count, excess, count]
-
-    ;; new_excess = max(0, excess + req_count - TARGET_PER_BLOCK)
-    push TARGET_PER_BLOCK  ; [target, req_count, excess, count]
-    dup3                   ; [excess, target, req_count, excess, count]
-    dup3                   ; [req_count, excess, target, req_count, excess, count]
-    add                    ; [req_count+excess, target, req_count, excess, count]
-    gt                     ; [req_count+excess > target, req_count, excess, count]
-    jumpi @compute_excess  ; [req_count, excess, count]
-
-zero_excess:               ; [req_count, excess, count]
-    pop                    ; [excess, count]
-    pop                    ; [count]
+    ;; Re-enable the queue with a fresh fee state.
     push 0                 ; [0, count]
-    jump @store_excess     ; [0, count]
-
-compute_excess:            ; [req_count, excess, count]
-    add                    ; [req_count+excess, count]
-    push TARGET_PER_BLOCK  ; [target, req_count+excess, count]
-    swap1                  ; [req_count+excess, target, count]
-    sub                    ; [new_excess, count]
-    jump @store_excess     ; [new_excess, count]
-
-set_inhibitor:             ; [count]
-    push EXCESS_INHIBITOR  ; [new_excess, count]
-
-store_excess:
-    push SLOT_EXCESS       ; [excess_slot, new_excess, count]
+    push SLOT_EXCESS       ; [excess_slot, 0, count]
     sstore                 ; [count]
-
-    ;; Reset the per-block request count.
     push 0                 ; [0, count]
     push SLOT_COUNT        ; [count_slot, 0, count]
     sstore                 ; [count]
+    jump @return_records   ; [count]
 
+set_inhibitor:             ; [count]
+    push EXCESS_INHIBITOR  ; [inhibitor, count]
+    push SLOT_EXCESS       ; [excess_slot, inhibitor, count]
+    sstore                 ; [count]
+
+return_records:            ; [count]
     ;; Return count * RECORD_SIZE bytes.
     push RECORD_SIZE       ; [record_size, count]
     mul                    ; [size]
