@@ -1,0 +1,163 @@
+---
+title: Introduce Double-Pricing
+description: Separate EVM execution credits from transaction billing.
+author: Giulio Rebuffo (@Giulio2002)
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-11-08
+---
+
+## Abstract
+
+Introduce two separate counters: credits and billing, both measured in gas units and both initialized from `tx.gasLimit`. Credits decrease according to the old gas schedule and determine ordinary EVM execution. Billing decreases according to the new gas schedule and determines what the transaction sender pays. The EVM's gas interfaces see only credits, but insufficient billing aborts the entire transaction.
+
+## Motivation
+
+Repricing operations should change their monetary cost without changing the execution behavior of existing contracts. Contracts that inspect remaining gas or forward a fixed allowance should continue operating under the old schedule.
+
+## Specification
+
+### Initialization and units
+
+Initialize both counters from the transaction's signed gas limit:
+
+```text
+credits = tx.gasLimit
+billing = tx.gasLimit
+```
+
+Both counters use the same gas unit and share the initial limit `tx.gasLimit`. They are accounted for separately, not added together. The sender pays for billing consumption only.
+
+Deduct legacy intrinsic charges from credits and new-schedule intrinsic charges from billing. Reject the transaction before execution if `tx.gasLimit` cannot cover either required intrinsic charge. The initial EVM allowance is the remaining credits; the remaining billing is transaction-wide. Other accepted-transaction preprocessing charges are checked at their specified processing stage.
+
+Because the schedules differ, the balances can diverge immediately. Repeating an operation whose billing cost exceeds its credit cost can exhaust billing first, despite both counters starting at the same value.
+
+### Credits
+
+Credits replace gas as the name of the EVM's existing execution allowance. Their behavior remains unchanged under a pinned legacy schedule:
+
+- Every opcode consumes credits according to the old schedule, including dynamic costs.
+- `GAS` (`gasleft()`) returns remaining credits.
+- `CALL` and all other call and creation instructions charge, forward, and return credits using the old rules.
+- Stipends, memory expansion, storage charges, precompile execution costs, and out-of-gas behavior use the old rules.
+- Returns, reverts, and exceptional halts preserve the old credit behavior. Billing refunds never replenish credits.
+
+A contract cannot inspect, forward, or spend the billing counter.
+
+### Billing
+
+A separate transaction-wide billing allowance is debited for operations according to the new gas schedule, including applicable transaction-level charges. Internal calls use the same transaction-wide billing accounting; forwarding credits does not itself purchase or allocate billing capacity.
+
+After execution, the sender pays the consumed billing amount at the applicable transaction fee price. Any unused prepaid allowance is returned. Charges and rebates for reverted work or discarded state follow the billing schedule without changing credits or call results.
+
+### Calls, creation, and gas-sensitive behavior
+
+All gas arguments and allowances visible to bytecode refer to the credit counter, not the billing counter. Both counters use gas units. The pinned legacy rules determine ordinary execution checks, deductions, forwarding, and returns, subject to the transaction-wide billing-abort condition below.
+
+- `CALL`: its gas argument requests credits. Charge legacy memory, access, value-transfer, and account-creation overhead; apply the legacy forwarding cap and value stipend. Billing for the caller's work and the child's work uses the new schedule independently.
+- `CALLCODE`: preserve its own legacy gas, value-check, stipend, and execution-context rules. Do not substitute `CALL` account-creation behavior.
+- `DELEGATECALL`: its gas argument requests credits. Preserve legacy access and memory charges, forwarding, and inherited caller/value context. It introduces no new value transfer or value-transfer stipend.
+- `STATICCALL`: its gas argument requests credits. Preserve legacy forwarding and static-context restrictions. A forbidden state-changing operation fails as before; billing capacity cannot authorize it.
+- `CREATE` and `CREATE2`: neither has an explicit gas argument. Derive the child's credit allowance using the legacy creation rules. Preserve initcode charges, `CREATE2` hashing charges, memory costs, code-deposit costs, size limits, collision handling, and creation failure behavior.
+- `GAS` / `gasleft()`: deduct the instruction's legacy credit cost and report the remaining credits at the legacy observation point.
+- `RETURN`, `STOP`, and `REVERT`: return unused child credits exactly as under the legacy rules. `REVERT` rolls back the appropriate state changes but does not restore credits already spent executing the reverted work.
+- Exceptional halts: out-of-credits, invalid instructions, stack faults, invalid jumps, and prohibited operations retain their legacy effects on the current frame's allowance and the caller's result.
+- Precompiles: apply the legacy credit requirement and failure rules for the selected precompile, while charging its work under the new billing schedule. No additional billing allowance is forwarded to it.
+- Dynamic costs: memory expansion, copying, hashing, exponentiation, logs, account access, and storage access use their legacy formulas for credits. Billing uses its separately specified formulas for the same work.
+- Storage and refunds: preserve warm/cold accounting, original/current/new-value tracking, the `SSTORE` low-gas check, and legacy refund journaling. Settlement refunds are not spendable credits.
+- `SELFDESTRUCT`: preserve legacy credit charges, account-access handling, termination, and state-change eligibility. Any economic rebate affects billing settlement only.
+- Transaction entry: intrinsic deductions, access-list processing, authorization/delegation processing, and the initial frame allowance must use the selected legacy execution rules. Keeping opcode constants alone is insufficient.
+
+High-level language operations such as `send`, `transfer`, low-level calls, and contract creation inherit these rules from their generated bytecode; they do not get a separate billing-funded execution path.
+
+Call-depth failure, insufficient balance for a value transfer, and other failures before entering a child retain their individual legacy credit-return rules. They must not all be treated as if a child ran out of credits. Forwarding credits is an allowance transfer, not work to be billed a second time.
+
+`GASPRICE` and `BASEFEE` expose monetary fee parameters, not remaining allowances. Their exact relationship to billing units must be specified alongside the transaction fee format. `GASLIMIT` exposes the block limit selected by the block-accounting specification; it must not silently switch from legacy execution units to billing units. These interfaces are distinct from `GAS` and need explicit integration rules.
+
+### Exhaustion and settlement
+
+- A child runs out of credits while billing remains: the child halts exceptionally under legacy rules, its application changes revert, and its forwarded credit allowance is consumed. The caller receives the legacy failure result and may continue with its retained credits. Remaining billing cannot rescue the child.
+- The top-level frame runs out of credits while billing remains: execution fails with legacy rollback and nonce/preprocessing semantics. The sender still pays the billing charges for performed work.
+- A child reverts with credits remaining: the caller receives the legacy failure result, return data, and unused credits. Work already performed remains billable; any charge contingent on surviving state follows the billing journal.
+- Execution finishes with unused credits and billing: unused credits grant no further execution after completion. Unused prepaid billing is returned; monetary settlement is not calculated from unused credits.
+- Billing cannot cover the next charge, even if credits remain: abort the entire transaction under the billing-exhaustion rule below. This is distinct from an ordinary child out-of-credits failure.
+
+Exhausting credits does not automatically consume the entire remaining billing allowance. Charge according to the new schedule, including any explicitly specified and bounded failure surcharge. Do not charge the full nominal cost of an operation rejected before its work occurs unless that schedule explicitly defines such a charge.
+
+Billing is finalized per transaction, not from block-final state. Later transactions cannot change an earlier transaction's bill. Fee-settlement changes must not feed back into the same transaction's billing calculation.
+
+### Billing-exhaustion condition
+
+Before performing chargeable work, obtain its charge from the new schedule and apply:
+
+```text
+if billing_remaining < billing_cost:
+    billing_remaining = 0
+    abort_entire_transaction(BILLING_OUT_OF_GAS)
+else:
+    billing_remaining -= billing_cost
+    perform_the_work()
+```
+
+`BILLING_OUT_OF_GAS` is a transaction-wide exceptional abort, not an ordinary frame exception, `REVERT`, or `CALL` failure result. No caller can catch it, receive a failure flag, or continue a failure handler. Unwind every active frame and roll back the transaction's application effects. Preserve the specified transaction-envelope effects, including the consumed sender nonce and fees; preprocessing changes follow the pinned baseline's top-level-failure rollback boundary.
+
+Billing exhaustion consumes the remaining billing allowance. The final billed usage is `tx.gasLimit`, including intrinsic usage. The unaffordable operation must not run, and settlement rebates must not be applied after this abort. Ordinary credit exhaustion alone does not trigger this full-billing penalty.
+
+An exact payment is permitted: if the next charge equals the remaining billing, debit it to zero and execute the work. Zero billing does not itself abort execution; a subsequent positive charge does. Zero-cost events still follow their credit rules. Credits cannot refill billing, and billing cannot refill credits.
+
+For an operation that fails its legacy credit check before performing its work, preserve the ordinary credit-failure path; do not additionally debit the unperformed operation's normal billing cost. If the new schedule prices work performed along that failure path, apply the billing condition to that actual charge. This defines precedence when both allowances would be insufficient for the attempted operation.
+
+The condition applies at every charge point, including preprocessing, precompiles, child execution, and code deposit. Charges must be checkable before their associated work; a final unbounded post-execution charge is not allowed. Refundable charges are debited provisionally and any allowed rebate is settled later, never made available to extend execution. The exact charge and rebate table remains to be specified.
+
+### Funding and payment
+
+Use the existing signed gas limit and applicable fee-price fields. Reserve `tx.gasLimit * effectiveGasPrice`, subject to the existing maximum-fee affordability checks, transferred value, and any separately authorized fees. The sender pays for billing usage only, not the sum of credit and billing consumption.
+
+For ordinary completion or legacy execution failure, settle new-schedule billing usage and permitted rebates, returning unused prepaid billing. For `BILLING_OUT_OF_GAS`, charge `tx.gasLimit * effectiveGasPrice`. Never exceed `tx.gasLimit * maxFeePerGas` for this fee domain. Separate fee domains, such as blob fees, remain separate.
+
+## Rationale
+
+Credits determine ordinary execution allowances and call behavior. Billing determines what it costs and when the transaction-wide spending allowance is exhausted. Changing the billing schedule does not change the credit schedule, but can cause an earlier transaction-wide abort. No new EVM instruction, transaction gas-limit field, or contract-visible resource budget is introduced.
+
+## Repricing and Capacity Considerations
+
+This proposal preserves economic repricing without changing the legacy credit cost of individual operations. A fixed credit allowance retains its legacy execution capacity only while sufficient transaction-wide billing remains.
+
+- Making an operation more expensive raises its billing charge without increasing the credits needed to execute it. Repeating it can nevertheless exhaust the shared billing allowance and abort the transaction earlier.
+- Making an operation cheaper lowers its billing charge without reducing its credit requirement. A transaction or internal call can therefore run out of credits even though its remaining billing allowance could pay for more work.
+- Cheaper billing cannot enlarge a fixed legacy credit allowance. More expensive billing can reduce how much of that allowance the transaction actually gets to execute. The design therefore preserves the legacy credit rules, not unconditional execution equivalence.
+
+Charging more is not itself a physical resource limit. If repricing is intended to protect block-processing time, state growth, or another resource, block admission must enforce an appropriate resource bound independently of payment.
+
+One possible extension is to use the new accounting for block packing while credits govern execution within each transaction. That does not enlarge existing fixed-credit calls. It also requires an explicit resource-safety argument: replacing a legacy block limit with discounted billed usage alone could admit excessive work. Block-capacity failure must not be turned into a new catchable failure inside an otherwise executable call.
+
+Accordingly, cheaper fees, increased block throughput, and increased execution capacity within a call are separate outcomes. This proposal provides the first where the selected prices do so; the latter two are not automatic benefits.
+
+## Backwards Compatibility
+
+For identical execution inputs and environment, gas-dependent behavior remains governed by the old credit rules until a billing abort occurs. This includes internal calls, not just the value returned by `gasleft()`. Transactions that previously succeeded can now abort with credits remaining.
+
+Credit consumption is no longer a measure of the sender's actual charge. Reimbursement contracts, fee estimation, and receipts must distinguish execution credits from billed usage. Different fees can also change balances observed by later transactions.
+
+## Security Considerations
+
+Payment must be guaranteed without silently increasing the sender's signed maximum fee. Existing execution and block resource limits must not be replaced by discounted billing consumption. Reverted work must not become free merely because its state changes are discarded.
+
+Preserving old execution rules does not fix weaknesses already present in those rules or in contracts' gas-based failure detection.
+
+An untrusted child can consume the shared billing allowance and abort the entire transaction, including unrelated work in a batch. Holding credits back does not reserve billing for cleanup or guarantee that the caller can finish. The uncatchable abort prevents application failure records from being committed after billing exhaustion, but does not eliminate denial-of-service or griefing risks. Raising `tx.gasLimit` also raises the initial credits and maximum authorized fee, rather than independently increasing billing alone.
+
+## Test Cases
+
+When billing is sufficient, run identical executions under different billing schedules and verify identical credit traces, call results, and application effects before fee settlement. Include nested calls, stipends, storage clearing, reverts, out-of-credits, creation, and precompiles.
+
+Also test equal initial limits with billing-heavy repeated work, child-triggered billing exhaustion, and credit exhaustion while billing remains. Verify that billing exhaustion unwinds all frames without allowing a caller to continue, charges the full billing limit, and preserves the specified envelope effects. Test exact-zero billing at successful completion, a subsequent positive charge, zero-cost work, intrinsic rejection under either schedule, and simultaneous insufficient allowances with the defined credit-check precedence. In every case, the sender's signed fee ceiling must hold.
+
+## Open Specification Items
+
+Before implementation, select the exact legacy schedule and new billing schedule, enumerate all charge points and failure-path charges, define billing rebates and receipt fields, and specify block accounting. Validate the billing-exhaustion penalty and transaction-wide abort against real applications and consensus tests.
+
+## Copyright
+
+Copyright and related rights waived via CC0.
