@@ -1,5 +1,5 @@
 ---
-title: Introduce Double-Pricing
+title: Separate execution credits and billing credits
 description: Separate EVM execution credits from transaction billing.
 author: Giulio Rebuffo (@Giulio2002)
 status: Draft
