@@ -15,23 +15,40 @@ jobs:
       actions: read
       contents: read
     steps:
+      - name: Find PR Number artifact
+        id: find-pr-number
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          artifact_id="$(gh api --paginate "repos/$GH_REPO/actions/runs/$RUN_ID/artifacts" \
+            --jq '.artifacts[] | select(.name == "pr-number") | .id')"
+          if [[ -z "$artifact_id" ]]; then
+            echo "::notice::No PR-number artifact was uploaded; skipping review."
+          fi
+          echo "artifact_id=$artifact_id" >> "$GITHUB_OUTPUT"
+
       - name: Fetch PR Number
         id: fetch-pr-number
+        if: steps.find-pr-number.outputs.artifact_id != ''
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: pr-number
+          artifact-ids: ${{ steps.find-pr-number.outputs.artifact_id }}
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           run-id: ${{ github.event.workflow_run.id }}
-          if-no-artifact-found: ignore
 
       - name: Check PR Number file
         id: check-pr-number
+        if: steps.find-pr-number.outputs.artifact_id != ''
         run: |
           if [[ -f pr-number.txt ]]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::error::PR-number artifact is missing pr-number.txt"
+            exit 1
           fi
 
       - name: Save PR Number

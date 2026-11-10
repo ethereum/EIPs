@@ -18,23 +18,40 @@ jobs:
       issues: write
       pull-requests: write
     steps:
+      - name: Find PR Data artifact
+        id: find-pr-data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          artifact_id="$(gh api --paginate "repos/$GH_REPO/actions/runs/$RUN_ID/artifacts" \
+            --jq '.artifacts[] | select(.name == "pr_number") | .id')"
+          if [[ -z "$artifact_id" ]]; then
+            echo "::notice::No PR-data artifact was uploaded; skipping Post CI."
+          fi
+          echo "artifact_id=$artifact_id" >> "$GITHUB_OUTPUT"
+
       - name: Fetch PR Data
         id: fetch-pr-data
+        if: steps.find-pr-data.outputs.artifact_id != ''
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: pr_number
+          artifact-ids: ${{ steps.find-pr-data.outputs.artifact_id }}
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           run-id: ${{ github.event.workflow_run.id }}
-          if-no-artifact-found: ignore
 
       - name: Check PR Data
         id: check-pr-data
+        if: steps.find-pr-data.outputs.artifact_id != ''
         run: |
           if [[ -f pr_number && -f pr_sha && -f merge_sha ]]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::error::PR-data artifact must contain pr_number, pr_sha, and merge_sha"
+            exit 1
           fi
 
       - name: Save PR Data
