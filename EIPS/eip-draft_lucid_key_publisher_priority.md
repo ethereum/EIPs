@@ -1,0 +1,281 @@
+---
+title: LUCID Key Publisher Priority Lists
+description: Extend EIP-8184 with validator-selected key publisher priority and authenticated key release
+author: Jannik Luhn (@jannikluhn)
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-lucid-key-publisher-priority-lists/30330
+status: Draft
+type: Standards Track
+category: Core
+created: 2026-11-10
+requires: 7002, 7685, 7732, 8184, 8282
+---
+
+## Abstract
+
+This EIP extends [EIP-8184](./eip-8184.md) with a validator-managed priority list of key publishers. Sealed transactions using publishers on this list execute before other sealed transactions, mitigating the impact of key publishers' optionality over key release. Publishers are included on the list when supported by more than half of active validator effective balance.
+
+## Motivation
+
+In LUCID, key publishers can choose whether to release a committed transaction's decryption key after learning how later transactions would execute. This optionality can enable frontrunning even when those later transactions are encrypted. Giving execution priority to transactions whose key publishers the validator set deems trusted prevents transactions using other publishers from exploiting selective key release to execute ahead of them.
+
+## Specification
+
+### Additional constants and parameters
+
+```python
+LUCID_KEY_MESSAGE_PREFIX = b"LUCID_KEY_MESSAGE"
+MAX_KEY_PUBLISHER_ADDRESSES_PER_LIST = TBD
+MAX_KEY_PUBLISHER_VOTE_LISTS = TBD
+MAX_KEY_PUBLISHER_VOTE_REQUESTS_PER_PAYLOAD = TBD
+TARGET_KEY_PUBLISHER_VOTE_REQUESTS_PER_PAYLOAD = TBD
+MIN_KEY_PUBLISHER_VOTE_REQUEST_FEE = TBD
+KEY_PUBLISHER_VOTE_REQUEST_FEE_UPDATE_FRACTION = TBD
+KEY_PUBLISHER_VOTE_SYSTEM_CALL_GAS_LIMIT = TBD
+SYSTEM_ADDRESS = 0xfffffffffffffffffffffffffffffffffffffffe
+KEY_PUBLISHER_VOTE_REGISTRY_ADDRESS = TBD
+DOMAIN_KEY_PUBLISHER_VOTE_SUBSCRIPTION = TBD
+KEY_PUBLISHER_VOTE_REQUEST_TYPE = TBD
+```
+
+### Key publisher voting
+
+Validators vote for key publishers by subscribing to lists of execution addresses. Each list is managed by an owner through a registry contract on the execution layer. Each active validator contributes its full effective balance to every address in its subscribed list. An address has priority when its support exceeds half of the total effective balance of all active validators.
+
+#### Beacon state and priority list
+
+The beacon state is extended with key publisher vote lists, validator subscriptions to those lists, and subscription nonces:
+
+```python
+VoteListIndex = uint64
+
+class BeaconState(Container):
+    ...
+    key_publisher_vote_list_addresses: List[List[ExecutionAddress, MAX_KEY_PUBLISHER_ADDRESSES_PER_LIST], MAX_KEY_PUBLISHER_VOTE_LISTS]
+    key_publisher_vote_subscriptions: List[Union[None, VoteListIndex], VALIDATOR_REGISTRY_LIMIT]
+    key_publisher_vote_subscription_nonces: List[uint64, VALIDATOR_REGISTRY_LIMIT]
+```
+
+For slot $n$, let $P_n$ be the priority list derived from the beacon state after all block, slot, and epoch processing through slot $n-1$, including any skipped slots, and before processing slot $n$ or its beacon block. An ST has priority in slot $n$ if its ticket's `key_publisher` is in $P_n$. All STs in a bundle have the same `key_publisher`, so each ST-commitment has one priority status. The derivation of $P_n$ is specified under "Key publisher voting".
+
+#### Registry contract
+
+The registry contract is deployed at `KEY_PUBLISHER_VOTE_REGISTRY_ADDRESS`. Anyone may create an empty list, initially owned by its creator. List IDs are assigned consecutively in creation order, starting at zero. IDs are never reused, and lists cannot be deleted. The contract rejects creation when the number of lists already created equals `MAX_KEY_PUBLISHER_VOTE_LISTS`.
+
+A list's owner may add or remove addresses or transfer ownership. Lists are unordered sets of distinct addresses: adding an existing address or removing an absent address does not change list membership. The list-management interface defines the operations and their corresponding events:
+
+```solidity
+interface IKeyPublisherVoteLists {
+    event ListCreated(uint64 indexed listId, address indexed owner);
+    event AddressesAdded(uint64 indexed listId, address[] addresses);
+    event AddressesRemoved(uint64 indexed listId, address[] addresses);
+    event OwnershipTransferred(
+        uint64 indexed listId,
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+
+    function createList() external payable returns (uint64 listId);
+    function addAddresses(uint64 listId, address[] calldata addresses) external payable;
+    function removeAddresses(uint64 listId, address[] calldata addresses) external payable;
+    function transferOwnership(uint64 listId, address newOwner) external;
+}
+```
+
+The contract rejects an add, remove, or ownership-transfer call unless the list exists and the caller is its current owner. Each accepted add/remove call contains at most `MAX_KEY_PUBLISHER_ADDRESSES_PER_LIST` addresses, counting duplicates toward this input bound. An accepted addition leaves at most that many distinct addresses in the complete list. Calls exceeding either bound revert atomically.
+
+Successful list-management calls immediately update the execution-layer registry. Creation, addition, and removal calls are subject to the fee specified under "Request fee".
+
+#### Validator subscriptions
+
+Anyone may relay a validator subscription through the registry contract. The signed message uses the following SSZ containers:
+
+```python
+class KeyPublisherVoteSubscription(Container):
+    validator_index: ValidatorIndex
+    list_id: VoteListIndex
+    nonce: uint64
+
+class SignedKeyPublisherVoteSubscription(Container):
+    message: KeyPublisherVoteSubscription
+    signature: BLSSignature
+```
+
+The subscription interface accepts individual fields and emits them in `VoteSubscriptionSubmitted`:
+
+```solidity
+interface IKeyPublisherVoteSubscriptions {
+    event VoteSubscriptionSubmitted(
+        uint64 indexed validatorIndex,
+        uint64 indexed listId,
+        uint64 nonce,
+        bytes signature
+    );
+
+    function submitVoteSubscription(
+        uint64 validatorIndex,
+        uint64 listId,
+        uint64 nonce,
+        bytes calldata signature
+    ) external payable;
+}
+```
+
+The contract requires an existing execution-layer list and a signature of exactly 96 bytes. It accepts the fields of a `SignedKeyPublisherVoteSubscription` without verifying the signature, validator index, or nonce, and does not maintain validator subscriptions. Submission is subject to the fee specified under "Request fee".
+
+On the consensus layer, the signature is verified against the validator's public key using the consensus-layer BLS signature scheme. The signing root is `compute_signing_root(message, domain)`, where `domain` is `compute_domain(DOMAIN_KEY_PUBLISHER_VOTE_SUBSCRIPTION, GENESIS_FORK_VERSION, state.genesis_validators_root)`.
+
+#### Execution requests
+
+The consensus-layer `ExecutionRequests` container is extended with voting requests. Under [EIP-7732](./eip-7732.md), it is carried in `ExecutionPayloadEnvelope.execution_requests`:
+
+```python
+class ExecutionRequests(Container):
+    ...
+    key_publisher_vote_requests: KeyPublisherVoteRequests
+```
+
+The request list and its variants are defined as follows:
+
+```python
+KeyPublisherVoteRequests = List[
+    KeyPublisherVoteRequest, MAX_KEY_PUBLISHER_VOTE_REQUESTS_PER_PAYLOAD
+]
+
+KeyPublisherVoteRequest = Union[
+    KeyPublisherVoteListCreated,
+    KeyPublisherVoteAddressesAdded,
+    KeyPublisherVoteAddressesRemoved,
+    SignedKeyPublisherVoteSubscription,
+]
+
+class KeyPublisherVoteListCreated(Container):
+    list_id: VoteListIndex
+
+class KeyPublisherVoteAddressesAdded(Container):
+    list_id: VoteListIndex
+    addresses: List[ExecutionAddress, MAX_KEY_PUBLISHER_ADDRESSES_PER_LIST]
+
+class KeyPublisherVoteAddressesRemoved(Container):
+    list_id: VoteListIndex
+    addresses: List[ExecutionAddress, MAX_KEY_PUBLISHER_ADDRESSES_PER_LIST]
+```
+
+All variants share the [EIP-7685](./eip-7685.md) request type `KEY_PUBLISHER_VOTE_REQUEST_TYPE`. Its `request_data` is the SSZ serialization of the ordered `KeyPublisherVoteRequests` list, with union selectors assigned in the order above.
+
+#### Request queue and system call
+
+Each successful list creation, address addition, address removal, or subscription submission appends one corresponding request to a shared first-in, first-out (FIFO) queue in the registry contract. Add/remove requests retain the supplied address arrays, including duplicates; empty or ineffective updates also append a request. Ownership transfers produce no request.
+
+After all transactions in each execution payload, the execution layer calls `KEY_PUBLISHER_VOTE_REGISTRY_ADDRESS` as `SYSTEM_ADDRESS`, with empty calldata and no value. The call removes and returns the oldest requests, up to `MAX_KEY_PUBLISHER_VOTE_REQUESTS_PER_PAYLOAD`, as an SSZ-encoded `KeyPublisherVoteRequests` list. Remaining requests stay queued. The execution layer verifies that `ExecutionRequests.key_publisher_vote_requests` matches this output and that its [EIP-7685](./eip-7685.md) encoding is committed by the payload's `requests_hash`. An empty returned list produces no entry for this type in the [EIP-7685](./eip-7685.md) requests list.
+
+The call has a dedicated gas limit of `KEY_PUBLISHER_VOTE_SYSTEM_CALL_GAS_LIMIT`, sufficient for the maximum permitted batch. Its gas allowance and consumption are excluded from block gas-limit checks and block gas usage, and no transaction fee is charged. Missing contract code, call failure, or malformed return data invalidates the execution payload. Other calls from `SYSTEM_ADDRESS` revert.
+
+#### Request fee
+
+Each list creation, address addition, address removal, and subscription submission carries a fee using `fake_exponential` as defined under "Fee calculation" in [EIP-7002](./eip-7002.md):
+
+```python
+fee = fake_exponential(
+    MIN_KEY_PUBLISHER_VOTE_REQUEST_FEE,
+    excess,
+    KEY_PUBLISHER_VOTE_REQUEST_FEE_UPDATE_FRACTION,
+)
+```
+
+Excess accounting follows the per-write fee updates described under "Request fee" in [EIP-8282](./eip-8282.md), using `TARGET_KEY_PUBLISHER_VOTE_REQUESTS_PER_PAYLOAD` as the target. Fees and overpayments remain locked in the contract. Ownership transfers carry no request fee.
+
+The contract exposes the current fee through the following getter:
+
+```solidity
+interface IKeyPublisherVoteRequestFee {
+    function getRequestFee() external view returns (uint256);
+}
+```
+
+#### Consensus-layer processing
+
+At activation, the beacon-state field `key_publisher_vote_list_addresses` is initialized to an empty list. The beacon-state fields `key_publisher_vote_subscriptions` and `key_publisher_vote_subscription_nonces` each have one entry per validator, initialized to `None` and zero, respectively. New validator-registry entries receive the same defaults.
+
+During execution-payload processing, the requests in `ExecutionRequests.key_publisher_vote_requests` are applied sequentially to the beacon state in their supplied order:
+
+- `KeyPublisherVoteListCreated` appends an empty list to `key_publisher_vote_list_addresses`. If its `list_id` does not equal the field's length before the append, or the append exceeds `MAX_KEY_PUBLISHER_VOTE_LISTS`, the payload is invalid.
+- `KeyPublisherVoteAddressesAdded` adds the supplied addresses to the selected list, storing its distinct addresses in ascending bytewise order. If its `list_id` does not refer to an existing list, or the resulting list exceeds `MAX_KEY_PUBLISHER_ADDRESSES_PER_LIST`, the payload is invalid.
+- `KeyPublisherVoteAddressesRemoved` removes the supplied addresses from the selected list, preserving ascending bytewise order. If its `list_id` does not refer to an existing list, the payload is invalid.
+- `SignedKeyPublisherVoteSubscription` sets the validator's subscription and nonce to the submitted values, including updating the nonce when the selected list is unchanged. The request is ignored if its `validator_index` or `list_id` does not exist, its `nonce` is not strictly greater than the validator's stored subscription nonce, or its `signature` is invalid.
+
+#### Priority-list derivation
+
+For a beacon state resulting from the request processing above, each validator's voting weight is its effective balance if it is active in the epoch being evaluated, and zero otherwise. An address's support is the sum of the weights of validators whose subscribed list contains that address. A validator contributes its full weight to each address in its list, regardless of the list's size. Validators without a subscription contribute no support to any address.
+
+The total voting weight is the sum of the effective balances of all active validators. The priority list consists of every address whose support is strictly greater than half of this total, represented in ascending bytewise order.
+
+Clients should compute the priority list incrementally and apply changes during block and epoch processing. Caching the aggregate active effective balance subscribed to each list allows address edits to update support without iterating over every subscriber. Such caches track subscription changes, validator activations and exits, effective-balance changes, and reorgs. A subscription switch can update support for addresses in both its old and new lists.
+
+### ST tickets and bundles
+
+Remove `max_preceding_commitments` from the ST ticket RLP encoding, leaving the remaining fields in their original order. Bundles no longer derive a collective `max_preceding_commitments`. No inclusion, key-release, or recovery check enforces a preceding-commitment bound.
+
+The definitions of `tob_fee`, `bundle_tob_fee`, and `commitment_tob_fee` remain those of EIP-8184.
+
+### Key message
+
+The `LucidKeyMessage` container is extended with signature fields:
+
+```python
+class LucidKeyMessage(Container):
+    ...
+    signature_id: uint8
+    signature: ByteList[MAX_SIGNATURE_SIZE]
+```
+
+The `signature_id` and `signature` are interpreted as for ST tickets. The signing hash is `keccak256(LUCID_KEY_MESSAGE_PREFIX || rlp([chain_id, scheduling_beacon_block_root, scheduling_slot, commit_index, k_dems, signature_id]))`.
+
+In addition to the key-message validity requirements in [EIP-8184](./eip-8184.md), a `LucidKeyMessage` must have a valid signature recovering the ticket's `key_publisher`, shared by all tickets for a bundle.
+
+### Key release
+
+The key publisher signs its `LucidKeyMessage` before release. A self-decrypting sender sets `key_publisher` to its own address and signs the message itself.
+
+### ST-commitment ordering and inclusion
+
+The ST-commitment ordering rule in [EIP-8184, "Block processing"](./eip-8184.md#block-processing) is replaced as follows: commitments whose key publishers are in $P_n$ precede all other commitments. Within each group, commitments are ordered by descending `commitment_tob_fee`, then descending `gas_obligation`, then ascending `commitment_root`.
+
+A violation of this ordering rule invalidates the execution payload.
+
+### Recovery under rejected payload
+
+During recovery, decrypted transactions retain their ordering by scheduling beacon block as specified in [EIP-8184](./eip-8184.md#recovery-under-rejected-payload): transactions scheduled in earlier blocks precede those scheduled in later blocks. Among transactions scheduled in the same beacon block, those whose key publishers were in that block's priority list now precede the others, preserving their original `st_commitments` order within each group.
+
+## Rationale
+
+Priority ordering limits the ability of non-prioritized publishers to exploit key-release optionality against transactions using prioritized publishers, while preserving permissionless participation. Disallowing non-prioritized publishers entirely could further mitigate optionality, but would make the key publisher market more prone to centralization.
+
+Validator voting ties publisher selection to Ethereum's existing validator set. Weighting support by effective balance aligns influence with stake. Requiring majority support for priority makes more than 50% of active validator effective balance a natural threshold, although the choice of threshold is arbitrary.
+
+Subscriptions to managed lists allow a single list update to change the selections of many validators. They also let validators delegate publisher assessment to parties they consider more qualified and trustworthy.
+
+Validators cannot explicitly unsubscribe. Instead, a validator can abstain by subscribing to an empty list whose ownership has been transferred to the zero address, preventing subsequent changes to its membership.
+
+The voting mechanism supports incremental counting rather than recounting every validator's votes in every block. Clients can cache the aggregate voting weight subscribed to each list and update publisher support as lists and subscriptions change. At epoch boundaries, changes in effective balances and validator activity must also be accounted for, which clients can handle with a full recount.
+
+Authenticating key-release messages prevents a sender from naming a prioritized publisher to obtain an earlier execution position while independently releasing its own decryption key.
+
+Removing `max_preceding_commitments` avoids additional complexity in key-release checks. In EIP-8184, a publisher can check the bound using its commitment's position in the scheduling beacon block. Retaining the bound while excluding prioritized commitments from its count would instead require identifying the publishers of preceding commitments and checking their priority status. Keeping the original count would avoid this check, but would count prioritized commitments against a bound intended to limit exposure to optionality. Priority ordering reduces the need for this bound, so this EIP removes it rather than introducing a more complex counting rule.
+
+## Backwards Compatibility
+
+This EIP introduces backwards incompatible changes to the beacon state, execution-payload envelope, ST ticket and key-message formats, and block processing rules defined in EIP-8184 and EIP-7732. It also introduces a key publisher vote registry system contract. These changes require a hard fork.
+
+## Security Considerations
+
+Exclusion from the priority list does not prevent a key publisher from participating in the protocol; transactions using that publisher remain eligible for inclusion but execute after prioritized transactions.
+
+The mechanism relies on validators to assess key publisher reliability, either directly or through the owners of the lists they subscribe to. Majority support does not guarantee honest behavior: a malicious prioritized publisher can still exploit key-release optionality to frontrun other transactions.
+
+Key withholding is observable and can inform subsequent changes to publisher support. Publishers may also make out-of-protocol commitments backed by slashable stake to support their inclusion on the priority list.
+
+If validators support malicious publishers, the mechanism loses its protection against key-release optionality, leaving transactions exposed to the same type of frontrunning already possible under EIP-8184.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
