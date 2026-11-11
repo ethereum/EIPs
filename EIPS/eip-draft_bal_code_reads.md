@@ -63,7 +63,7 @@ A **code load** of address `A` is any of the following events, and only these:
 4. Transaction validation checks the code of sender `A` under the [EIP-7702](./eip-7702.md) transaction-origination rule. This loads only the sender's own code, not its delegate's code.
 5. When [EIP-8298](./eip-8298.md) is active, `SETCODEFROM` targets source `A` and passes its `SETCODEFROM_SOURCE_GAS` check. This loads only the source's own code, without resolving delegation, whether or not the source is valid, the instruction subsequently runs out of gas, or the enclosing execution reverts.
 
-An event is a code load only when [EIP-7928](./eip-7928.md) records the corresponding address access. In particular an operation that fails its pre-state gas validation of [EIP-7928](./eip-7928.md), which charges the [EIP-2929](./eip-2929.md) access costs, loads no code, and `code_hash` can never be set on an address that is absent from the BAL.
+An event is a code load only when [EIP-7928](./eip-7928.md) records the corresponding address access. In particular an operation that fails its pre-state gas validation of [EIP-7928](./eip-7928.md), which includes the [EIP-2929](./eip-2929.md) access costs, loads no code, and `code_hash` can never be set on an address that is absent from the BAL.
 
 The following are not code loads: `BALANCE`, `EXTCODEHASH`, the collision check of `CREATE` and `CREATE2`, the delegation target named by an [EIP-7702](./eip-7702.md) authorization, `SELFDESTRUCT` beneficiaries, withdrawal recipients, and the fee recipient.
 
@@ -151,7 +151,7 @@ For each case, `pre` describes the pre-block state and `expect` the `code_hash` 
 16. Ordinary transaction from a delegated sender `E` to an EOA with no code, with no authorizations or other accesses to `E` or its delegate `D`. `pre`: `E.code = 0xef0100 || D`. `expect`: `E.code_hash = keccak256(E.code)`; `D` is absent from the BAL.
 17. A parent frame creates contract `N`, calls its deployed code, then reverts. `pre`: `N` does not exist. `expect`: `N` remains in the BAL with an empty `code_hash` and no `code_changes` entry. The executed runtime code is reconstructed by executing the initcode, despite the deployment being reverted.
 18. `CALL` to a delegated EOA `E` with enough gas for the access cost of `E` but not for the access cost of its delegate `D`. `expect`: `E.code_hash = keccak256(0xef0100 || D)`; `D` is absent from the BAL.
-19. `CALL` to a delegated EOA `E` whose delegate `E2` itself holds a delegation indicator to `D`. `expect`: `E.code_hash = keccak256(0xef0100 || E2)` and `E2.code_hash = keccak256(0xef0100 || D)`, since the indicator of `E2` is loaded and executed; `D` is absent from the BAL unless independently accessed.
+19. `CALL` to a delegated EOA `E` whose delegate `E2` itself holds a delegation indicator to `D`. `expect`: `E.code_hash = keccak256(0xef0100 || E2)` and `E2.code_hash = keccak256(0xef0100 || D)`, since the indicator of `E2` is loaded and executed, halting on its invalid `0xEF` opcode; `D` is absent from the BAL unless independently accessed.
 20. `EXTCODESIZE` or `EXTCODECOPY` of a delegated EOA `E` with delegate `D`. `expect`: `E.code_hash = keccak256(0xef0100 || D)`; `D` is absent from the BAL unless independently accessed.
 21. Transaction whose `to` is a delegated EOA `E` with delegate `D`. `pre`: `D` has code. `expect`: as case 6.
 
@@ -168,6 +168,8 @@ The following cases additionally activate EIP-8298. The source has no other acce
 
 See the pseudocode under [Validation](#validation). A client that already tracks state accesses for [EIP-7928](./eip-7928.md) records one additional value per account entry, set at the first code load of an account whose pre-block code is non-empty.
 
+A client without a pre-block snapshot records the account's current code hash at the first load, unless the account's code has changed earlier in the block. In that case the pre-block code was empty or its hash is already recorded, as shown under [Pre-block code only](#pre-block-code-only), and nothing is recorded.
+
 ## Security Considerations
 
 ### Size
@@ -176,7 +178,7 @@ For `A` account entries and `R` populated `code_hash` fields, the fields add `A 
 
 ### Validation overhead
 
-Recording the field requires checking whether a hash has already been recorded, then reading the pre-block code hash of the account when needed. Clients keep code hashes with the account, so deriving the field requires no additional bytecode load or hashing. The hash of a bytecode deployed in the block is never recorded.
+Recording the field requires checking whether a hash has already been recorded, then reading the code hash of the account when needed. Clients keep code hashes with the account, and the current code hash at the first load is the pre-block code hash unless the code changed earlier in the block, so deriving the field requires no pre-state lookup, bytecode load or hashing. The hash of a bytecode deployed in the block is never recorded.
 
 ### Completeness
 
