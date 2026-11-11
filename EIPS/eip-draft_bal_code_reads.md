@@ -154,7 +154,7 @@ For each case, `pre` describes the pre-block state and `expect` the `code_hash` 
 9. Authorization whose authority `E` has empty code, followed by a `CALL` to `E`. `expect`: `E.code_hash` empty; the indicator appears in `E.code_changes`.
 10. Contract `N` created at index 2 and called at index 5. `expect`: `N.code_hash` empty; `N.code_changes` holds the deployed code.
 11. Contract `N` created and called in the same transaction. `expect`: as case 10.
-12. Contract `C` with code, whose code changes at index 3 and which is called only at index 5. `expect`: `C.code_hash` empty.
+12. Delegated EOA `E` has its delegation updated by an authorization at index 3 and is called only at index 5. `pre`: `E` holds the old delegation indicator. `expect`: `E.code_hash = keccak256(old indicator)` because authorization processing loads it before the update; the new indicator appears in `E.code_changes` at index 3.
 13. Block with transactions. `expect`: the [EIP-2935](./eip-2935.md), [EIP-4788](./eip-4788.md), [EIP-7002](./eip-7002.md) and [EIP-7251](./eip-7251.md) system contracts have `code_hash = keccak256(code)` at the entries created for index `0` and `len(transactions) + 1`.
 14. `CALL` to a precompile. `expect`: `code_hash` empty.
 15. Value transfer from an EOA with no code to another EOA with no code. `expect`: `code_hash` empty for sender and recipient.
