@@ -2,7 +2,8 @@
 """Check EIP-8437 encoding fixtures and message rules on decoded values.
 
 Scalars are represented as Python integers. This checks encoding and blob
-metadata binding, not transaction execution, proof validity or client state.
+metadata binding, not transaction/program execution, key derivation, proof
+validity or client state.
 
 Requires Python 3.9+, pycryptodome and rlp. Run with:
     python3 assets/eip-8437/check_vectors.py
@@ -19,6 +20,7 @@ SOFT_RESPONSE_LIMIT = 2097152
 MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
 MAX_ANNOUNCEMENTS = 64
 MAX_WRAPPERS_PER_REQUEST = 32
+MAX_RAW_PROGRAMS = 64
 LEANSPHINCS_SCHEME = 0x10
 LEANSTARK_SCHEME = 0x11
 FRAME_TX_TYPE = b"\x06"
@@ -115,9 +117,11 @@ def wrapper_items():
     envelopes = sorted((transaction(i) for i in range(2)), key=transaction_hash)
     raw_deps = deps[:1] + sorted(bytes(31) + bytes([LEANSTARK_SCHEME]) + h(b"claim %d" % i) + h(b"batch program")
                                  for i in range(2))
+    # Synthetic bytecode and key: no executable profile or derived key is tested.
+    programs = [[h(b"batch program"), rlp([1, b"synthetic batch module" * 3])]]
     return {
         "mode2": [envelopes, 2, [raw_deps, [b"native signature"] +
-                  [[h(b"example raw format v1"), b"alternative signature %d" % i] for i in range(2)]]],
+                  [[h(b"example raw format v1"), b"alternative signature %d" % i] for i in range(2)], programs]],
         "mode0": [envelopes, 0, [deps, [b"witness 0", b"witness 1"]]],
         "mode1": [envelopes, 1, [deps, b"aggregate proof"]],
         "blob_mode1": [sorted(envelopes + [FRAME_TX_TYPE + rlp(blob_transaction())],
@@ -158,12 +162,14 @@ def wrapper_vectors():
             "txs_hash": announcement[4].hex(),
             "announcement_rlp": rlp(announcement).hex(),
             "response_rlp": rlp(reply_for(7, [item])).hex(),
-            "compact_response_rlp": rlp([7, [[announcement[2], compact_wrapper(item, {h(tx) for tx in item[0]})]]]).hex(),
+            "compact_response_rlp": rlp([7, [[announcement[2], compact_wrapper(item, {h(x) for x in wrapper_encodings(item)})]]]).hex(),
             "compact_request_rlp": rlp([7, 1, [announcement[2]]]).hex(),
             "full_request_rlp": rlp([8, 0, [announcement[2]]]).hex(),
             "encoding_hashes": [h(tx).hex() for tx in item[0]],
             "transaction_hashes": [transaction_hash(tx).hex() for tx in item[0]],
         }
+        if item[1] == 2:
+            out[name]["program_encoding_hashes"] = [h(code).hex() for _, code in item[2][2]]
     return out
 
 
@@ -190,14 +196,31 @@ def check_request(request_id, hashes, received_announcements, compact=0):
     assert all(digest in received_announcements for digest in hashes), "unannounced wrapper"
 
 
+def check_raw_policy(policy):
+    assert isinstance(policy, list) and len(policy) == 2, "policy fields"
+    accept_new, programs = policy
+    assert type(accept_new) is int and accept_new in (0, 1), "policy flag"
+    assert isinstance(programs, list) and len(programs) <= MAX_RAW_PROGRAMS, "policy program count"
+    assert all(isinstance(key, bytes) and len(key) == 32 for key in programs), "policy program id"
+    assert programs == sorted(set(programs)), "policy program order"
+    assert not accept_new or not programs, "wildcard policy list"
+
+
+def should_announce_raw(item, policy):
+    if policy is None:
+        return False
+    check_raw_policy(policy)
+    return bool(policy[0] or {key for key, _ in item[2][2]} <= set(policy[1]))
+
+
 def check_wrapper_shape(item):
     # Envelope structure and blob metadata binding are checked; EIP-8141
     # execution, dependency-union equality and cryptographic validity are not.
     assert isinstance(item, list) and len(item) == 3, "wrapper fields"
     envelopes, mode, content = item
-    assert isinstance(content, list) and len(content) == 2, "wrapper content"
-    deps, proof = content
     assert isinstance(mode, int) and mode in (0, 1, 2), "wrapper mode"
+    assert isinstance(content, list) and len(content) == (3 if mode == 2 else 2), "wrapper content"
+    deps, proof = content[:2]
     assert isinstance(deps, list) and deps, "wrapper dependencies"
     assert all(isinstance(dep, bytes) and len(dep) == 96 for dep in deps), "dependency length"
     assert deps == sorted(set(deps)), "dependency order"
@@ -218,6 +241,23 @@ def check_wrapper_shape(item):
                 assert isinstance(witness, list) and len(witness) == 2, "raw witness fields"
                 assert isinstance(witness[0], bytes) and len(witness[0]) == 32, "raw format id"
                 assert isinstance(witness[1], bytes), "raw witness bytes"
+        programs = content[2]
+        assert isinstance(programs, list), "raw programs"
+        for entry in programs:
+            assert isinstance(entry, list) and len(entry) == 2, "raw program fields"
+            key, code = entry
+            assert isinstance(key, bytes) and len(key) == 32, "raw program id"
+            assert isinstance(code, bytes), "raw program bytes"
+            try:
+                package = decode(code, strict=True)
+            except Exception as error:
+                raise AssertionError("raw program package") from error
+            assert isinstance(package, list) and len(package) == 2, "raw program package"
+            version, bytecode = package
+            assert isinstance(version, bytes) and not version.startswith(b"\x00"), "raw program version"
+            assert isinstance(bytecode, bytes), "raw program bytecode"
+        required = sorted({dep[64:] for dep in deps if dep[:32] == uint(LEANSTARK_SCHEME, 32)})
+        assert [key for key, _ in programs] == required, "raw program set"
     assert isinstance(envelopes, list) and envelopes, "wrapper envelopes"
     hashes = [transaction_hash(tx) for tx in envelopes]
     assert hashes == sorted(set(hashes)), "transaction order"
@@ -227,38 +267,54 @@ def reply_for(request_id, wrappers):
     return [request_id, [[h(rlp(item)), item] for item in wrappers]]
 
 
+def wrapper_encodings(item):
+    return item[0] + ([code for _, code in item[2][2]] if item[1] == 2 else [])
+
+
 def compact_wrapper(item, delivered):
     # delivered tracks exact encodings sent in full on this connection.
-    txs = [[h(tx)] if h(tx) in delivered and len(rlp([h(tx)])) < len(rlp(tx)) else tx
-           for tx in item[0]]
-    return [txs, *item[1:]]
+    def omit(encoded):
+        return [h(encoded)] if h(encoded) in delivered and len(rlp([h(encoded)])) < len(rlp(encoded)) else encoded
+    content = item[2]
+    if item[1] == 2:
+        content = content[:2] + [[[key, omit(code)] for key, code in content[2]]]
+    return [[omit(tx) for tx in item[0]], item[1], content]
 
 
 def reconstruct(item, compact, cache, length):
     assert isinstance(item, list) and len(item) == 3, "wrapper fields"
     assert isinstance(item[0], list), "wrapper envelopes"
     assert 1 <= len(rlp(item)) <= length <= MAX_WRAPPER_BYTES, "wrapper length"
-    txs = []
     missing = False
     expanded_size = len(rlp(item))
-    for entry in item[0]:
+    def resolve(entry):
+        nonlocal missing, expanded_size
         if isinstance(entry, list):
             assert compact == 1, "reference in full response"
             assert len(entry) == 1 and isinstance(entry[0], bytes) and len(entry[0]) == 32, "encoding reference"
-            tx = cache.get(entry[0])
-            if tx is None:
+            encoded = cache.get(entry[0])
+            if encoded is None:
                 missing = True
-                continue
-            assert isinstance(tx, bytes) and h(tx) == entry[0], "encoding hash"
-            assert len(rlp(entry)) < len(rlp(tx)), "reference size"
-            expanded_size += len(rlp(tx)) - len(rlp(entry))
+                return None
+            assert isinstance(encoded, bytes) and h(encoded) == entry[0], "encoding hash"
+            assert len(rlp(entry)) < len(rlp(encoded)), "reference size"
+            expanded_size += len(rlp(encoded)) - len(rlp(entry))
             assert expanded_size <= length, "wrapper length"
-        else:
-            tx = entry
-        txs.append(tx)
+            return encoded
+        return entry
+    txs = [resolve(entry) for entry in item[0]]
+    content = item[2]
+    if item[1] == 2:
+        assert isinstance(content, list) and len(content) == 3, "wrapper content"
+        assert isinstance(content[2], list), "raw programs"
+        programs = []
+        for entry in content[2]:
+            assert isinstance(entry, list) and len(entry) == 2, "raw program fields"
+            programs.append([entry[0], resolve(entry[1])])
+        content = content[:2] + [programs]
     if missing:
         return None
-    result = [txs, *item[1:]]
+    result = [txs, item[1], content]
     assert len(rlp(result)) <= length, "wrapper length"
     return result
 
@@ -324,6 +380,7 @@ def rlp_list(payload):
 
 def vector(mode, size):
     # Pattern bytes test hash and length encoding, not wrapper validity.
+    # Repeated hashes/hints across modes are deliberate synthetic fixtures.
     announcement = describe(mode, pattern(size), h(b"dependency hint"), h(b"transaction hint"))
     return {
         "mode": mode,
@@ -404,6 +461,25 @@ def main():
 
     # Complete envelopes are part of the canonical wrapper and its identity.
     mode2, mode0, mode1, blob_mode1 = wrapper_items().values()
+    # Policies replace prior state; no policy advertises no raw support.
+    program_ids = [key for key, _ in mode2[2][2]]
+    assert not should_announce_raw(mode2, None)
+    assert not should_announce_raw(mode2, [0, []])
+    assert should_announce_raw(mode2, [0, program_ids])
+    assert should_announce_raw(mode2, [1, []])
+    assert not should_announce_raw(mode2, [0, [bytes(32)]])
+    check_raw_policy([0, [uint(i, 32) for i in range(64)]])
+    expect_error("policy fields", check_raw_policy, [0])
+    expect_error("policy fields", check_raw_policy, [0, [], b"extra"])
+    for flag in (-1, 2, b"", True):
+        expect_error("policy flag", check_raw_policy, [flag, []])
+    expect_error("policy program count", check_raw_policy, [0, [uint(i, 32) for i in range(65)]])
+    expect_error("policy program id", check_raw_policy, [0, [bytes(31)]])
+    expect_error("policy program order", check_raw_policy, [0, program_ids * 2])
+    expect_error("policy program order", check_raw_policy, [0, [uint(1, 32), uint(0, 32)]])
+    expect_error("wildcard policy list", check_raw_policy, [1, program_ids])
+    assert rlp([1, []]).hex() == "c201c0"
+    assert rlp([0, []]).hex() == "c280c0"
     for item in (mode0, mode1, blob_mode1, mode2):
         check_wrapper_shape(item)
         decoded = decode(rlp(item), strict=True)
@@ -572,7 +648,7 @@ def main():
 
     # Compact transport preserves full identity, including blob metadata.
     for item in (mode0, mode1, blob_mode1, mode2):
-        cache = {h(tx): tx for tx in item[0]}
+        cache = {h(encoded): encoded for encoded in wrapper_encodings(item)}
         digest = h(rlp(item))
         meta = {digest: metadata_for(item)}
         compact = compact_wrapper(item, set(cache))
@@ -614,9 +690,9 @@ def main():
     assert not may_skip_fetch(proof_hint, [mode2])
     assert may_skip_fetch(raw_hint, [proven])
     assert may_skip_fetch(raw_hint, [mode2])
-    raw_deps, raw_witnesses = mode2[2]
-    def with_raw(witnesses):
-        return [mode2[0], 2, [raw_deps, witnesses]]
+    raw_deps, raw_witnesses, raw_programs = mode2[2]
+    def with_raw(witnesses, programs=raw_programs):
+        return [mode2[0], 2, [raw_deps, witnesses, programs]]
     expect_error("raw witness count", check_wrapper_shape, with_raw(raw_witnesses[:-1]))
     expect_error("raw witness count", check_wrapper_shape, with_raw(raw_witnesses + [b"extra"]))
     expect_error("raw native witness", check_wrapper_shape, with_raw([[b"bad"]] + raw_witnesses[1:]))
@@ -626,17 +702,77 @@ def main():
                  with_raw(raw_witnesses[:1] + [b"missing format"] + raw_witnesses[2:]))
     expect_error("raw witness bytes", check_wrapper_shape,
                  with_raw(raw_witnesses[:1] + [[bytes(32), []]] + raw_witnesses[2:]))
-    expect_error("raw generic dependency", check_wrapper_shape, [mode0[0], 2, mode0[2]])
-    # Unknown format IDs are a policy decision, not malformed transport.
+    expect_error("raw generic dependency", check_wrapper_shape, [mode0[0], 2, mode0[2] + [[]]])
+    # Witness decoding is program-judged, not transport validation.
     unknown = with_raw(raw_witnesses[:1] + [[bytes(32), b"opaque"]] + raw_witnesses[2:])
     check_wrapper_shape(unknown)
     native_deps = [uint(LEANSPHINCS_SCHEME, 32) + uint(i, 32) + bytes(32) for i in range(17)]
     expect_error("raw native count", check_wrapper_shape,
-                 [mode2[0], 2, [native_deps + raw_deps[1:], [b"sig"] * 17 + raw_witnesses[1:]]])
+                 [mode2[0], 2, [native_deps + raw_deps[1:], [b"sig"] * 17 + raw_witnesses[1:], raw_programs]])
     # Changed witness bytes leave coverage unchanged but change object identity.
     changed = with_raw(raw_witnesses[:1] + [[raw_witnesses[1][0], b"changed signature"]] + raw_witnesses[2:])
     assert coverage(changed) == coverage(mode2)
     assert h(rlp(changed)) != h(rlp(mode2))
+
+    # The table contains exactly the generic programs, shared within a wrapper.
+    key, code = raw_programs[0]
+    for programs in ([], raw_programs * 2, [[bytes(32), code]], raw_programs + [[bytes(32), code]]):
+        expect_error("raw program set", check_wrapper_shape, with_raw(raw_witnesses, programs))
+    expect_error("raw program fields", check_wrapper_shape, with_raw(raw_witnesses, [[key]]))
+    expect_error("raw program id", check_wrapper_shape, with_raw(raw_witnesses, [[bytes(31), code]]))
+    expect_error("raw program bytes", check_wrapper_shape, with_raw(raw_witnesses, [[key, [h(code)]]]))
+    for malformed_code in (b"", b"\xff", rlp([1]), rlp([1, b"code", b"extra"])):
+        expect_error("raw program package", check_wrapper_shape, with_raw(raw_witnesses, [[key, malformed_code]]))
+    expect_error("raw program version", check_wrapper_shape,
+                 with_raw(raw_witnesses, [[key, rlp([b"\x00", b"code"])]]))
+    expect_error("raw program bytecode", check_wrapper_shape,
+                 with_raw(raw_witnesses, [[key, rlp([1, []])]]))
+    # Unknown VM versions are well-formed; support and key binding are not tested.
+    check_wrapper_shape(with_raw(raw_witnesses, [[key, rlp([255, b"unknown profile"])]]))
+    two_programs = [mode2[0], 2, [raw_deps[:2] + [raw_deps[2][:64] + bytes(32)],
+                                raw_witnesses, [[bytes(32), code], [key, code]]]]
+    check_wrapper_shape(two_programs)
+    assert not should_announce_raw(two_programs, [0, [key]])
+    assert should_announce_raw(two_programs, [0, [bytes(32), key]])
+    assert should_announce_raw(two_programs, [1, []])
+    expect_error("raw program set", check_wrapper_shape,
+                 [two_programs[0], 2, two_programs[2][:2] + [two_programs[2][2][::-1]]])
+
+    # Program references use the encoding hash, not the verification-key hash.
+    code_cache = {h(code): code}
+    raw_digest = h(rlp(mode2))
+    raw_meta = {raw_digest: metadata_for(mode2)}
+    code_compact = compact_wrapper(mode2, set(code_cache))
+    assert code_compact[0] == mode2[0]
+    assert code_compact[2][2] == [[key, [h(code)]]]
+    assert compact_wrapper(mode2, {key}) == mode2
+    code_reply = [7, [[raw_digest, code_compact]]]
+    assert check_wrapper_response(7, [raw_digest], raw_meta, code_reply, 1, code_cache) == []
+    assert check_wrapper_response(7, [raw_digest], raw_meta, code_reply, 1,
+                                  {h(tx): tx for tx in mode2[0]}) == [raw_digest]
+    expect_error("reference in full response", check_wrapper_response,
+                 7, [raw_digest], raw_meta, code_reply, 0, code_cache)
+    expect_error("encoding hash", check_wrapper_response,
+                 7, [raw_digest], raw_meta, code_reply, 1, {h(code): code + b"changed"})
+    malformed_program_ref = with_raw(raw_witnesses, [[key, [bytes(31)]]])
+    expect_error("encoding reference", check_wrapper_response, 7, [raw_digest], raw_meta,
+                 [7, [[raw_digest, malformed_program_ref]]], 1, code_cache)
+    no_execution = []
+    assert check_wrapper_response(7, [raw_digest], raw_meta, code_reply, compact=1,
+                                  verify=lambda item: no_execution.append(item)) == [raw_digest]
+    assert no_execution == []
+    assert check_wrapper_response(8, [raw_digest], raw_meta, reply_for(8, [mode2])) == []
+    changed_code = with_raw(raw_witnesses, [[key, rlp([1, b"other code"])]])
+    assert coverage(changed_code) == coverage(mode2)
+    expect_error("response hash", check_wrapper_response, 7, [raw_digest], raw_meta,
+                 [7, [[raw_digest, changed_code]]])
+    # Program bytes contribute to the reconstructed byte bound too.
+    giant_code = rlp([1, bytes(MAX_WRAPPER_BYTES)])
+    giant_program = with_raw(raw_witnesses, [[key, giant_code]])
+    giant_compact = compact_wrapper(giant_program, {h(giant_code)})
+    assert len(rlp(giant_compact)) < MAX_WRAPPER_BYTES
+    expect_error("wrapper length", reconstruct, giant_compact, 1,
+                 {h(giant_code): giant_code}, MAX_WRAPPER_BYTES)
 
     # Same consensus transaction hash does not identify the exact blob encoding.
     assert h(blob_encoded) != h(altered_blob)
@@ -647,9 +783,9 @@ def main():
     expect_error("wrapper length", reconstruct, compact_oversized, 1,
                  {h(tx): tx for tx in oversized[0]}, MAX_WRAPPER_BYTES)
 
-    print("PASS: announcement, full-envelope, raw-witness and sparse-blob wrapper encoding vectors; "
-          "compact reconstruction and full retries, message counts, ordering, metadata matching, byte limits and response packing. "
-          "Transaction/proof validity, KZG verification and client-state sequences are not tested.")
+    print("PASS: announcement, full-envelope, raw-witness/program and sparse-blob wrapper encoding vectors; "
+          "raw-policy routing, compact reconstruction and full retries, message counts, ordering, metadata matching, byte limits and response packing. "
+          "Transaction/program execution, key derivation, proof/KZG validity and client-state sequences are not tested.")
 
 
 if __name__ == "__main__":
