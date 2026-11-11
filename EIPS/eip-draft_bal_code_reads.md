@@ -20,7 +20,7 @@ This EIP adds a `code_read` field to the `AccountChanges` entry of the [EIP-7928
 
 Clients already diverge on this point. A witness generator that answers `EXTCODESIZE` from the code hash never loads the bytes and omits the code from its witness, while a guest built on the reference implementation reads the code and fails without it. A normative definition of "code read" in the BAL removes that class of interoperability bug and gives witness formats such as [EIP-8025](./eip-8025.md) a complete and checkable definition of their code list.
 
-Recording the hash rather than a flag lets consumers without state, such as witness services or peers exchanging BALs, resolve the bytecode from a hash-keyed code store, deduplicates shared code across accounts, and matches the hash form that [EIP-8298](./eip-8298.md) uses for adopted code.
+Recording the code hash lets consumers without state, such as witness services or peers exchanging BALs, resolve the bytecode from a hash-keyed code store, deduplicates shared code across accounts, and matches the hash form that [EIP-8298](./eip-8298.md) uses for adopted code.
 
 ## Specification
 
@@ -103,15 +103,11 @@ On a chain that activates this EIP at genesis, the pre-block code of every accou
 
 ## Rationale
 
-### Hash rather than flag or bytecode
+### Hash rather than bytecode
 
-Three encodings were considered for the new field.
+Recording the full bytecode would make the BAL self-contained but would add the code of every executed contract to a consensus object that is gossiped with every block. A mainnet block loads a few hundred distinct contracts, so this adds on the order of megabytes per block, against a BAL of roughly 72 KiB at a 60M gas limit per the size analysis of [EIP-7928](./eip-7928.md).
 
-- **Full bytecode** would make the BAL self-contained but would add the code of every executed contract to a consensus object that is gossiped with every block. A mainnet block loads a few hundred distinct contracts, so this adds on the order of megabytes per block, against a BAL of roughly 72 KiB at a 60M gas limit per the size analysis of [EIP-7928](./eip-7928.md).
-- **A boolean flag** costs one byte per account entry. It is sufficient for a consumer that holds the pre-state, because the account leaf already contains the code hash.
-- **The code hash** costs 33 bytes per loaded account, roughly 13 KiB for a block that loads 400 contracts. It lets a consumer without state resolve the bytecode from a hash-keyed store, deduplicates code shared by many accounts, lets a verifier check witness completeness against the BAL alone, and uses the same form as the `new_code_hash` element that [EIP-8298](./eip-8298.md) adds to `CodeChange`.
-
-The hash is chosen. A flag remains a valid simplification if BAL size proves to matter more than state-free resolution.
+The code hash costs 33 bytes per loaded account, roughly 13 KiB for a block that loads 400 contracts. It lets a consumer without state resolve the bytecode from a hash-keyed store, deduplicates code shared by many accounts, lets a verifier check witness completeness against the BAL alone, and uses the same form as the `new_code_hash` element that [EIP-8298](./eip-8298.md) adds to `CodeChange`.
 
 ### Pre-block code only
 
