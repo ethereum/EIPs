@@ -18,6 +18,8 @@ This EIP adds a `code_read` field to the `AccountChanges` entry of the [EIP-7928
 
 [EIP-7928](./eip-7928.md) records every account and storage slot a block touches. A stateless verifier or a zkVM prover can use the BAL as the index of the pre-state it has to load: the account leaves of every listed address and the storage leaves of every listed key. Bytecode is the one exception. The BAL records bytecode only when it changes, in `code_changes`. An address that is only called, or whose code is only copied or sized, appears with empty change lists, indistinguishable from an address whose balance was read. Which bytecode a block needs can today only be learned by executing the block, or by over-approximating and shipping the code of every listed address.
 
+A witness is therefore still gathered the way it was before BALs existed: execute the block, record what it reads, then prove. This EIP removes the last state read that the BAL does not name. [EIP-7709](./eip-7709.md) removes the only non-state read, by serving `BLOCKHASH` from the storage of the [EIP-2935](./eip-2935.md) history contract so that it appears in `storage_reads`. With both, the block, its BAL and a state snapshot are a complete proving input. A prover assembles the witness by lookup alone, with no execution ahead of proving, and can start collecting it as soon as the BAL arrives, which under [EIP-8146](./eip-8146.md) is before the transactions.
+
 Clients already diverge on this point. A witness generator that answers `EXTCODESIZE` from the code hash never loads the bytes and omits the code from its witness, while a guest built on the reference implementation reads the code and fails without it. A normative definition of "code read" in the BAL removes that class of interoperability bug and gives witness formats such as [EIP-8025](./eip-8025.md) a complete and checkable definition of their code list.
 
 Recording the code hash lets consumers without state, such as witness services or peers exchanging BALs, resolve the bytecode from a hash-keyed code store, deduplicates shared code across accounts, and matches the hash form that [EIP-8298](./eip-8298.md) uses for adopted code.
@@ -127,7 +129,7 @@ The field names bytecode that is not otherwise in the BAL. Code created or chang
 
 ### Witness construction
 
-A witness builder with access to the pre-state includes, for every account entry with a non-empty `code_read`, the bytecode with that hash, deduplicated by hash. A verifier binds each bytecode to the account leaf by hashing it on first use. Together with the storage reads of a `BLOCKHASH` served from the [EIP-2935](./eip-2935.md) history contract, this makes the BAL a complete index of the pre-state a block reads.
+A witness builder with access to the pre-state includes, for every account entry with a non-empty `code_read`, the bytecode with that hash, deduplicated by hash. A verifier binds each bytecode to the account leaf by hashing it on first use. Together with the storage reads that [EIP-7709](./eip-7709.md) records for `BLOCKHASH`, this makes the BAL a complete index of the pre-state a block reads.
 
 ## Backwards Compatibility
 
