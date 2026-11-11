@@ -167,7 +167,7 @@ See the pseudocode under [Validation](#validation). A client that already tracks
 
 ### Validation overhead
 
-Recording the field costs one comparison per code load and one hash lookup per flagged account; clients keep code hashes with the account, so no bytecode is hashed during validation. The hash of a bytecode deployed in the block is never recorded.
+Recording the field costs one comparison per code load and one hash lookup per recorded account; clients keep code hashes with the account, so no bytecode is hashed during validation. The hash of a bytecode deployed in the block is never recorded.
 
 ### Completeness
 
