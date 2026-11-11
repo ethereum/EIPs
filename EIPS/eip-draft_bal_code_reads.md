@@ -57,15 +57,15 @@ AccountChanges = [
 
 A **code load** of address `A` is any of the following events, and only these:
 
-1. A message frame executes with `A` as its code address. This includes the recipient of a transaction with a non-empty `to`, the code address of `CALL`, `CALLCODE`, `DELEGATECALL` and `STATICCALL` after [EIP-7702](./eip-7702.md) delegation resolution, the targets of pre- and post-execution system contract calls, and the resolved target of every [EIP-8141](./eip-8141.md) frame. The frame counts even if it reverts, halts exceptionally, or is not started because the call fails its sender-balance or call-stack-depth check. A call to a delegated account loads the account under this rule to resolve the delegation, and loads the delegate under this rule when [EIP-7928](./eip-7928.md) includes it.
+1. A message frame is dispatched with `A` as its code address. This includes the recipient of a transaction with a non-empty `to`, the code address of `CALL`, `CALLCODE`, `DELEGATECALL` and `STATICCALL` after [EIP-7702](./eip-7702.md) delegation resolution, the targets of pre- and post-execution system contract calls, and the resolved target of every [EIP-8141](./eip-8141.md) frame. The frame counts even if it reverts, halts exceptionally, or is not started because the call fails a post-state gas charge, its sender-balance check or its call-stack-depth check. A call to a delegated account loads the account under this rule to resolve the delegation, and loads the delegate under this rule when [EIP-7928](./eip-7928.md) includes it.
 2. `EXTCODESIZE` or `EXTCODECOPY` executes with `A` as its target.
 3. An [EIP-7702](./eip-7702.md) authorization names `A` as its authority and the authority account is loaded, whether or not the authorization then succeeds.
 4. Transaction validation checks the code of sender `A` under the [EIP-7702](./eip-7702.md) transaction-origination rule. This loads only the sender's own code, not its delegate's code.
 5. When [EIP-8298](./eip-8298.md) is active, `SETCODEFROM` targets source `A` and passes its `SETCODEFROM_SOURCE_GAS` check. This loads only the source's own code, without resolving delegation, whether or not the source is valid, the instruction subsequently runs out of gas, or the enclosing execution reverts.
 
-An event is a code load only when [EIP-7928](./eip-7928.md) records the corresponding address access. In particular an operation that fails its pre-state gas validation of [EIP-7928](./eip-7928.md) loads no code, and `code_hash` can never be set on an address that is absent from the BAL.
+An event is a code load only when [EIP-7928](./eip-7928.md) records the corresponding address access. In particular an operation that fails its pre-state gas validation of [EIP-7928](./eip-7928.md), which charges the [EIP-2929](./eip-2929.md) access costs, loads no code, and `code_hash` can never be set on an address that is absent from the BAL.
 
-The following are not code loads: `BALANCE`, `EXTCODEHASH`, the collision check of `CREATE` and `CREATE2`, `SELFDESTRUCT` beneficiaries, withdrawal recipients, and the fee recipient.
+The following are not code loads: `BALANCE`, `EXTCODEHASH`, the collision check of `CREATE` and `CREATE2`, the delegation target named by an [EIP-7702](./eip-7702.md) authorization, `SELFDESTRUCT` beneficiaries, withdrawal recipients, and the fee recipient.
 
 ### Recording Rule
 
@@ -73,8 +73,6 @@ For every `AccountChanges` entry of address `A`:
 
 - `code_hash` MUST be `keccak256(pre_block_code(A))` if the pre-block code of `A` is non-empty and at least one code load of `A` occurs in the block.
 - Otherwise `code_hash` MUST be empty.
-
-Code introduced during the block is reconstructed during execution from contract creation, authorization processing, or code-adoption sources. Only surviving post-transaction code changes appear in `code_changes`; intermediate or reverted code need not appear there.
 
 ### Validation
 
@@ -107,7 +105,7 @@ Each populated `code_hash` costs 33 bytes, roughly 13 KiB for 400 populated fiel
 
 The field identifies pre-block bytecode needed during execution. Code introduced during the block can be reconstructed as execution proceeds, even when it is later overwritten or reverted and therefore absent from `code_changes`. Code that is loaded only while empty needs no bytes: the account leaf, or its absence, already proves that the code is empty. Both conditions depend only on the account's state and on instruction semantics, never on whether a client chose to read the bytes or to answer from the code hash, so independent implementations produce the same value.
 
-The rule does not order loads against code changes. Every operation that changes the code of an account with non-empty code first loads that code: EIP-7702 authorization processing reads the authority's code before it writes the indicator, and `SETCODEFROM` runs in the frame of the account it changes. Contract creation and [EIP-6780](./eip-6780.md) self-destruct only touch accounts whose pre-block code is empty. A load that follows an in-block code change therefore never records a hash that an earlier load has not already recorded, so a client need not track code changes to derive the field.
+The rule does not order loads against code changes. Every operation that changes the code of an account with non-empty code first loads that code: EIP-7702 authorization processing reads the authority's code before it writes the indicator, and code-changing instructions such as `SETCODEFROM` run in the frame of the account they change. Contract creation and [EIP-6780](./eip-6780.md) self-destruct only touch accounts whose pre-block code is empty. A load that follows an in-block code change therefore never records a hash that an earlier load has not already recorded, so a client need not track code changes to derive the field.
 
 ### `EXTCODEHASH` is not a code load
 
@@ -141,7 +139,7 @@ For each case, `pre` describes the pre-block state and `expect` the `code_hash` 
 4. `EXTCODESIZE` of an EOA `E` with no code. `expect`: `E.code_hash` empty.
 5. `EXTCODESIZE` of contract `C`. `expect`: `C.code_hash = keccak256(C.code)`.
 6. `CALL` to a delegated EOA `E` with delegate `D`. `pre`: `D` has code. `expect`: `E.code_hash = keccak256(0xef0100 || D)` and `D.code_hash = keccak256(D.code)`.
-7. `CALL` to a delegated EOA `E` at call-stack depth 1024. `expect`: as case 6, since the delegation is resolved before the depth check.
+7. `CALL` to a delegated EOA `E` from a frame at the call-stack depth limit. `expect`: as case 6, since the delegation is resolved before the depth check.
 8. Transaction with an authorization whose authority `E` already holds a delegation indicator, then a `CALL` to `E` in the same transaction. `expect`: `E.code_hash = keccak256(old indicator)` by rule 3; the new indicator appears in `E.code_changes`.
 9. Authorization whose authority `E` has empty code, followed by a `CALL` to `E`. `expect`: `E.code_hash` empty; the indicator appears in `E.code_changes`.
 10. Contract `N` created at index 2 and called at index 5. `expect`: `N.code_hash` empty; `N.code_changes` holds the deployed code.
@@ -152,15 +150,19 @@ For each case, `pre` describes the pre-block state and `expect` the `code_hash` 
 15. Value transfer from an EOA with no code to another EOA with no code. `expect`: `code_hash` empty for sender and recipient.
 16. Ordinary transaction from a delegated sender `E` to an EOA with no code, with no authorizations or other accesses to `E` or its delegate `D`. `pre`: `E.code = 0xef0100 || D`. `expect`: `E.code_hash = keccak256(E.code)`; `D` is absent from the BAL.
 17. A parent frame creates contract `N`, calls its deployed code, then reverts. `pre`: `N` does not exist. `expect`: `N` remains in the BAL with an empty `code_hash` and no `code_changes` entry. The executed runtime code is reconstructed by executing the initcode, despite the deployment being reverted.
+18. `CALL` to a delegated EOA `E` with enough gas for the access cost of `E` but not for the access cost of its delegate `D`. `expect`: `E.code_hash = keccak256(0xef0100 || D)`; `D` is absent from the BAL.
+19. `CALL` to a delegated EOA `E` whose delegate `E2` itself holds a delegation indicator to `D`. `expect`: `E.code_hash = keccak256(0xef0100 || E2)` and `E2.code_hash = keccak256(0xef0100 || D)`, since the indicator of `E2` is loaded and executed; `D` is absent from the BAL unless independently accessed.
+20. `EXTCODESIZE` or `EXTCODECOPY` of a delegated EOA `E` with delegate `D`. `expect`: `E.code_hash = keccak256(0xef0100 || D)`; `D` is absent from the BAL unless independently accessed.
+21. Transaction whose `to` is a delegated EOA `E` with delegate `D`. `pre`: `D` has code. `expect`: as case 6.
 
 The following cases additionally activate EIP-8298. The source has no other accesses or code changes in the block:
 
-18. `SETCODEFROM(S)` with sufficient gas, followed by a call to the adopter. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the adopter's `code_changes` entry records the adopted hash.
-19. `SETCODEFROM(E)` rejects a delegated source. `pre`: `E.code = 0xef0100 || D`. `expect`: `E.code_hash = keccak256(E.code)`; `D` is absent from the BAL unless independently accessed.
-20. `SETCODEFROM(S)` passes the source-access gas check but fails a subsequent gas charge. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)` despite the exceptional halt.
-21. Successful `SETCODEFROM(S)` in a frame that later reverts. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the reverted adoption contributes no `code_changes` entry.
-22. `SETCODEFROM(S)` fails its source-access gas check. `expect`: `S` is absent from the BAL.
-23. `SETCODEFROM(E)` with an empty-code source. `expect`: `E` is included with an empty `code_hash`.
+22. `SETCODEFROM(S)` with sufficient gas, followed by a call to the adopter. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the adopter's `code_changes` entry records the adopted hash.
+23. `SETCODEFROM(E)` rejects a delegated source. `pre`: `E.code = 0xef0100 || D`. `expect`: `E.code_hash = keccak256(E.code)`; `D` is absent from the BAL unless independently accessed.
+24. `SETCODEFROM(S)` passes the source-access gas check but fails a subsequent gas charge. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)` despite the exceptional halt.
+25. Successful `SETCODEFROM(S)` in a frame that later reverts. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the reverted adoption contributes no `code_changes` entry.
+26. `SETCODEFROM(S)` fails its source-access gas check. `expect`: `S` is absent from the BAL.
+27. `SETCODEFROM(E)` with an empty-code source. `expect`: `E` is included with an empty `code_hash`.
 
 ## Reference Implementation
 
