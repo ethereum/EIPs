@@ -105,7 +105,7 @@ Each populated `code_hash` costs 33 bytes, roughly 13 KiB for 400 populated fiel
 
 The field identifies pre-block bytecode needed during execution. Code introduced during the block can be reconstructed as execution proceeds, even when it is later overwritten or reverted and therefore absent from `code_changes`. Code that is loaded only while empty needs no bytes: the account leaf, or its absence, already proves that the code is empty. Both conditions depend only on the account's state and on instruction semantics, never on whether a client chose to read the bytes or to answer from the code hash, so independent implementations produce the same value.
 
-The rule does not order loads against code changes. Every operation that changes the code of an account with non-empty code first loads that code: EIP-7702 authorization processing reads the authority's code before it writes the indicator, and code-changing instructions such as `SETCODEFROM` run in the frame of the account they change. Contract creation and [EIP-6780](./eip-6780.md) self-destruct only touch accounts whose pre-block code is empty. A load that follows an in-block code change therefore never records a hash that an earlier load has not already recorded, so a client need not track code changes to derive the field.
+The rule does not order loads against code changes. Every operation that changes the code of an account with non-empty code first loads that code: EIP-7702 authorization processing reads the authority's code before it writes the indicator, and code-changing instructions such as `SETCODEFROM` run in the frame of the account they change. Contract creation and [EIP-6780](./eip-6780.md) self-destruct only touch accounts whose pre-block code is empty. A load that follows an in-block code change therefore never records a hash that an earlier load has not already recorded, so the field does not depend on the order of loads and changes.
 
 ### `EXTCODEHASH` is not a code load
 
@@ -168,7 +168,7 @@ The following cases additionally activate EIP-8298. The source has no other acce
 
 See the pseudocode under [Validation](#validation). A client that already tracks state accesses for [EIP-7928](./eip-7928.md) records one additional value per account entry, set at the first code load of an account whose pre-block code is non-empty.
 
-A client without a pre-block snapshot records the account's current code hash at the first load, unless the account's code has changed earlier in the block. In that case the pre-block code was empty or its hash is already recorded, as shown under [Pre-block code only](#pre-block-code-only), and nothing is recorded.
+A client without a pre-block snapshot can use the account's current code hash. When `code_hash` is still empty at a load and the account's code has not changed in the block, the current code hash is the pre-block code hash. When the code has changed, the pre-block code was empty, as shown under [Pre-block code only](#pre-block-code-only), and nothing is recorded. The client already tracks code changes to produce `code_changes`.
 
 ## Security Considerations
 
@@ -178,7 +178,7 @@ For `A` account entries and `R` populated `code_hash` fields, the fields add `A 
 
 ### Validation overhead
 
-Recording the field requires checking whether a hash has already been recorded, then reading the code hash of the account when needed. Clients keep code hashes with the account, and the current code hash at the first load is the pre-block code hash unless the code changed earlier in the block, so deriving the field requires no pre-state lookup, bytecode load or hashing. The hash of a bytecode deployed in the block is never recorded.
+Recording the field requires checking whether a hash has already been recorded, then reading the code hash of the account when needed. Clients keep code hashes with the account and already track code changes for `code_changes`, so deriving the field requires no pre-state lookup, bytecode load or hashing. The hash of a bytecode deployed in the block is never recorded.
 
 ### Completeness
 
