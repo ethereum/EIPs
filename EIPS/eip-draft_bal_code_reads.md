@@ -12,7 +12,7 @@ requires: 2929, 7702, 7928
 
 ## Abstract
 
-This EIP adds a `code_hash` field to the `AccountChanges` entry of the [EIP-7928](./eip-7928.md) block access list (BAL). For every account whose pre-block bytecode is executed, copied or inspected during the block, the field holds the Keccak-256 hash of that bytecode. For every other account the field is empty. The BAL then names every piece of pre-block state that a block reads, so a stateless or proving input for the block can be assembled from the block, its BAL and a state snapshot, without executing the block.
+This EIP adds a `code_hash` field to the `AccountChanges` entry of the [EIP-7928](./eip-7928.md) block access list (BAL). For every account whose pre-block bytecode is executed, copied or inspected during the block, the field holds the Keccak-256 hash of that bytecode. For every other account the field is empty. The BAL then names every piece of pre-block state that a block reads. When [EIP-7709](./eip-7709.md) is also active, a stateless or proving input for the block can be assembled from the block, its BAL and a state snapshot, without executing the block.
 
 ## Motivation
 
@@ -62,6 +62,8 @@ A **code load** of address `A` is any of the following events, and only these:
 2. `EXTCODESIZE` or `EXTCODECOPY` executes with `A` as its target.
 3. An [EIP-7702](./eip-7702.md) authorization names `A` as its authority and the authority account is loaded, whether or not the authorization then succeeds.
 4. A `CALL`, `CALLCODE`, `DELEGATECALL` or `STATICCALL` targets a delegated account `A`. `A` is loaded under rule 1 to resolve the delegation. The delegate is loaded under rule 1 when [EIP-7928](./eip-7928.md) includes it.
+5. Transaction validation checks the code of sender `A` under the [EIP-7702](./eip-7702.md) transaction-origination rule. This loads only the sender's own code, not its delegate's code.
+6. When [EIP-8298](./eip-8298.md) is active, `SETCODEFROM` targets source `A` and passes its `SETCODEFROM_SOURCE_GAS` check. This loads only the source's own code, without resolving delegation, whether or not the source is valid, the instruction subsequently runs out of gas, or the enclosing execution reverts.
 
 An event is a code load only when [EIP-7928](./eip-7928.md) records the corresponding address access. In particular an operation that fails its pre-state gas validation of [EIP-7928](./eip-7928.md) loads no code, and `code_hash` can never be set on an address that is absent from the BAL.
 
@@ -80,7 +82,7 @@ Code loaded after the first code change of `A` is the bytecode of a `code_change
 
 The [EIP-7928](./eip-7928.md) rule that the BAL MUST be complete and accurate extends to `code_hash`. A BAL whose `code_hash` values differ from those produced by execution invalidates the block.
 
-The reference pseudocode of [EIP-7928](./eip-7928.md) changes as follows:
+The reference pseudocode of [EIP-7928](./eip-7928.md) changes as follows. New account entries initialize `code_changed` to `False` and `code_hash` to `b""`. `EMPTY_CODE_HASH` is the Keccak-256 hash of the empty byte string. `get_pre_block_code_hash` reads the code hash from the pre-block account leaf and returns `EMPTY_CODE_HASH` for an absent account; it does not load bytecode.
 
 ```python
 def track_code_load(addr, accesses):
@@ -88,9 +90,9 @@ def track_code_load(addr, accesses):
     entry = accesses.setdefault(addr, new_account_entry())
     if entry['code_changed'] or entry['code_hash'] != b"":
         return
-    code = get_pre_block_code(addr)
-    if code != b"":
-        entry['code_hash'] = keccak256(code)
+    code_hash = get_pre_block_code_hash(addr)
+    if code_hash != EMPTY_CODE_HASH:
+        entry['code_hash'] = code_hash
 
 def track_code_change(addr, accesses):
     """Called when the code of addr changes, before the change is recorded"""
@@ -109,7 +111,7 @@ On a chain that activates this EIP at genesis, the pre-block code of every accou
 
 Recording the full bytecode would make the BAL self-contained but would add the code of every executed contract to a consensus object that is gossiped with every block. A mainnet block loads a few hundred distinct contracts, so this adds on the order of megabytes per block, against a BAL of roughly 72 KiB at a 60M gas limit per the size analysis of [EIP-7928](./eip-7928.md).
 
-The code hash costs 33 bytes per loaded account, roughly 13 KiB for a block that loads 400 contracts. It lets a consumer without state resolve the bytecode from a hash-keyed store, deduplicates code shared by many accounts, lets a verifier check witness completeness against the BAL alone, and uses the same form as the `new_code_hash` element that [EIP-8298](./eip-8298.md) adds to `CodeChange`.
+Each populated `code_hash` costs 33 bytes, roughly 13 KiB for 400 populated fields, plus one byte for every empty field and any growth in enclosing RLP length prefixes. It lets a consumer without state resolve the bytecode from a hash-keyed store, deduplicates code shared by many accounts, lets a verifier check witness completeness against the BAL alone, and uses the same form as the `new_code_hash` element that [EIP-8298](./eip-8298.md) adds to `CodeChange`.
 
 ### Pre-block code only
 
@@ -125,11 +127,11 @@ The field names bytecode that is not otherwise in the BAL. Code created or chang
 
 ### Interaction with EIP-8298
 
-`SETCODEFROM` in [EIP-8298](./eip-8298.md) copies a code hash from a source account without loading its bytecode. An adopter that is called later in the block executes the source's pre-block code, which no rule above records. [EIP-8298](./eip-8298.md) should define a successful `SETCODEFROM` as a code load of its source so that the source's `code_hash` is set.
+`SETCODEFROM` in [EIP-8298](./eip-8298.md) inspects the source's own code to determine whether it is valid regular deployed code before copying its code hash. The source bytes are therefore needed even when validation rejects a delegation indicator or a later gas charge fails. Rule 6 records this access once the source-access gas check passes, independently of success or reversion. It also makes pre-block source code available to an adopter called later in the block, whose `code_changes` entry contains only the adopted hash.
 
 ### Witness construction
 
-A witness builder with access to the pre-state includes, for every account entry with a non-empty `code_hash`, the bytecode with that hash, deduplicated by hash. A verifier binds each bytecode to the account leaf by hashing it on first use. Together with the storage reads that [EIP-7709](./eip-7709.md) records for `BLOCKHASH`, this makes the BAL a complete index of the pre-state a block reads.
+A witness builder with access to the pre-state includes, for every account entry with a non-empty `code_hash`, the bytecode with that hash, deduplicated by hash. A verifier binds each bytecode to the account leaf by hashing it on first use. Together with the storage reads that [EIP-7709](./eip-7709.md) records for `BLOCKHASH`, this makes the BAL a complete index of the pre-state a block reads. Without EIP-7709, a proving input still needs the historical block data required to resolve `BLOCKHASH`; EIP-2935 alone does not change the opcode's access recording.
 
 ## Backwards Compatibility
 
@@ -155,7 +157,17 @@ For each case, `pre` describes the pre-block state and `expect` the `code_hash` 
 12. Contract `C` with code, whose code changes at index 3 and which is called only at index 5. `expect`: `C.code_hash` empty.
 13. Block with transactions. `expect`: the [EIP-2935](./eip-2935.md), [EIP-4788](./eip-4788.md), [EIP-7002](./eip-7002.md) and [EIP-7251](./eip-7251.md) system contracts have `code_hash = keccak256(code)` at the entries created for index `0` and `len(transactions) + 1`.
 14. `CALL` to a precompile. `expect`: `code_hash` empty.
-15. Value transfer to an EOA with no code. `expect`: `code_hash` empty for sender and recipient.
+15. Value transfer from an EOA with no code to another EOA with no code. `expect`: `code_hash` empty for sender and recipient.
+16. Ordinary transaction from a delegated sender `E` to an EOA with no code, with no authorizations or other accesses to `E` or its delegate `D`. `pre`: `E.code = 0xef0100 || D`. `expect`: `E.code_hash = keccak256(E.code)`; `D` is absent from the BAL.
+
+The following cases additionally activate EIP-8298. The source has no other accesses or code changes in the block:
+
+17. `SETCODEFROM(S)` with sufficient gas, followed by a call to the adopter. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the adopter's `code_changes` entry records the adopted hash.
+18. `SETCODEFROM(E)` rejects a delegated source. `pre`: `E.code = 0xef0100 || D`. `expect`: `E.code_hash = keccak256(E.code)`; `D` is absent from the BAL unless independently accessed.
+19. `SETCODEFROM(S)` passes the source-access gas check but fails a subsequent gas charge. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)` despite the exceptional halt.
+20. Successful `SETCODEFROM(S)` in a frame that later reverts. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the reverted adoption contributes no `code_changes` entry.
+21. `SETCODEFROM(S)` fails its source-access gas check. `expect`: `S` is absent from the BAL.
+22. `SETCODEFROM(E)` with an empty-code source. `expect`: `E` is included with an empty `code_hash`.
 
 ## Reference Implementation
 
@@ -165,11 +177,11 @@ See the pseudocode under [Validation](#validation). A client that already tracks
 
 ### Size
 
-`code_hash` adds at most 33 bytes per account entry, and only to entries that paid an access cost for a code-bearing account. It is bounded by the [EIP-7928](./eip-7928.md) size constraint on the number of account entries.
+For `A` account entries and `R` populated `code_hash` fields, the fields add `A + 32 * R` bytes before growth in enclosing RLP length prefixes: one byte per empty field and 33 bytes per populated field. This includes accounts accessed by system calls and other accesses that do not pay a cold-account access cost. The overhead is bounded by the [EIP-7928](./eip-7928.md) size constraint on the number of account entries.
 
 ### Validation overhead
 
-Recording the field costs one comparison per code load and one hash lookup per recorded account; clients keep code hashes with the account, so no bytecode is hashed during validation. The hash of a bytecode deployed in the block is never recorded.
+Recording the field requires checking whether code has changed or a hash has already been recorded, then reading the existing account code hash when needed. Clients keep code hashes with the account, so deriving the field requires no additional bytecode load or hashing. The hash of a bytecode deployed in the block is never recorded.
 
 ### Completeness
 
