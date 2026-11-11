@@ -76,7 +76,7 @@ For every `AccountChanges` entry of address `A`:
 - `code_hash` MUST be `keccak256(pre_block_code(A))` if the pre-block code of `A` is non-empty and at least one code load of `A` occurs before the first code change of `A` in the block.
 - Otherwise `code_hash` MUST be empty.
 
-Code loaded after the first code change of `A` is the bytecode of a `code_changes` entry, so it is not recorded again.
+Code introduced during the block is reconstructed during execution from contract creation, authorization processing, or code-adoption sources. Only surviving post-transaction code changes appear in `code_changes`; intermediate or reverted code need not appear there.
 
 ### Validation
 
@@ -115,7 +115,7 @@ Each populated `code_hash` costs 33 bytes, roughly 13 KiB for 400 populated fiel
 
 ### Pre-block code only
 
-The field names bytecode that is not otherwise in the BAL. Code created or changed in the block is already in `code_changes`, so a load that happens after the account's first code change records nothing. Code that is loaded only while empty needs no bytes: the account leaf, or its absence, already proves that the code is empty. Both conditions depend only on the account's state and on instruction semantics, never on whether a client chose to read the bytes or to answer from the code hash, so independent implementations produce the same value.
+The field identifies pre-block bytecode needed during execution. Code introduced during the block can be reconstructed as execution proceeds, even when it is later overwritten or reverted and therefore absent from `code_changes`. A load after the account's first code change does not add a hash to this field. Code that is loaded only while empty needs no bytes: the account leaf, or its absence, already proves that the code is empty. Both conditions depend only on the account's state and on instruction semantics, never on whether a client chose to read the bytes or to answer from the code hash, so independent implementations produce the same value.
 
 ### `EXTCODEHASH` is not a code load
 
@@ -159,15 +159,16 @@ For each case, `pre` describes the pre-block state and `expect` the `code_hash` 
 14. `CALL` to a precompile. `expect`: `code_hash` empty.
 15. Value transfer from an EOA with no code to another EOA with no code. `expect`: `code_hash` empty for sender and recipient.
 16. Ordinary transaction from a delegated sender `E` to an EOA with no code, with no authorizations or other accesses to `E` or its delegate `D`. `pre`: `E.code = 0xef0100 || D`. `expect`: `E.code_hash = keccak256(E.code)`; `D` is absent from the BAL.
+17. A parent frame creates contract `N`, calls its deployed code, then reverts. `pre`: `N` does not exist. `expect`: `N` remains in the BAL with an empty `code_hash` and no `code_changes` entry. The executed runtime code is reconstructed by executing the initcode, despite the deployment being reverted.
 
 The following cases additionally activate EIP-8298. The source has no other accesses or code changes in the block:
 
-17. `SETCODEFROM(S)` with sufficient gas, followed by a call to the adopter. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the adopter's `code_changes` entry records the adopted hash.
-18. `SETCODEFROM(E)` rejects a delegated source. `pre`: `E.code = 0xef0100 || D`. `expect`: `E.code_hash = keccak256(E.code)`; `D` is absent from the BAL unless independently accessed.
-19. `SETCODEFROM(S)` passes the source-access gas check but fails a subsequent gas charge. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)` despite the exceptional halt.
-20. Successful `SETCODEFROM(S)` in a frame that later reverts. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the reverted adoption contributes no `code_changes` entry.
-21. `SETCODEFROM(S)` fails its source-access gas check. `expect`: `S` is absent from the BAL.
-22. `SETCODEFROM(E)` with an empty-code source. `expect`: `E` is included with an empty `code_hash`.
+18. `SETCODEFROM(S)` with sufficient gas, followed by a call to the adopter. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the adopter's `code_changes` entry records the adopted hash.
+19. `SETCODEFROM(E)` rejects a delegated source. `pre`: `E.code = 0xef0100 || D`. `expect`: `E.code_hash = keccak256(E.code)`; `D` is absent from the BAL unless independently accessed.
+20. `SETCODEFROM(S)` passes the source-access gas check but fails a subsequent gas charge. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)` despite the exceptional halt.
+21. Successful `SETCODEFROM(S)` in a frame that later reverts. `pre`: `S` has regular deployed code. `expect`: `S.code_hash = keccak256(S.code)`; the reverted adoption contributes no `code_changes` entry.
+22. `SETCODEFROM(S)` fails its source-access gas check. `expect`: `S` is absent from the BAL.
+23. `SETCODEFROM(E)` with an empty-code source. `expect`: `E` is included with an empty `code_hash`.
 
 ## Reference Implementation
 
