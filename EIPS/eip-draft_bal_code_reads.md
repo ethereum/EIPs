@@ -2,7 +2,7 @@
 title: Code Reads in Block-Level Access Lists
 description: Record in the block access list the code hash of every pre-block bytecode that a block loads
 author: Lukasz Rozmej (@LukaszRozmej)
-discussions-to: https://ethereum-magicians.org/t/eip-draft-code-reads-in-block-level-access-lists
+discussions-to: https://ethereum-magicians.org/t/code-reads-in-block-level-access-lists-extension-to-eip-7928/30354
 status: Draft
 type: Standards Track
 category: Core
