@@ -57,13 +57,13 @@ AccountChanges = [
 
 A **code load** of address `A` is any of the following events, and only these:
 
-1. A message frame is dispatched with `A` as its code address. This includes the recipient of a transaction with a non-empty `to`, the code address of `CALL`, `CALLCODE`, `DELEGATECALL` and `STATICCALL` after [EIP-7702](./eip-7702.md) delegation resolution, the targets of pre- and post-execution system contract calls, and the resolved target of every [EIP-8141](./eip-8141.md) frame. The frame counts even if it reverts, halts exceptionally, or is not started because the call fails a post-state gas charge, its sender-balance check or its call-stack-depth check. A call to a delegated account loads the account under this rule to resolve the delegation, and loads the delegate under this rule when [EIP-7928](./eip-7928.md) includes it.
+1. A message frame is dispatched with `A` as its code address. This includes the recipient of a transaction with a non-empty `to`, the code address of `CALL`, `CALLCODE`, `DELEGATECALL` and `STATICCALL` after [EIP-7702](./eip-7702.md) delegation resolution, the targets of pre- and post-execution system contract calls, and the resolved target of every [EIP-8141](./eip-8141.md) frame. The frame counts even if it reverts, halts exceptionally, or is not started because the call fails a post-state gas charge, its sender-balance check or its call-stack-depth check. A call or transaction to a delegated account loads the account under this rule to resolve the delegation, and loads the delegate under this rule when [EIP-7928](./eip-7928.md) includes it.
 2. `EXTCODESIZE` or `EXTCODECOPY` executes with `A` as its target.
 3. An [EIP-7702](./eip-7702.md) authorization names `A` as its authority and the authority account is loaded, whether or not the authorization then succeeds.
 4. Transaction validation checks the code of sender `A` under the [EIP-7702](./eip-7702.md) transaction-origination rule. This loads only the sender's own code, not its delegate's code.
 5. When [EIP-8298](./eip-8298.md) is active, `SETCODEFROM` targets source `A` and passes its `SETCODEFROM_SOURCE_GAS` check. This loads only the source's own code, without resolving delegation, whether or not the source is valid, the instruction subsequently runs out of gas, or the enclosing execution reverts.
 
-An event is a code load only when [EIP-7928](./eip-7928.md) records the corresponding address access. In particular an operation that fails its pre-state gas validation of [EIP-7928](./eip-7928.md), which includes the [EIP-2929](./eip-2929.md) access costs, loads no code, and `code_hash` can never be set on an address that is absent from the BAL.
+An event is a code load only when [EIP-7928](./eip-7928.md) records the corresponding address access. In particular an operation that fails its pre-state gas validation of [EIP-7928](./eip-7928.md), which includes the [EIP-2929](./eip-2929.md) access costs, loads no code, and `code_hash` can never be set on an address that is absent from the BAL. Bytecode reads that a client performs for other reasons, such as prefetching, tracing or computing `EXTCODEHASH` from the bytes, are not code loads.
 
 The following are not code loads: `BALANCE`, `EXTCODEHASH`, the collision check of `CREATE` and `CREATE2`, the execution of initcode by a creation frame, the delegation target named by an [EIP-7702](./eip-7702.md) authorization, `SELFDESTRUCT` beneficiaries, withdrawal recipients, and the fee recipient.
 
@@ -103,7 +103,7 @@ Each populated `code_hash` costs 33 bytes, roughly 13 KiB for 400 populated fiel
 
 ### Fixed arity rather than an optional element
 
-[EIP-8298](./eip-8298.md) adds its hash as an optional trailing element of `CodeChange`, so an entry has two or three elements. `code_hash` is instead always present, empty or 32 bytes. The cost is one byte per account entry, a few hundred bytes per block. The benefit is a single shape for `AccountChanges`: decoders need no arity check, and the position of the field never depends on the value of another field.
+[EIP-8298](./eip-8298.md) adds its hash as an optional trailing element of `CodeChange`, so an entry has two or three elements. `code_hash` is instead always present, empty or 32 bytes. The cost is one byte per account entry, about 2 KiB for a block that touches 2000 accounts. The benefit is a single shape for `AccountChanges`: decoders need no arity check, and the position of the field never depends on the value of another field.
 
 ### Pre-block code only
 
