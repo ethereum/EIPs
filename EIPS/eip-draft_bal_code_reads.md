@@ -1,5 +1,4 @@
 ---
-eip: 12658
 title: Code Reads in Block-Level Access Lists
 description: Record in the block access list the code hash of every pre-block bytecode that a block loads
 author: Lukasz Rozmej (@LukaszRozmej)
