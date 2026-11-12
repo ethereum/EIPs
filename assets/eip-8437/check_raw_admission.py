@@ -19,7 +19,7 @@ NATIVE, GENERIC = 0x10, 0x11
 MAX_DEPS, MAX_NATIVE, MAX_GENERIC_TX, MAX_SUPPLIED = 4096, 16, 2, 1
 BASE_SHAPE, BASE_RECONSTRUCT = wire.check_wrapper_shape, wire.reconstruct
 ALLOWED = ({0x00, 0x20, 0xf3, 0xfa, 0xfd}
-           | set(range(0x01, 0x0c)) | set(range(0x10, 0x1e))
+           | set(range(0x01, 0x0c)) | set(range(0x10, 0x1f))
            | set(range(0x34, 0x3a)) | set(range(0x3d, 0x3f))
            | set(range(0x50, 0x54)) | set(range(0x56, 0x5c))
            | set(range(0x5e, 0xa0)))
@@ -422,8 +422,10 @@ class AdmissionTests(unittest.TestCase):
 
     def test_compact_byte_cap(self):
         oversized = fixture(code=b'\x00' * wire.MAX_WRAPPER_BYTES)
-        with self.assertRaisesRegex(AssertionError, 'wrapper bytes'):
-            raw_shape(oversized)
+        with patch(__name__ + '.package_fields') as inspect_code:
+            with self.assertRaisesRegex(AssertionError, 'wrapper bytes'):
+                raw_shape(oversized)
+            inspect_code.assert_not_called()
         code = oversized[2][2][0][1]
         sparse = compact(oversized, {h(code)})
         with self.assertRaisesRegex(AssertionError, 'wrapper length'):
@@ -459,7 +461,7 @@ class AdmissionTests(unittest.TestCase):
                    0x3b, 0x3c, 0x3f, 0x40, 0x42, 0x48, 0x49, 0xa0, 0xaa,
                    0xb0, 0xf0, 0xf1, 0xf2, 0xf4, 0xf5, 0xff):
             self.assertNotIn(op, ALLOWED)
-        for op in (0x20, 0x34, 0x35, 0x5a, 0x5e, 0xfa, 0xf3, 0xfd):
+        for op in (0x1e, 0x20, 0x34, 0x35, 0x5a, 0x5e, 0xfa, 0xf3, 0xfd):
             self.assertIn(op, ALLOWED)
 
 
