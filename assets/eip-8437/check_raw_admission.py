@@ -2,19 +2,18 @@
 """Raw-admission wire vectors, signed-field bindings and policy checks.
 
 No EVM execution, account validation, signature/STARK/KZG verification or
-performance measurements. Fixture verifier identifiers and gas limits are not
-profile allocations or recommended limits. Run alongside check_vectors.py.
+performance measurements. Fixture key hashes and gas limits do not define
+cryptographic encodings or recommended limits. Run alongside check_vectors.py.
 """
 import copy
 import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
-from rlp.exceptions import DecodingError
-
 import check_vectors as wire
 
 h, rlp, decode = wire.h, wire.rlp, wire.decode
+announcements = wire.check_announcements
 NATIVE, GENERIC = 0x10, 0x11
 MAX_DEPS, MAX_NATIVE, MAX_GENERIC_TX, MAX_SUPPLIED = 4096, 16, 2, 1
 BASE_SHAPE, BASE_RECONSTRUCT = wire.check_wrapper_shape, wire.reconstruct
@@ -94,14 +93,6 @@ def binding_id(tx, binding):
     return frame[5][offset:offset + 32]
 
 
-def singleton(witness):
-    assert isinstance(witness, bytes), 'proof bytes'
-    fields = decode(witness, strict=True)
-    assert isinstance(fields, list) and len(fields) == 2, 'proof fields'
-    scalar(fields[0])
-    assert isinstance(fields[1], bytes) and fields[1], 'proof value'
-
-
 def raw_shape(item):
     if item[1] != 2:
         return BASE_SHAPE(item)
@@ -134,8 +125,8 @@ def raw_shape(item):
             native_count += 1
             assert isinstance(witness, bytes), 'native witness'
         elif isinstance(witness, bytes):
+            # Plain leanSTARK proof bytes: cryptographic validation is not modeled.
             proof_count += 1
-            singleton(witness)
         else:
             raw_count += 1
             assert isinstance(witness, list) and len(witness) == 3, 'raw witness'
@@ -192,16 +183,6 @@ def may_skip_fetch(announcement, held):
     return wire.may_skip_fetch(announcement, eligible)
 
 
-def announcements(entries):
-    # Mode 2 extends the mode domain; all other announcement rules are inherited.
-    encoded = []
-    for entry in entries:
-        assert isinstance(entry, list) and len(entry) == 5, 'announcement fields'
-        assert type(entry[0]) is int and entry[0] in (0, 1, 2), 'announcement mode'
-        encoded.append([1 if entry[0] == 2 else entry[0], *entry[1:]])
-    wire.check_announcements(encoded)
-
-
 def encodings(item):
     return item[0] + [package for _, package in item[2][2]]
 
@@ -255,8 +236,8 @@ def fixture(shared=False, mixed=False, sandbox=1, gas=50000, code=None):
     code = bytes.fromhex('6004355f5260205ff3') + bytes(64) if code is None else code
     package = rlp([sandbox, gas, code])
     identifier = admission_id(package)
-    verifier = h(b'opaque fixture verifier')
-    generic = wire.uint(GENERIC, 32) + (h(b'shared claim') if shared else bytes(32)) + verifier
+    key_hash = h(b'opaque fixture verifier')
+    generic = wire.uint(GENERIC, 32) + (h(b'shared claim') if shared else bytes(32)) + key_hash
     private = wire.uint(GENERIC, 32) + h(b'private claim') + h(b'private verifier')
     txs = []
     for nonce in range(2):
@@ -271,7 +252,7 @@ def fixture(shared=False, mixed=False, sandbox=1, gas=50000, code=None):
     witnesses = []
     for dep in deps:
         if dep == private:
-            witnesses.append(rlp([7, b'opaque singleton proof']))
+            witnesses.append(b'opaque singleton proof')
         else:
             bindings = [[i, 1, 4] for i, ds in enumerate(per_tx) if dep in ds]
             witnesses.append([h(b'format'), b'raw assertion', bindings])
@@ -370,11 +351,16 @@ class AdmissionTests(unittest.TestCase):
         self.assertEqual(len(pairs), 1)
         self.assertEqual(sandboxes, {1})
         self.assertTrue(should_announce(item, [0, 0, [1], sorted(map(list, pairs))]))
-        for witness in (b'not rlp', rlp([1]), rlp([1, b''])):
+        # Proof bytes are opaque to networking.
+        i = next(i for i, w in enumerate(item[2][1]) if isinstance(w, bytes))
+        self.assertEqual(item[2][1][i], b'opaque singleton proof')
+        altered = copy.deepcopy(item)
+        altered[2][1][i] = b'\xff\x00opaque proof'
+        raw_shape(altered)
+        for witness in (7, [7, b'proof']):
             altered = copy.deepcopy(item)
-            i = next(i for i, w in enumerate(item[2][1]) if isinstance(w, bytes))
             altered[2][1][i] = witness
-            with self.assertRaises((AssertionError, ValueError, DecodingError)):
+            with self.assertRaises(AssertionError):
                 raw_shape(altered)
 
     def test_policy_pairs_and_proving_flag(self):

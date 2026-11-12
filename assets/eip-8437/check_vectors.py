@@ -166,7 +166,7 @@ def check_announcements(entries):
     for entry in entries:
         assert isinstance(entry, list) and len(entry) == 5, "announcement fields"
         mode, length, digest, deps_hash, txs_hash = entry
-        assert isinstance(mode, int) and mode in (0, 1), "announcement mode"
+        assert type(mode) is int and mode in (0, 1, 2), "announcement mode"
         assert isinstance(length, int) and 1 <= length <= MAX_WRAPPER_BYTES, "announcement length"
         assert isinstance(digest, bytes) and len(digest) == 32, "announcement hash"
         assert isinstance(deps_hash, bytes) and len(deps_hash) == 32, "announcement dependency hash"
@@ -185,6 +185,7 @@ def check_request(request_id, hashes, received_announcements, compact=0):
 
 
 def check_wrapper_shape(item):
+    # Proof-wrapper modes only; check_raw_admission.py supplies the mode 2 schema.
     # Envelope structure and blob metadata binding are checked; EIP-8141
     # execution, dependency-union equality and cryptographic validity are not.
     assert isinstance(item, list) and len(item) == 3, "wrapper fields"
@@ -338,14 +339,15 @@ def main():
     wrappers = json.loads(Path(__file__).with_name("wrapper-vectors.json").read_text())
     assert wrapper_vectors() == wrappers
 
-    # RLP prefix expansion makes the maximum entry 106 bytes in either mode.
+    # RLP prefix expansion makes the maximum entry 106 bytes in every mode.
     assert MAX_WRAPPER_BYTES == SOFT_RESPONSE_LIMIT
-    for mode in (0, 1):
+    for mode in (0, 1, 2):
         assert len(rlp([mode, MAX_WRAPPER_BYTES, bytes(32), bytes(32), bytes(32)])) == 106
 
     # Announcement count, fields and strict hash ordering.
     announced = [[i % 2, MAX_WRAPPER_BYTES, uint(i + 1, 32), bytes(32), bytes(32)] for i in range(65)]
-    check_announcements([[0, 1, bytes(32), bytes(32), bytes(32)]])
+    for mode in (0, 1, 2):
+        check_announcements([[mode, 1, bytes(32), bytes(32), bytes(32)]])
     check_announcements(announced[:64])
     expect_error("announcement count", check_announcements, [])
     expect_error("announcement count", check_announcements, announced)
@@ -353,7 +355,7 @@ def main():
     expect_error("announcement order", check_announcements, announced[:1] * 2)
     for length in (0, MAX_WRAPPER_BYTES + 1):
         expect_error("announcement length", check_announcements, [[0, length, bytes(32), bytes(32), bytes(32)]])
-    for mode in (-1, 2, 256, b"\x01"):
+    for mode in (-1, 3, 256, b"\x01", True):
         expect_error("announcement mode", check_announcements, [[mode, 1, bytes(32), bytes(32), bytes(32)]])
     expect_error("announcement hash", check_announcements, [[0, 1, bytes(31), bytes(32), bytes(32)]])
     expect_error("announcement fields", check_announcements, [[0, 1, bytes(32), b""]])
