@@ -65,7 +65,7 @@ A **code load** of address `A` is any of the following events, and only these:
 
 An event is a code load only when [EIP-7928](./eip-7928.md) records the corresponding address access. In particular an operation that fails its pre-state gas validation of [EIP-7928](./eip-7928.md), which includes the [EIP-2929](./eip-2929.md) access costs, loads no code, and `code_hash` can never be set on an address that is absent from the BAL.
 
-The following are not code loads: `BALANCE`, `EXTCODEHASH`, the collision check of `CREATE` and `CREATE2`, the delegation target named by an [EIP-7702](./eip-7702.md) authorization, `SELFDESTRUCT` beneficiaries, withdrawal recipients, and the fee recipient.
+The following are not code loads: `BALANCE`, `EXTCODEHASH`, the collision check of `CREATE` and `CREATE2`, the execution of initcode by a creation frame, the delegation target named by an [EIP-7702](./eip-7702.md) authorization, `SELFDESTRUCT` beneficiaries, withdrawal recipients, and the fee recipient.
 
 ### Recording Rule
 
@@ -100,6 +100,10 @@ def track_code_load(addr, accesses):
 Recording the full bytecode would make the BAL self-contained but would add the code of every executed contract to a consensus object that is gossiped with every block. A mainnet block loads a few hundred distinct contracts, so this adds on the order of megabytes per block, against a BAL of roughly 72 KiB at a 60M gas limit per the size analysis of [EIP-7928](./eip-7928.md).
 
 Each populated `code_hash` costs 33 bytes, roughly 13 KiB for 400 populated fields, plus one byte for every empty field and any growth in enclosing RLP length prefixes. It lets a consumer without state resolve the bytecode from a hash-keyed store, deduplicates code shared by many accounts, lets a verifier check witness completeness against the BAL alone, and uses the same form as the `new_code_hash` element that [EIP-8298](./eip-8298.md) adds to `CodeChange`.
+
+### Fixed arity rather than an optional element
+
+[EIP-8298](./eip-8298.md) adds its hash as an optional trailing element of `CodeChange`, so an entry has two or three elements. `code_hash` is instead always present, empty or 32 bytes. The cost is one byte per account entry, a few hundred bytes per block. The benefit is a single shape for `AccountChanges`: decoders need no arity check, and the position of the field never depends on the value of another field.
 
 ### Pre-block code only
 
