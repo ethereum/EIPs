@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Check EIP-8437 encoding fixtures and message rules on decoded values.
 
-Scalars are represented as Python integers. This checks encoding and blob
-metadata binding, not transaction/program execution, key derivation, proof
-validity or client state.
+Scalars are represented as Python integers. This checks encoding, program IDs
+and blob metadata binding, not transaction/program execution, proof validity
+or client state.
 
 Requires Python 3.9+, pycryptodome and rlp. Run with:
     python3 assets/eip-8437/check_vectors.py
@@ -21,6 +21,7 @@ MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
 MAX_ANNOUNCEMENTS = 64
 MAX_WRAPPERS_PER_REQUEST = 32
 MAX_RAW_PROGRAMS = 64
+MAX_RAW_PROFILES = 64
 LEANSPHINCS_SCHEME = 0x10
 LEANSTARK_SCHEME = 0x11
 FRAME_TX_TYPE = b"\x06"
@@ -29,6 +30,23 @@ CELLS_PER_EXT_BLOB = 128
 
 def h(data):
     return keccak.new(digest_bits=256, data=data).digest()
+
+
+def program_id(package):
+    return h(b"EIP8288:program:v1" + package)
+
+
+def program_profile(package):
+    assert isinstance(package, bytes), "raw program bytes"
+    try:
+        decoded = decode(package, strict=True)
+    except Exception as error:
+        raise AssertionError("raw program package") from error
+    assert isinstance(decoded, list) and len(decoded) == 2, "raw program package"
+    version, bytecode = decoded
+    assert isinstance(version, bytes) and len(version) <= 8 and not version.startswith(b"\x00"), "raw program version"
+    assert isinstance(bytecode, bytes), "raw program bytecode"
+    return int.from_bytes(version, "big")
 
 
 def uint(value, width):
@@ -115,10 +133,12 @@ def wrapper_items():
     deps = sorted(bytes(31) + bytes([LEANSPHINCS_SCHEME]) + h(b"message %d" % i) + uint(i + 1, 32)
                   for i in range(2))
     envelopes = sorted((transaction(i) for i in range(2)), key=transaction_hash)
-    raw_deps = deps[:1] + sorted(bytes(31) + bytes([LEANSTARK_SCHEME]) + h(b"claim %d" % i) + h(b"batch program")
+    # Synthetic bytecode, but real content-addressed program identity.
+    package = rlp([1, b"synthetic batch module" * 3])
+    identifier = program_id(package)
+    raw_deps = deps[:1] + sorted(bytes(31) + bytes([LEANSTARK_SCHEME]) + h(b"claim %d" % i) + identifier
                                  for i in range(2))
-    # Synthetic bytecode and key: no executable profile or derived key is tested.
-    programs = [[h(b"batch program"), rlp([1, b"synthetic batch module" * 3])]]
+    programs = [[identifier, package]]
     return {
         "mode2": [envelopes, 2, [raw_deps, [b"native signature"] +
                   [[h(b"example raw format v1"), b"alternative signature %d" % i] for i in range(2)], programs]],
@@ -170,6 +190,9 @@ def wrapper_vectors():
         }
         if item[1] == 2:
             out[name]["program_encoding_hashes"] = [h(code).hex() for _, code in item[2][2]]
+            out[name]["program_ids"] = [identifier.hex() for identifier, _ in item[2][2]]
+            out[name]["profile_policy_rlp"] = rlp([0, [1], [identifier for identifier, _ in item[2][2]]]).hex()
+            out[name]["wildcard_policy_rlp"] = rlp([1, [1], []]).hex()
     return out
 
 
@@ -197,9 +220,12 @@ def check_request(request_id, hashes, received_announcements, compact=0):
 
 
 def check_raw_policy(policy):
-    assert isinstance(policy, list) and len(policy) == 2, "policy fields"
-    accept_new, programs = policy
+    assert isinstance(policy, list) and len(policy) == 3, "policy fields"
+    accept_new, profiles, programs = policy
     assert type(accept_new) is int and accept_new in (0, 1), "policy flag"
+    assert isinstance(profiles, list) and len(profiles) <= MAX_RAW_PROFILES, "policy profile count"
+    assert all(type(version) is int and 0 <= version < 2**64 for version in profiles), "policy profile id"
+    assert profiles == sorted(set(profiles)), "policy profile order"
     assert isinstance(programs, list) and len(programs) <= MAX_RAW_PROGRAMS, "policy program count"
     assert all(isinstance(key, bytes) and len(key) == 32 for key in programs), "policy program id"
     assert programs == sorted(set(programs)), "policy program order"
@@ -210,7 +236,8 @@ def should_announce_raw(item, policy):
     if policy is None:
         return False
     check_raw_policy(policy)
-    return bool(policy[0] or {key for key, _ in item[2][2]} <= set(policy[1]))
+    return ({program_profile(code) for _, code in item[2][2]} <= set(policy[1])
+            and bool(policy[0] or {key for key, _ in item[2][2]} <= set(policy[2])))
 
 
 def check_wrapper_shape(item):
@@ -247,15 +274,8 @@ def check_wrapper_shape(item):
             assert isinstance(entry, list) and len(entry) == 2, "raw program fields"
             key, code = entry
             assert isinstance(key, bytes) and len(key) == 32, "raw program id"
-            assert isinstance(code, bytes), "raw program bytes"
-            try:
-                package = decode(code, strict=True)
-            except Exception as error:
-                raise AssertionError("raw program package") from error
-            assert isinstance(package, list) and len(package) == 2, "raw program package"
-            version, bytecode = package
-            assert isinstance(version, bytes) and not version.startswith(b"\x00"), "raw program version"
-            assert isinstance(bytecode, bytes), "raw program bytecode"
+            program_profile(code)
+            assert key == program_id(code), "raw program hash"
         required = sorted({dep[64:] for dep in deps if dep[:32] == uint(LEANSTARK_SCHEME, 32)})
         assert [key for key, _ in programs] == required, "raw program set"
     assert isinstance(envelopes, list) and envelopes, "wrapper envelopes"
@@ -464,22 +484,34 @@ def main():
     # Policies replace prior state; no policy advertises no raw support.
     program_ids = [key for key, _ in mode2[2][2]]
     assert not should_announce_raw(mode2, None)
-    assert not should_announce_raw(mode2, [0, []])
-    assert should_announce_raw(mode2, [0, program_ids])
-    assert should_announce_raw(mode2, [1, []])
-    assert not should_announce_raw(mode2, [0, [bytes(32)]])
-    check_raw_policy([0, [uint(i, 32) for i in range(64)]])
+    assert not should_announce_raw(mode2, [0, [1], []])
+    assert should_announce_raw(mode2, [0, [1], program_ids])
+    assert should_announce_raw(mode2, [1, [1], []])
+    assert not should_announce_raw(mode2, [0, [1], [bytes(32)]])
+    assert not should_announce_raw(mode2, [1, [], []])
+    assert not should_announce_raw(mode2, [1, [2], []])
+    assert not should_announce_raw(mode2, [0, [2], program_ids])
+    assert not should_announce_raw(mode2, [0, [], program_ids])
+    check_raw_policy([0, list(range(64)), [uint(i, 32) for i in range(64)]])
+    check_raw_policy([1, [2**64 - 1], []])
     expect_error("policy fields", check_raw_policy, [0])
-    expect_error("policy fields", check_raw_policy, [0, [], b"extra"])
+    expect_error("policy fields", check_raw_policy, [0, []])
+    expect_error("policy fields", check_raw_policy, [0, [], [], b"extra"])
     for flag in (-1, 2, b"", True):
-        expect_error("policy flag", check_raw_policy, [flag, []])
-    expect_error("policy program count", check_raw_policy, [0, [uint(i, 32) for i in range(65)]])
-    expect_error("policy program id", check_raw_policy, [0, [bytes(31)]])
-    expect_error("policy program order", check_raw_policy, [0, program_ids * 2])
-    expect_error("policy program order", check_raw_policy, [0, [uint(1, 32), uint(0, 32)]])
-    expect_error("wildcard policy list", check_raw_policy, [1, program_ids])
-    assert rlp([1, []]).hex() == "c201c0"
-    assert rlp([0, []]).hex() == "c280c0"
+        expect_error("policy flag", check_raw_policy, [flag, [], []])
+    expect_error("policy profile count", check_raw_policy, [1, list(range(65)), []])
+    expect_error("policy profile count", check_raw_policy, [1, b"", []])
+    for version in (-1, 2**64, b"\x01", True):
+        expect_error("policy profile id", check_raw_policy, [1, [version], []])
+    for profiles in ([1, 1], [2, 1]):
+        expect_error("policy profile order", check_raw_policy, [1, profiles, []])
+    expect_error("policy program count", check_raw_policy, [0, [1], [uint(i, 32) for i in range(65)]])
+    expect_error("policy program id", check_raw_policy, [0, [1], [bytes(31)]])
+    expect_error("policy program order", check_raw_policy, [0, [1], program_ids * 2])
+    expect_error("policy program order", check_raw_policy, [0, [1], [uint(1, 32), uint(0, 32)]])
+    expect_error("wildcard policy list", check_raw_policy, [1, [1], program_ids])
+    assert rlp([1, [1], []]).hex() == "c401c101c0"
+    assert rlp([0, [], []]).hex() == "c380c0c0"
     for item in (mode0, mode1, blob_mode1, mode2):
         check_wrapper_shape(item)
         decoded = decode(rlp(item), strict=True)
@@ -716,29 +748,44 @@ def main():
 
     # The table contains exactly the generic programs, shared within a wrapper.
     key, code = raw_programs[0]
-    for programs in ([], raw_programs * 2, [[bytes(32), code]], raw_programs + [[bytes(32), code]]):
+    def with_program(package):
+        identifier = program_id(package)
+        deps = [dep[:64] + identifier if dep[:32] == uint(LEANSTARK_SCHEME, 32) else dep for dep in raw_deps]
+        return [mode2[0], 2, [deps, raw_witnesses, [[identifier, package]]]]
+    code2 = rlp([2, b"synthetic batch module" * 3])
+    key2 = program_id(code2)
+    assert program_id(code) == key != key2 != h(code2)
+    assert key != program_id(rlp([1, b"different module"]))
+    for programs in ([], raw_programs * 2, [[key2, code2]], sorted(raw_programs + [[key2, code2]])):
         expect_error("raw program set", check_wrapper_shape, with_raw(raw_witnesses, programs))
+    expect_error("raw program hash", check_wrapper_shape, with_raw(raw_witnesses, [[bytes(32), code]]))
     expect_error("raw program fields", check_wrapper_shape, with_raw(raw_witnesses, [[key]]))
     expect_error("raw program id", check_wrapper_shape, with_raw(raw_witnesses, [[bytes(31), code]]))
     expect_error("raw program bytes", check_wrapper_shape, with_raw(raw_witnesses, [[key, [h(code)]]]))
     for malformed_code in (b"", b"\xff", rlp([1]), rlp([1, b"code", b"extra"])):
         expect_error("raw program package", check_wrapper_shape, with_raw(raw_witnesses, [[key, malformed_code]]))
-    expect_error("raw program version", check_wrapper_shape,
-                 with_raw(raw_witnesses, [[key, rlp([b"\x00", b"code"])]]))
+    for version in (b"\x00", 2**64):
+        expect_error("raw program version", check_wrapper_shape,
+                     with_raw(raw_witnesses, [[key, rlp([version, b"code"])]]))
     expect_error("raw program bytecode", check_wrapper_shape,
                  with_raw(raw_witnesses, [[key, rlp([1, []])]]))
-    # Unknown VM versions are well-formed; support and key binding are not tested.
-    check_wrapper_shape(with_raw(raw_witnesses, [[key, rlp([255, b"unknown profile"])]]))
-    two_programs = [mode2[0], 2, [raw_deps[:2] + [raw_deps[2][:64] + bytes(32)],
-                                raw_witnesses, [[bytes(32), code], [key, code]]]]
+    # Unknown VM versions are well-formed but excluded by an unmatched policy.
+    unknown_profile = with_program(rlp([255, b"unknown profile"]))
+    check_wrapper_shape(unknown_profile)
+    assert not should_announce_raw(unknown_profile, [1, [1], []])
+    assert should_announce_raw(unknown_profile, [1, [255], []])
+    two_programs = [mode2[0], 2, [raw_deps[:2] + [raw_deps[2][:64] + key2],
+                                raw_witnesses, sorted([[key2, code2], [key, code]])]]
     check_wrapper_shape(two_programs)
-    assert not should_announce_raw(two_programs, [0, [key]])
-    assert should_announce_raw(two_programs, [0, [bytes(32), key]])
-    assert should_announce_raw(two_programs, [1, []])
+    assert not should_announce_raw(two_programs, [0, [1, 2], [key]])
+    assert not should_announce_raw(two_programs, [0, [1], sorted([key, key2])])
+    assert should_announce_raw(two_programs, [0, [1, 2], sorted([key, key2])])
+    assert not should_announce_raw(two_programs, [1, [1], []])
+    assert should_announce_raw(two_programs, [1, [1, 2], []])
     expect_error("raw program set", check_wrapper_shape,
                  [two_programs[0], 2, two_programs[2][:2] + [two_programs[2][2][::-1]]])
 
-    # Program references use the encoding hash, not the verification-key hash.
+    # Omission uses the plain encoding hash; program identity is domain-separated.
     code_cache = {h(code): code}
     raw_digest = h(rlp(mode2))
     raw_meta = {raw_digest: metadata_for(mode2)}
@@ -766,9 +813,15 @@ def main():
     assert coverage(changed_code) == coverage(mode2)
     expect_error("response hash", check_wrapper_response, 7, [raw_digest], raw_meta,
                  [7, [[raw_digest, changed_code]]])
+    # Even with correct wrapper metadata, a false program ID fails before execution.
+    changed_digest = h(rlp(changed_code))
+    expect_error("raw program hash", check_wrapper_response, 7, [changed_digest],
+                 {changed_digest: metadata_for(changed_code)}, reply_for(7, [changed_code]),
+                 0, None, lambda item: no_execution.append(item))
+    assert no_execution == []
     # Program bytes contribute to the reconstructed byte bound too.
     giant_code = rlp([1, bytes(MAX_WRAPPER_BYTES)])
-    giant_program = with_raw(raw_witnesses, [[key, giant_code]])
+    giant_program = with_program(giant_code)
     giant_compact = compact_wrapper(giant_program, {h(giant_code)})
     assert len(rlp(giant_compact)) < MAX_WRAPPER_BYTES
     expect_error("wrapper length", reconstruct, giant_compact, 1,
@@ -785,7 +838,7 @@ def main():
 
     print("PASS: announcement, full-envelope, raw-witness/program and sparse-blob wrapper encoding vectors; "
           "raw-policy routing, compact reconstruction and full retries, message counts, ordering, metadata matching, byte limits and response packing. "
-          "Transaction/program execution, key derivation, proof/KZG validity and client-state sequences are not tested.")
+          "Transaction/program execution, proof/KZG validity and client-state sequences are not tested.")
 
 
 if __name__ == "__main__":
