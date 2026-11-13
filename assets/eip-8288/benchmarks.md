@@ -4,7 +4,7 @@ This document supplies the measurement procedure for EIP-8288's activation requi
 
 ## Configuration
 
-Publish the prover and verifier revisions and configurations, commitment construction, hashes, gas schedule, gas limit and verifier resource bounds. Record hardware, worker count, threads and memory per worker, and safety margins. Specify numerical builder aggregation and validator execution/verification time and peak-memory budgets before calibration.
+Publish the prover and verifier revisions and configurations, commitment construction, hashes, gas schedule, gas limit and verifier resource bounds. Record hardware, worker count, threads and memory per worker, and safety margins. Specify numerical builder aggregation and validator execution/verification time and peak-memory budgets before calibration. Fix memory per worker jointly with the commitment construction and `MAX_INNER_PROOFS_PER_STEP`: a full maximum-resource step must fit within one worker's memory.
 
 ## Workloads
 
@@ -18,6 +18,8 @@ Publish the prover and verifier revisions and configurations, commitment constru
 Measure complete scheduled wall-clock completion time (makespan) at the stated worker count, including recursive critical paths and inter-worker transfers. Total work divided by worker count is not a completion-time measurement.
 
 Report program-commitment authentication and other recursion costs, total work, tree depth, critical-path latency, per-worker and aggregate peak memory, proof sizes and transmitted bytes. Measure validator execution and proof verification against their stated budgets as well.
+
+Run each measured step in its own process, discard a warm-up run and take at least three timed repetitions, reporting the median and range. Measure without competing load or swap growth; repeat a measurement that violates these conditions and exclude it if the repeat also does. Report deterministic cycle counts alongside times.
 
 Separate measured results from models and extrapolations. Measure the selected commitment construction and permitted resource extremes; projected full-block timings do not establish activation readiness.
 
