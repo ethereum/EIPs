@@ -35,7 +35,7 @@ jobs:
           recreate: true
           message: |
             The commit ${{ steps.save-pr-data.outputs.pr_sha }} (as a parent of ${{ steps.save-pr-data.outputs.merge_sha }}) contains errors.
-            Please inspect the [Run Summary](https://github.com/ethereum/EIPs/pull/${{ steps.save-pr-data.outputs.pr_number }}/files) for details.
+            Please inspect the [Run Summary](${{ github.event.workflow_run.html_url }}) for details.
 
       - name: Add Waiting Label
         uses: actions-ecosystem/action-add-labels@288072f1a3b596f4350fe135bcfe381a23abadef
