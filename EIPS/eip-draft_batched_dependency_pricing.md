@@ -38,7 +38,7 @@ This EIP uses EIP-8288's verification-key derivation, singleton claim digest and
 | `BATCH_WRAPPER_MODE` | `2` |
 | `MAX_BATCH_BYTES` | `2**21` |
 
-The provisional resource and gas parameters MUST be finalized through the activation benchmarks below. The networking version is provisionally `eth/74`.
+The provisional resource and gas parameters MUST be finalized through the activation benchmarks below.
 
 ### Dependency encoding
 
@@ -119,9 +119,9 @@ Clients SHOULD bound batch bytes, verification work and retained variants global
 
 ### Propagation
 
-`eth/74` extends EIP-8437's `eth/73` without changing Status or its three wrapper-message encodings. NewProofWrapperHashes (`0x16`) additionally accepts mode `2`, with lengths bounded by `MAX_BATCH_BYTES`; GetProofWrappers (`0x17`) and ProofWrappers (`0x18`) retrieve complete batch wrappers in the same way as ordinary wrappers. The wrapper hash is Keccak-256 of the complete RLP object; the two coverage hints use its encoded `deps` and consensus transaction hashes.
+Batch wrappers use EIP-8437's `eth/73` messages; Status and message encodings are unchanged. NewProofWrapperHashes (`0x16`) additionally accepts mode `2`, with lengths bounded by `MAX_BATCH_BYTES`; GetProofWrappers (`0x17`) and ProofWrappers (`0x18`) retrieve complete batch wrappers in the same way as ordinary wrappers. The wrapper hash is Keccak-256 of the complete RLP object; the two coverage hints use its encoded `deps` and consensus transaction hashes.
 
-Mode 2 responses MUST carry full transaction encodings, for either value of `compact`. EIP-8437's count limits, response ordering, soft limit and validation-before-relay apply. Announce only batches that remain fully admitted; proof coverage alone does not suppress a batch announcement. An admitted batch with matching dependency and transaction hints may suppress another. Peers MUST NOT send mode 2 wrappers or their members to `eth/73` peers. Before local activation, clients MUST ignore mode 2 announcements without penalties and send none.
+Mode 2 responses MUST carry full transaction encodings, for either value of `compact`. EIP-8437's count limits, response ordering, soft limit and validation-before-relay apply. Announce only batches that remain fully admitted; proof coverage alone does not suppress a batch announcement. An admitted batch with matching dependency and transaction hints may suppress another. Before local activation, clients MUST ignore mode 2 announcements without penalties and send none.
 
 ### Block construction and inclusion lists
 
@@ -157,7 +157,7 @@ A new wrapper mode reuses announcement and retrieval instead of adding parallel 
 
 Activation enables a new dependency scheme and changes the aggregation verifier. Existing schemes retain their encodings, charges and singleton statements. User verification keys only gain batching if their programs accept lists of independent claims; a program restricted to one claim remains usable.
 
-Older peers do not receive batch wrappers or their members. Blocks and inclusion lists contain ordinary transactions and recursive proofs under the activating fork's rules, without a bundle field.
+Peers without mode 2 support ignore its announcements and do not retrieve batches. Blocks and inclusion lists contain ordinary transactions and recursive proofs under the activating fork's rules, without a bundle field.
 
 ## Test Cases
 
@@ -176,6 +176,7 @@ Older peers do not receive batch wrappers or their members. Blocks and inclusion
 | One member fails admission, or paymaster cannot fund summed maximum fees | Admit none; create no partial reservations |
 | Two batches share a pending member | Count its payer reservation once; releasing one batch does not release an otherwise pending member |
 | A member expires, is replaced or included | Stop offering the batch; retain other members only through another complete admitted batch |
+| Mode 2 announcement before local activation; after activation | Ignore without penalty; process using the existing `eth/73` messages |
 | Mode 2 sent with an omission reference | Reject; complete encodings are required even with `compact = 1` |
 | Complete batch exactly at `MAX_BATCH_BYTES`; one byte larger | Accept size boundary; reject oversized batch |
 | A block includes one member of a valid batch | Check its individual validity and established qualifier; no atomic-inclusion requirement |
