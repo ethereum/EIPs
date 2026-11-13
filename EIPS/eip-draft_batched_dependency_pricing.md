@@ -11,7 +11,7 @@ requires: 7805, 8141, 8288
 
 ## Abstract
 
-This EIP extends [EIP-8288](./eip-8288.md) with proofs of multiple independent claims under one verification key. Transactions pay per claim; a sponsor separately pays for each leaf used in the block. Any valid subset of a batch can be included without changing its members' signatures. These transactions are submitted directly to builders and are excluded from the public mempool and inclusion-list obligations.
+This EIP extends [EIP-8288](./eip-8288.md) with proofs of multiple independent claims under one verification key and recalibrates its dependency gas charges against a common proving budget. Transactions pay per claim; a sponsor separately pays for each leaf used in the block. Any valid subset of a batch can be included without changing its members' signatures. These transactions are submitted directly to builders and are excluded from the public mempool and inclusion-list obligations.
 
 ## Motivation
 
@@ -32,6 +32,9 @@ This EIP uses EIP-8288's verification-key derivation, singleton claim digest and
 | `BATCHED_LEANSTARK_SCHEME` | `0x12` (provisional) |
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | `0x13` (provisional) |
 | `MAX_CLAIMS_PER_BATCH_LEAF` | `256` (provisional) |
+| `LEANSPHINCS_VERIFICATION_GAS` | `15400` (provisional) |
+| `LEANSTARK_VERIFICATION_GAS` | `572000` (provisional) |
+| `RECURSIVE_PROOF_SHARE_GAS` | `4200` (provisional) |
 | `LEANSTARK_CLAIM_GAS` | `4200` (provisional) |
 | `BATCH_HASH` | EIP-8288's `CLAIM_HASH` |
 
@@ -50,12 +53,16 @@ The payment triple identifies a leaf statement independently of its proof bytes.
 
 ### Gas accounting
 
-Each declaration contributes to its dependency frame's exact `limits.execution`:
+From activation, replace EIP-8288's native and generic verification charges with the values above and its intrinsic proof-share multiplier with `RECURSIVE_PROOF_SHARE_GAS`. Charge each declaration as follows:
 
-- `BATCHED_LEANSTARK_SCHEME`: `LEANSTARK_CLAIM_GAS`.
-- `LEANSTARK_LEAF_PAYMENT_SCHEME`: EIP-8288's `LEANSTARK_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS`.
+| Scheme | Dependency frame's `limits.execution` contribution | Intrinsic proof share |
+| --- | --- | --- |
+| `LEANSPHINCS_SCHEME` | `LEANSPHINCS_VERIFICATION_GAS` | `RECURSIVE_PROOF_SHARE_GAS` |
+| `LEANSTARK_SCHEME` | `LEANSTARK_VERIFICATION_GAS` | `RECURSIVE_PROOF_SHARE_GAS` |
+| `BATCHED_LEANSTARK_SCHEME` | `LEANSTARK_CLAIM_GAS` | `0` |
+| `LEANSTARK_LEAF_PAYMENT_SCHEME` | `LEANSTARK_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS` | `0` |
 
-Charge each occurrence before dependency deduplication. Both new schemes are excluded from EIP-8288's intrinsic proof-share charge. Other transaction and authorization costs still apply. Frame charges count toward block execution capacity under EIP-8141's normal gas accounting; refunds do not reduce that capacity charge.
+Charge each occurrence before dependency deduplication. Sum frame contributions to obtain the frame's exact `limits.execution`; add proof shares to transaction intrinsic gas as in EIP-8288. Other transaction and authorization costs still apply. Frame charges count toward block execution capacity under EIP-8141's normal gas accounting; refunds do not reduce that capacity charge.
 
 A sponsor declares one or more leaf payments in its own frame transaction. Its payer authorizes the fees through EIP-8141; member transactions need not use that payer. A payment is effective only when its transaction is valid and included in the same block, before or after its members. If two sponsors pay for the same leaf, both declarations are charged; deduplication gives neither a refund nor additional credit. Payment in an earlier block provides no credit.
 
@@ -133,7 +140,7 @@ Proof-validation caches MUST distinguish `AGGREGATED_VK` and statement domain. W
 
 ### Activation requirements
 
-Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding and statement-domain conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Calibrate leaf and claim charges against the same published block-capacity budgets as EIP-8288's native and ordinary generic charges, using its reference hardware, worker and thread counts, and complete transaction gas accounting. The calibration applies only to the benchmarked gas limits.
+Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding and statement-domain conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Calibrate native, ordinary generic, proof-share and batch-claim charges together against EIP-8288's published block-capacity budgets, using its reference hardware, worker and thread counts, and complete transaction gas accounting. The calibration applies only to the benchmarked gas limits.
 
 A maximum-resource leaf is a valid leaf maximizing recursive verification cost within the permitted program size (including support code and padding), trace dimensions, committed values, bus interactions, proof bytes and claim count. Include program-commitment authentication and opening verification; benchmark jointly valid combinations of resource bounds.
 
@@ -148,7 +155,9 @@ The leaf charge MUST account for maximum permitted verification work; the claim 
 
 ### Charging for shared work
 
-The leaf and claim charges allocate shares of EIP-8288's block proving capacity: worst-case recursive verification per leaf, and additional digest, payment-binding and output work per claim. Linear work accounting is a proxy under the reference hardware and worker budget; measured time ratios alone do not establish gas prices. The leaf charge equals an ordinary generic declaration's verification charge plus its proof share, covering the leaf's child slot and payment dependency's carry; member claims pay their own carry through the claim charge. Neither new scheme adds another intrinsic proof share. Losing members cannot reduce the leaf charge.
+The charges allocate EIP-8288's block proving capacity under the reference hardware and worker budget. Work-proportional pricing approximates additive work but does not alone bound peak memory or recursive critical-path latency. Program size, trace dimensions, committed values and bus interactions affect the worst case; proof size or an assumed small average-to-worst-case ratio cannot establish a safe rate.
+
+Generic verification includes its recursive child-slot cost; the separate proof share prices dependency carry, so native signatures do not pay for a generic proof's child slot. A leaf payment charges both once; member claims pay their own carry and payment binding. Neither new scheme adds another intrinsic share. Losing members cannot reduce the leaf charge.
 
 The provisional claim charge equals the proof share pending comparable carry and payment-binding measurements. This is a conservative placeholder, not a measured equality: a native-path share estimate that includes amortized node overhead is not a pure per-record baseline.
 
@@ -162,7 +171,7 @@ Direct submission avoids a public pool tracking sponsorship dependencies or rese
 
 ## Backwards Compatibility
 
-Activation enables two dependency schemes and changes the aggregation verifier. The applicable fork's `AGGREGATED_VK` fixes the accepted schemes and statement forms; pre-activation generic verification remains singleton-only. Existing schemes retain their encodings, charges and singleton leaf statements; all recursive proofs adopt the tagged statements above. User verification keys only gain batching if their programs accept lists of independent claims; a program restricted to one claim remains usable and can produce a sponsored singleton.
+Activation enables two dependency schemes and changes the aggregation verifier. The applicable fork's `AGGREGATED_VK` fixes the accepted schemes and statement forms; pre-activation generic verification remains singleton-only. Existing schemes retain their encodings and singleton leaf statements, but use the revised gas schedule; all recursive proofs adopt the tagged statements above. Transactions signed with old dependency-frame execution limits require updated budgets and signatures. User verification keys only gain batching if their programs accept lists of independent claims; a program restricted to one claim remains usable and can produce a sponsored singleton.
 
 Public-mempool message formats remain unchanged. Blocks contain individual transactions and the recursive proof under the activating fork's rules, without batch membership fields.
 
@@ -187,6 +196,7 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 | Block with either new scheme supplies a plain dependency-digest proof | Reject; require the finalized statement and the usual block dependency commitment |
 | Restore a discarded claim or change its source without verified coverage | Reject |
 | Payment for another key, claim list or earlier block | Does not satisfy the retained claim's source |
+| One native or ordinary generic declaration | 19,600 or 576,200 gas respectively, including the revised intrinsic share; charge duplicate declarations separately |
 | 64 included claims and one payment | 64 times 4,200 gas plus 576,200 leaf gas: 845,000 gas, excluding other transaction costs |
 | Two sponsors pay for the same leaf in one block | Charge both payments; deduplicate the dependency without refund or extra credit |
 | Duplicate declaration in a transaction | Charge both occurrences before dependency deduplication |
