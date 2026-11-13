@@ -32,8 +32,8 @@ This EIP uses EIP-8288's verification-key derivation, singleton claim digest and
 | `BATCHED_LEANSTARK_SCHEME` | `0x12` (provisional) |
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | `0x13` (provisional) |
 | `MAX_CLAIMS_PER_BATCH_LEAF` | `256` (provisional) |
-| `LEANSTARK_LEAF_GAS` | `430000` (provisional) |
-| `LEANSTARK_CLAIM_GAS` | `300` (provisional) |
+| `LEANSTARK_LEAF_GAS` | `LEANSTARK_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS` from EIP-8288 (provisionally `576200`) |
+| `LEANSTARK_CLAIM_GAS` | `2100` (provisional) |
 | `BATCH_HASH` | EIP-8288's `CLAIM_HASH` |
 
 The provisional resource and gas parameters MUST be finalized through the activation benchmarks below.
@@ -122,22 +122,22 @@ Accounts seeking a fallback SHOULD authorize both generic schemes under the same
 
 ### Activation requirements
 
-Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding and statement-domain conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Calibrate leaf and claim charges against the same published block-capacity budgets as EIP-8288's native and ordinary generic charges, using its reference hardware, worker counts and complete transaction gas accounting.
+Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding and statement-domain conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Calibrate leaf and claim charges against the same published block-capacity budgets as EIP-8288's native and ordinary generic charges, using its reference hardware, worker and thread counts, and complete transaction gas accounting. The calibration applies only to the benchmarked gas limits.
 
 A maximum-resource leaf is a valid leaf maximizing recursive verification cost within the permitted program size (including support code and padding), trace dimensions, committed values, bus interactions, proof bytes and claim count. Include program-commitment authentication and opening verification; benchmark jointly valid combinations of resource bounds.
 
 Benchmarks MUST cover:
 
-- Singleton proofs under distinct keys without shared-key preprocessing savings, full 256-claim leaves, and blocks retaining one claim per maximum-resource leaf with its payment; include mixtures with native signatures and EVM execution.
-- Claim hashing, payment lookup and binding, overlapping leaves, pruning and finalization throughout the block's aggregation tree. Report tree depth, cumulative per-claim work, total work, critical-path latency, peak memory and transmitted bytes.
+- Singleton proofs under distinct keys, full 256-claim leaves, and blocks retaining one claim per maximum-resource leaf with its payment; include mixtures with native signatures and EVM execution. Charges assume unpacked leaves: one generic leaf per initial aggregation step, without shared-key preprocessing savings.
+- Claim hashing, payment lookup and binding, overlapping leaves, pruning and finalization throughout the block's aggregation tree. Report tree depth, cumulative per-claim work, total work, critical-path latency, scheduled completion time at the stated worker count, peak memory and transmitted bytes.
 
-The leaf charge MUST account for maximum permitted verification work; the claim charge MUST account for cumulative claim and payment-binding work through finalization, not just a single hashing pass. Their rates MUST keep gas-admissible blocks within the shared time and memory budgets, including recursive critical-path latency. Measure the selected commitment construction before crediting any projected savings. If the gas schedule does not meet the budgets, revise the charges or interface before activation.
+The leaf charge MUST account for maximum permitted verification work; the claim charge MUST account for cumulative claim and payment-binding work through finalization, not just a single hashing pass. Their rates MUST keep gas-admissible blocks within the shared time and memory budgets, including recursive critical-path latency and inter-worker transfers. Total work divided by worker count is not a completion-time measurement. Measure the selected commitment construction, maximum-resource leaves and payment binding before finalizing the charges; modelled timings do not satisfy this requirement. If the gas schedule does not meet the budgets, revise the charges or interface before activation.
 
 ## Rationale
 
 ### Charging for shared work
 
-The leaf and claim charges allocate shares of EIP-8288's block proving capacity: worst-case recursive verification per leaf, and additional digest, payment-binding and output work per claim. Linear work accounting is a proxy under the reference hardware and worker budget; measured time ratios alone do not establish gas prices. These charges replace the intrinsic proof share for the new schemes: provisionally, a sponsor pays 430,000 gas per leaf and each included claim pays 300 gas, excluding other transaction costs. Losing members cannot reduce the leaf charge.
+The leaf and claim charges allocate shares of EIP-8288's block proving capacity: worst-case recursive verification per leaf, and additional digest, payment-binding and output work per claim. Linear work accounting is a proxy under the reference hardware and worker budget; measured time ratios alone do not establish gas prices. The leaf charge equals an ordinary generic declaration's verification charge plus its proof share, covering the leaf's child slot and payment dependency's carry; member claims pay their own carry through the claim charge. Neither new scheme adds another intrinsic proof share. Losing members cannot reduce the leaf charge.
 
 The payment declaration uses ordinary transaction fee authorization and settlement; it does not compensate the batcher directly. An application may fund proving or charge a separate service fee. Batching amortizes proof overhead and recursive verification; application-specific claim proving, possibly using the signature scheme's own aggregation, can still dominate. Filling a batch trades latency for cost.
 
@@ -173,7 +173,7 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 | Block with either new scheme supplies a plain dependency-digest proof | Reject; require the finalized statement and the usual block dependency commitment |
 | Restore a discarded claim or change its source without verified coverage | Reject |
 | Payment for another key, claim list or earlier block | Does not satisfy the retained claim's source |
-| 64 included claims and one payment | 64 times 300 gas plus 430,000 leaf gas: 449,200 gas, excluding other transaction costs |
+| 64 included claims and one payment | 64 times 2,100 gas plus 576,200 leaf gas: 710,600 gas, excluding other transaction costs |
 | Two sponsors pay for the same leaf in one block | Charge both payments; deduplicate the dependency without refund or extra credit |
 | Duplicate declaration in a transaction | Charge both occurrences before dependency deduplication |
 | Matching claim under a different key; invalid or over-resource leaf | Reject, including inputs later discarded |
@@ -186,7 +186,7 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 
 ## Security Considerations
 
-The constants are provisional, not measured prices. Every discounted claim included in a block must be linked to a verified leaf and its included payment. Payment identities cannot be invented by union or changed by pruning; payment without leaf verification cannot establish a claim. All leaf resource bounds apply even to inputs later discarded. Padding cannot reduce the fixed charge.
+The gas parameters are provisional; payment-binding cost and complete block schedules require measurement. Every discounted claim included in a block must be linked to a verified leaf and its included payment. Payment identities cannot be invented by union or changed by pruning; payment without leaf verification cannot establish a claim. All leaf resource bounds apply even to inputs later discarded. Padding cannot reduce the fixed charge.
 
 Sponsorship remains an availability dependency: the sponsor may withhold payment or its transaction may become invalid. Another sponsor can pay for the same leaf without changing member transactions. If every member disappears, omitting the leaf prevents a block charge but does not reimburse proving already performed; that risk belongs to the batcher's service arrangement.
 
