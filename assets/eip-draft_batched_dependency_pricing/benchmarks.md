@@ -11,7 +11,7 @@ Apply EIP-8288's benchmark methodology, reference configuration and common capac
 
 ## Measurements and calibration
 
-Measure claim hashing and payment binding throughout the tree, not only a single hashing pass. Compare ordinary dependency carry and batch-claim carry at the same tree depths, separating per-record work from amortized leaf and recursive-node overhead. Account for each component once.
+Measure claim hashing and payment binding throughout the tree, not only a single hashing pass. Compare ordinary dependency carry and batch-claim carry at the same tree depths, separating per-record work from amortized leaf and recursive-node overhead. Account for each component once. Measure a maximum-resource batch leaf, including its payment-binding work, separately from an ordinary generic leaf: the payment charge reuses the ordinary verification charge and proof share, so it must cover any additional per-leaf work.
 
 Report cumulative per-claim work alongside EIP-8288's full-block measurements: total work, depth, critical-path latency, scheduled completion time at the stated worker count, peak memory and transmitted bytes. Include the 192-byte intermediate records in memory and serialization measurements where they are materialized or transmitted.
 
