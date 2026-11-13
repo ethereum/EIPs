@@ -32,7 +32,6 @@ This EIP uses EIP-8288's verification-key derivation, singleton claim digest and
 | `BATCHED_LEANSTARK_SCHEME` | `0x12` (provisional) |
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | `0x13` (provisional) |
 | `MAX_CLAIMS_PER_BATCH_LEAF` | `256` (provisional) |
-| `LEANSTARK_LEAF_GAS` | `LEANSTARK_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS` from EIP-8288 (provisionally `576200`) |
 | `LEANSTARK_CLAIM_GAS` | `2100` (provisional) |
 | `BATCH_HASH` | EIP-8288's `CLAIM_HASH` |
 
@@ -54,7 +53,7 @@ The payment triple identifies a leaf statement independently of its proof bytes.
 Each declaration contributes to its dependency frame's exact `limits.execution`:
 
 - `BATCHED_LEANSTARK_SCHEME`: `LEANSTARK_CLAIM_GAS`.
-- `LEANSTARK_LEAF_PAYMENT_SCHEME`: `LEANSTARK_LEAF_GAS`.
+- `LEANSTARK_LEAF_PAYMENT_SCHEME`: EIP-8288's `LEANSTARK_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS`.
 
 Charge each occurrence before dependency deduplication. Both new schemes are excluded from EIP-8288's intrinsic proof-share charge. Other transaction and authorization costs still apply. Frame charges count toward block execution capacity under EIP-8141's normal gas accounting; refunds do not reduce that capacity charge.
 
