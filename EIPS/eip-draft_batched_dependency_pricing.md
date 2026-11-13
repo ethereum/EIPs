@@ -89,7 +89,7 @@ A direct ordinary leanSTARK proof is a one-claim leaf. It and each multi-claim l
 
 ### Recursive payment binding
 
-Each batch dependency is assigned to the payment triple of the verified leaf that established it. Recursive proofs authenticate records `(dependency, source)`, where `source` is that payment triple for a batch dependency and absent for other schemes. Records are sorted and deduplicated by dependency. Intermediate proofs may retain claims without their payment dependencies; payment presence is checked at finalization. Recursive public statements are:
+Each batch dependency is assigned to the payment triple of the verified leaf that established it. Recursive proofs authenticate records `(dependency, source)`, where `source` is that payment triple for a batch dependency and absent for other schemes. Records are sorted and deduplicated by dependency. EIP-8288's resource and counter bounds apply to the 192-byte records and intermediate unions. Intermediate proofs may retain claims without their payment dependencies; payment presence is checked at finalization. Recursive public statements are:
 
 ```python
 def get_ordinary_hash(deps_hash):
@@ -140,16 +140,12 @@ Proof-validation caches MUST distinguish `AGGREGATED_VK` and statement domain. W
 
 ### Activation requirements
 
-Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding and statement-domain conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Calibrate native, ordinary generic, proof-share and batch-claim charges together against EIP-8288's published block-capacity budgets, using its reference hardware, worker and thread counts, and complete transaction gas accounting. The calibration applies only to the benchmarked gas limits.
+EIP-8288's activation requirements apply. Fix the new `AGGREGATED_VK`, leaf and intermediate-proof encodings, and payment-binding and statement-domain conformance vectors before activation. The common calibration must additionally cover:
 
-A maximum-resource leaf is a valid leaf maximizing recursive verification cost within the permitted program size (including support code and padding), trace dimensions, committed values, bus interactions, proof bytes and claim count. Include program-commitment authentication and opening verification; benchmark jointly valid combinations of resource bounds.
+- Leaves with `MAX_CLAIMS_PER_BATCH_LEAF` claims, and blocks retaining one claim per maximum-resource leaf with its payment.
+- Cumulative claim carry and payment binding through overlapping leaves, pruning and finalization, separating per-record work from amortized node overhead.
 
-Benchmarks MUST cover:
-
-- Singleton proofs under distinct keys, full 256-claim leaves, and blocks retaining one claim per maximum-resource leaf with its payment; include mixtures with native signatures and EVM execution. Charges assume unpacked leaves: one generic leaf per initial aggregation step, without shared-key preprocessing savings.
-- Claim hashing, payment lookup and binding, overlapping leaves, pruning and finalization throughout the block's aggregation tree. Report tree depth, cumulative per-claim work, total work, critical-path latency, scheduled completion time at the stated worker count, peak memory and transmitted bytes.
-
-The leaf charge MUST account for maximum permitted verification work; the claim charge MUST account for cumulative claim and payment-binding work through finalization, not just a single hashing pass. Calibrate ordinary dependency carry and batch-claim carry at the same tree depths, separating per-record work from amortized leaf and recursive-node overhead; charge each component once. Their rates MUST keep gas-admissible blocks within the shared time and memory budgets, including recursive critical-path latency and inter-worker transfers. Total work divided by worker count is not a completion-time measurement. Measure the selected commitment construction, maximum-resource leaves and payment binding before finalizing the charges; modelled timings do not satisfy this requirement. If the gas schedule does not meet the budgets, revise the charges or interface before activation.
+Use the [batching benchmark supplement](../assets/eip-draft_batched_dependency_pricing/benchmarks.md). Finalize all charges from measured block schedules meeting the shared budgets: the leaf charge covers maximum permitted verification work, and the claim charge covers full-tree carry and payment binding.
 
 ## Rationale
 
