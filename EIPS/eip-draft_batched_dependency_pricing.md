@@ -83,7 +83,7 @@ A direct ordinary leanSTARK proof is a one-claim leaf. It and each multi-claim l
 
 ### Recursive payment binding
 
-Each batch dependency is assigned to the payment triple of the verified leaf that established it. Recursive proofs authenticate records `(dependency, source)`, where `source` is that payment triple for a batch dependency and absent for other schemes. Every source payment MUST also be a retained dependency. Records are sorted and deduplicated by dependency. An intermediate proof's public statement is:
+Each batch dependency is assigned to the payment triple of the verified leaf that established it. Recursive proofs authenticate records `(dependency, source)`, where `source` is that payment triple for a batch dependency and absent for other schemes. Records are sorted and deduplicated by dependency. Intermediate proofs may retain claims without their payment dependencies; payment presence is checked at finalization. An intermediate proof's public statement is:
 
 ```python
 def get_batch_state_hash(records):
@@ -93,15 +93,18 @@ def get_batch_state_hash(records):
         )
         for dep, source in records
     ))
+
+def get_batch_final_hash(deps_hash):
+    assert len(deps_hash) == 32
+    return DEPS_HASH(b'EIP8288:batch-final:v1' + deps_hash)
 ```
 
-`encode_dependency` is EIP-8288's canonical 96-byte encoding. The circuit checks record order, widths and source types before hashing. The tag separates intermediate statements from ordinary dependency digests. The updated `AGGREGATED_VK` supports intermediate aggregation and finalization; a dependency-only statement containing batch claims can be produced only by finalization.
+`encode_dependency` is EIP-8288's canonical 96-byte encoding. The circuit checks record order, widths and source types before hashing. The tags separate intermediate and finalized statements from ordinary dependency digests. Under the updated `AGGREGATED_VK`, the ordinary-output circuit MUST reject both new schemes. Ordinary proofs can therefore be imported with absent sources; finalized proofs MUST NOT be imported for aggregation in either domain.
 
-- Merging retains authenticated assignments. For duplicate dependencies it may select either verified source; union size cannot create a new leaf statement or payment identity.
-- Discarding a dependency removes its assignment. A payment may be discarded only when no retained dependency refers to it. Discarded dependencies cannot be restored without another verified input.
-- An ordinary recursive proof of `get_deps_hash(deps)` may be imported with absent sources only if `deps` contains no `BATCHED_LEANSTARK_SCHEME` dependency. Finalization cannot erase payment bindings for subsequent pruning.
+- At each step, the prover chooses among sources authenticated by its verified inputs. The output commits to that choice. A later step may change it only by supplying another verified source for the same dependency; union size cannot create a leaf statement or payment identity.
+- Discarding a dependency removes its record. Discarding a payment does not remove references to it from retained claims. Discarded dependencies cannot be restored without another verified input.
 
-Finalization verifies an intermediate proof and checks that every source payment is present in its retained dependencies. It outputs the usual `get_deps_hash(deps)`, which block validation MUST match against `dependencies(block)`. Thus each retained batch claim requires a matching included payment declaration. Intermediate records are proving inputs; no batch membership field is added to the block.
+Finalization verifies an intermediate proof and checks that every source payment is present in its retained dependencies, then outputs `get_batch_final_hash(get_deps_hash(deps))`. The block's `block_deps_hash` remains `get_deps_hash(dependencies(block))`. For a block containing either new scheme, validators MUST verify its proof against `get_batch_final_hash(block_deps_hash)`; other blocks retain EIP-8288's statement. Both statements also bind the fork's `AGGREGATED_VK`. Sources remain private proving inputs: validators enforce payment binding through the proof, without a new block field.
 
 ### Submission and inclusion
 
@@ -109,7 +112,7 @@ Batchers submit member transactions, leaf proofs and sponsorship transactions di
 
 Transactions declaring either new scheme MUST NOT be admitted to or propagated through the public mempool, including inside proof wrappers. They impose no [EIP-7805](./eip-7805.md) inclusion obligation, even if an inclusion list supplies a covering proof. Includers MUST omit them; their presence does not remove other entries' obligations.
 
-Builders may include any valid subset of member transactions, including a single survivor, provided the corresponding leaf payments are included. Each transaction follows EIP-8141's validity and payment rules independently. Expiry, replacement or inclusion of another member does not change the surviving member's charge or require its signature or leaf proof to be replaced; the aggregate is updated for the retained dependencies.
+Builders may include any valid subset of member transactions, including a single survivor. They MUST include payments matching the selected sources before producing a block with batch claims. If a selected payment is unavailable, the builder must obtain a valid payment, reaggregate with another authenticated source, or omit the affected claim. Each transaction follows EIP-8141's validity and payment rules independently. Expiry, replacement or inclusion of another member does not change the surviving member's charge or require its signature or leaf proof to be replaced; the aggregate is updated for the retained dependencies.
 
 If all members are omitted, the builder may omit their leaf and its payment. A payment included without any surviving members, including when all have expired, still requires a valid leaf proof and is charged normally at the sponsor's risk. A missing or invalid sponsorship transaction requires another valid payment transaction, not new member signatures.
 
@@ -119,7 +122,7 @@ Accounts seeking a fallback SHOULD authorize both generic schemes under the same
 
 ### Activation requirements
 
-Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Calibrate leaf and claim charges against the same published block-capacity budgets as EIP-8288's native and ordinary generic charges, using its reference hardware, worker counts and complete transaction gas accounting.
+Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding and statement-domain conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Calibrate leaf and claim charges against the same published block-capacity budgets as EIP-8288's native and ordinary generic charges, using its reference hardware, worker counts and complete transaction gas accounting.
 
 A maximum-resource leaf is a valid leaf maximizing recursive verification cost within the permitted program size (including support code and padding), trace dimensions, committed values, bus interactions, proof bytes and claim count. Include program-commitment authentication and opening verification; benchmark jointly valid combinations of resource bounds.
 
@@ -138,7 +141,7 @@ The leaf and claim charges allocate shares of EIP-8288's block proving capacity:
 
 The payment declaration uses ordinary transaction fee authorization and settlement; it does not compensate the batcher directly. An application may fund proving or charge a separate service fee. Batching amortizes proof overhead and recursive verification; application-specific claim proving, possibly using the signature scheme's own aggregation, can still dominate. Filling a batch trades latency for cost.
 
-A separate payment transaction keeps the fixed charge independent of members' validity. A shared member paymaster alone would not achieve this. Identifying the payment by the key and claim-list digest lets a sponsor authorize it after proving and lets the same statement use different proof bytes. Authenticated source assignments prevent pruning from removing the payment while retaining its discounted claims.
+A separate payment transaction keeps the fixed charge independent of members' validity. A shared member paymaster alone would not achieve this. Identifying the payment by the key and claim-list digest lets a sponsor authorize it after proving and lets the same statement use different proof bytes. Authenticated sources and the finalization check prevent unpaid claims in a block without repeating payment-presence checks at each step. A separate finalization domain prevents importing a proof after its sources have been erased.
 
 ### Submission path
 
@@ -146,7 +149,7 @@ Direct submission avoids a public pool tracking sponsorship dependencies or rese
 
 ## Backwards Compatibility
 
-Activation enables two dependency schemes and changes the aggregation verifier. Existing schemes retain their encodings, charges and singleton statements. User verification keys only gain batching if their programs accept lists of independent claims; a program restricted to one claim remains usable and can produce a sponsored singleton.
+Activation enables two dependency schemes and changes the aggregation verifier. The applicable fork's `AGGREGATED_VK` fixes the accepted schemes and statement forms; pre-activation generic verification remains singleton-only. Existing schemes retain their encodings, charges and singleton statements. User verification keys only gain batching if their programs accept lists of independent claims; a program restricted to one claim remains usable and can produce a sponsored singleton.
 
 Public-mempool message formats remain unchanged. Blocks contain individual transactions and the recursive proof under the activating fork's rules, without batch membership fields.
 
@@ -158,13 +161,16 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 | One-claim digest | Equals EIP-8288's singleton statement |
 | Empty, repeated, unsorted or 257-claim leaf | Reject before hashing or leaf verification |
 | 64 members and their leaf payment; prune to one member | Accept with the same leaf and member signature; retain the payment |
-| Remove the payment while retaining one assigned claim | Reject |
+| Remove the payment while retaining one assigned claim | Accept as an intermediate state; reject finalization until the matching payment is restored from verified input |
 | Remove every member and the payment | Accept; the block owes no charge for that omitted leaf |
 | Include a payment after all its members expire | Verify its leaf and charge the sponsor normally |
 | Padding in a leaf or different proof bytes for the same statement | Fixed payment remains required; statement identity is unchanged |
 | 64 singleton leaves under one key | Require their 64 distinct payments; cannot replace them with payment for an unproved union |
-| Overlapping leaves establish the same dependency | Select an authenticated source; each distinct source retained by any claim needs its own payment |
-| Finalized batch proof imported without its authenticated assignments | Reject |
+| Overlapping leaves establish the same dependency but only one source is paid | The prover selects that source; another selection fails finalization unless its payment is supplied |
+| Change a source after an earlier step selected it | Require another verified input authenticating the alternative source |
+| Finalized proof imported as ordinary or intermediate input | Reject by statement-domain mismatch, including payment-only outputs |
+| Ordinary-output circuit asked to emit either new scheme | Reject |
+| Block with either new scheme supplies a plain dependency-digest proof | Reject; require the finalized statement and the usual block dependency commitment |
 | Restore a discarded claim or change its source without verified coverage | Reject |
 | Payment for another key, claim list or earlier block | Does not satisfy the retained claim's source |
 | 64 included claims and one payment | 64 times 300 gas plus 430,000 leaf gas: 449,200 gas, excluding other transaction costs |
@@ -180,7 +186,7 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 
 ## Security Considerations
 
-The constants are provisional, not measured prices. Every retained discounted claim must be linked to a verified leaf and its included payment. Payment identities cannot be invented by union or changed by pruning; payment without leaf verification cannot establish a claim. All leaf resource bounds apply even to inputs later discarded. Padding cannot reduce the fixed charge.
+The constants are provisional, not measured prices. Every discounted claim included in a block must be linked to a verified leaf and its included payment. Payment identities cannot be invented by union or changed by pruning; payment without leaf verification cannot establish a claim. All leaf resource bounds apply even to inputs later discarded. Padding cannot reduce the fixed charge.
 
 Sponsorship remains an availability dependency: the sponsor may withhold payment or its transaction may become invalid. Another sponsor can pay for the same leaf without changing member transactions. If every member disappears, omitting the leaf prevents a block charge but does not reimburse proving already performed; that risk belongs to the batcher's service arrangement.
 
