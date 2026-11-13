@@ -119,22 +119,22 @@ Accounts seeking a fallback SHOULD authorize both generic schemes under the same
 
 ### Activation requirements
 
-Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Publish reference prover and verifier revisions and configurations, numerical time and peak-memory budgets, target hardware and bounded worker counts before finalizing gas parameters.
+Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Calibrate leaf and claim charges against the same published block-capacity budgets as EIP-8288's native and ordinary generic charges, using its reference hardware, worker counts and complete transaction gas accounting.
 
 A maximum-resource leaf is a valid leaf maximizing recursive verification cost within the permitted program size (including support code and padding), trace dimensions, committed values, bus interactions, proof bytes and claim count. Include program-commitment authentication and opening verification; benchmark jointly valid combinations of resource bounds.
 
 Benchmarks MUST cover:
 
-- Singleton proofs under distinct keys without shared-key preprocessing savings, full 256-claim leaves, and blocks retaining one claim per maximum-resource leaf with its payment.
+- Singleton proofs under distinct keys without shared-key preprocessing savings, full 256-claim leaves, and blocks retaining one claim per maximum-resource leaf with its payment; include mixtures with native signatures and EVM execution.
 - Claim hashing, payment lookup and binding, overlapping leaves, pruning and finalization throughout the block's aggregation tree. Report tree depth, cumulative per-claim work, total work, critical-path latency, peak memory and transmitted bytes.
 
-The leaf charge MUST cover the maximum permitted verification cost; the claim charge MUST cover cumulative claim and payment-binding work through finalization, not just a single hashing pass. Measure the selected commitment construction before crediting any projected savings. If the gas schedule does not meet the budgets, revise the charges or interface before activation.
+The leaf charge MUST account for maximum permitted verification work; the claim charge MUST account for cumulative claim and payment-binding work through finalization, not just a single hashing pass. Their rates MUST keep gas-admissible blocks within the shared time and memory budgets, including recursive critical-path latency. Measure the selected commitment construction before crediting any projected savings. If the gas schedule does not meet the budgets, revise the charges or interface before activation.
 
 ## Rationale
 
 ### Charging for shared work
 
-The leaf charge prices the worst permitted recursive verification under EIP-8288's resource bounds; the claim charge prices additional digest, payment-binding and output work. Neither depends on the signature scheme implemented by a user verifier. These charges replace the intrinsic proof share for the new schemes: provisionally, a sponsor pays 430,000 gas per leaf and each included claim pays 300 gas, excluding other transaction costs. Losing members cannot reduce the leaf charge.
+The leaf and claim charges allocate shares of EIP-8288's block proving capacity: worst-case recursive verification per leaf, and additional digest, payment-binding and output work per claim. Linear work accounting is a proxy under the reference hardware and worker budget; measured time ratios alone do not establish gas prices. These charges replace the intrinsic proof share for the new schemes: provisionally, a sponsor pays 430,000 gas per leaf and each included claim pays 300 gas, excluding other transaction costs. Losing members cannot reduce the leaf charge.
 
 The payment declaration uses ordinary transaction fee authorization and settlement; it does not compensate the batcher directly. An application may fund proving or charge a separate service fee. Batching amortizes proof overhead and recursive verification; application-specific claim proving, possibly using the signature scheme's own aggregation, can still dominate. Filling a batch trades latency for cost.
 
