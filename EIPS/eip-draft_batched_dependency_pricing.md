@@ -1,21 +1,21 @@
 ---
-title: Batch Pricing for Generic Proofs
-description: Separates sponsored leaf verification from per-claim charges for generic proofs submitted directly to builders
+title: Generic Proof Verification and Batching
+description: Enables bounded generic proof verification and sponsored batches of independent claims
 author: Marc Harvey-Hill (@Marchhill)
 status: Draft
 type: Standards Track
 category: Core
 created: 2026-11-13
-requires: 7805, 8141, 8288
+requires: 7805, 7934, 8141, 8288
 ---
 
 ## Abstract
 
-This EIP extends [EIP-8288](./eip-8288.md) with proofs of multiple independent claims under one verification key and recalibrates its dependency gas charges against a common proving budget. Transactions pay per claim; a sponsor separately pays for each leaf used in the block. Any valid subset of a batch can be included without changing its members' signatures. These transactions are submitted directly to builders and are excluded from the public mempool and inclusion-list obligations.
+This EIP enables generic leanSTARK dependencies in [EIP-8288](./eip-8288.md), defines bounded singleton and batch proof verification, and calibrates dependency gas charges against a common proving budget. For discounted batches, transactions pay per claim and a sponsor separately pays for each leaf used in the block. Any valid subset of a batch can be included without changing its members' signatures. Discounted transactions are submitted directly to builders and are excluded from the public mempool and inclusion-list obligations.
 
 ## Motivation
 
-Verifying one generic proof inside the aggregation circuit can establish claims for many transactions. Charging every claim as a separate proof ignores that amortization. Each transaction should commit to its own claim before a batch is formed, without depending on other members remaining includable.
+Generic proofs let accounts authenticate claims under a chosen verification key instead of executing costly verifiers on chain. One proof inside the aggregation circuit can establish claims for many transactions. Charging every claim as a separate proof ignores that amortization. Each transaction should commit to its own claim before a batch is formed, without depending on other members remaining includable.
 
 An application supporting future post-quantum passkeys can collect assertions through its API, fund proving and submit a leaf, its payment transaction and the users' transactions directly to a builder. Each user keeps a native [EIP-8141](./eip-8141.md) transaction with its own nonce, receipt and payer. Another batcher or sponsor can serve the signed transactions without changing them. Public-mempool access and inclusion-list protection remain available through the ordinary, full-price scheme.
 
@@ -23,12 +23,13 @@ An application supporting future post-quantum passkeys can collect assertions th
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 
-This EIP uses EIP-8288's verification-key derivation, singleton claim digest and verifier resource bounds. It changes the aggregation circuit and therefore requires a new `AGGREGATED_VK`.
+This EIP enables EIP-8288's reserved `LEANSTARK_SCHEME`, adds batch claims and leaf payments, and replaces its dependency digest and recursive statements. Activation requires a new `AGGREGATED_VK`; other EIP-8288 rules apply unless modified below.
 
 ### Constants
 
 | Name | Value |
 | --- | --- |
+| `LEANSTARK_SCHEME` | `0x11` (enabled) |
 | `BATCHED_LEANSTARK_SCHEME` | `0x12` (provisional) |
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | `0x13` (provisional) |
 | `MAX_CLAIMS_PER_BATCH_LEAF` | `256` (provisional) |
@@ -36,20 +37,55 @@ This EIP uses EIP-8288's verification-key derivation, singleton claim digest and
 | `LEANSTARK_VERIFICATION_GAS` | `572000` (provisional) |
 | `RECURSIVE_PROOF_SHARE_GAS` | `4200` (provisional) |
 | `LEANSTARK_CLAIM_GAS` | `4200` (provisional) |
-| `BATCH_HASH` | EIP-8288's `CLAIM_HASH` |
+| `BATCH_HASH` | Keccak-256 (provisional) |
+| `MAX_INNER_PROOFS_PER_STEP` | `16` (provisional) |
 
 The provisional resource and gas parameters MUST be finalized through the activation benchmarks below.
 
 ### Dependency encoding
 
-Both new schemes are valid in dependency verification frames and use EIP-8288's 96-byte triple with 31 zero padding bytes before the scheme byte:
+Allow `LEANSTARK_SCHEME`, `BATCHED_LEANSTARK_SCHEME` and `LEANSTARK_LEAF_PAYMENT_SCHEME` alongside `LEANSPHINCS_SCHEME` in dependency verification frames. They use EIP-8288's 96-byte triple; the 31 padding bytes before the scheme byte remain reserved and zero:
 
 | Scheme | `data_hash` | `verification_key_hash` |
 | --- | --- | --- |
+| `LEANSTARK_SCHEME` | Individual claim, with EIP-8288's zero substitution | Leaf verification-key hash |
 | `BATCHED_LEANSTARK_SCHEME` | Individual claim, with EIP-8288's zero substitution | Leaf verification-key hash |
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | Nonzero `get_batch_hash(claims)` | Leaf verification-key hash |
 
 The payment triple identifies a leaf statement independently of its proof bytes. A member transaction commits to its claim and key, not the batch membership or sponsor.
+
+### Dependency digest
+
+Replace `get_deps_hash` everywhere in EIP-8288, including block commitments, with the hash of canonical 96-byte triples, including the scheme. Lists retain EIP-8288's sorting and deduplication rules.
+
+```python
+def encode_dependency(dep):
+    scheme, data_hash, verification_key_hash = dep
+    return scheme.to_bytes(32, 'big') + data_hash + verification_key_hash
+
+def get_deps_hash(deps):
+    return DEPS_HASH(b''.join(encode_dependency(dep) for dep in deps))
+```
+
+### Generic proof verification
+
+Provisionally, the leanSTARK verification key is the verifier's canonical 32-byte `program_commitment`, binding the complete program and its layout. The fork's pinned proof-system specification defines its derivation and all key-material encodings, and fixes the commitment construction, byte order, proof system, field, transcript, soundness parameters and resource bounds. Per-key parameter overrides are forbidden; proof-specific dimensions are authenticated inputs constrained by those bounds.
+
+At the fork's soundness level, the commitment must bind at most one complete program and layout even when generated adversarially. It must bind the proof transcript and support sound openings of the program-table evaluations required by verification, with authentication work sublinear in padded program size. Verification authenticates the proven program against the commitment named by:
+
+```python
+def get_vk_hash(program_commitment):
+    assert len(program_commitment) == 32
+    return keccak256(b'EIP8288:vk:v1' + program_commitment)
+```
+
+### Verifier resource bounds
+
+The fork fixes the following bounds with `AGGREGATED_VK`:
+
+- Maximum program size, trace dimensions, committed field elements, bus interactions and proof bytes. Program size includes support code and padding; proof bytes include all openings and authentication data. Encodings must represent every permitted proof. Reject violations at direct admission and inside aggregation, including discarded inputs.
+- Outer aggregation trace and proof-system size bounds. The commitment construction, leaf bounds and `MAX_INNER_PROOFS_PER_STEP` must jointly support full steps of maximum-resource leaves under distinct keys and permitted mixtures with recursive inputs within those bounds.
+- Output capacity of at least `MAX_RLP_BLOCK_SIZE // 96` dependencies, using [EIP-7934](./eip-7934.md)'s block-size bound. Counters and indices must represent all permitted program, list, intermediate-union and derived byte lengths without overflow; reject out-of-range lengths before narrowing conversions.
 
 ### Gas accounting
 
@@ -73,9 +109,13 @@ A leaf has one verification key, a proof and a nonempty list `claims` of at most
 ```python
 def get_batch_hash(claims):
     return BATCH_HASH(b'EIP8288:batch:v1' + b''.join(claims))
+
+def get_claim_hash(data_hash):
+    assert len(data_hash) == 32
+    return get_batch_hash([data_hash])
 ```
 
-For one claim this equals EIP-8288's `get_claim_hash`. `BATCH_HASH` remains fixed independently of `DEPS_HASH`. Existing singleton verifiers remain usable; a verifier need not accept longer lists.
+Verify each leaf with `verify_leanSTARK((get_batch_hash(claims),), verification_key_hash, proof)`. A direct `LEANSTARK_SCHEME` witness is a proof byte string establishing `(get_claim_hash(data_hash),)`, a one-claim leaf. This applies to mode 0 admission and direct inputs to aggregation. `BATCH_HASH` remains fixed independently of `DEPS_HASH`; a verifier may accept only singleton lists.
 
 The aggregation circuit MUST check claim widths, the list bound and strictly increasing byte-lexicographic order before hashing. The leaf verifier need not duplicate the order check. It must establish each claim independently of other records; a constraint spanning records belongs in one composite claim. The protocol authenticates acceptance under the selected key, not the claims' meaning or independence, which remain the responsibility of accounts selecting that key.
 
@@ -85,11 +125,11 @@ For each verified leaf, the aggregation circuit may establish:
 - Batch dependencies with the same membership and key checks.
 - Its leaf-payment dependency, whose digest and key match the leaf.
 
-A direct ordinary leanSTARK proof is a one-claim leaf. It and each multi-claim leaf count once toward `MAX_INNER_PROOFS_PER_STEP`, together with recursive proof inputs. All leaf resource bounds apply before discards. The per-leaf claim bound does not cap recursive output.
+A step is one execution of the aggregation circuit producing one recursive proof. It MUST support any combination of up to `MAX_INNER_PROOFS_PER_STEP` generic leaves and recursive proofs within the other resource bounds, and reject larger counts. Each direct singleton or batch leaf counts once, including direct proofs across folded mode 0 wrappers and discarded or redundant inputs; proofs deeper in the tree do not count. Apply all resource bounds before discards. Neither step arity nor the per-leaf claim bound caps recursive output.
 
 ### Recursive payment binding
 
-Each batch dependency is assigned to the payment triple of the verified leaf that established it. Recursive proofs authenticate records `(dependency, source)`, where `source` is that payment triple for a batch dependency and absent for other schemes. Records are sorted and deduplicated by dependency. EIP-8288's resource and counter bounds apply to the 192-byte records and intermediate unions. Intermediate proofs may retain claims without their payment dependencies; payment presence is checked at finalization. Recursive public statements are:
+Each batch dependency is assigned to the payment triple of the verified leaf that established it. Recursive proofs authenticate records `(dependency, source)`, where `source` is that payment triple for a batch dependency and absent for other schemes. Records are sorted and deduplicated by dependency. The resource and counter bounds apply to the 192-byte records and intermediate unions. Intermediate proofs may retain claims without their payment dependencies; payment presence is checked at finalization. Recursive public statements are:
 
 ```python
 def get_ordinary_hash(deps_hash):
@@ -109,7 +149,7 @@ def get_batch_final_hash(deps_hash):
     return DEPS_HASH(b'EIP8288:aggregate:v1' + b'\x02' + deps_hash)
 ```
 
-`encode_dependency` is EIP-8288's canonical 96-byte encoding. The circuit checks record order, widths and source types before hashing. The common prefix and distinct one-byte tags separate all three recursive statement domains independently of payload length. Under the updated `AGGREGATED_VK`, ordinary recursive proofs use `get_ordinary_hash(get_deps_hash(deps))` in wrappers, inclusion lists, blocks and recursive inputs; the ordinary-output circuit MUST reject both new schemes. Ordinary proofs can be imported with absent sources; finalized proofs MUST NOT be imported for aggregation in either domain. Direct generic leaf statements are unchanged.
+The circuit checks record order, widths and source types before hashing. The common prefix and distinct one-byte tags separate all three recursive statement domains independently of payload length. Under the updated `AGGREGATED_VK`, ordinary recursive proofs use `get_ordinary_hash(get_deps_hash(deps))` in wrappers, inclusion lists, blocks and recursive inputs; the ordinary-output circuit MUST reject both new schemes. Ordinary proofs can be imported with absent sources; finalized proofs MUST NOT be imported for aggregation in either domain.
 
 - At each step, the prover chooses among sources authenticated by its verified inputs. The output commits to that choice. A later step may change it only by supplying another verified source for the same dependency; union size cannot create a leaf statement or payment identity.
 - Discarding a dependency removes its record. Discarding a payment does not remove references to it from retained claims. Discarded dependencies cannot be restored without another verified input.
@@ -140,14 +180,19 @@ Proof-validation caches MUST distinguish `AGGREGATED_VK` and statement domain. W
 
 ### Activation requirements
 
-EIP-8288's activation requirements apply. Fix the new `AGGREGATED_VK`, leaf and intermediate-proof encodings, and payment-binding and statement-domain conformance vectors before activation. The common calibration must additionally cover:
+Before activation:
 
-- Leaves with `MAX_CLAIMS_PER_BATCH_LEAF` claims, and blocks retaining one claim per maximum-resource leaf with its payment.
-- Cumulative claim carry and payment binding through overlapping leaves, pruning and finalization, separating per-record work from amortized node overhead.
+- Pin the complete proof-system specification and soundness analysis covering adversarial keys, canonical key/proof encodings, `DEPS_HASH`, `BATCH_HASH`, `AGGREGATED_VK`, and key, digest, payment-binding and statement-domain conformance vectors.
+- Publish the reference prover/verifier configuration, hardware and worker count, block gas limit, numerical builder and validator time/memory budgets, and safety margins.
+- Demonstrate maximum-resource steps and gas-admissible blocks meeting those budgets: EVM execution, native signatures, distinct-key singleton proofs, full batch leaves, one surviving claim per paid leaf, and adversarial mixtures. Measure cumulative carry and payment binding through overlaps, pruning and finalization. Finalize all bounds and charges from these measurements before activation.
 
-Use the [batching benchmark supplement](../assets/eip-draft_batched_dependency_pricing/benchmarks.md). Finalize all charges from measured block schedules meeting the shared budgets: the leaf charge covers maximum permitted verification work, and the claim charge covers full-tree carry and payment binding.
+Use the [benchmark methodology](../assets/eip-draft_batched_dependency_pricing/benchmarks.md) for workload construction and reporting. Models and extrapolations do not satisfy the gate; higher gas limits require recalibration.
 
 ## Rationale
+
+### Verifier identity and statements
+
+Sound evaluation openings authenticate the committed program without hashing its entire table inside recursion. Binding must hold for adversarial keys; the pinned proof-system specification defines the construction. User verifiers compute the claim digest in-circuit, so fixing `BATCH_HASH` independently of `DEPS_HASH` preserves pinned keys when the aggregation hash changes. Singletons and batches use one statement, allowing batch membership to change without changing transaction claims.
 
 ### Charging for shared work
 
@@ -167,7 +212,9 @@ Direct submission avoids a public pool tracking sponsorship dependencies or rese
 
 ## Backwards Compatibility
 
-Activation enables two dependency schemes and changes the aggregation verifier. The applicable fork's `AGGREGATED_VK` fixes the accepted schemes and statement forms; pre-activation generic verification remains singleton-only. Existing schemes retain their encodings and singleton leaf statements, but use the revised gas schedule; all recursive proofs adopt the tagged statements above. Transactions signed with old dependency-frame execution limits require updated budgets and signatures. User verification keys only gain batching if their programs accept lists of independent claims; a program restricted to one claim remains usable and can produce a sponsored singleton.
+Activation enables the reserved `LEANSTARK_SCHEME` and two additional schemes. It replaces EIP-8288's proposed bare `(data_hash,)` generic statement with `(get_claim_hash(data_hash),)`; verifiers written for the former must adopt the new statement. A singleton-only verifier remains valid under this EIP and can produce sponsored singletons.
+
+Native signature verification and dependency-frame encoding remain unchanged, but the dependency digest now includes scheme bytes and all recursive proofs use the new key and tagged statements. The revised gas schedule requires updated budgets and signatures for transactions signed with old dependency-frame execution limits.
 
 Public-mempool message formats remain unchanged. Blocks contain individual transactions and the recursive proof under the activating fork's rules, without batch membership fields.
 
@@ -176,7 +223,17 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 | Case | Expected result |
 | --- | --- |
 | Nonzero scheme padding; zero payment digest | Reject |
-| One-claim digest | Equals EIP-8288's singleton statement |
+| One-claim digest | `get_batch_hash([claim]) == get_claim_hash(claim)`; reject a proof of the bare claim |
+| Same claim and key under different schemes | Distinct canonical 96-byte encodings and dependency digests |
+| Wrong key, key-hash tag or commitment width | Reject |
+| Program substitution, unauthenticated dimensions or parameter overrides | Reject |
+| Opening for another commitment, point or value; unbound transcript | Reject, including inconsistent key-bound evaluations even if the key hash is recomputed |
+| Each resource bound and one above it | Accept the bound; reject overflow even for discarded inputs; count support code, padding and all authentication data |
+| Full step at finalized arity and maximum resource bounds | Fits outer proof bounds; reject oversized steps even within the arity limit |
+| `MAX_INNER_PROOFS_PER_STEP` immediate generic/recursive inputs, then one more | Accept then reject; include direct inputs across wrappers and discarded or redundant proofs |
+| 65,535, 65,536 and `MAX_RLP_BLOCK_SIZE // 96` dependencies | Preserve lengths without narrowing or truncation; reject out-of-range program, list and derived byte lengths |
+| Noncanonical key or proof encoding | Reject before proof verification |
+| Change `DEPS_HASH` | Does not change `get_claim_hash` or the user verification key |
 | Empty, repeated, unsorted or 257-claim leaf | Reject before hashing or leaf verification |
 | 64 members and their leaf payment; prune to one member | Accept with the same leaf and member signature; retain the payment |
 | Remove the payment while retaining one assigned claim | Accept as an intermediate state; reject finalization until the matching payment is restored from verified input |
@@ -215,7 +272,9 @@ Sponsorship remains an availability dependency: the sponsor may withhold payment
 
 Batchers and builders can delay, withhold or expose transactions received privately. The discounted path has no inclusion-list guarantee. A sender unable to prove needs another prover for the full-price fallback, which also requires account support and public-mempool eligibility.
 
-Accounts remain responsible for verifier semantics and for authenticating every claim independently. Under a sound verifier, a batcher cannot forge authorization. Accounts may also retain a native key or an in-EVM validation path within the public-mempool limits.
+Generic claims can prove arbitrary computations, so worst-case benchmarks must cover the most expensive permitted singleton proofs, not only signature programs. Gas bounds included declarations; step arity and resource bounds limit individual operations, not redundant or discarded proving histories. Clients should bound that local work. Signature witnesses need not have canonical byte encodings, but the leaf verifier must enforce the scheme's validity constraints.
+
+Accounts remain responsible for verifier semantics and for authenticating every claim independently. Authorization claims must bind the signer, message and required policy. Under a sound verifier, a batcher cannot forge authorization. Accounts may also retain a native key or an in-EVM validation path within the public-mempool limits.
 
 ## Copyright
 
