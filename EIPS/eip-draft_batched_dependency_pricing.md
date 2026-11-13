@@ -1,24 +1,23 @@
 ---
 title: Batch Pricing for Generic Proofs
-description: Discounts generic proof dependencies through complete sponsored batches with a minimum batch size signed by each transaction
+description: Discounts generic proof dependencies submitted directly to builders using a minimum batch size signed by each transaction
 author: Marc Harvey-Hill (@Marchhill)
-discussions-to: https://ethereum-magicians.org/t/eip-8288-frame-type-for-pq-sig-and-stark-aggregation/28723
 status: Draft
 type: Standards Track
 category: Core
 created: 2026-11-13
-requires: 8141, 8288, 8437
+requires: 7805, 8141, 8288
 ---
 
 ## Abstract
 
-This EIP extends [EIP-8288](./eip-8288.md) with proofs of multiple independent claims under one verification key. A new dependency scheme splits its charge into a marginal claim cost and a share of leaf verification, determined by a minimum batch size committed by the transaction. Public mempool admission and propagation require complete, funded batches sponsored by one paymaster; block inclusion remains per transaction.
+This EIP extends [EIP-8288](./eip-8288.md) with proofs of multiple independent claims under one verification key. A new dependency scheme splits its charge into a marginal claim cost and a share of leaf verification, determined by a minimum batch size committed by the transaction. Discounted transactions are submitted directly to builders and are excluded from the public mempool and inclusion-list obligations.
 
 ## Motivation
 
 Verifying one generic proof inside the aggregation circuit can establish claims for many transactions. Charging every claim as a separate proof ignores that amortization. Each transaction should commit to its own claim and minimum acceptable batch size without waiting for the batch's membership to be chosen.
 
-An application supporting future post-quantum passkeys can collect assertions through its API, fund proving and sponsor users through [EIP-8141](./eip-8141.md). The backend submits one proven batch with its member transactions. Users need neither a local prover nor raw-witness gossip; a different batcher using the same verifier can serve them without changing their signed claims.
+An application supporting future post-quantum passkeys can collect assertions through its API, fund proving and submit a batch proof with the users' transactions directly to a builder. Each user keeps a native [EIP-8141](./eip-8141.md) transaction with its own nonce, receipt and payer. A different batcher using the same verifier can serve the signed transactions. Public-mempool access and inclusion-list protection remain available through the ordinary, full-price scheme.
 
 ## Specification
 
@@ -35,8 +34,6 @@ This EIP uses EIP-8288's verification-key derivation, singleton claim digest and
 | `LEANSTARK_LEAF_GAS` | `30000` (provisional) |
 | `LEANSTARK_CLAIM_GAS` | `300` (provisional) |
 | `BATCH_HASH` | EIP-8288's `CLAIM_HASH` |
-| `BATCH_WRAPPER_MODE` | `2` |
-| `MAX_BATCH_BYTES` | `2**21` |
 
 The provisional resource and gas parameters MUST be finalized through the activation benchmarks below.
 
@@ -64,7 +61,7 @@ def batch_dependency_gas(min_batch):
     return LEANSTARK_CLAIM_GAS + leaf_share(min_batch)
 ```
 
-Charge each declaration before dependency deduplication, regardless of execution reverting. Other schemes' charges, EIP-8288's transaction-level intrinsic proof-share charge and EIP-8141's other gas and fee rules continue to apply. The actual batch size or block order does not change the transaction's charge.
+Charge each declaration before dependency deduplication, regardless of execution reverting. Other schemes' charges, EIP-8288's intrinsic proof-share charge per declared dependency and EIP-8141's other gas and fee rules continue to apply. The actual batch size or block order does not change the transaction's charge.
 
 ### Batch statements
 
@@ -86,78 +83,45 @@ For each verified leaf with `N = len(claims)`, the aggregation circuit may estab
 
 A direct ordinary leanSTARK proof is a one-claim leaf. It and each multi-claim leaf count once toward `MAX_INNER_PROOFS_PER_STEP`, together with recursive proof inputs. All leaf resource bounds apply before discards. The per-leaf claim bound does not cap recursive output.
 
-Recursive proofs carry the exact established triples, including `min_batch`, through EIP-8288's union, deduplication and discard operations. They MUST NOT increase `min_batch`, establish a new batch qualifier from the size of a recursive union, or restore discarded triples without another verified input. A subset retained from a verified leaf keeps its established qualifier: `min_batch` refers to the original leaf, not the surviving block membership. No leaf identifier, group cap or historical proof counter is added to the block statement.
+Recursive proofs carry the exact established triples, including `min_batch`, through EIP-8288's union, deduplication and discard operations. They MUST NOT increase `min_batch`, establish a new batch qualifier from the size of a recursive union, or restore discarded triples without another verified input. A subset retained from a verified leaf keeps its established qualifier: `min_batch` refers to the original leaf, not the surviving block membership.
 
-`MAX_LEANSTARK_DEPS_PER_WRAPPER` limits direct proofs in mode 0; it does not limit claims in a recursive mode 1 proof. Both generic schemes count toward `MAX_STARKS_PER_TX`; other EIP-8288 transaction and wrapper limits continue to apply.
+### Submission and inclusion
 
-### Complete batch wrappers
+Batchers submit transactions and their leaf proofs directly to builders. The submission API and service payment are outside this specification. Builders verify the leaves and incorporate them into EIP-8288's recursive block proof; leaves are not added to the block encoding.
 
-A batch wrapper is a canonical RLP object:
+Transactions declaring `BATCHED_LEANSTARK_SCHEME` MUST NOT be admitted to or propagated through the public mempool, including inside proof wrappers. They impose no [EIP-7805](./eip-7805.md) inclusion obligation, even if an inclusion list supplies a covering proof. Includers MUST omit them; their presence does not remove other entries' obligations.
 
-```text
-[transactions, BATCH_WRAPPER_MODE, [deps, leaf_proof]]
-```
+Builders may include any valid subset of the submitted transactions. Each transaction follows EIP-8141's validity and payment rules independently, and the block proof must retain its exact dependencies, including `min_batch`. No common payer or atomic inclusion is required. Expiry, replacement or inclusion of one transaction does not invalidate the leaf's proof of the other claims.
 
-- `transactions` contains full pooled encodings as byte strings, ordered by strictly ascending consensus transaction hash. Their form, blob-data elision and cell handling follow [EIP-8437](./eip-8437.md). The complete object MUST fit `MAX_BATCH_BYTES`.
-- Each member MUST declare exactly one dependency, using `BATCHED_LEANSTARK_SCHEME`. All members MUST use the same verification key and have distinct resolved claims. Conflicting `(sender, nonce)` pairs are forbidden.
-- `deps` is exactly the sorted, deduplicated union of those declarations. There MUST be a one-to-one correspondence between its claims and member transactions, with no surplus claims. Derive `claims` by sorting its resolved `data_hash` values byte-lexicographically.
-- Verify `leaf_proof` once against `(get_batch_hash(claims),)` and the common key. With `N = len(claims)`, every member MUST have `min_batch <= N`, and the sum of members' `leaf_share(min_batch)` MUST be at least `LEANSTARK_LEAF_GAS`.
+### Public-mempool fallback
 
-Only complete batch wrappers may introduce batch-dependent transactions into the public mempool. Ordinary mode 0/1 wrappers and standalone transaction messages MUST NOT introduce or propagate these transactions. Ordinary generic dependencies remain eligible for EIP-8288's mode 0/1 paths.
-
-### Admission and lifecycle
-
-Clients MUST validate the whole batch before admitting or relaying any member:
-
-1. Apply the byte, encoding, dependency and proof checks above.
-2. Apply EIP-8141's public-mempool rules to every member against the same head, without executing another member's body. All MUST pass and approve the same canonical paymaster as payer. Existing blob-availability checks apply to every member.
-3. Atomically reserve every distinct member's `max_fee` under EIP-8141's paymaster accounting. Existing pending reservations count once; another batch cannot reuse their balance as additional funding. New membership and payer reservations are committed only if all checks succeed.
-
-Proof validity alone is insufficient for admission or relay. If any member expires, is replaced, is included, or otherwise ceases to pass admission, clients MUST stop offering the batch and remove its membership. A member may remain pending only through another complete, currently admissible batch. Release its reservation when it has no remaining pending membership. Clients MUST NOT relay the remaining members as a partial batch. Re-entry requires a complete admissible batch; checking a cached valid proof need not be repeated.
-
-Clients SHOULD bound batch bytes, verification work and retained variants globally and per peer and paymaster. Resource refusal or a member's state-dependent admission failure is not proof invalidity or peer misbehavior. EIP-8437's malformed-data and proof-failure rules otherwise apply.
-
-### Propagation
-
-Batch wrappers use EIP-8437's `eth/73` messages; Status and message encodings are unchanged. NewProofWrapperHashes (`0x16`) additionally accepts mode `2`, with lengths bounded by `MAX_BATCH_BYTES`; GetProofWrappers (`0x17`) and ProofWrappers (`0x18`) retrieve complete batch wrappers in the same way as ordinary wrappers. The wrapper hash is Keccak-256 of the complete RLP object; the two coverage hints use its encoded `deps` and consensus transaction hashes.
-
-Mode 2 responses MUST carry full transaction encodings, for either value of `compact`. EIP-8437's count limits, response ordering, soft limit and validation-before-relay apply. Announce only batches that remain fully admitted; proof coverage alone does not suppress a batch announcement. An admitted batch with matching dependency and transaction hints may suppress another. Before local activation, clients MUST ignore mode 2 announcements without penalties and send none.
-
-### Block construction and inclusion lists
-
-Builders aggregate batch leaves into EIP-8288's recursive proof. The proof need only retain the dependencies of included transactions, with their original `min_batch` values. Blocks carry no batch wrapper and impose neither common-paymaster nor atomic-batch inclusion requirements. Existing inclusion-list rules likewise apply to transactions individually; a recursive proof can cover a selected subset of a leaf's claims.
+Accounts seeking a fallback SHOULD authorize both generic schemes under the same verification key and claim semantics. A sender can replace the discounted declaration with ordinary `LEANSTARK_SCHEME`, update the gas budget, re-sign and obtain a singleton proof for the updated transaction. The ordinary transaction is subject to the existing public-mempool and inclusion-list eligibility rules. A singleton proof cannot satisfy an already-signed `min_batch > 1`.
 
 ### Activation requirements
 
 Activation requires the new aggregation key, canonical leaf proof encoding and conformance vectors, and EIP-8288's verifier resource and counter bounds. Publish numerical time and peak-memory budgets, target hardware and bounded worker counts before finalizing gas parameters.
 
-Benchmarks MUST cover singleton proofs under distinct keys, maximum-size leaves, complete sponsored batches, and blocks retaining one discounted claim from each of many distinct maximum-resource leaves. Measure leaf verification, claim hashing and output handling separately, plus total work, recursive critical path, memory and transmitted bytes. The leaf charge MUST cover the most expensive permitted proof shape, not an average application program. If the proposed gas schedule does not meet the budgets, revise the charges or interface before activation.
+Benchmarks MUST cover singleton proofs under distinct keys, maximum-size leaves, and blocks retaining one discounted claim from each of many distinct maximum-resource leaves, including padded leaves. Measure leaf verification, claim hashing and output handling separately, plus total work, recursive critical path, memory and transmitted bytes. The leaf charge MUST cover the most expensive permitted proof shape, not an average application program. If the gas schedule does not meet the budgets in the partial-inclusion case, revise the charges or interface before activation.
 
 ## Rationale
 
 ### Charging for shared work
 
-The leaf charge prices the worst permitted recursive verification under EIP-8288's resource bounds; the claim charge prices additional digest and output work. Neither depends on the signature scheme implemented by a user verifier. `min_batch` makes the charge knowable before signing. With the provisional values, the dependency-frame charge is 30,300 gas at `min_batch = 1`, and 769 at `min_batch = 64`; 64 such members contribute 30,016 gas toward the leaf, excluding their marginal charges.
+The leaf charge prices the worst permitted recursive verification under EIP-8288's resource bounds; the claim charge prices additional digest and output work. Neither depends on the signature scheme implemented by a user verifier. `min_batch` makes the charge knowable before signing and permits smaller batches at higher prices, unlike a fixed threshold. With the provisional values, the dependency-frame charge is 30,300 gas at `min_batch = 1`, and 769 at `min_batch = 64`. EIP-8288's separate 30,000-gas transaction proof share still applies: batching reduces a single declaration's combined proof charges from 60,000 to 30,418 at `min_batch = 256`, excluding other transaction costs.
 
 This is not a payment to the batcher. An application may fund proving, charge a separate service fee or receive an authorized transaction payment. Batching amortizes proof overhead and recursive verification; application-specific claim proving, possibly using the signature scheme's own aggregation, can still dominate. Filling a batch trades latency for cost.
 
-### Complete sponsored batches
+### Submission path
 
-Checking only a leaf's size would let a sender pad it with unpaid claims and gossip one cheap transaction with a large proof. Complete batches require a distinct admitted transaction for every claim and enough declared leaf shares. One canonical paymaster supplies bounded, shared fee exposure using existing reservation rules. A paymaster is not a validity guarantee: sender nonces, account state, expiries and competing transactions still require revalidation.
+Direct submission lets builders choose and price the proving work they accept, without a public pool tracking interdependent transactions or shared fee reservations. Each user retains a native transaction. Combining users' operations into one application transaction could share more fixed costs, but would also share its nonce and receipt and require application-level replay protection.
 
-This admission rule does not ensure that every leaf is fully paid in a block. Builders may include subsets and bear the resulting proving cost; private submissions and inclusion obligations can also produce partial batches. Requiring full payment at consensus would need additional leaf accounting or atomic inclusion. The activation workload therefore includes partial batches rather than assuming profitable builder selection removes that case.
-
-### Statements and transport
-
-Transactions commit to individual claims and `min_batch`, not the later batch membership. Existing one-claim statements remain valid, while multi-claim verifiers must support the extended list. Keeping the claim hash independent of the aggregation hash avoids changing pinned user keys when recursion changes.
-
-A new wrapper mode reuses announcement and retrieval instead of adding parallel bundle messages. Full delivery avoids partial admission and keeps this version independent of omission caches. Ordinary singleton proofs remain available at the full EIP-8288 price.
+Builder choice does not prove the discount sound: unused claims can still leave a leaf underfunded, so activation benchmarks include that case.
 
 ## Backwards Compatibility
 
 Activation enables a new dependency scheme and changes the aggregation verifier. Existing schemes retain their encodings, charges and singleton statements. User verification keys only gain batching if their programs accept lists of independent claims; a program restricted to one claim remains usable.
 
-Peers without mode 2 support ignore its announcements and do not retrieve batches. Blocks and inclusion lists contain ordinary transactions and recursive proofs under the activating fork's rules, without a bundle field.
+Public-mempool message formats remain unchanged. Blocks contain individual transactions and the recursive proof under the activating fork's rules, without batch membership fields.
 
 ## Test Cases
 
@@ -171,23 +135,22 @@ Peers without mode 2 support ignore its announcements and do not retrieve batche
 | Merge 64 independently proved singleton claims | May establish their existing qualifiers; cannot establish `min_batch = 64` |
 | Prune a 64-claim leaf to one established triple | Accept its original qualifier; reject increasing it or resurrecting a discarded triple without verified coverage |
 | 64 members at minimum 64 | Each pays 769 dependency gas; leaf shares total 30,016 |
-| Duplicate declaration in a transaction | Charge both occurrences; it cannot count as two members for bundle admission |
-| Missing member, surplus claim, mixed keys or conflicting sender/nonces | Reject bundle admission |
-| One member fails admission, or paymaster cannot fund summed maximum fees | Admit none; create no partial reservations |
-| Two batches share a pending member | Count its payer reservation once; releasing one batch does not release an otherwise pending member |
-| A member expires, is replaced or included | Stop offering the batch; retain other members only through another complete admitted batch |
-| Mode 2 announcement before local activation; after activation | Ignore without penalty; process using the existing `eth/73` messages |
-| Mode 2 sent with an omission reference | Reject; complete encodings are required even with `compact = 1` |
-| Complete batch exactly at `MAX_BATCH_BYTES`; one byte larger | Accept size boundary; reject oversized batch |
-| A block includes one member of a valid batch | Check its individual validity and established qualifier; no atomic-inclusion requirement |
+| Duplicate declaration in a transaction | Charge both occurrences before dependency deduplication |
+| Matching claim under a different key; invalid or over-resource leaf | Reject, including inputs later discarded |
+| A member expires, is replaced or included | The leaf can still establish other claims; evaluate each transaction separately |
+| Transactions have different payers or only a subset is included | Apply individual validity and established qualifiers; no atomic-inclusion requirement |
+| A leaf has padded claims with no corresponding included transaction | May establish a matching discount; leaf size does not prove payment |
+| Discounted transaction submitted to the public pool or inside a wrapper | Do not admit or propagate, even with a valid proof |
+| An inclusion list contains ordinary and discounted entries | Discounted entries impose no obligation; evaluate the others normally |
+| Switch a signature-hash-bound transaction to the ordinary scheme | Recompute its budget and signature; prove the updated claim before ordinary admission |
 
 ## Security Considerations
 
-The constants are provisional, not measured prices. A list-sized discount is safe only if the recursive proof authenticates the original leaf size; union size, repeated claims or a sender-provided count cannot replace that check. Retaining qualifiers through pruning deliberately permits underfunded block subsets, so public-mempool admission alone does not bound worst-case block proving work.
+The constants are provisional, not measured prices. The recursive proof must authenticate the original leaf size; union size, repeated claims or a sender-provided count cannot replace that check. A verifier may accept padded claims with no paying transactions, and pruning may retain one discounted claim from an expensive leaf. Consequently, leaf size proves eligibility for the discount, not shared payment. Private submission removes public relay costs, not this proving-cost mismatch.
 
-Complete batches can still consume unpaid network work and can be invalidated after admission. Shared sponsorship concentrates this risk and does not remove it. Local work limits, canonical-paymaster reservations, expiry and whole-batch revalidation bound exposure; alternative proof bytes or repeated submissions must not duplicate reservations.
+Batchers and builders can delay, withhold or expose transactions received privately. The discounted path has no inclusion-list guarantee. A sender unable to prove needs another prover for the full-price fallback, which also requires account support and public-mempool eligibility.
 
-Accounts remain responsible for verifier semantics and for authenticating every claim independently. With `MAX_STARKS_PER_TX = 1`, signature authorization plus an application proof needs one composite claim. Keeping the application witness private from a batcher requires a user-generated zero-knowledge proof checked by that composite verifier. A batcher can delay or censor but cannot forge a sound claim. Accounts needing a path without a batcher can retain singleton proving, a native key or an in-EVM validation path within the public-mempool limits.
+Accounts remain responsible for verifier semantics and for authenticating every claim independently. Under a sound verifier, a batcher cannot forge authorization. Accounts may also retain a native key or an in-EVM validation path within the public-mempool limits.
 
 ## Copyright
 
