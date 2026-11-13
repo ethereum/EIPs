@@ -32,7 +32,7 @@ This EIP uses EIP-8288's verification-key derivation, singleton claim digest and
 | `BATCHED_LEANSTARK_SCHEME` | `0x12` (provisional) |
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | `0x13` (provisional) |
 | `MAX_CLAIMS_PER_BATCH_LEAF` | `256` (provisional) |
-| `LEANSTARK_LEAF_GAS` | `30000` (provisional) |
+| `LEANSTARK_LEAF_GAS` | `430000` (provisional) |
 | `LEANSTARK_CLAIM_GAS` | `300` (provisional) |
 | `BATCH_HASH` | EIP-8288's `CLAIM_HASH` |
 
@@ -56,9 +56,9 @@ Each declaration contributes to its dependency frame's exact `limits.execution`:
 - `BATCHED_LEANSTARK_SCHEME`: `LEANSTARK_CLAIM_GAS`.
 - `LEANSTARK_LEAF_PAYMENT_SCHEME`: `LEANSTARK_LEAF_GAS`.
 
-Charge each occurrence before dependency deduplication. EIP-8288's intrinsic proof-share charge applies to claim declarations, including the new claim scheme, but excludes leaf-payment declarations. Other transaction and authorization costs still apply. Frame charges count toward block execution capacity under EIP-8141's normal gas accounting; refunds do not reduce that capacity charge.
+Charge each occurrence before dependency deduplication. Both new schemes are excluded from EIP-8288's intrinsic proof-share charge. Other transaction and authorization costs still apply. Frame charges count toward block execution capacity under EIP-8141's normal gas accounting; refunds do not reduce that capacity charge.
 
-A sponsor declares one or more leaf payments in its own frame transaction. Its payer authorizes the fees through EIP-8141; member transactions need not use that payer. A payment is effective only when its transaction is valid and included in the same block, before or after its members. Repeated declarations are charged repeatedly but identify the same leaf. Payment in an earlier block provides no credit.
+A sponsor declares one or more leaf payments in its own frame transaction. Its payer authorizes the fees through EIP-8141; member transactions need not use that payer. A payment is effective only when its transaction is valid and included in the same block, before or after its members. If two sponsors pay for the same leaf, both declarations are charged; deduplication gives neither a refund nor additional credit. Payment in an earlier block provides no credit.
 
 ### Batch statements
 
@@ -111,7 +111,7 @@ Transactions declaring either new scheme MUST NOT be admitted to or propagated t
 
 Builders may include any valid subset of member transactions, including a single survivor, provided the corresponding leaf payments are included. Each transaction follows EIP-8141's validity and payment rules independently. Expiry, replacement or inclusion of another member does not change the surviving member's charge or require its signature or leaf proof to be replaced; the aggregate is updated for the retained dependencies.
 
-If all members are omitted, the builder may omit their leaf and its payment. A payment included without any surviving members still requires a valid leaf proof and is charged normally. A missing or invalid sponsorship transaction requires another valid payment transaction, not new member signatures.
+If all members are omitted, the builder may omit their leaf and its payment. A payment included without any surviving members, including when all have expired, still requires a valid leaf proof and is charged normally at the sponsor's risk. A missing or invalid sponsorship transaction requires another valid payment transaction, not new member signatures.
 
 ### Public-mempool fallback
 
@@ -119,15 +119,22 @@ Accounts seeking a fallback SHOULD authorize both generic schemes under the same
 
 ### Activation requirements
 
-Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Publish numerical time and peak-memory budgets, target hardware and bounded worker counts before finalizing gas parameters.
+Activation requires the new aggregation key, leaf and intermediate-proof encodings, payment-binding conformance vectors, and EIP-8288's verifier resource and counter bounds, including the 192-byte intermediate records. Publish reference prover and verifier revisions and configurations, numerical time and peak-memory budgets, target hardware and bounded worker counts before finalizing gas parameters.
 
-Benchmarks MUST cover singleton proofs under distinct keys, maximum-size leaves, and blocks retaining one claim per maximum-resource leaf with its payment. Include padded leaves, overlapping leaves, pruning and finalization. Measure leaf verification, claim hashing and payment-binding work separately, plus total work, recursive critical path, memory and transmitted bytes. The leaf charge MUST cover the most expensive permitted proof shape, not an average application program. If the gas schedule does not meet the budgets, revise the charges or interface before activation.
+A maximum-resource leaf is a valid leaf maximizing recursive verification cost within the permitted program size (including support code and padding), trace dimensions, committed values, bus interactions, proof bytes and claim count. Include program-commitment authentication and opening verification; benchmark jointly valid combinations of resource bounds.
+
+Benchmarks MUST cover:
+
+- Singleton proofs under distinct keys without shared-key preprocessing savings, full 256-claim leaves, and blocks retaining one claim per maximum-resource leaf with its payment.
+- Claim hashing, payment lookup and binding, overlapping leaves, pruning and finalization throughout the block's aggregation tree. Report tree depth, cumulative per-claim work, total work, critical-path latency, peak memory and transmitted bytes.
+
+The leaf charge MUST cover the maximum permitted verification cost; the claim charge MUST cover cumulative claim and payment-binding work through finalization, not just a single hashing pass. Measure the selected commitment construction before crediting any projected savings. If the gas schedule does not meet the budgets, revise the charges or interface before activation.
 
 ## Rationale
 
 ### Charging for shared work
 
-The leaf charge prices the worst permitted recursive verification under EIP-8288's resource bounds; the claim charge prices additional digest and output work. Neither depends on the signature scheme implemented by a user verifier. With the provisional values, each included claim pays 300 dependency-frame gas plus EIP-8288's 30,000-gas intrinsic proof share; a separate payment declaration contributes 30,000 gas per leaf, plus its transaction's other costs. Losing members cannot reduce the leaf charge.
+The leaf charge prices the worst permitted recursive verification under EIP-8288's resource bounds; the claim charge prices additional digest, payment-binding and output work. Neither depends on the signature scheme implemented by a user verifier. These charges replace the intrinsic proof share for the new schemes: provisionally, a sponsor pays 430,000 gas per leaf and each included claim pays 300 gas, excluding other transaction costs. Losing members cannot reduce the leaf charge.
 
 The payment declaration uses ordinary transaction fee authorization and settlement; it does not compensate the batcher directly. An application may fund proving or charge a separate service fee. Batching amortizes proof overhead and recursive verification; application-specific claim proving, possibly using the signature scheme's own aggregation, can still dominate. Filling a batch trades latency for cost.
 
@@ -153,14 +160,15 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 | 64 members and their leaf payment; prune to one member | Accept with the same leaf and member signature; retain the payment |
 | Remove the payment while retaining one assigned claim | Reject |
 | Remove every member and the payment | Accept; the block owes no charge for that omitted leaf |
-| Include an unused payment | Verify its leaf and charge the declaration normally |
+| Include a payment after all its members expire | Verify its leaf and charge the sponsor normally |
 | Padding in a leaf or different proof bytes for the same statement | Fixed payment remains required; statement identity is unchanged |
 | 64 singleton leaves under one key | Require their 64 distinct payments; cannot replace them with payment for an unproved union |
 | Overlapping leaves establish the same dependency | Select an authenticated source; each distinct source retained by any claim needs its own payment |
 | Finalized batch proof imported without its authenticated assignments | Reject |
 | Restore a discarded claim or change its source without verified coverage | Reject |
 | Payment for another key, claim list or earlier block | Does not satisfy the retained claim's source |
-| 64 included claims and one payment | 64 times 30,300 gas plus 30,000 leaf gas, excluding other transaction costs |
+| 64 included claims and one payment | 64 times 300 gas plus 430,000 leaf gas: 449,200 gas, excluding other transaction costs |
+| Two sponsors pay for the same leaf in one block | Charge both payments; deduplicate the dependency without refund or extra credit |
 | Duplicate declaration in a transaction | Charge both occurrences before dependency deduplication |
 | Matching claim under a different key; invalid or over-resource leaf | Reject, including inputs later discarded |
 | A member expires, is replaced or included; member and sponsor have different payers | Evaluate each transaction separately; other claims remain provable |
