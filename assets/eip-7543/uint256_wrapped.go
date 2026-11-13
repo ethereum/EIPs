@@ -1,8 +1,8 @@
 package vm
 
 import (
-	"github.com/holiman/uint256"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/holiman/uint256"
 )
 
 type int256 = uint256.Int
