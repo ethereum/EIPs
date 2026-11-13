@@ -9,8 +9,7 @@
 </style>
 {% for status in site.data.statuses %}
   {% assign eips = include.eips|where:"status",status|sort:"eip" %}
-  {% assign count = eips|size %}
-  {% if count > 0 %}
+  {% if eips != empty %}
     <h2 id="{{status|slugify}}">{{status}}</h2>
     <table class="eiptable">
       <thead>
