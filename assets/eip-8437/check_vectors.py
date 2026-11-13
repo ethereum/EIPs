@@ -166,13 +166,14 @@ def check_announcements(entries):
     for entry in entries:
         assert isinstance(entry, list) and len(entry) == 5, "announcement fields"
         mode, length, digest, deps_hash, txs_hash = entry
-        assert isinstance(mode, int) and mode in (0, 1), "announcement mode"
+        assert isinstance(mode, int) and mode >= 0, "announcement mode"
         assert isinstance(length, int) and 1 <= length <= MAX_WRAPPER_BYTES, "announcement length"
         assert isinstance(digest, bytes) and len(digest) == 32, "announcement hash"
         assert isinstance(deps_hash, bytes) and len(deps_hash) == 32, "announcement dependency hash"
         assert isinstance(txs_hash, bytes) and len(txs_hash) == 32, "announcement transaction hash"
     hashes = [entry[2] for entry in entries]
     assert hashes == sorted(set(hashes)), "announcement order"
+    return [entry for entry in entries if entry[0] in (0, 1)]
 
 
 def check_request(request_id, hashes, received_announcements, compact=0):
@@ -353,8 +354,17 @@ def main():
     expect_error("announcement order", check_announcements, announced[:1] * 2)
     for length in (0, MAX_WRAPPER_BYTES + 1):
         expect_error("announcement length", check_announcements, [[0, length, bytes(32), bytes(32), bytes(32)]])
-    for mode in (-1, 2, 256, b"\x01"):
+    for mode in (-1, b"\x01"):
         expect_error("announcement mode", check_announcements, [[mode, 1, bytes(32), bytes(32), bytes(32)]])
+    for mode in (2, 256):
+        unknown = [mode, 1, bytes(32), bytes(32), bytes(32)]
+        known = [0, 1, bytes([1]) * 32, bytes(32), bytes(32)]
+        assert check_announcements([unknown]) == []
+        assert check_announcements([unknown, known]) == [known]
+        expect_error("announcement count", check_announcements, [unknown] * 65)
+        expect_error("announcement order", check_announcements, [known, unknown])
+        expect_error("announcement length", check_announcements,
+                     [[mode, MAX_WRAPPER_BYTES + 1, *unknown[2:]]])
     expect_error("announcement hash", check_announcements, [[0, 1, bytes(31), bytes(32), bytes(32)]])
     expect_error("announcement fields", check_announcements, [[0, 1, bytes(32), b""]])
     expect_error("announcement fields", check_announcements, [[1, bytes(32)]])
