@@ -123,6 +123,8 @@ Recursive proofs retain EIP-8288's statement `(get_deps_hash(deps), AGGREGATED_V
 
 A multi-claim leaf is folded into a mode 1 wrapper before public propagation. The wrapper covers exactly its listed transactions' dependencies; surplus leaf claims are discarded during aggregation. `MAX_LEANSTARK_DEPS_PER_WRAPPER` applies to mode 0 only; mode 1 generic dependency lists are bounded by the aggregation circuit's output capacity. Transaction validity and pool admission are evaluated individually. Omitting a member does not require new signatures or a new leaf proof, although the covering aggregate must be updated.
 
+For mempool admission, clients MUST bound verification work and retained wrapper bytes per peer and globally, with an explicit rate limit for direct mode 0 leanSTARK witnesses. These budgets also apply to mode 1, including singleton and overlapping wrappers. Clients SHOULD prefer mode 1 when it reduces verification work for the covered transactions. Exhausting a local budget does not make a wrapper invalid.
+
 A dependency-bearing inclusion-list transaction imposes an obligation only when the list supplies a valid recursive proof covering all its dependencies under the block's fork. Missing or invalid coverage does not remove dependency-free entries' obligations. Builders reuse these covering proofs as recursive inputs; no original witnesses or new leaf proofs are required.
 
 An otherwise applicable inclusion-list transaction `T` may be omitted for dependency capacity only if `len(set(dependencies(block)) | set(dependencies(T))) > MAX_DEPS_PER_BLOCK`. Transactions adding no distinct dependencies cannot be excused on this ground. Local proving capacity MUST NOT excuse an otherwise required inclusion.
@@ -136,7 +138,7 @@ Proof-validation caches MUST distinguish verifier keys and public statements, in
 Before activation:
 
 - Pin the complete proof-system specification and soundness analysis covering adversarial keys, canonical key/proof encodings, resource bounds, `DEPS_HASH`, `BATCH_HASH`, `AGGREGATED_VK` and conformance vectors.
-- Calibrate verification charges against native checks on node-class hardware and the proof share against shared proof verification and relay costs. Include invalid inputs, transaction gas limits and validator execution/proof-verification budgets.
+- Benchmark the verification-only mempool path to calibrate admission budgets. Assess gas charges against shared block-validation costs and resource bounds, including transaction gas limits and validator budgets.
 - Demonstrate permitted aggregation steps, output capacity and inclusion-list construction and integration within their timing and memory budgets, including maximum committee load, latest permitted arrivals, overlaps and pruning. Publish hardware, worker counts, gas limits, schedules and safety margins before finalizing the bounds.
 
 Use the [benchmark methodology](../assets/eip-draft_batched_dependency_pricing/benchmarks.md). Per-step bounds and dependency counts alone do not establish latency; modelled parallel speedups do not satisfy the timing requirements.
@@ -155,7 +157,7 @@ Sound evaluation openings authenticate the committed program without hashing its
 
 ### Pricing and prover incentives
 
-Verification charges price public validation work; the proof share is an allowance for shared block-proof verification and relay costs. Transaction data uses normal gas accounting. These charges do not price worst-case leaf proving or guarantee that every gas-admissible selection can be proved within a slot. Builders select optional work according to their capacity and fees; inclusion-list obligations instead arrive with covering proofs and require a measured integration budget.
+Verification charges and the proof share provisionally allocate shared validation costs; transaction data uses normal gas accounting. Mempool verification varies with wrapper composition and occurs even without inclusion, so admission budgets bound it separately. An `ecrecover` timing comparison measures relative work, not a required execution-gas conversion. Builders select optional proving work according to capacity and fees; inclusion-list obligations arrive with covering proofs and require a measured integration budget.
 
 Batching reduces prover work and proof traffic without changing the per-declaration charge. Priority fees reward the block producer, not an independent leaf prover; applications may fund proving or arrange service fees off chain. Inclusion lists do not guarantee proof production for an unproven claim. A sender needs prover access for either a singleton or a batch, while accounts may retain a native-key or in-EVM fallback. Filling a batch trades latency for amortization.
 
@@ -188,6 +190,7 @@ Frame and wrapper encodings remain unchanged. Transactions must budget the activ
 | A member expires or fails pool admission | Other members remain independently admissible; reaggregation can omit its exclusive dependencies |
 | Multiple generic claims in mode 0 versus mode 1 | Enforce the direct-wrapper limit in mode 0; accept valid recursive coverage within output bounds in mode 1 |
 | Batched transaction in a public wrapper or inclusion list | Apply ordinary eligibility and coverage rules, with no batch-membership condition |
+| Direct witnesses or singleton/overlapping mode 1 wrappers exhaust a local verification budget | Defer or decline further work without declaring the wrapper invalid; changing mode does not bypass the budget |
 | Inclusion list with missing or invalid covering proof | No dependency-bearing obligation without coverage; dependency-free entries retain theirs |
 | An inclusion-list transaction adds dependencies beyond the block limit | Excuse that entry for capacity; shared or empty dependencies do not excuse omission |
 | One native or generic declaration | 5,700 or 32,700 gas respectively, excluding other transaction costs |
@@ -197,7 +200,7 @@ Frame and wrapper encodings remain unchanged. Transactions must budget the activ
 
 ## Security Considerations
 
-The gas charges are provisional pending native-verifier and shared proof-cost measurements. Fee floors do not prevent unpaid mempool verification, and repeated invalid or redundant inputs can consume work without inclusion. Clients should bound local verification, storage and reaggregation work.
+The provisional gas charges and fee floors do not prevent unpaid mempool verification. A mode 1 wrapper may cover only one transaction or repeat existing coverage, so aggregate preference alone does not bound verification work. Direct witnesses and intermediate proofs are not transaction calldata; their bytes need separate transport and storage bounds. Clients should also bound local reaggregation work.
 
 A small step arity does not bound the number of steps or guarantee a timely block proof. Inclusion lists constrain the builder's choice, so their covering-proof availability and worst-case integration path must meet the fork's deadlines even when optional work is declined. Builder-local slowness is not an omission excuse. The final aggregate must cover every included dependency, irrespective of the proving schedule.
 

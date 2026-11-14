@@ -10,8 +10,9 @@ Fix maximum step arity jointly with the commitment construction and memory per w
 
 ## Verification and gas
 
-- Measure native leanSPHINCS and leanSTARK verification on node-class hardware, including maximum permitted proofs, key authentication, malformed inputs and failures at different stages. Compare with the client's existing verification operations, such as `ecrecover`, using the same machine and harness. An equal gas figure is not evidence of equal work.
-- Measure shared block-proof verification and relay costs for the proof-share allowance. Separate fixed per-block overhead from dependency-dependent hashing and data costs, avoiding double charging transaction bytes. A builder's recursive-carry timing is not a measurement of these shared costs.
+- Measure mempool-only leanSPHINCS and leanSTARK verification on node-class hardware, including decoding, key authentication, maximum proofs and failures at different stages. Measure aggregation-hint generation separately. Compare with uncached `ecrecover` on the same machine as a work ratio, not an automatic execution-gas conversion.
+- Exercise admission budgets with direct witnesses, singleton and dense mode 1 wrappers, overlaps, invalid proofs and many peers. Report verification rate, queued work, retained bytes and useful new coverage. Show that mode 1 cannot bypass per-peer or global budgets. Measure proof transport separately from transaction calldata; proof bytes are not charged at the calldata rate.
+- Measure shared block-proof verification and relay costs for the proof-share allowance. Separate fixed per-block overhead from dependency-dependent hashing and data costs, avoiding double charging transaction bytes. Neither a builder's recursive-carry timing nor a per-witness relay benchmark measures these shared block costs.
 - Include complete transaction gas accounting and the applicable transaction gas limit. A calibration admitting no generic transactions cannot pass the generic workloads. Batching does not change the charge per declaration.
 - Measure validator execution and final-proof verification for worst-case blocks permitted by both gas and dependency limits. Verification costs and data limits must remain safe independently of a builder's willingness to prove.
 
@@ -30,10 +31,24 @@ Measure complete scheduled wall-clock completion time (makespan) at the stated w
 
 Run each measured step in its own process, discard a warm-up and take at least three timed repetitions, reporting median and range. Exclude competing load and swap growth; repeat a measurement that violates these conditions and exclude it if the repeat also does.
 
-Activation requires measured verifier safety, permitted circuit capacity and the mandatory inclusion-list paths within their stated budgets. If the inclusion path fails, revise the circuit, bounds or timing rules before activation; higher optional priority fees cannot excuse an inclusion obligation. Recheck changed prices, gas limits or proof-system parameters. Raising `MAX_DEPS_PER_BLOCK` requires a fork and matching aggregation key.
+Activation requires measured verifier safety, effective admission budgets, permitted circuit capacity and the mandatory inclusion-list paths within their stated budgets. If the inclusion path fails, revise the circuit, bounds or timing rules before activation; higher optional priority fees cannot excuse an inclusion obligation. Recheck changed prices, gas limits or proof-system parameters. Raising `MAX_DEPS_PER_BLOCK` requires a fork and matching aggregation key.
 
 ## Calibration status
 
 The [calibration suite](https://github.com/NethermindEth/lean-bindings/pull/13) and [committed-key study](https://github.com/NethermindEth/lean-bindings/pull/10) report node and single-machine measurements. The committed construction supports a tested 16-leaf step; the flat-key run supports only 12. Their largest tested leaf trace was approximately `2**29.5` under a `2**30` stacked-witness bound. Exact limits belong in the pinned proof-system specification.
 
-The 3,000 and 30,000 verification charges are provisional EIP-8288 estimates, pending node-class native-verifier measurements. The 2,700 proof share is a placeholder pending calibration of shared proof costs; recursive-carry models do not establish that price. Published two-budget results miss the tested late-native-arrival target on the measured machine; scaling them to an M4-Max-class reference is modelled. Real multi-machine schedules, inclusion-list deadline workloads, jointly maximal resources and 16,384-dependency output capacity remain to be demonstrated with the selected circuit.
+The suite's native-verification run used a `c4-standard-8` (4 cores / 8 vCPU, 30 GB), lean-bindings revision `e87b7b0`, and five timed repetitions after warm-up. It reports:
+
+| Operation | Median time |
+| --- | --- |
+| Uncached `ecrecover`, cycling distinct signatures | 29.6 µs |
+| leanSPHINCS signature | 0.303 ms |
+| Generic proof, small / maximum tested program | 8.97 / 13.17 ms |
+| 256-claim leaf using the measured payment-binding guest | 13.08 ms |
+| Mode 1 proof covering one leaf and 64 signatures | 10.35 ms |
+
+The STARK path also generates aggregation hints, so these are not isolated mempool-verification timings. The payment-binding guest is not the ordinary multi-claim interface specified here. A verification-only run must separate these effects. Similar results with one and all threads indicate little within-proof parallelism in this path; independent verifications may still run concurrently. First-run timings differed by 15–18%, so the report's variation also matters.
+
+The 3,000 / 30,000 / 2,700 charges remain uncalibrated placeholders. The measurements establish material relay costs, not an execution-gas price, and neither confirm these low values nor require the `ecrecover`-equivalent million-gas figure. Wrapper composition and unpaid submissions require measured admission budgets regardless of the eventual charges.
+
+Published two-budget results miss the tested late-native-arrival target on the measured machine; scaling them to an M4-Max-class reference is modelled. Real multi-machine schedules, inclusion-list deadline workloads, jointly maximal resources and 16,384-dependency output capacity remain to be demonstrated with the selected circuit.
