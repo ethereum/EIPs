@@ -1,5 +1,5 @@
 ---
-title: Generic Proof Verification and Batching
+title: Batched Generic Proof Dependencies
 description: Enables bounded generic proof verification and sponsored batches of independent claims
 author: Marc Harvey-Hill (@Marchhill)
 status: Draft
@@ -33,14 +33,38 @@ This EIP enables EIP-8288's reserved `LEANSTARK_SCHEME`, adds batch claims and l
 | `BATCHED_LEANSTARK_SCHEME` | `0x12` (provisional) |
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | `0x13` (provisional) |
 | `MAX_CLAIMS_PER_BATCH_LEAF` | `256` (provisional) |
-| `LEANSPHINCS_VERIFICATION_GAS` | `15400` (provisional) |
-| `LEANSTARK_VERIFICATION_GAS` | `572000` (provisional) |
-| `RECURSIVE_PROOF_SHARE_GAS` | `4200` (provisional) |
 | `LEANSTARK_CLAIM_GAS` | `4200` (provisional) |
 | `BATCH_HASH` | Keccak-256 (provisional) |
 | `MAX_INNER_PROOFS_PER_STEP` | `16` (provisional) |
 
 The provisional resource and gas parameters MUST be finalized through the activation benchmarks below.
+
+### Provisional changes to EIP-8288
+
+The dependency digest and base pricing below are included provisionally here and intended to move into EIP-8288 once benchmarks settle the parameters.
+
+#### Dependency pricing
+
+| Name | Value |
+| --- | --- |
+| `LEANSPHINCS_VERIFICATION_GAS` | `15400` (provisional) |
+| `LEANSTARK_VERIFICATION_GAS` | `572000` (provisional) |
+| `RECURSIVE_PROOF_SHARE_GAS` | `4200` (provisional) |
+
+From activation, replace EIP-8288's native and generic verification charges with these values and its intrinsic proof-share multiplier with `RECURSIVE_PROOF_SHARE_GAS`.
+
+#### Dependency digest
+
+Replace `get_deps_hash` everywhere in EIP-8288, including block commitments, with the hash of canonical 96-byte triples, including the scheme. Lists retain EIP-8288's sorting and deduplication rules.
+
+```python
+def encode_dependency(dep):
+    scheme, data_hash, verification_key_hash = dep
+    return scheme.to_bytes(32, 'big') + data_hash + verification_key_hash
+
+def get_deps_hash(deps):
+    return DEPS_HASH(b''.join(encode_dependency(dep) for dep in deps))
+```
 
 ### Dependency encoding
 
@@ -53,19 +77,6 @@ Allow `LEANSTARK_SCHEME`, `BATCHED_LEANSTARK_SCHEME` and `LEANSTARK_LEAF_PAYMENT
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | Nonzero `get_batch_hash(claims)` | Leaf verification-key hash |
 
 The payment triple identifies a leaf statement independently of its proof bytes. A member transaction commits to its claim and key, not the batch membership or sponsor.
-
-### Dependency digest
-
-Replace `get_deps_hash` everywhere in EIP-8288, including block commitments, with the hash of canonical 96-byte triples, including the scheme. Lists retain EIP-8288's sorting and deduplication rules.
-
-```python
-def encode_dependency(dep):
-    scheme, data_hash, verification_key_hash = dep
-    return scheme.to_bytes(32, 'big') + data_hash + verification_key_hash
-
-def get_deps_hash(deps):
-    return DEPS_HASH(b''.join(encode_dependency(dep) for dep in deps))
-```
 
 ### Generic proof verification
 
@@ -84,12 +95,12 @@ def get_vk_hash(program_commitment):
 The fork fixes the following bounds with `AGGREGATED_VK`:
 
 - Maximum program size, trace dimensions, committed field elements, bus interactions and proof bytes. Program size includes support code and padding; proof bytes include all openings and authentication data. Encodings must represent every permitted proof. Reject violations at direct admission and inside aggregation, including discarded inputs.
-- Outer aggregation trace and proof-system size bounds. The commitment construction, leaf bounds and `MAX_INNER_PROOFS_PER_STEP` must jointly support full steps of maximum-resource leaves under distinct keys and permitted mixtures with recursive inputs within those bounds.
+- Outer aggregation trace and proof-system size bounds. Finalize `MAX_INNER_PROOFS_PER_STEP` and leaf bounds jointly with the commitment construction. The resulting circuit must support full steps of maximum-resource leaves under distinct keys and permitted mixtures with recursive inputs within those bounds.
 - Output capacity of at least `MAX_RLP_BLOCK_SIZE // 96` dependencies, using [EIP-7934](./eip-7934.md)'s block-size bound. Counters and indices must represent all permitted program, list, intermediate-union and derived byte lengths without overflow; reject out-of-range lengths before narrowing conversions.
 
 ### Gas accounting
 
-From activation, replace EIP-8288's native and generic verification charges with the values above and its intrinsic proof-share multiplier with `RECURSIVE_PROOF_SHARE_GAS`. Charge each declaration as follows:
+Combining the base pricing above with the batch charges, charge each declaration as follows:
 
 | Scheme | Dependency frame's `limits.execution` contribution | Intrinsic proof share |
 | --- | --- | --- |
@@ -168,7 +179,7 @@ Builders may include any valid subset of member transactions, including a single
 
 If all members are omitted, the builder may omit their leaf and its payment. A payment included without any surviving members, including when all have expired, still requires a valid leaf proof and is charged normally at the sponsor's risk.
 
-A proof does not establish sponsorship-transaction validity. If that transaction becomes invalid after proving, the builder MUST replace it or update the aggregate before publishing the block. The proof may be reused with a valid replacement only if the final dependency set is unchanged; otherwise reaggregate from intermediate proofs or leaves. Member signatures need not change.
+A proof does not establish sponsorship-transaction validity. If that transaction becomes invalid after proving, the builder MUST replace it or update the aggregate before publishing the block. The proof may be reused with a valid replacement only if the final dependency set is unchanged; otherwise reaggregate from intermediate proofs or leaves and produce a new finalization proof. Member signatures need not change.
 
 ### Public-mempool fallback
 
@@ -176,7 +187,7 @@ Accounts seeking a fallback SHOULD authorize both generic schemes under the same
 
 ### Fork transition
 
-Proof-validation caches MUST distinguish `AGGREGATED_VK` and statement domain. When the applicable mempool fork changes, wrappers validated only under the previous rules MUST NOT be admitted, served, announced or used to suppress announcements. Direct-witness wrappers may be revalidated under the new rules; recursive coverage must be rebuilt under the new key. Transactions require current-fork coverage for admission. Old-key proofs provide no coverage for post-activation inclusion lists or blocks.
+Proof-validation caches MUST distinguish verifier keys, statement domains and public inputs, including `AGGREGATED_VK` for recursive proofs. When the applicable mempool fork changes, wrappers validated only under the previous rules MUST NOT be admitted, served, announced or used to suppress announcements. Direct witnesses MUST be validated under the new rules before reuse: a generic proof of the bare `(data_hash,)` statement cannot satisfy the new claim-digest statement, while native witnesses may remain valid. Recursive coverage must be rebuilt under the new key. Transactions require current-fork coverage for admission. Old-key proofs provide no coverage for post-activation inclusion lists or blocks.
 
 ### Activation requirements
 
@@ -256,12 +267,12 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 | Matching claim under a different key; invalid or over-resource leaf | Reject, including inputs later discarded |
 | A member expires, is replaced or included; member and sponsor have different payers | Evaluate each transaction separately; other claims remain provable |
 | Sponsor transaction invalid or absent | Reject until a valid payment is included; members need no new signatures |
-| Sponsor invalidated after proving; replacement preserves or changes final dependencies | Reuse the proof only for a valid replacement preserving the dependency set; otherwise reaggregate |
+| Sponsor invalidated after proving; replacement preserves or changes final dependencies | Reuse the proof only for a valid replacement preserving the dependency set; otherwise reaggregate and finalize again |
 | A later ordinary execution frame reverts in a valid sponsorship transaction | Payment declaration remains effective and charged |
 | Either new scheme submitted to the public pool or inside a wrapper | Do not admit or propagate, even with a valid proof |
 | An inclusion list contains ordinary and discounted entries with an ordinary proof | Discounted entries impose no obligation; covered ordinary and dependency-free entries retain theirs |
 | Inclusion-list proof names a new scheme or uses the intermediate/finalized domain | Provides no coverage; dependency-free entries and other lists are unaffected |
-| Activation changes `AGGREGATED_VK` with old wrappers cached | Do not reuse old validation or suppression; rebuild coverage under the new key, retaining only direct witnesses that still verify |
+| Activation changes verification rules with old verdicts cached | Revalidate direct witnesses; reject bare-claim generic proofs; distinguish keys, domains and public inputs in the cache; rebuild recursive coverage under the new key |
 | Switch a signature-hash-bound transaction to the ordinary scheme | Recompute its budget and signature; prove the updated claim before ordinary admission |
 
 ## Security Considerations

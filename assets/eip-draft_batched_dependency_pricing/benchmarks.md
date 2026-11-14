@@ -1,4 +1,4 @@
-# Generic proof verification and batching: benchmarks
+# Batched generic proof dependencies: benchmarks
 
 This document supplies the measurement procedure for the EIP's activation requirements. It contains no benchmark results or selected hardware baseline.
 
@@ -11,7 +11,8 @@ Publish the prover and verifier revisions and configurations, commitment constru
 - Use jointly valid resource combinations. A maximum-resource leaf maximizes recursive verification work within the permitted program size, trace dimensions, committed values, bus interactions, proof bytes and claim count. Include support code, padding, program-commitment authentication and all opening verification.
 - Measure full aggregation steps at the proposed arity: maximum-resource leaves under distinct keys, recursive inputs and permitted mixtures. Check outer trace and proof-size bounds as well as time and memory. Individual-leaf measurements do not establish full-step feasibility.
 - Construct gas-admissible blocks using complete transaction gas accounting. Cover EVM-dominated blocks, native signatures, unaggregated singleton generic proofs under distinct keys, full batch leaves, and blocks retaining one claim per maximum-resource leaf with its payment. Include adversarial mixtures. Calibrate generic and leaf charges with one leaf per initial step, without shared-key preprocessing savings.
-- Exercise overlapping leaves, source selection, payment lookup, pruning and finalization across the complete block aggregation tree.
+- Exercise overlapping leaves, source selection, payment lookup, pruning and finalization across the complete block aggregation tree. Invalidate a sponsorship transaction after finalization; measure repair with changed dependencies, including reaggregation and a new finalization proof, within the remaining builder budget. Compare a valid replacement preserving the dependency set, where proof reuse suffices.
+- Demonstrate circuit output capacity at `MAX_RLP_BLOCK_SIZE // 96`, including the 65,535 and 65,536 counter boundaries and large intermediate unions. Validate the circuit and encodings at these sizes, not only the configured limits.
 - Demonstrate that intended application verifiers fit the resource bounds for both leaf proving and recursive aggregation.
 
 ## Measurements
