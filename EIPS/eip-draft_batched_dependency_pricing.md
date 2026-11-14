@@ -33,6 +33,7 @@ This EIP enables EIP-8288's reserved `LEANSTARK_SCHEME`, adds batch claims and l
 | `BATCHED_LEANSTARK_SCHEME` | `0x12` (provisional) |
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | `0x13` (provisional) |
 | `MAX_CLAIMS_PER_BATCH_LEAF` | `256` (provisional) |
+| `MAX_DEPS_PER_BLOCK` | `16384` (provisional) |
 | `LEANSTARK_CLAIM_GAS` | `4200` (provisional) |
 | `BATCH_HASH` | Keccak-256 (provisional) |
 | `MAX_INNER_PROOFS_PER_STEP` | `16` (provisional) |
@@ -96,19 +97,13 @@ The fork fixes the following bounds with `AGGREGATED_VK`:
 
 - Maximum program size, trace dimensions, committed field elements, bus interactions and proof bytes. Program size includes support code and padding; proof bytes include all openings and authentication data. Encodings must represent every permitted proof. Reject violations at direct admission and inside aggregation, including discarded inputs.
 - Outer aggregation trace and proof-system size bounds. Finalize `MAX_INNER_PROOFS_PER_STEP` and leaf bounds jointly with the commitment construction. The resulting circuit must support full steps of maximum-resource leaves under distinct keys and permitted mixtures with recursive inputs within those bounds.
-- Output capacity sufficient for every gas-admissible block dependency set. The following conservative sizing bound uses the smallest per-declaration charge counted toward block execution gas, including intrinsic shares. Payment declarations cost the same as ordinary generic declarations; duplicates and refunds cannot increase the bound.
+- Output capacity of at least `MAX_DEPS_PER_BLOCK` dependencies.
 
-```python
-def required_output_capacity(block_gas_limit):
-    min_dependency_gas = min(
-        LEANSPHINCS_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS,
-        LEANSTARK_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS,
-        LEANSTARK_CLAIM_GAS,
-    )
-    return block_gas_limit // min_dependency_gas
-```
+Counters and indices must represent permitted program, list, intermediate-union and derived byte lengths without overflow, including input unions larger than the retained output. Reject out-of-range lengths before narrowing conversions.
 
-This is a sizing bound, not an additional block-validity limit. The active verifier MUST continue to cover gas-admissible outputs as gas limits or prices change. Any fixed capacity must cover all outputs allowed by consensus limits, not merely a benchmark or client-default gas limit. Counters and indices must represent permitted program, list, intermediate-union and derived byte lengths without overflow, including input unions larger than the retained output. Reject out-of-range lengths before narrowing conversions.
+### Block dependency capacity
+
+A block is invalid if `len(dependencies(block)) > MAX_DEPS_PER_BLOCK`. Count distinct resolved triples across all schemes, including leaf payments. The limit is independent of the block gas limit; changing it requires a fork with a matching `AGGREGATED_VK`.
 
 ### Gas accounting
 
@@ -187,6 +182,8 @@ Transactions declaring either new scheme MUST NOT be admitted to or propagated t
 
 An inclusion-list proof establishes coverage only in the ordinary recursive domain. A proof dependency list containing either new scheme, or an intermediate or finalized proof, provides no coverage for any entry. Dependency-free entries retain their obligations regardless of that proof; other lists are unaffected.
 
+An otherwise applicable inclusion-list transaction `T` may be omitted for dependency capacity only if `len(set(dependencies(block)) | set(dependencies(T))) > MAX_DEPS_PER_BLOCK`. Transactions adding no distinct dependencies cannot be excused on this ground.
+
 Builders may include any valid subset of member transactions, including a single survivor. They MUST include payments matching the selected sources before producing a block with batch claims. If a selected payment is unavailable, the builder must obtain a valid payment, reaggregate with another authenticated source, or omit the affected claim. Each transaction follows EIP-8141's validity and payment rules independently. Expiry, replacement or inclusion of another member does not change the surviving member's charge or require its signature or leaf proof to be replaced; the aggregate is updated for the retained dependencies.
 
 If all members are omitted, the builder may omit their leaf and its payment. A payment included without any surviving members, including when all have expired, still requires a valid leaf proof and is charged normally at the sponsor's risk.
@@ -219,7 +216,7 @@ Sound evaluation openings authenticate the committed program without hashing its
 
 ### Output capacity
 
-Gas pricing makes the block-size-derived dependency count unnecessarily large for the calibrated gas limit. At 60 million gas and the provisional minimum charge of 4,200, at most 14,285 declarations fit even before other transaction costs. A 16,384-entry layout supplies headroom for that workload, but is not a permanent capacity limit: higher gas limits or lower charges require larger outputs. The circuit must support that growth under the chain's gas-limit rules.
+A fixed dependency limit bounds the circuit's output without imposing a gas-limit ceiling. At 60 million gas and the provisional minimum charge of 4,200, at most 14,285 declarations fit even before other transaction costs, below the proposed 16,384 limit. Higher gas limits or lower charges may make the dependency limit binding.
 
 ### Charging for shared work
 
@@ -258,8 +255,10 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 | Each resource bound and one above it | Accept the bound; reject overflow even for discarded inputs; count support code, padding and all authentication data |
 | Full step at finalized arity and maximum resource bounds | Fits outer proof bounds; reject oversized steps even within the arity limit |
 | `MAX_INNER_PROOFS_PER_STEP` immediate generic/recursive inputs, then one more | Accept then reject; include direct inputs across wrappers and discarded or redundant proofs |
-| 60M and 100M gas at the provisional prices | Sizing bounds are 14,285 and 23,809 dependencies; a fixed 16,384-entry layout does not cover the latter |
-| Reduce the cheapest declaration charge or increase the gas limit | Recompute required capacity; do not silently reject otherwise gas-admissible blocks |
+| `MAX_DEPS_PER_BLOCK` distinct block dependencies, then one more | Accept at the limit if otherwise valid; reject one above even if gas fits |
+| Repeated triples, mixed schemes and leaf payments | Count each distinct resolved triple once, including payments |
+| Reduce a declaration charge or increase the gas limit | The block dependency limit remains unchanged |
+| An otherwise applicable inclusion-list transaction adds dependencies beyond the block limit | Omission is excused for that entry; adding only existing dependencies or none does not excuse omission |
 | 65,535- and 65,536-entry intermediate unions pruned to a supported output | Preserve lengths and retained entries without truncation; reject out-of-range program, list and derived byte lengths before narrowing |
 | Noncanonical key or proof encoding | Reject before proof verification |
 | Change `DEPS_HASH` | Does not change `get_claim_hash` or the user verification key |
