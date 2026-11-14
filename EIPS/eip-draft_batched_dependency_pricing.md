@@ -6,7 +6,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2026-11-13
-requires: 7805, 7934, 8141, 8288
+requires: 7805, 8141, 8288
 ---
 
 ## Abstract
@@ -96,7 +96,19 @@ The fork fixes the following bounds with `AGGREGATED_VK`:
 
 - Maximum program size, trace dimensions, committed field elements, bus interactions and proof bytes. Program size includes support code and padding; proof bytes include all openings and authentication data. Encodings must represent every permitted proof. Reject violations at direct admission and inside aggregation, including discarded inputs.
 - Outer aggregation trace and proof-system size bounds. Finalize `MAX_INNER_PROOFS_PER_STEP` and leaf bounds jointly with the commitment construction. The resulting circuit must support full steps of maximum-resource leaves under distinct keys and permitted mixtures with recursive inputs within those bounds.
-- Output capacity of at least `MAX_RLP_BLOCK_SIZE // 96` dependencies, using [EIP-7934](./eip-7934.md)'s block-size bound. Counters and indices must represent all permitted program, list, intermediate-union and derived byte lengths without overflow; reject out-of-range lengths before narrowing conversions.
+- Output capacity sufficient for every gas-admissible block dependency set. The following conservative sizing bound uses the smallest per-declaration charge counted toward block execution gas, including intrinsic shares. Payment declarations cost the same as ordinary generic declarations; duplicates and refunds cannot increase the bound.
+
+```python
+def required_output_capacity(block_gas_limit):
+    min_dependency_gas = min(
+        LEANSPHINCS_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS,
+        LEANSTARK_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS,
+        LEANSTARK_CLAIM_GAS,
+    )
+    return block_gas_limit // min_dependency_gas
+```
+
+This is a sizing bound, not an additional block-validity limit. The active verifier MUST continue to cover gas-admissible outputs as gas limits or prices change. Any fixed capacity must cover all outputs allowed by consensus limits, not merely a benchmark or client-default gas limit. Counters and indices must represent permitted program, list, intermediate-union and derived byte lengths without overflow, including input unions larger than the retained output. Reject out-of-range lengths before narrowing conversions.
 
 ### Gas accounting
 
@@ -136,7 +148,7 @@ For each verified leaf, the aggregation circuit may establish:
 - Batch dependencies with the same membership and key checks.
 - Its leaf-payment dependency, whose digest and key match the leaf.
 
-A step is one execution of the aggregation circuit producing one recursive proof. It MUST support any combination of up to `MAX_INNER_PROOFS_PER_STEP` generic leaves and recursive proofs within the other resource bounds, and reject larger counts. Each direct singleton or batch leaf counts once, including direct proofs across folded mode 0 wrappers and discarded or redundant inputs; proofs deeper in the tree do not count. Apply all resource bounds before discards. Neither step arity nor the per-leaf claim bound caps recursive output.
+A step is one execution of the aggregation circuit producing one recursive proof. It MUST support any combination of up to `MAX_INNER_PROOFS_PER_STEP` generic leaves and recursive proofs within the other resource bounds, and reject larger counts. Each direct singleton or batch leaf counts once, including direct proofs across folded mode 0 wrappers and discarded or redundant inputs; proofs deeper in the tree do not count. Apply all resource bounds before discards. Recursion may combine more claims and proofs than these per-step and per-leaf bounds.
 
 ### Recursive payment binding
 
@@ -205,17 +217,21 @@ Use the [benchmark methodology](../assets/eip-draft_batched_dependency_pricing/b
 
 Sound evaluation openings authenticate the committed program without hashing its entire table inside recursion. Binding must hold for adversarial keys; the pinned proof-system specification defines the construction. User verifiers compute the claim digest in-circuit, so fixing `BATCH_HASH` independently of `DEPS_HASH` preserves pinned keys when the aggregation hash changes. Singletons and batches use one statement, allowing batch membership to change without changing transaction claims.
 
+### Output capacity
+
+Gas pricing makes the block-size-derived dependency count unnecessarily large for the calibrated gas limit. At 60 million gas and the provisional minimum charge of 4,200, at most 14,285 declarations fit even before other transaction costs. A 16,384-entry layout supplies headroom for that workload, but is not a permanent capacity limit: higher gas limits or lower charges require larger outputs. The circuit must support that growth under the chain's gas-limit rules.
+
 ### Charging for shared work
 
 The charges allocate EIP-8288's block proving capacity under the reference hardware and worker budget. Work-proportional pricing approximates additive work but does not alone bound peak memory or recursive critical-path latency. Program size, trace dimensions, committed values and bus interactions affect the worst case; proof size or an assumed small average-to-worst-case ratio cannot establish a safe rate.
 
 Generic verification includes its recursive child-slot cost; the separate proof share prices dependency carry, so native signatures do not pay for a generic proof's child slot. A leaf payment charges both once; member claims pay their own carry and payment binding. Neither new scheme adds another intrinsic share. Losing members cannot reduce the leaf charge.
 
-The provisional claim charge equals the proof share pending comparable carry and payment-binding measurements. This is a conservative placeholder, not a measured equality: a native-path share estimate that includes amortized node overhead is not a pure per-record baseline.
+The provisional claim charge equals the proof share pending separate measurements of cumulative carry and payment-binding costs.
 
 The payment declaration uses ordinary transaction fee authorization and settlement; it does not compensate the batcher directly. An application may fund proving or charge a separate service fee. Batching amortizes proof overhead and recursive verification; application-specific claim proving, possibly using the signature scheme's own aggregation, can still dominate. Filling a batch trades latency for cost.
 
-A separate payment transaction keeps the fixed charge independent of members' validity. A shared member paymaster alone would not achieve this. Identifying the payment by the key and claim-list digest lets a sponsor authorize it after proving and lets the same statement use different proof bytes. Authenticated sources and the finalization check prevent unpaid claims in a block without repeating payment-presence checks at each step. A separate finalization domain prevents importing a proof after its sources have been erased.
+A separate payment transaction keeps the fixed charge independent of members' validity. Identifying the payment by the key and claim-list digest lets a sponsor authorize it after proving and lets the same statement use different proof bytes. Authenticated sources and the finalization check prevent unpaid claims in a block. A separate finalization domain prevents importing a proof after its sources have been erased.
 
 ### Submission path
 
@@ -223,7 +239,7 @@ Direct submission avoids a public pool tracking sponsorship dependencies or rese
 
 ## Backwards Compatibility
 
-Activation enables the reserved `LEANSTARK_SCHEME` and two additional schemes. It replaces EIP-8288's proposed bare `(data_hash,)` generic statement with `(get_claim_hash(data_hash),)`; verifiers written for the former must adopt the new statement. A singleton-only verifier remains valid under this EIP and can produce sponsored singletons.
+Activation enables the reserved `LEANSTARK_SCHEME` and two additional schemes. It replaces EIP-8288's proposed bare `(data_hash,)` generic statement with `(get_claim_hash(data_hash),)`; verifiers written for the former must adopt the new statement.
 
 Native signature verification and dependency-frame encoding remain unchanged, but the dependency digest now includes scheme bytes and all recursive proofs use the new key and tagged statements. The revised gas schedule requires updated budgets and signatures for transactions signed with old dependency-frame execution limits.
 
@@ -242,7 +258,9 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 | Each resource bound and one above it | Accept the bound; reject overflow even for discarded inputs; count support code, padding and all authentication data |
 | Full step at finalized arity and maximum resource bounds | Fits outer proof bounds; reject oversized steps even within the arity limit |
 | `MAX_INNER_PROOFS_PER_STEP` immediate generic/recursive inputs, then one more | Accept then reject; include direct inputs across wrappers and discarded or redundant proofs |
-| 65,535, 65,536 and `MAX_RLP_BLOCK_SIZE // 96` dependencies | Preserve lengths without narrowing or truncation; reject out-of-range program, list and derived byte lengths |
+| 60M and 100M gas at the provisional prices | Sizing bounds are 14,285 and 23,809 dependencies; a fixed 16,384-entry layout does not cover the latter |
+| Reduce the cheapest declaration charge or increase the gas limit | Recompute required capacity; do not silently reject otherwise gas-admissible blocks |
+| 65,535- and 65,536-entry intermediate unions pruned to a supported output | Preserve lengths and retained entries without truncation; reject out-of-range program, list and derived byte lengths before narrowing |
 | Noncanonical key or proof encoding | Reject before proof verification |
 | Change `DEPS_HASH` | Does not change `get_claim_hash` or the user verification key |
 | Empty, repeated, unsorted or 257-claim leaf | Reject before hashing or leaf verification |
@@ -283,7 +301,7 @@ Sponsorship remains an availability dependency: the sponsor may withhold payment
 
 Batchers and builders can delay, withhold or expose transactions received privately. The discounted path has no inclusion-list guarantee. A sender unable to prove needs another prover for the full-price fallback, which also requires account support and public-mempool eligibility.
 
-Generic claims can prove arbitrary computations, so worst-case benchmarks must cover the most expensive permitted singleton proofs, not only signature programs. Gas bounds included declarations; step arity and resource bounds limit individual operations, not redundant or discarded proving histories. Clients should bound that local work. Signature witnesses need not have canonical byte encodings, but the leaf verifier must enforce the scheme's validity constraints.
+Generic claims can prove arbitrary computations, so worst-case benchmarks must cover the most expensive permitted singleton proofs, not only signature programs. Gas bounds included declarations; step arity and resource bounds limit individual operations, not redundant or discarded proving histories. Clients should bound that local work.
 
 Accounts remain responsible for verifier semantics and for authenticating every claim independently. Authorization claims must bind the signer, message and required policy. Under a sound verifier, a batcher cannot forge authorization. Accounts may also retain a native key or an in-EVM validation path within the public-mempool limits.
 
