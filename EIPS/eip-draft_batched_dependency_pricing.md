@@ -34,6 +34,7 @@ This EIP enables EIP-8288's reserved `LEANSTARK_SCHEME`, adds batch claims and l
 | `LEANSTARK_LEAF_PAYMENT_SCHEME` | `0x13` (provisional) |
 | `MAX_CLAIMS_PER_BATCH_LEAF` | `256` (provisional) |
 | `MAX_DEPS_PER_BLOCK` | `16384` (provisional) |
+| `LEANSTARK_LEAF_PAYMENT_GAS` | `675000` (provisional) |
 | `LEANSTARK_CLAIM_GAS` | `4200` (provisional) |
 | `BATCH_HASH` | Keccak-256 (provisional) |
 | `MAX_INNER_PROOFS_PER_STEP` | `16` (provisional) |
@@ -50,7 +51,7 @@ The dependency digest and base pricing below are included provisionally here and
 | --- | --- |
 | `LEANSPHINCS_VERIFICATION_GAS` | `15400` (provisional) |
 | `LEANSTARK_VERIFICATION_GAS` | `572000` (provisional) |
-| `RECURSIVE_PROOF_SHARE_GAS` | `4200` (provisional) |
+| `RECURSIVE_PROOF_SHARE_GAS` | `5100` (provisional) |
 
 From activation, replace EIP-8288's native and generic verification charges with these values and its intrinsic proof-share multiplier with `RECURSIVE_PROOF_SHARE_GAS`.
 
@@ -114,7 +115,7 @@ Combining the base pricing above with the batch charges, charge each declaration
 | `LEANSPHINCS_SCHEME` | `LEANSPHINCS_VERIFICATION_GAS` | `RECURSIVE_PROOF_SHARE_GAS` |
 | `LEANSTARK_SCHEME` | `LEANSTARK_VERIFICATION_GAS` | `RECURSIVE_PROOF_SHARE_GAS` |
 | `BATCHED_LEANSTARK_SCHEME` | `LEANSTARK_CLAIM_GAS` | `0` |
-| `LEANSTARK_LEAF_PAYMENT_SCHEME` | `LEANSTARK_VERIFICATION_GAS + RECURSIVE_PROOF_SHARE_GAS` | `0` |
+| `LEANSTARK_LEAF_PAYMENT_SCHEME` | `LEANSTARK_LEAF_PAYMENT_GAS` | `0` |
 
 Charge each occurrence before dependency deduplication. Sum frame contributions to obtain the frame's exact `limits.execution`; add proof shares to transaction intrinsic gas as in EIP-8288. Other transaction and authorization costs still apply. Frame charges count toward block execution capacity under EIP-8141's normal gas accounting; refunds do not reduce that capacity charge.
 
@@ -204,7 +205,7 @@ Before activation:
 
 - Pin the complete proof-system specification and soundness analysis covering adversarial keys, canonical key/proof encodings, `DEPS_HASH`, `BATCH_HASH`, `AGGREGATED_VK`, and key, digest, payment-binding and statement-domain conformance vectors.
 - Publish the reference prover/verifier configuration, hardware and worker count, block gas limit, numerical builder and validator time/memory budgets, and safety margins.
-- Demonstrate maximum-resource steps and gas-admissible blocks meeting those budgets: EVM execution, native signatures, distinct-key singleton proofs, full batch leaves, one surviving claim per paid leaf, and adversarial mixtures. Measure cumulative carry and payment binding through overlaps, pruning and finalization. Finalize all bounds and charges from these measurements before activation.
+- Demonstrate maximum-resource steps and valid blocks meeting those budgets: EVM execution, native signatures, distinct-key singleton proofs, full batch leaves, one surviving claim per paid leaf, and adversarial mixtures. Measure cumulative carry and payment binding through overlaps, pruning and finalization. Finalize all bounds and charges together; an ordinary singleton proof or leaf payment, including required transaction overhead, must fit within the applicable per-transaction gas limit.
 
 Use the [benchmark methodology](../assets/eip-draft_batched_dependency_pricing/benchmarks.md) for workload construction and reporting. Models and extrapolations do not satisfy the gate; higher gas limits require recalibration.
 
@@ -222,9 +223,7 @@ A fixed dependency limit bounds the circuit's output without imposing a gas-limi
 
 The charges allocate EIP-8288's block proving capacity under the reference hardware and worker budget. Work-proportional pricing approximates additive work but does not alone bound peak memory or recursive critical-path latency. Program size, trace dimensions, committed values and bus interactions affect the worst case; proof size or an assumed small average-to-worst-case ratio cannot establish a safe rate.
 
-Generic verification includes its recursive child-slot cost; the separate proof share prices dependency carry, so native signatures do not pay for a generic proof's child slot. A leaf payment charges both once; member claims pay their own carry and payment binding. Neither new scheme adds another intrinsic share. Losing members cannot reduce the leaf charge.
-
-The provisional claim charge equals the proof share pending separate measurements of cumulative carry and payment-binding costs.
+Generic verification includes its recursive child-slot cost; the separate proof share prices dependency carry. A leaf payment additionally covers fixed payment-binding work, so it is calibrated separately from ordinary verification. Member claims pay marginal carry and binding through finalization. Neither new scheme adds another intrinsic share, and losing members cannot reduce the leaf charge. Carry charges must cover the depths of the calibrated block schedules; their provisional calibration is documented in the benchmark methodology.
 
 The payment declaration uses ordinary transaction fee authorization and settlement; it does not compensate the batcher directly. An application may fund proving or charge a separate service fee. Batching amortizes proof overhead and recursive verification; application-specific claim proving, possibly using the signature scheme's own aggregation, can still dominate. Filling a batch trades latency for cost.
 
@@ -232,7 +231,7 @@ A separate payment transaction keeps the fixed charge independent of members' va
 
 ### Submission path
 
-Direct submission avoids a public pool tracking sponsorship dependencies or reserving fees for a batch. Each user retains a native transaction. Combining users' operations into one application transaction could share more fixed costs, but would also share its nonce and receipt and require application-level replay protection.
+Direct submission avoids a public pool tracking sponsorship dependencies or reserving fees for a batch. Each user retains a native transaction. Combining users' operations and payment into one transaction would remove cross-transaction payment dependence, but would also share its nonce and receipt and require application-level replay protection. Separate payments preserve individual transactions and partial inclusion at the cost of builder-side sponsorship risk.
 
 ## Backwards Compatibility
 
@@ -277,8 +276,8 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 | Block with either new scheme supplies a plain dependency-digest proof | Reject; require the finalized statement and the usual block dependency commitment |
 | Restore a discarded claim or change its source without verified coverage | Reject |
 | Payment for another key, claim list or earlier block | Does not satisfy the retained claim's source |
-| One native or ordinary generic declaration | 19,600 or 576,200 gas respectively, including the revised intrinsic share; charge duplicate declarations separately |
-| 64 included claims and one payment | 64 times 4,200 gas plus 576,200 leaf gas: 845,000 gas, excluding other transaction costs |
+| One native or ordinary generic declaration | 20,500 or 577,100 gas respectively, including the intrinsic share; charge duplicate declarations separately |
+| 64 included claims and one payment | 64 times 4,200 gas plus 675,000 leaf gas: 943,800 gas, excluding other transaction costs |
 | Two sponsors pay for the same leaf in one block | Charge both payments; deduplicate the dependency without refund or extra credit |
 | Duplicate declaration in a transaction | Charge both occurrences before dependency deduplication |
 | Matching claim under a different key; invalid or over-resource leaf | Reject, including inputs later discarded |
@@ -296,7 +295,7 @@ Public-mempool message formats remain unchanged. Blocks contain individual trans
 
 The gas parameters are provisional; payment-binding cost and complete block schedules require measurement. Every discounted claim included in a block must be linked to a verified leaf and its included payment. Payment identities cannot be invented by union or changed by pruning; payment without leaf verification cannot establish a claim. All leaf resource bounds apply even to inputs later discarded. Padding cannot reduce the fixed charge.
 
-Sponsorship remains an availability dependency: the sponsor may withhold payment or its transaction may become invalid. Another sponsor can pay for the same leaf without changing member transactions. If every member disappears, omitting the leaf prevents a block charge but does not reimburse proving already performed; that risk belongs to the batcher's service arrangement.
+Sponsorship remains an availability dependency: the sponsor may withhold payment or invalidate its transaction after proving, wasting builder work without paying on chain. Another sponsor can pay for the same leaf without changing member transactions. If every member disappears, the builder may omit the leaf. Inclusion gas does not reimburse discarded or repeated proving; builders must manage this risk through submission policy or service arrangements.
 
 Batchers and builders can delay, withhold or expose transactions received privately. The discounted path has no inclusion-list guarantee. A sender unable to prove needs another prover for the full-price fallback, which also requires account support and public-mempool eligibility.
 
