@@ -68,17 +68,7 @@ def get_deps_hash(deps):
 
 Allow `LEANSTARK_SCHEME` alongside `LEANSPHINCS_SCHEME` in dependency verification frames. For a generic dependency, `data_hash` is the individual claim and `verification_key_hash` identifies its leaf verifier. EIP-8288's zero substitution and reserved zero padding apply. Neither the batch membership nor the prover's identity appears in the transaction.
 
-### Generic proof verification
-
-Provisionally, the leanSTARK verification key is the verifier's canonical 32-byte `program_commitment`, binding the complete program and its layout. The fork's pinned proof-system specification defines its derivation and all key-material encodings, and fixes the commitment construction, byte order, proof system, field, transcript, soundness parameters and resource bounds. Per-key parameter overrides are forbidden; proof-specific dimensions are authenticated inputs constrained by those bounds.
-
-At the fork's soundness level, the commitment must bind at most one complete program and layout even when generated adversarially. It must bind the proof transcript and support sound openings of the program-table evaluations required by verification, with authentication work sublinear in padded program size. Verification authenticates the proven program against the commitment named by:
-
-```python
-def get_vk_hash(program_commitment):
-    assert len(program_commitment) == 32
-    return keccak256(b'EIP8288:vk:v1' + program_commitment)
-```
+Generic proofs use EIP-8288's leanSTARK verification-key definition.
 
 ### Verifier resource bounds
 
@@ -149,9 +139,9 @@ Single-claim proofs repeat proof overhead and recursive verification. A batch le
 
 User verifiers compute the claim digest in-circuit, so fixing `BATCH_HASH` independently of `DEPS_HASH` preserves pinned keys when the aggregation hash changes. The generic interface also supports signature schemes with their own aggregation, provided each output claim is independently valid.
 
-### Verifier identity and capacity
+### Dependency capacity
 
-Sound evaluation openings authenticate the committed program without hashing its entire table inside recursion. Binding must hold for adversarial keys; the pinned proof-system specification defines the construction. The block dependency limit bounds output size independently of gas-limit changes. Per-leaf and per-step limits bound individual operations, not total proving time or redundant input histories.
+The block dependency limit bounds output size independently of gas-limit changes. Per-leaf and per-step limits bound individual operations, not total proving time or redundant input histories.
 
 ### Pricing and prover incentives
 
@@ -172,9 +162,6 @@ Frame and wrapper encodings remain unchanged. Transactions must budget the activ
 | Nonzero scheme padding or an unsupported scheme | Reject |
 | One-claim digest | `get_batch_hash([claim]) == get_claim_hash(claim)`; reject a proof of the bare claim |
 | Same claim and key under different schemes | Distinct canonical 96-byte encodings and dependency digests |
-| Wrong key, key-hash tag or commitment width | Reject |
-| Program substitution, unauthenticated dimensions or parameter overrides | Reject |
-| Opening for another commitment, point or value; unbound transcript | Reject, including inconsistent key-bound evaluations even if the key hash is recomputed |
 | Each resource bound and one above it | Accept the bound; reject overflow even for discarded inputs; count support code, padding and authentication data |
 | Full step at finalized arity and maximum resource bounds | Fits outer proof bounds; reject oversized steps even within the arity limit |
 | `MAX_INNER_PROOFS_PER_STEP` immediate generic/recursive inputs, then one more | Accept then reject; include direct inputs across wrappers and discarded or redundant proofs |
