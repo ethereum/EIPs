@@ -1,0 +1,59 @@
+<svg width="540" height="398" viewBox="0 0 540 398" xmlns="http://www.w3.org/2000/svg" font-family="Courier, monospace" font-size="13" fill="none">
+<desc>Control flow graphs of three static chains, of two, four, and six blocks: each block is jumpdest/push/jump, pushing the next block's address, and the last block is jumpdest/stop. Every jump has one destination, so a chain of N blocks has N-1 edges and one path.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="black"/></marker></defs>
+<rect width="540" height="398" fill="#e0e0e0"/>
+<rect x="62" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="70" y="44" fill="black">JUMPDEST</text>
+<text x="70" y="60" fill="black">PUSH 4</text>
+<text x="70" y="76" fill="black">JUMP</text>
+<rect x="62" y="90" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="70" y="104" fill="black">JUMPDEST</text>
+<text x="70" y="120" fill="black">STOP</text>
+<path d="M 142 72 C 161 72, 161 100, 142 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="242" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="250" y="44" fill="black">JUMPDEST</text>
+<text x="250" y="60" fill="black">PUSH 4</text>
+<text x="250" y="76" fill="black">JUMP</text>
+<rect x="242" y="90" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="250" y="104" fill="black">JUMPDEST</text>
+<text x="250" y="120" fill="black">PUSH 8</text>
+<text x="250" y="136" fill="black">JUMP</text>
+<rect x="242" y="150" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="250" y="164" fill="black">JUMPDEST</text>
+<text x="250" y="180" fill="black">PUSH 12</text>
+<text x="250" y="196" fill="black">JUMP</text>
+<rect x="242" y="210" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="250" y="224" fill="black">JUMPDEST</text>
+<text x="250" y="240" fill="black">STOP</text>
+<path d="M 322 72 C 341 72, 341 100, 322 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 322 132 C 341 132, 341 160, 322 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 322 192 C 341 192, 341 220, 322 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="422" y="30" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="430" y="44" fill="black">JUMPDEST</text>
+<text x="430" y="60" fill="black">PUSH 4</text>
+<text x="430" y="76" fill="black">JUMP</text>
+<rect x="422" y="90" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="430" y="104" fill="black">JUMPDEST</text>
+<text x="430" y="120" fill="black">PUSH 8</text>
+<text x="430" y="136" fill="black">JUMP</text>
+<rect x="422" y="150" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="430" y="164" fill="black">JUMPDEST</text>
+<text x="430" y="180" fill="black">PUSH 12</text>
+<text x="430" y="196" fill="black">JUMP</text>
+<rect x="422" y="210" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="430" y="224" fill="black">JUMPDEST</text>
+<text x="430" y="240" fill="black">PUSH 16</text>
+<text x="430" y="256" fill="black">JUMP</text>
+<rect x="422" y="270" width="80" height="54" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="430" y="284" fill="black">JUMPDEST</text>
+<text x="430" y="300" fill="black">PUSH 20</text>
+<text x="430" y="316" fill="black">JUMP</text>
+<rect x="422" y="330" width="80" height="38" rx="4" stroke="black" stroke-width="1.1"/>
+<text x="430" y="344" fill="black">JUMPDEST</text>
+<text x="430" y="360" fill="black">STOP</text>
+<path d="M 502 72 C 521 72, 521 100, 502 100" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 502 132 C 521 132, 521 160, 502 160" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 502 192 C 521 192, 521 220, 502 220" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 502 252 C 521 252, 521 280, 502 280" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M 502 312 C 521 312, 521 340, 502 340" stroke="black" stroke-width="1.2" marker-end="url(#a)"/>
+</svg>

@@ -22,7 +22,7 @@ supplies the gas figures.
 PUSH1, JUMP, JUMPI, JUMPDEST, STOP = 0x60, 0x56, 0x57, 0x5B, 0x00
 CALLDATALOAD = 0x35
 DUP1, MUL, SWAP1 = 0x80, 0x02, 0x90
-CALLSUB, CALLDEST, RETURNSUB = 0xB0, 0xB1, 0xB2
+CALLSUB, CALLDEST, RETURNSUB = 0xBC, 0xBB, 0xBF
 
 def build_jump(K):
     """push RTN_i; push v; push SQUARE; jump; RTN_i: jumpdest ... stop

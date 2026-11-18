@@ -3,12 +3,12 @@
 opcode_info() gives each opcode's size, stack pops and pushes, and
 whether it terminates its basic block; push_value() reads a PUSH's
 immediate.  Current through the Prague fork, plus this EIP's three
-instructions at their placeholder values: CALLSUB=0xB0, CALLDEST=0xB1,
-RETURNSUB=0xB2.
+instructions at their values: CALLDEST=0xBB, CALLSUB=0xBC,
+RETURNSUB=0xBF.
 """
 
 JUMP, JUMPI, JUMPDEST = 0x56, 0x57, 0x5B
-CALLSUB, CALLDEST, RETURNSUB = 0xB0, 0xB1, 0xB2
+CALLSUB, CALLDEST, RETURNSUB = 0xBC, 0xBB, 0xBF
 PUSH0, PUSH32 = 0x5F, 0x7F
 
 

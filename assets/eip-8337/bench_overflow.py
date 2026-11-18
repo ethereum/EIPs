@@ -16,7 +16,7 @@ shows the worst-case constant — time O(1024 * n), still linear in the
 input because 1024 is the protocol's stack limit, not the attacker's
 choice — and only invalid code gets near it.
 
-Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
 """
 import time
 import overflow_validator as ref
@@ -40,24 +40,24 @@ def jumpi_diamonds(size=24000):
 def call_chain(n_subs):
     """Top level calls sub 1; sub i calls sub i+1; the last returns.
     Valid iff n_subs <= 1024 (the return stack limit)."""
-    code = bytearray([0x61, 0, 5, 0xB0, 0x00])      # PUSH2 5, CALLSUB, STOP
+    code = bytearray([0x61, 0, 5, 0xBC, 0x00])      # PUSH2 5, CALLSUB, STOP
     pos = 5
     for _ in range(n_subs - 1):
         nxt = pos + 6
-        code += bytes([0xB1, 0x61, nxt >> 8, nxt & 0xFF, 0xB0, 0xB2])
+        code += bytes([0xBB, 0x61, nxt >> 8, nxt & 0xFF, 0xBC, 0xBF])
         pos += 6
-    return bytes(code + bytearray([0xB1, 0xB2]))
+    return bytes(code + bytearray([0xBB, 0xBF]))
 
 
 def recursion_pump(n_subs=2700):
     """A single huge cycle: each entry pops one caller item, then calls
     the next; the last calls the first.  Every lap raises every entry's
     inputs by one, until the first crosses the stack limit: invalid."""
-    code = bytearray([0x61, 0, 5, 0xB0, 0x00])
+    code = bytearray([0x61, 0, 5, 0xBC, 0x00])
     pos = 5
     for i in range(n_subs):
         nxt = pos + 7 if i < n_subs - 1 else 5
-        code += bytes([0xB1, 0x50, 0x61, nxt >> 8, nxt & 0xFF, 0xB0, 0xB2])
+        code += bytes([0xBB, 0x50, 0x61, nxt >> 8, nxt & 0xFF, 0xBC, 0xBF])
         pos += 7
     return bytes(code)
 

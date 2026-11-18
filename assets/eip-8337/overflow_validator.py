@@ -35,7 +35,7 @@ points therefore wait on a pending list until that net is first fixed
 subroutine it lies.  If a callee never returns, its return points are
 never visited.  That is correct: they are unreachable.
 
-Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
 """
 from collections import defaultdict, deque
 from dataclasses import dataclass
@@ -102,7 +102,7 @@ def validate(code, stack_limit=STACK_LIMIT):
             e, v = settle.pop()
             if stack_use[e].net is not None:
                 if stack_use[e].net != v:
-                    return False  # Constraint 5: one net per entry
+                    return False  # Constraint 4: one net per entry
                 continue
             stack_use[e].net = v
             for ret_pc, offset, caller in pending.pop(e, ()):
@@ -132,7 +132,7 @@ def validate(code, stack_limit=STACK_LIMIT):
             offset, entry = 0, pc
 
         if pc in visited:
-            # Constraint 5: paths must agree.
+            # Constraint 4: paths must agree.
             if visited[pc] != (offset, entry):
                 return False
             continue
@@ -144,7 +144,7 @@ def validate(code, stack_limit=STACK_LIMIT):
         if required.get(pc) == ENTRY and op != CALLDEST:
             return False
 
-        # Constraint 4: items used below the start; growth above it.
+        # Constraint 5: items used below the start; growth above it.
         u = stack_use[entry]
         u.inputs = max(u.inputs, pops - offset)
         if u.inputs > stack_limit:
@@ -189,7 +189,7 @@ def validate(code, stack_limit=STACK_LIMIT):
             value = push_value(code, pc) if PUSH0 <= op <= PUSH32 else None
             work_items.append((nxt, offset, entry, value))
 
-    # Constraint 4, framing: the top level is unframed, and so is every
+    # Constraint 5, framing: the top level is unframed, and so is every
     # entry that an unframed entry jumps or falls into (the edges that
     # are not calls); no unframed entry may contain a RETURNSUB.  The
     # set only grows, so this ends.
