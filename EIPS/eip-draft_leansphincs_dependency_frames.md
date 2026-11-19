@@ -2,6 +2,7 @@
 title: Dependency frames for leanSPHINCS signatures
 description: A frame mode that declares the leanSPHINCS signatures a transaction depends on, verified outside the EVM and carried beside it
 author: Ivan Litteri (@ilitteri)
+discussions-to: https://ethereum-magicians.org/t/add-eip-dependency-frames-for-leansphincs-signatures/30448
 status: Draft
 type: Standards Track
 category: Core
