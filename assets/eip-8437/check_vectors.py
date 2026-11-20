@@ -80,9 +80,8 @@ def transaction_body(nonce, commitments=()):
             [versioned_hash(c) for c in commitments]]
 
 
-# The fees list of the EIP-8141 this branch carries, [max_priority_fee_per_gas,
-# max_fee_per_gas, max_fee_per_blob_gas]; EIP-8141 on master has two fields.
-FEE_FIELDS = 3
+# Synthetic fixtures use three fees; transport accepts other fee-list lengths.
+FIXTURE_FEE_FIELDS = 3
 
 
 def transaction(nonce):
@@ -162,9 +161,9 @@ def check_metadata(meta, txs_hash, length, limit):
     assert hashes == sorted(set(hashes)), "metadata order"
     assert h(b"".join(hashes)) == txs_hash, "metadata transaction hash"
     assert all(isinstance(source, bytes) and len(source) == 20 for source in sources), "metadata source"
-    # EIP-8141's ranges: nonce below 2**64 - 1, fees below 2**256, frame gas below 2**64.
-    assert all(isinstance(nonce, int) and 0 <= nonce < 2**64 - 1 for nonce in nonces), "metadata nonce"
-    assert all(isinstance(fee, list) and len(fee) == FEE_FIELDS
+    # Fixed wire bounds, independent of fork-specific transaction validity.
+    assert all(isinstance(nonce, int) and 0 <= nonce < 2**64 for nonce in nonces), "metadata nonce"
+    assert all(isinstance(fee, list)
                and all(isinstance(value, int) and 0 <= value < 2**256 for value in fee) for fee in fees), "metadata fees"
     assert all(isinstance(value, int) and 0 <= value < 2**64 for value in gas), "metadata gas"
 
@@ -174,6 +173,20 @@ def check_claims(serving_peer, item, claims, expected):
     # peer's claim, and other peers' claims found false count against them.
     assert claims[serving_peer] == expected(item), "announced transaction metadata"
     return sorted(peer for peer, claim in claims.items() if claim != expected(item))
+
+
+def mismatched_held_transactions(meta, held):
+    # Only fields bound by the consensus hash can be checked without the wrapper.
+    mismatches = []
+    for i, digest in enumerate(meta[2]):
+        if digest not in held:
+            continue
+        envelope = held[digest]
+        assert transaction_hash(envelope) == digest, "held transaction hash"
+        expected = transaction_metadata([envelope])
+        if any(meta[field][i] != expected[field][0] for field in (0, 3, 4, 5, 6)):
+            mismatches.append(digest)
+    return mismatches
 
 
 def wrapper_items():
@@ -498,15 +511,14 @@ def main():
     expect_error("announcement transaction hash", check_announcements,
                  [[0, 1, bytes(32), bytes(32), bytes(31), []]])
 
-    # The widest metadata the arrival checks accept: 17 transactions, 256-bit
-    # fees, the largest nonce and frame gas, sizes filling the wrapper.
+    # A wide fixture with three fees: no fixed fee-list length limits transport.
     widest_hashes = sorted(h(uint(i, 1)) for i in range(MAX_INLINE_TRANSACTIONS))
     widest = [FRAME_TX_TYPE * MAX_INLINE_TRANSACTIONS,
               [(MAX_WRAPPER_BYTES - 1) // MAX_INLINE_TRANSACTIONS] * MAX_INLINE_TRANSACTIONS,
               widest_hashes,
               [b"\xff" * 20] * MAX_INLINE_TRANSACTIONS,
-              [2**64 - 2] * MAX_INLINE_TRANSACTIONS,
-              [[2**256 - 1] * FEE_FIELDS] * MAX_INLINE_TRANSACTIONS,
+              [2**64 - 1] * MAX_INLINE_TRANSACTIONS,
+              [[2**256 - 1] * FIXTURE_FEE_FIELDS] * MAX_INLINE_TRANSACTIONS,
               [2**64 - 1] * MAX_INLINE_TRANSACTIONS]
     widest_entries = [[0, MAX_WRAPPER_BYTES, uint(i + 1, 32), bytes(32), h(b"".join(widest_hashes)), widest]
                       for i in range(MAX_ANNOUNCEMENTS)]
@@ -647,13 +659,27 @@ def main():
                          (altered(2, meta0[2][:1] * 2), "metadata order"),
                          (altered(2, sorted([h(b"other 0"), h(b"other 1")])), "metadata transaction hash"),
                          (altered(3, [bytes(19)] + meta0[3][1:]), "metadata source"),
-                         (altered(4, [2**64 - 1] + meta0[4][1:]), "metadata nonce"),
-                         (altered(5, [[]] + meta0[5][1:]), "metadata fees"),
-                         (altered(5, [meta0[5][0][1:]] + meta0[5][1:]), "metadata fees"),
-                         (altered(5, [meta0[5][0] + [0]] + meta0[5][1:]), "metadata fees"),
+                         (altered(4, [2**64] + meta0[4][1:]), "metadata nonce"),
+                         (altered(4, [-1] + meta0[4][1:]), "metadata nonce"),
+                         (altered(5, [b""] + meta0[5][1:]), "metadata fees"),
+                         (altered(5, [[[]]] + meta0[5][1:]), "metadata fees"),
+                         (altered(5, [[-1]] + meta0[5][1:]), "metadata fees"),
                          (altered(5, [[2**256] + meta0[5][0][1:]] + meta0[5][1:]), "metadata fees"),
                          (altered(6, [2**64] + meta0[6][1:]), "metadata gas")]:
         expect_error(reason, check_announcements, [describe(0, encoded[0], *coverage(mode0), meta)])
+    # Fee arity and the transaction nonce rule are not transport validity rules.
+    for fee_list in ([], [7, 3], [7, 3, 0], [7, 3, 0, 0]):
+        payload = transaction_body(2**64 - 1)
+        payload[5] = fee_list
+        item = [[FRAME_TX_TYPE + rlp(payload)], 0, mode0[2]]
+        body = rlp(item)
+        check_announcements([describe(0, body, *coverage(item), inline_metadata(item))])
+        check_wrapper_response(7, [h(body)], {h(body): metadata_for(item)}, reply_for(7, [item]))
+        false_meta = altered(5, [fee_list] + meta0[5][1:])
+        check_announcements([describe(0, encoded[0], *coverage(mode0), false_meta)])
+        expect_error("announced transaction metadata", check_wrapper_response, 7, requested,
+                     {**metadata, requested[0]: (*metadata[requested[0]][:4], false_meta)},
+                     reply_for(7, [mode0]))
     # Other fields are checked against the wrapper, before proof verification.
     for index, value in [(0, b"\x02" + meta0[0][1:]),
                          (1, [meta0[1][0] + 1] + meta0[1][1:]),
@@ -672,12 +698,30 @@ def main():
     # Fields come from each transaction, in wrapper order.
     sent = transaction_body(5)
     sent[2], sent[5] = b"\x11" * 20, [7, 3, 0]
-    assert len(transaction_body(0)[5]) == FEE_FIELDS
+    assert len(transaction_body(0)[5]) == FIXTURE_FEE_FIELDS
     assert transaction_metadata([FRAME_TX_TYPE + rlp(sent)])[3:6] == [[b"\x11" * 20], [5], [[7, 3, 0]]]
     # A's false metadata leaves the wrapper B serves intact, and counts against A.
     claims = {"A": altered(4, [meta0[4][0] + 1] + meta0[4][1:]), "B": meta0}
     assert check_claims("B", mode0, claims, inline_metadata) == ["A"]
     expect_error("announced transaction metadata", check_claims, "A", mode0, claims, inline_metadata)
+    # Held transactions expose hash-bound lies before any wrapper fetch or proof check.
+    held_transactions = {transaction_hash(tx): tx for tx in mode0[0]}
+    assert mismatched_held_transactions(meta0, held_transactions) == []
+    for index, value in [(0, b"\x02" + meta0[0][1:]),
+                         (3, [b"\x01" * 20] + meta0[3][1:]),
+                         (4, [meta0[4][0] + 1] + meta0[4][1:]),
+                         (5, [[2, 1, 0]] + meta0[5][1:]),
+                         (6, [meta0[6][0] + 1] + meta0[6][1:])]:
+        false_meta = altered(index, value)
+        assert mismatched_held_transactions(false_meta, held_transactions) == [meta0[2][0]]
+        assert mismatched_held_transactions(false_meta, {}) == []
+    assert {peer: mismatched_held_transactions(meta, held_transactions)
+            for peer, meta in claims.items()} == {"A": [meta0[2][0]], "B": []}
+    # Pooled size is not bound by the consensus hash; sidecars can differ.
+    assert mismatched_held_transactions(altered(1, [meta0[1][0] + 1] + meta0[1][1:]),
+                                        held_transactions) == []
+    expect_error("held transaction hash", mismatched_held_transactions, meta0,
+                 {meta0[2][0]: transaction(1000)})
     # Mode 0 wrappers list up to 17 transactions inline, and larger ones none.
     seventeen, eighteen = ([sorted((transaction(i) for i in range(count)), key=transaction_hash), 0, mode0[2]]
                            for count in (MAX_INLINE_TRANSACTIONS, MAX_INLINE_TRANSACTIONS + 1))
