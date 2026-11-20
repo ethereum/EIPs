@@ -8,7 +8,7 @@
  * Usage:  validator FILE [STACK_LIMIT]           -> prints 0 or 1
  *         validator -b FILE REPS [STACK_LIMIT]   -> ns/byte on stdout
  *
- * Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+ * Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,29 +20,33 @@
 #define ARENA  (4 * MAXN + 8)
 #define RINGSZ 32768                    /* > MAXN + 2, power of two   */
 
-enum { CALLSUB = 0xB0, CALLDEST = 0xB1, RETURNSUB = 0xB2,
+enum { CALLSUB = 0xBC, CALLDEST = 0xBB, RETURNSUB = 0xBF,
        JUMP = 0x56, JUMPI = 0x57, JUMPDEST = 0x5B };
 enum { REQ_NONE, REQ_LABEL, REQ_ENTRY };
 
-typedef struct { int32_t pc, off, entry, framed, push; } Item;
+typedef struct { int32_t pc, off, entry, push; } Item;
 
 /* per position (entry id = its pc; top-level code = index n) */
-static uint8_t  vis[MAXN + 2], vfr[MAXN + 2], required[MAXN + 2];
+static uint8_t  vis[MAXN + 2], required[MAXN + 2];
+static uint8_t  unframed[MAXN + 2], returning[MAXN + 2];
 static int32_t  voff[MAXN + 2], vent[MAXN + 2];
 static uint8_t  net_known[MAXN + 2], seen[MAXN + 2], queued[MAXN + 2];
 static uint8_t  scan_op[MAXN + 2];
 static int32_t  net[MAXN + 2], inputs[MAXN + 2], growth[MAXN + 2], calldep[MAXN + 2];
                                 /* inputs: per entry, its demand for caller items */
 static int32_t  pend_head[MAXN + 2], entp_head[MAXN + 2], chld_head[MAXN + 2];
+static int32_t  jout_head[MAXN + 2];
 static int32_t  unfin[MAXN + 2];
 static int32_t  nodes[MAXN + 2], ready[MAXN + 2], ring[RINGSZ];
 /* arenas: linked lists, heads store index + 1 */
-static struct { int32_t ret_pc, off, caller, framed, next; } pend[ARENA];
+static struct { int32_t ret_pc, off, caller, next; } pend[ARENA];
 static struct { int32_t parent, off, next; }                 entp[ARENA];
 static struct { int32_t parent, off, is_call, next; }        chld[ARENA];
+static struct { int32_t child, next; }                       jout[ARENA];
+                                /* jout: per entry, the entries it jumps or falls into */
 static Item work[ARENA];
 static struct { int32_t e, v; } settle[ARENA];
-static int32_t npend, nentp, nchld, nwork, nnodes;
+static int32_t npend, nentp, nchld, njout, nwork, nnodes;
 
 static void touch(int32_t e)
 {
@@ -58,7 +62,7 @@ static int resolve(int32_t e0, int32_t v0)
     while (top > 0) {
         int32_t e = settle[--top].e, v = settle[top].v;
         if (net_known[e]) {
-            if (net[e] != v) return 0;  /* Constraint 5: one net per entry */
+            if (net[e] != v) return 0;  /* Constraint 4: one net per entry */
             continue;
         }
         net_known[e] = 1; net[e] = v;
@@ -66,7 +70,6 @@ static int resolve(int32_t e0, int32_t v0)
             work[nwork].pc = pend[h-1].ret_pc;
             work[nwork].off = pend[h-1].off + v;
             work[nwork].entry = pend[h-1].caller;
-            work[nwork].framed = pend[h-1].framed;
             work[nwork].push = -1;
             nwork++;
             h = pend[h-1].next;
@@ -86,14 +89,15 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
 {
     if (n == 0 || n > MAXN) return 0;
     size_t bytes = (size_t)(n + 2);
-    memset(vis, 0, bytes);      memset(vfr, 0, bytes);
+    memset(vis, 0, bytes);      memset(unframed, 0, bytes);
+    memset(returning, 0, bytes);
     memset(required, 0, bytes); memset(net_known, 0, bytes);
     memset(seen, 0, bytes);     memset(queued, 0, bytes);
     memset(inputs, 0, bytes * 4);    memset(growth, 0, bytes * 4);
     memset(calldep, 0, bytes * 4);   memset(unfin, 0, bytes * 4);
     memset(pend_head, 0, bytes * 4); memset(entp_head, 0, bytes * 4);
-    memset(chld_head, 0, bytes * 4);
-    npend = nentp = nchld = nnodes = 0;
+    memset(chld_head, 0, bytes * 4); memset(jout_head, 0, bytes * 4);
+    npend = nentp = nchld = njout = nnodes = 0;
 
     /* JUMPDEST analysis: the sequential scan from position 0 that every
      * client runs today.  Only its instructions may be executed or
@@ -109,14 +113,14 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
     }
     const int32_t outer = n;
     touch(outer);
-    work[0] = (Item){0, 0, outer, 0, -1};
+    work[0] = (Item){0, 0, outer, -1};
     nwork = 1;
 
     /* Phase 1, the traversal: visit every reachable instruction once. */
     while (nwork > 0) {
         Item it = work[--nwork];
         int32_t pc = it.pc, off = it.off, entry = it.entry;
-        int32_t framed = it.framed, push = it.push;
+        int32_t push = it.push;
         if (pc >= n) continue;          /* implicit STOP: a valid end */
         int op = scan_op[pc];
         if (!OPSIZE[op]) return 0;      /* Constraint 1 — or PUSH immediate
@@ -132,17 +136,19 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
             chld[nchld].parent = entry; chld[nchld].off = off;
             chld[nchld].is_call = 0; chld[nchld].next = chld_head[pc]; nchld++;
             chld_head[pc] = nchld;
+            jout[njout].child = pc; jout[njout].next = jout_head[entry]; njout++;
+            jout_head[entry] = njout;
             unfin[entry]++;
             if (net_known[pc] && !resolve(entry, off + net[pc])) return 0;
             off = 0; entry = pc;
         }
 
-        if (vis[pc]) {                  /* Constraint 5: paths must agree */
-            if (voff[pc] != off || vent[pc] != entry || vfr[pc] != framed)
+        if (vis[pc]) {                  /* Constraint 4: paths must agree */
+            if (voff[pc] != off || vent[pc] != entry)
                 return 0;
             continue;
         }
-        vis[pc] = 1; voff[pc] = off; vent[pc] = entry; vfr[pc] = (uint8_t)framed;
+        vis[pc] = 1; voff[pc] = off; vent[pc] = entry;
 
         /* Constraints 2 and 3: a required destination type, if any. */
         if (required[pc] == REQ_LABEL && op != JUMPDEST && op != CALLDEST)
@@ -150,7 +156,7 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
         if (required[pc] == REQ_ENTRY && op != CALLDEST)
             return 0;
 
-        /* Constraint 4: items used below the start; growth above it. */
+        /* Constraint 5: items used below the start; growth above it. */
         int32_t cand = OPPOPS[op] - off;
         if (cand > inputs[entry]) {
             if (cand > limit) return 0;
@@ -171,17 +177,17 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
             chld[nchld].is_call = 1; chld[nchld].next = chld_head[dest]; nchld++;
             chld_head[dest] = nchld;
             unfin[entry]++;
-            work[nwork++] = (Item){dest, 0, dest, 1, -1};
+            work[nwork++] = (Item){dest, 0, dest, -1};
             if (net_known[dest]) {      /* return point: offset plus net */
-                work[nwork++] = (Item){nxt, off + net[dest], entry, framed, -1};
+                work[nwork++] = (Item){nxt, off + net[dest], entry, -1};
             } else {
                 pend[npend].ret_pc = nxt; pend[npend].off = off;
-                pend[npend].caller = entry; pend[npend].framed = framed;
+                pend[npend].caller = entry;
                 pend[npend].next = pend_head[dest]; npend++;
                 pend_head[dest] = npend;
             }
         } else if (op == RETURNSUB) {
-            if (!framed) return 0;      /* no CALLSUB to return from */
+            returning[entry] = 1;       /* framing is settled per entry, below */
             if (!resolve(entry, off)) return 0;
         } else if (op == JUMP || op == JUMPI) {
             if (push < 0) return 0;     /* Constraint 2: PUSH before JUMP/JUMPI */
@@ -190,9 +196,9 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
             if (vis[dest] && code[dest] != JUMPDEST && code[dest] != CALLDEST)
                 return 0;
             if (!required[dest]) required[dest] = REQ_LABEL;
-            work[nwork++] = (Item){dest, off, entry, framed, -1};
+            work[nwork++] = (Item){dest, off, entry, -1};
             if (op == JUMPI)            /* and the fall-through arm */
-                work[nwork++] = (Item){nxt, off, entry, framed, -1};
+                work[nwork++] = (Item){nxt, off, entry, -1};
         } else if (!OPTERM[op]) {       /* everything else falls through */
             int32_t val = -1;
             if (op >= 0x5F && op <= 0x7F) {
@@ -203,9 +209,26 @@ static int validate(const uint8_t *code, int32_t n, int32_t limit)
                     if (val > MAXN) val = MAXN + 1;   /* invalid as any dest */
                 }
             }
-            work[nwork++] = (Item){nxt, off, entry, framed, val};
+            work[nwork++] = (Item){nxt, off, entry, val};
         }
     }
+
+    /* Constraint 5, framing: the top level is unframed, and so is every
+     * entry that an unframed entry jumps or falls into (the edges that
+     * are not calls); no unframed entry may contain a RETURNSUB.  A
+     * walk over the non-call edges from the top level, each entry once. */
+    unframed[outer] = 1;
+    nwork = 0;
+    work[nwork++].entry = outer;
+    while (nwork > 0) {
+        int32_t e = work[--nwork].entry;
+        for (int32_t h = jout_head[e]; h; h = jout[h-1].next) {
+            int32_t c = jout[h-1].child;
+            if (!unframed[c]) { unframed[c] = 1; work[nwork++].entry = c; }
+        }
+    }
+    for (int32_t i = 0; i < nnodes; i++)
+        if (unframed[nodes[i]] && returning[nodes[i]]) return 0;
 
     /* Phase 2, the combining: fold each subroutine's stack use into
      * everyone who calls or enters it.  Children before parents:

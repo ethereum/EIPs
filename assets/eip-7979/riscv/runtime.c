@@ -15,7 +15,8 @@ typedef unsigned long u64;
 
 extern void evm_entry(void);
 
-unsigned char MEM[1 << 20];            /* EVM memory                   */
+unsigned char MEM[1 << 20]             /* EVM memory; aligned so the   */
+    __attribute__((aligned(32)));      /* LLVM cell may load words     */
 unsigned char FRAME[1024 * 32];        /* 256-bit AOT data stack       */
 
 static long sys(long n, long a, long b, long c)

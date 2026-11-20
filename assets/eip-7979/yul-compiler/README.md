@@ -69,4 +69,4 @@ address plumbing at all.
   stand alone, so the files are repeated here verbatim and must stay
   byte-identical to the originals.
 
-Placeholder opcodes: `CALLSUB`=0xB0, `CALLDEST`=0xB1, `RETURNSUB`=0xB2.
+Opcodes: `CALLDEST`=0xBB, `CALLSUB`=0xBC, `RETURNSUB`=0xBF.

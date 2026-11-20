@@ -25,7 +25,7 @@ protocol's constant, and approached only by invalid code built to
 pump demands around a recursive cycle (see native-cost/ for the measured
 costs).
 
-Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
 """
 from collections import defaultdict, deque
 
@@ -40,8 +40,8 @@ ENTRY = "calldest"    # destination must be a CALLDEST
 
 def validate(code, stack_limit=STACK_LIMIT):
     """True iff the code satisfies the five constraints of EIP-8337
-    validation: valid opcodes, proven destinations, framed returns,
-    no underflow, and one static stack offset per instruction.
+    validation: valid opcodes, proven destinations, one static stack
+    offset per instruction, framed returns, and no underflow.
     Framing is a property of entries: no entry reachable by jumps from
     the top level may contain a RETURNSUB."""
     if len(code) == 0:
@@ -69,7 +69,7 @@ def validate(code, stack_limit=STACK_LIMIT):
     parents = defaultdict(list)   # child -> [(parent, offset)]
     enter_parents = defaultdict(list)  # entry -> [(parent, offset)]
     pending = defaultdict(list)   # entry -> return points waiting on its net
-    jump_parents = defaultdict(list)  # entry -> entries reaching it by jump or fall-through
+    jump_children = defaultdict(list)  # entry -> entries it jumps or falls into
     returning = set()             # entries that contain a RETURNSUB
     work_items = [(0, 0, OUTER, None)]
 
@@ -82,7 +82,7 @@ def validate(code, stack_limit=STACK_LIMIT):
             e, v = settle.pop()
             if e in net_effect:
                 if net_effect[e] != v:
-                    return False  # Constraint 5: one net per entry
+                    return False  # Constraint 4: one net per entry
                 continue
             net_effect[e] = v
             for ret_pc, offset, caller in pending.pop(e, ()):
@@ -106,7 +106,7 @@ def validate(code, stack_limit=STACK_LIMIT):
         # any other way first records the link between the subroutines.
         if op == CALLDEST and (entry != pc or offset != 0):
             parents[pc].append((entry, offset))
-            jump_parents[pc].append(entry)
+            jump_children[entry].append(pc)
             if pc in net_effect:      # settled: the arriving net follows
                 if not resolve(entry, offset + net_effect[pc]):
                     return False
@@ -115,7 +115,7 @@ def validate(code, stack_limit=STACK_LIMIT):
             offset, entry = 0, pc
 
         if pc in visited:
-            # Constraint 5: paths must agree.
+            # Constraint 4: paths must agree.
             if visited[pc] != (offset, entry):
                 return False
             continue
@@ -127,7 +127,7 @@ def validate(code, stack_limit=STACK_LIMIT):
         if required.get(pc) == ENTRY and op != CALLDEST:
             return False
 
-        # Constraint 4: items used from below the subroutine's start.
+        # Constraint 5: items used from below the subroutine's start.
         need = pops - offset
         if need > inputs[entry]:
             if need > stack_limit:
@@ -172,18 +172,17 @@ def validate(code, stack_limit=STACK_LIMIT):
             value = push_value(code, pc) if PUSH0 <= op <= PUSH32 else None
             work_items.append((nxt, offset, entry, value))
 
-    # Constraint 4, framing: the top level is unframed, and so is every
+    # Constraint 5, framing: the top level is unframed, and so is every
     # entry that an unframed entry jumps or falls into; no unframed entry
-    # may contain a RETURNSUB.  Framing propagates along jump links only,
-    # since a CALLSUB frames its callee.  The set only grows, so this ends.
+    # may contain a RETURNSUB.  A worklist walks each jump link at most
+    # once — a CALLSUB makes no link, since it frames its callee.
     unframed = {OUTER}
-    changed = True
-    while changed:
-        changed = False
-        for e, ps in jump_parents.items():
-            if e not in unframed and any(p in unframed for p in ps):
+    work = [OUTER]
+    while work:
+        for e in jump_children[work.pop()]:
+            if e not in unframed:
                 unframed.add(e)
-                changed = True
+                work.append(e)
     if unframed & returning:
         return False
 
