@@ -23,7 +23,7 @@ MAX_MANIFESTS_PER_REQUEST = 32
 LEANSPHINCS_SCHEME = 0x10
 FRAME_TX_TYPE = b"\x06"
 CELLS_PER_EXT_BLOB = 128
-# Fixed for eth/73, from EIP-8288's 16 leanSPHINCS and 1 leanSTARK dependencies
+# Fixed for eth/74, from EIP-8288's 16 leanSPHINCS and 1 leanSTARK dependencies
 # per mode 0 wrapper, so that it does not follow fork rules.
 MAX_INLINE_TRANSACTIONS = 17
 METADATA_FIELDS = 7
