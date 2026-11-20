@@ -15,13 +15,13 @@ Usage:
     python3 extract_cfg.py <hex>      # print the CFG of the given code
     python3 extract_cfg.py <hex> --dot  # emit Graphviz DOT instead
 
-Placeholder opcodes: CALLSUB=0xB0, CALLDEST=0xB1, RETURNSUB=0xB2.
+Opcodes: CALLDEST=0xBB, CALLSUB=0xBC, RETURNSUB=0xBF.
 """
 import sys
 from collections import defaultdict
 
 JUMP, JUMPI, JUMPDEST = 0x56, 0x57, 0x5B
-CALLSUB, CALLDEST, RETURNSUB = 0xB0, 0xB1, 0xB2
+CALLSUB, CALLDEST, RETURNSUB = 0xBC, 0xBB, 0xBF
 PUSH0, PUSH32 = 0x5F, 0x7F
 
 # Terminators: control cannot fall through to the next instruction.
@@ -30,7 +30,7 @@ TERMINATORS = {0x00, 0xF3, 0xFD, 0xFE, 0xFF, JUMP, CALLSUB, RETURNSUB}
 NAMES = {
     0x00: "STOP", 0x01: "ADD", 0x02: "MUL", 0x03: "SUB", 0x50: "POP",
     0x36: "CALLDATASIZE", 0x5B: "JUMPDEST", 0x56: "JUMP", 0x57: "JUMPI",
-    0xB0: "CALLSUB", 0xB1: "CALLDEST", 0xB2: "RETURNSUB",
+    0xBC: "CALLSUB", 0xBB: "CALLDEST", 0xBF: "RETURNSUB",
     0xF3: "RETURN", 0xFD: "REVERT", 0xFE: "INVALID", 0xFF: "SELFDESTRUCT",
 }
 NAMES.update({0x80 + i: f"DUP{i + 1}" for i in range(16)})
@@ -198,13 +198,13 @@ def dot_cfg(code):
 
 
 DEMOS = [
-    ("simple routine",           "6004B000B1B2"),
-    ("two levels of subroutines","6004B000B16009B0B2B1B2"),
-    ("subroutine at end of code","600556B1B25B6003B0"),
-    ("SQUARE called at two depths","6002600BB06003600BB000B18002B2"),
-    ("fall-through second entry","6008B05F600AB000B15FB150B2"),
-    ("recursion, no base case",  "6004B000B16004B0B2"),
-    ("jump to a CALLDEST",      "6004B000B15F600956B150B2"),
+    ("simple routine",           "6004BC00BBBF"),
+    ("two levels of subroutines","6004BC00BB6009BCBFBBBF"),
+    ("subroutine at end of code","600556BBBF5B6003BC"),
+    ("SQUARE called at two depths","6002600BBC6003600BBC00BB8002BF"),
+    ("fall-through second entry","6008BC5F600ABC00BB5FBB50BF"),
+    ("recursion, no base case",  "6004BC00BB6004BCBF"),
+    ("jump to a CALLDEST",      "6004BC00BB5F600956BB50BF"),
 ]
 
 if __name__ == "__main__":
