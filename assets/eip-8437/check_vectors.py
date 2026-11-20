@@ -132,7 +132,7 @@ def frame_gas(payload):
 
 
 def transaction_metadata(envelopes):
-    # EIP-8077's announcement layout plus fees and gas, in wrapper order.
+    # EIP-8437 transaction metadata, in wrapper order.
     payloads = [frame_payload(tx) for tx in envelopes]
     return [b"".join(tx[:1] for tx in envelopes),
             [len(tx) for tx in envelopes],
