@@ -69,3 +69,141 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+    - name: Deploy GitHub Runner to AWS (EC2)
+  # You may pin to the exact commit or the version.
+  # uses: bitovi/github-actions-deploy-github-runner-to-ec2@6e35bdc2c305bec7608655b84227b88ac75c5961
+  uses: bitovi/github-actions-deploy-github-runner-to-ec2@v0
+  with:
+    # Specifies if this action should checkout the code
+    checkout: # optional, default is true
+    # Will run only the generation phase of BitOps, where the Terraform and Ansible code is built.
+    bitops_code_only: # optional
+    # Store BitOps code as a GitHub artifact
+    bitops_code_store: # optional
+    # Repo URL for the runner to listen to
+    repo_url: 
+    # Repo access token
+    repo_access_token: 
+    # AWS access key ID
+    aws_access_key_id: # optional
+    # AWS secret access key
+    aws_secret_access_key: # optional
+    # AWS session token
+    aws_session_token: # optional
+    # AWS default region
+    aws_default_region: # optional, default is us-east-1
+    # Set to override the AWS resource identifier for the deployment.  Defaults to `${org}-{repo}-{branch}`.  Use with destroy to destroy specific resources.
+    aws_resource_identifier: # optional
+    # A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`
+    aws_additional_tags: # optional
+    # Set to "true" to Destroy the stack through Terraform.
+    tf_stack_destroy: # optional
+    # Change this to be anything you want to. Carefull to be consistent here. A missing file could trigger recreation, or stepping over destruction of non-defined objects.
+    tf_state_file_name: # optional
+    # Append a string to the tf-state-file. Setting this to `unique` will generate `tf-state-aws-unique`. Can co-exist with the tf_state_file_name variable. 
+    tf_state_file_name_append: # optional
+    # AWS S3 bucket to use for Terraform state. Defaults to `${org}-${repo}-{branch}-tf-state`
+    tf_state_bucket: # optional
+    # Force purge and deletion of S3 bucket defined. Any file contained there will be destroyed. `tf_stack_destroy` must also be `true`
+    tf_state_bucket_destroy: # optional
+    # Secret name to pull env variables from AWS Secret Manager, could be a comma separated list, read in order. Expected JSON content.
+    env_aws_secret: # optional
+    # File containing environment variables to be used with the app
+    env_repo: # optional
+    # `.env` file to be used with the app from Github secrets
+    env_ghs: # optional
+    # `.env` file to be used with the app from Github variables
+    env_ghv: # optional
+    # Define if an EC2 instance should be created
+    aws_ec2_instance_create: # optional
+    # AWS AMI Filter string. Will be used to lookup for lates image based on the string. Defaults to `ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*`.
+    aws_ec2_ami_filter: # optional
+    # Owner of AWS AMI image. This ensures the provider is the one we are looking for. Defaults to `099720109477`, Canonical (Ubuntu).
+    aws_ec2_ami_owner: # optional
+    # AWS AMI ID. Will default to lookup for latest image of the `aws_ec2_ami_filter` string. This will override `aws_ec2_ami_filter` lookup.
+    aws_ec2_ami_id: # optional
+    # Set this to true if you want to recreate the EC2 instance if there is a newer version of the AMI.
+    aws_ec2_ami_update: # optional
+    # The AWS IAM instance profile to use for the EC2 instance
+    aws_ec2_iam_instance_profile: # optional
+    # The AWS Instance type
+    aws_ec2_instance_type: # optional
+    # Define the volume size (in GiB) for the root volume on the AWS Instance.
+    aws_ec2_instance_root_vol_size: # optional
+    # Set this to true to avoid deletion of root volume on termination. Defaults to false.
+    aws_ec2_instance_root_vol_preserve: # optional
+    # The name of the EC2 security group
+    aws_ec2_security_group_name: # optional
+    # Generates and manages a secret manager entry that contains the public and private keys created for the ec2 instance.
+    aws_ec2_create_keypair_sm: # optional
+    # Add a public IP to the instance or not. (Not an Elastic IP)
+    aws_ec2_instance_public_ip: # optional
+    # List of ports to be enabled as an ingress rule in the EC2 SG, in a [xx,yy] format - Not the ELB
+    aws_ec2_port_list: # optional
+    # Relative path in the repo for a user provided script to be executed with Terraform EC2 Instance creation.
+    aws_ec2_user_data_file: # optional, default is no-file-provided
+    # If user_data file changes, instance will stop and start. Hence public IP will change. Defaults to true.
+    aws_ec2_user_data_replace_on_change: # optional
+    # A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`
+    aws_ec2_additional_tags: # optional
+    # Define if a VPC should be created
+    aws_vpc_create: # optional
+    # Set a specific name for the VPC
+    aws_vpc_name: # optional
+    # Define Base CIDR block which is divided into subnet CIDR blocks. Defaults to 10.0.0.0/16.
+    aws_vpc_cidr_block: # optional
+    # Comma separated list of public subnets. Defaults to 10.10.110.0/24
+    aws_vpc_public_subnets: # optional
+    # Comma separated list of private subnets. If none, none will be created.
+    aws_vpc_private_subnets: # optional
+    # Comma separated list of availability zones. Defaults to `aws_default_region.
+    aws_vpc_availability_zones: # optional
+    # AWS VPC ID. Accepts `vpc-###` values.
+    aws_vpc_id: # optional
+    # Specify a Subnet to be used with the instance. If none provided, will pick one.
+    aws_vpc_subnet_id: # optional
+    # Enables NAT gateway
+    aws_vpc_enable_nat_gateway: # optional
+    # Creates only one NAT gateway
+    aws_vpc_single_nat_gateway: # optional
+    # Comma separated list of IP IDS to reuse in the NAT gateways
+    aws_vpc_external_nat_ip_ids: # optional
+    # A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`
+    aws_vpc_additional_tags: # optional
+    # 
+    aws_secret_env: # optional
+    # 
+    repo_env: # optional
+    # 
+    dot_env: # optional
+    # 
+    ghv_env: # optional
+    # 
+    stack_destroy: # optional
+    # 
+    additional_tags: # optional
+    # 
+    ec2_instance_profile: # optional
+    # 
+    ec2_instance_type: # optional
+    # 
+    ec2_ami_id: # optional
+    # 
+    ec2_ami_update: # optional
+    # 
+    ec2_volume_size: # optional
+    # 
+    ec2_root_preserve: # optional
+    # 
+    ec2_security_group_name: # optional
+    # 
+    ec2_create_keypair_sm: # optional
+    # 
+    ec2_instance_public_ip: # optional
+    # 
+    ec2_user_data_file: # optional, default is no-file-provided
+    # 
+    ec2_user_data_replace_on_change: # optional
+    # 
+    ec2_additional_tags: # optional
