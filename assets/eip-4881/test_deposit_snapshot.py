@@ -13,9 +13,6 @@ class DepositTestCase:
     block_height: uint64
     snapshot: DepositTreeSnapshot
 
-def get_hex(some_bytes) -> str:
-    return "0x{}".format(some_bytes.hex())
-
 def get_bytes(hexstr) -> bytes:
     return bytes.fromhex(hexstr.replace("0x",""))
 
