@@ -420,6 +420,7 @@ Links qualified with a Digital Object Identifier (DOI) may be included using the
 This is a sentence with a footnote.[^1]
 
 [^1]:
+
     ```csl-json
     {
       "type": "article",
@@ -455,6 +456,7 @@ Which renders to:
 This is a sentence with a footnote.[^1]
 
 [^1]:
+
     ```csl-json
     {
       "type": "article",
