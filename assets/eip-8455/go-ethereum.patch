@@ -1,0 +1,370 @@
+diff --git a/core/vm/eips.go b/core/vm/eips.go
+--- a/core/vm/eips.go
++++ b/core/vm/eips.go
+@@ -585,6 +585,26 @@
+ 	}
+ }
+ 
++// opReservoir implements the RESERVOIR opcode: it pushes the state-gas
++// reservoir of the current frame (the part of the frame's budget that GAS
++// does not report).
++func opReservoir(pc *uint64, evm *EVM, scope *ScopeContext) ([]byte, error) {
++	scope.Stack.get().SetUint64(scope.Contract.Gas.StateGas)
++	return nil, nil
++}
++
++// enableReservoir enables the RESERVOIR opcode (state-gas reservoir
++// introspection). It depends on the reservoir model of EIP-8037 and therefore
++// must only be applied on top of an instruction set that has it.
++func enableReservoir(jt *JumpTable) {
++	jt[RESERVOIR] = &operation{
++		execute:     opReservoir,
++		constantGas: GasQuickStep,
++		minStack:    minStack(0, 1),
++		maxStack:    maxStack(0, 1),
++	}
++}
++
+ // enable8037And8038 enables EIP-8037 (multidimensional state-gas metering)
+ // together with EIP-8038 (state-access gas cost update).
+ func enable8037And8038(jt *JumpTable) {
+diff --git a/core/vm/jump_table.go b/core/vm/jump_table.go
+--- a/core/vm/jump_table.go
++++ b/core/vm/jump_table.go
+@@ -94,6 +94,7 @@
+ 
+ func newBogotaInstructionSet() JumpTable {
+ 	instructionSet := newAmsterdamInstructionSet()
++	enableReservoir(&instructionSet) // RESERVOIR opcode (state-gas reservoir introspection)
+ 	return validate(instructionSet)
+ }
+ 
+diff --git a/core/vm/opcodes.go b/core/vm/opcodes.go
+--- a/core/vm/opcodes.go
++++ b/core/vm/opcodes.go
+@@ -106,6 +106,7 @@
+ 	BLOBHASH    OpCode = 0x49
+ 	BLOBBASEFEE OpCode = 0x4a
+ 	SLOTNUM     OpCode = 0x4b
++	RESERVOIR   OpCode = 0x4d
+ )
+ 
+ // 0x50 range - 'storage' and execution.
+@@ -322,6 +323,7 @@
+ 	BLOBHASH:    "BLOBHASH",
+ 	BLOBBASEFEE: "BLOBBASEFEE",
+ 	SLOTNUM:     "SLOTNUM",
++	RESERVOIR:   "RESERVOIR",
+ 
+ 	// 0x50 range - 'storage' and execution.
+ 	POP:      "POP",
+@@ -505,6 +507,7 @@
+ 	"BLOBHASH":        BLOBHASH,
+ 	"BLOBBASEFEE":     BLOBBASEFEE,
+ 	"SLOTNUM":         SLOTNUM,
++	"RESERVOIR":       RESERVOIR,
+ 	"DELEGATECALL":    DELEGATECALL,
+ 	"STATICCALL":      STATICCALL,
+ 	"CODESIZE":        CODESIZE,
+diff --git a/core/vm/reservoir_test.go b/core/vm/reservoir_test.go
+new file mode 100644
+--- /dev/null
++++ b/core/vm/reservoir_test.go
+@@ -0,0 +1,255 @@
++// Copyright 2026 The go-ethereum Authors
++// This file is part of the go-ethereum library.
++//
++// The go-ethereum library is free software: you can redistribute it and/or modify
++// it under the terms of the GNU Lesser General Public License as published by
++// the Free Software Foundation, either version 3 of the License, or
++// (at your option) any later version.
++//
++// The go-ethereum library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++// GNU Lesser General Public License for more details.
++//
++// You should have received a copy of the GNU Lesser General Public License
++// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
++
++// Tests for the RESERVOIR opcode (0x4d), which pushes the state-gas reservoir
++// of the current frame. They reuse the helpers of eip8037_test.go.
++
++package vm
++
++import (
++	"errors"
++	"math/big"
++	"testing"
++
++	"github.com/ethereum/go-ethereum/common"
++	"github.com/ethereum/go-ethereum/core/state"
++	"github.com/ethereum/go-ethereum/core/tracing"
++	"github.com/ethereum/go-ethereum/core/types"
++	"github.com/ethereum/go-ethereum/params"
++	"github.com/holiman/uint256"
++)
++
++// bogotaReservoirEVM builds an EVM with the fork that activates RESERVOIR.
++func bogotaReservoirEVM(statedb StateDB) *EVM {
++	ctx := BlockContext{
++		CanTransfer: func(db StateDB, addr common.Address, amount *uint256.Int) bool {
++			return db.GetBalance(addr).Cmp(amount) >= 0
++		},
++		Transfer: func(db StateDB, sender, recipient common.Address, amount *uint256.Int, _ *params.Rules) {
++			db.SubBalance(sender, amount, tracing.BalanceChangeTransfer)
++			db.AddBalance(recipient, amount, tracing.BalanceChangeTransfer)
++		},
++		BlockNumber:      big.NewInt(0),
++		Random:           &common.Hash{},
++		CostPerStateByte: params.CostPerStateByte,
++	}
++	cfg := *params.MergedTestChainConfig
++	cfg.AmsterdamTime = new(uint64)
++	cfg.BogotaTime = new(uint64)
++	return NewEVM(ctx, statedb, &cfg, Config{})
++}
++
++// runReservoir executes code at a contract address under the RESERVOIR fork.
++func runReservoir(t *testing.T, code []byte, gas GasBudget, setup func(db *state.StateDB, self common.Address)) ([]byte, GasBudget, error) {
++	t.Helper()
++	self := common.BytesToAddress([]byte("self"))
++	statedb, _ := state.New(types.EmptyRootHash, state.NewDatabaseForTesting())
++	statedb.CreateAccount(self)
++	statedb.SetCode(self, code, tracing.CodeChangeUnspecified)
++	if setup != nil {
++		setup(statedb, self)
++	}
++	statedb.Finalise(params.Rules{IsEIP158: true})
++	ret, result, err := bogotaReservoirEVM(statedb).Call(common.Address{}, self, nil, gas, new(uint256.Int))
++	assertBudgetSane(t, gas, result)
++	return ret, result, err
++}
++
++// returnTop returns the code that stores the stack top at memory 0 and
++// returns 32 bytes. It is appended to code that leaves one value on the stack.
++var returnTop = []byte{0x60, 0x00, 0x52, 0x60, 0x20, 0x60, 0x00, 0xf3}
++
++const opRESERVOIR = byte(0x4d)
++
++func word(ret []byte, i int) uint64 {
++	return new(uint256.Int).SetBytes(ret[32*i : 32*i+32]).Uint64()
++}
++
++func withChild(code []byte) func(*state.StateDB, common.Address) {
++	return func(db *state.StateDB, self common.Address) {
++		db.CreateAccount(childAddr)
++		db.SetCode(childAddr, code, tracing.CodeChangeUnspecified)
++	}
++}
++
++// callReservoirParent: CALL child (32-byte return area at 0), then push
++// RESERVOIR and store it at 32; return 64 bytes. op is the call opcode byte.
++func callReservoirParent(op byte, to common.Address) []byte {
++	var b []byte
++	switch op {
++	case 0xf1, 0xf2: // CALL, CALLCODE: retLen retOff argsLen argsOff value addr gas
++		b = []byte{0x60, 0x20, 0x60, 0x00, 0x60, 0x00, 0x60, 0x00, 0x60, 0x00}
++	default: // DELEGATECALL, STATICCALL: no value
++		b = []byte{0x60, 0x20, 0x60, 0x00, 0x60, 0x00, 0x60, 0x00}
++	}
++	b = append(b, 0x73)
++	b = append(b, to.Bytes()...)
++	b = append(b, 0x5a, op, 0x50)                // GAS; CALL*; POP success flag
++	b = append(b, opRESERVOIR, 0x60, 0x20, 0x52) // MSTORE(32, RESERVOIR)
++	b = append(b, 0x60, 0x40, 0x60, 0x00, 0xf3)  // RETURN(0, 64)
++	return b
++}
++
++// The opcode pushes the frame's reservoir and nothing else.
++func TestReservoirReturnsReservoir(t *testing.T) {
++	for _, r := range []uint64{0, 1, 500_000, 1 << 40} {
++		ret, _, err := runReservoir(t, append([]byte{opRESERVOIR}, returnTop...), NewGasBudget(1_000_000, r), nil)
++		if err != nil {
++			t.Fatal(err)
++		}
++		if got := word(ret, 0); got != r {
++			t.Fatalf("RESERVOIR = %d, want %d", got, r)
++		}
++	}
++}
++
++// RESERVOIR costs GasQuickStep (2) execution gas and no state gas.
++func TestReservoirGasCost(t *testing.T) {
++	// RESERVOIR; POP; STOP  (2 + 2 + 0)
++	_, res, err := runReservoir(t, []byte{opRESERVOIR, 0x50, 0x00}, NewGasBudget(1_000, 777), nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if res.UsedExecutionGas != 4 || res.ExecutionGas != 996 {
++		t.Fatalf("exec used=%d left=%d, want 4/996", res.UsedExecutionGas, res.ExecutionGas)
++	}
++	if res.StateGas != 777 || res.UsedStateGas != 0 {
++		t.Fatalf("state left=%d used=%d, want 777/0", res.StateGas, res.UsedStateGas)
++	}
++}
++
++// With 1 gas left the opcode runs out of execution gas even if the reservoir is huge.
++func TestReservoirNeedsExecutionGas(t *testing.T) {
++	_, _, err := runReservoir(t, []byte{opRESERVOIR}, NewGasBudget(1, 1_000_000), nil)
++	if !errors.Is(err, ErrOutOfGas) {
++		t.Fatalf("err = %v, want ErrOutOfGas", err)
++	}
++}
++
++// The opcode is invalid before the fork that introduces it.
++func TestReservoirInvalidBeforeFork(t *testing.T) {
++	_, _, err := run8037(t, []byte{opRESERVOIR}, NewGasBudget(1_000, 0), new(uint256.Int), nil)
++	var invalid *ErrInvalidOpCode
++	if !errors.As(err, &invalid) {
++		t.Fatalf("err = %v, want *ErrInvalidOpCode", err)
++	}
++}
++
++func TestReservoirOpcodeNames(t *testing.T) {
++	if RESERVOIR != 0x4d || RESERVOIR.String() != "RESERVOIR" || StringToOp("RESERVOIR") != RESERVOIR {
++		t.Fatalf("bad opcode metadata: %#x %q", byte(RESERVOIR), RESERVOIR.String())
++	}
++}
++
++// State charges draw from the reservoir first; a refill returns to it.
++func TestReservoirTracksChargesAndRefills(t *testing.T) {
++	tests := []struct {
++		name      string
++		code      []byte
++		reservoir uint64
++		want      uint64
++	}{
++		{"sstore-new-slot", append(sstore(0, 1), append([]byte{opRESERVOIR}, returnTop...)...), 200_000, 200_000 - uint64(stateGasNewSlot)},
++		{"sstore-set-then-clear", append(append(sstore(0, 1), sstore(0, 0)...), append([]byte{opRESERVOIR}, returnTop...)...), 200_000, 200_000},
++		{"spill-empties-reservoir", append(sstore(0, 1), append([]byte{opRESERVOIR}, returnTop...)...), 50_000, 0},
++	}
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			ret, _, err := runReservoir(t, tt.code, NewGasBudget(1_000_000, tt.reservoir), nil)
++			if err != nil {
++				t.Fatal(err)
++			}
++			if got := word(ret, 0); got != tt.want {
++				t.Fatalf("RESERVOIR = %d, want %d", got, tt.want)
++			}
++		})
++	}
++}
++
++// GAS+RESERVOIR measures the same consumption whether or not the reservoir
++// funds a state charge; GAS alone does not.
++func TestReservoirTotalGasDeltaIsFundingIndependent(t *testing.T) {
++	// GAS; RESERVOIR; SSTORE(0,1); GAS; RESERVOIR; store g1,r1,g2,r2 at 0,32,64,96.
++	code := []byte{0x5a, opRESERVOIR}
++	code = append(code, sstore(0, 1)...)
++	code = append(code, 0x5a, opRESERVOIR)
++	code = append(code, 0x60, 0x60, 0x52, 0x60, 0x40, 0x52, 0x60, 0x20, 0x52, 0x60, 0x00, 0x52)
++	code = append(code, 0x60, 0x80, 0x60, 0x00, 0xf3)
++
++	read := func(reservoir uint64) (gasDrop, resDrop, totalDrop uint64) {
++		ret, _, err := runReservoir(t, code, NewGasBudget(1_000_000, reservoir), nil)
++		if err != nil {
++			t.Fatal(err)
++		}
++		g1, r1, g2, r2 := word(ret, 0), word(ret, 1), word(ret, 2), word(ret, 3)
++		return g1 - g2, r1 - r2, (g1 + r1) - (g2 + r2)
++	}
++	fundedGas, fundedRes, fundedTotal := read(500_000)
++	spillGas, spillRes, spillTotal := read(0)
++
++	if fundedRes != uint64(stateGasNewSlot) || spillRes != 0 {
++		t.Fatalf("reservoir drop funded=%d unfunded=%d, want %d/0", fundedRes, spillRes, stateGasNewSlot)
++	}
++	if spillGas != fundedGas+uint64(stateGasNewSlot) {
++		t.Fatalf("GAS drop funded=%d unfunded=%d: unfunded must also pay the state charge", fundedGas, spillGas)
++	}
++	if fundedTotal != spillTotal {
++		t.Fatalf("GAS+RESERVOIR drop funded=%d unfunded=%d, want equal", fundedTotal, spillTotal)
++	}
++}
++
++// Reservoir across call frames: the child sees the caller's whole reservoir;
++// a successful child's charges persist, a reverting or halting child's do not.
++func TestReservoirAcrossFrames(t *testing.T) {
++	const R = 500_000
++	slot := uint64(stateGasNewSlot)
++	readOnly := append([]byte{opRESERVOIR}, returnTop...)
++	writeThenRead := append(sstore(0, 1), readOnly...)
++	writeThenRevert := append(sstore(0, 1), revertTail...)
++	writeThenHalt := append(sstore(0, 1), invalidTail...)
++
++	tests := []struct {
++		name         string
++		op           byte
++		child        []byte
++		childSees    uint64
++		parentAfter  uint64
++		skipChildRet bool
++	}{
++		{"call-forwards-all", 0xf1, readOnly, R, R, false},
++		{"callcode-forwards-all", 0xf2, readOnly, R, R, false},
++		{"delegatecall-forwards-all", 0xf4, readOnly, R, R, false},
++		{"staticcall-forwards-all", 0xfa, readOnly, R, R, false},
++		{"call-success-persists", 0xf1, writeThenRead, R - slot, R - slot, false},
++		{"call-revert-restores", 0xf1, writeThenRevert, 0, R, true},
++		{"call-halt-restores", 0xf1, writeThenHalt, 0, R, true},
++	}
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			parent := callReservoirParent(tt.op, childAddr)
++			ret, _, err := runReservoir(t, parent, NewGasBudget(5_000_000, R), withChild(tt.child))
++			if err != nil {
++				t.Fatal(err)
++			}
++			if !tt.skipChildRet && word(ret, 0) != tt.childSees {
++				t.Fatalf("child saw %d, want %d", word(ret, 0), tt.childSees)
++			}
++			if got := word(ret, 1); got != tt.parentAfter {
++				t.Fatalf("parent reservoir after call = %d, want %d", got, tt.parentAfter)
++			}
++		})
++	}
++}
+diff --git a/tests/init.go b/tests/init.go
+--- a/tests/init.go
++++ b/tests/init.go
+@@ -741,6 +741,38 @@
+ 			BPO2:   params.DefaultBPO2BlobConfig,
+ 		},
+ 	},
++	"Bogota": {
++		ChainID:                 big.NewInt(1),
++		HomesteadBlock:          big.NewInt(0),
++		EIP150Block:             big.NewInt(0),
++		EIP155Block:             big.NewInt(0),
++		EIP158Block:             big.NewInt(0),
++		ByzantiumBlock:          big.NewInt(0),
++		ConstantinopleBlock:     big.NewInt(0),
++		PetersburgBlock:         big.NewInt(0),
++		IstanbulBlock:           big.NewInt(0),
++		MuirGlacierBlock:        big.NewInt(0),
++		BerlinBlock:             big.NewInt(0),
++		LondonBlock:             big.NewInt(0),
++		ArrowGlacierBlock:       big.NewInt(0),
++		MergeNetsplitBlock:      big.NewInt(0),
++		TerminalTotalDifficulty: big.NewInt(0),
++		ShanghaiTime:            u64(0),
++		CancunTime:              u64(0),
++		PragueTime:              u64(0),
++		OsakaTime:               u64(0),
++		BPO1Time:                u64(0),
++		BPO2Time:                u64(0),
++		AmsterdamTime:           u64(0),
++		BogotaTime:              u64(0),
++		DepositContractAddress:  params.MainnetChainConfig.DepositContractAddress,
++		BlobScheduleConfig: &params.BlobScheduleConfig{
++			Cancun: params.DefaultCancunBlobConfig,
++			Prague: params.DefaultPragueBlobConfig,
++			BPO1:   params.DefaultBPO1BlobConfig,
++			BPO2:   params.DefaultBPO2BlobConfig,
++		},
++	},
+ 	"BPO2ToAmsterdamAtTime15k": {
+ 		ChainID:                 big.NewInt(1),
+ 		HomesteadBlock:          big.NewInt(0),

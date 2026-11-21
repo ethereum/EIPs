@@ -1,0 +1,1270 @@
+diff --git a/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_8455.py b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_8455.py
+new file mode 100644
+--- /dev/null
++++ b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_8455.py
+@@ -0,0 +1,28 @@
++"""
++EIP-8455: RESERVOIR opcode (0x4d), pushing the state gas budget that GAS
++does not report.
++"""
++
++from typing import Callable, Dict, List
++
++from execution_testing.vm import OpcodeBase, Opcodes
++
++from ....base_fork import BaseFork
++
++
++class EIP8455(BaseFork):
++    """RESERVOIR opcode (EIP-8455)."""
++
++    @classmethod
++    def opcode_gas_map(
++        cls,
++    ) -> Dict[OpcodeBase, int | Callable[[OpcodeBase], int]]:
++        """Add RESERVOIR opcode gas cost."""
++        gas_costs = cls.gas_costs()
++        base_map = super(EIP8455, cls).opcode_gas_map()
++        return {**base_map, Opcodes.RESERVOIR: gas_costs.BASE}
++
++    @classmethod
++    def valid_opcodes(cls) -> List[Opcodes]:
++        """Add RESERVOIR opcode."""
++        return [Opcodes.RESERVOIR] + super(EIP8455, cls).valid_opcodes()
+diff --git a/packages/testing/src/execution_testing/vm/opcodes.py b/packages/testing/src/execution_testing/vm/opcodes.py
+--- a/packages/testing/src/execution_testing/vm/opcodes.py
++++ b/packages/testing/src/execution_testing/vm/opcodes.py
+@@ -2389,6 +2389,22 @@
+     Source: [EIP-7516](https://eips.ethereum.org/EIPS/eip-7516)
+     """
+ 
++    RESERVOIR = Opcode(0x4D, popped_stack_items=0, pushed_stack_items=1)
++    """
++    RESERVOIR() = state_budget
++    ----
++
++    Description
++    ----
++    State gas available to the executing frame that `GAS` does not
++    report: the EIP-8037 reservoir, or the EIP-8141 frame's
++    `state_gas_left` inside a frame transaction (draft EIP).
++
++    Gas
++    ----
++    2
++    """
++
+     SLOTNUM = Opcode(0x4B, popped_stack_items=0, pushed_stack_items=1)
+     """
+     SLOTNUM() = slotNumber
+diff --git a/src/ethereum/forks/bogota/vm/gas.py b/src/ethereum/forks/bogota/vm/gas.py
+--- a/src/ethereum/forks/bogota/vm/gas.py
++++ b/src/ethereum/forks/bogota/vm/gas.py
+@@ -259,6 +259,7 @@
+     OPCODE_MSIZE: Final[ExecutionGas] = BASE
+     OPCODE_PC: Final[ExecutionGas] = BASE
+     OPCODE_GAS: Final[ExecutionGas] = BASE
++    OPCODE_RESERVOIR: Final[ExecutionGas] = BASE
+     OPCODE_ADDRESS: Final[ExecutionGas] = BASE
+     OPCODE_ORIGIN: Final[ExecutionGas] = BASE
+     OPCODE_CALLER: Final[ExecutionGas] = BASE
+diff --git a/src/ethereum/forks/bogota/vm/instructions/__init__.py b/src/ethereum/forks/bogota/vm/instructions/__init__.py
+--- a/src/ethereum/forks/bogota/vm/instructions/__init__.py
++++ b/src/ethereum/forks/bogota/vm/instructions/__init__.py
+@@ -101,6 +101,7 @@
+     BLOBHASH = 0x49
+     BLOBBASEFEE = 0x4A
+     SLOTNUM = 0x4B
++    RESERVOIR = 0x4D
+ 
+     # Control Flow Ops
+     STOP = 0x00
+@@ -268,6 +269,7 @@
+     Ops.GASLIMIT: block_instructions.gas_limit,
+     Ops.CHAINID: block_instructions.chain_id,
+     Ops.SLOTNUM: block_instructions.slot_number,
++    Ops.RESERVOIR: control_flow_instructions.state_gas_budget,
+     Ops.MLOAD: memory_instructions.mload,
+     Ops.MSTORE: memory_instructions.mstore,
+     Ops.MSTORE8: memory_instructions.mstore8,
+diff --git a/src/ethereum/forks/bogota/vm/instructions/control_flow.py b/src/ethereum/forks/bogota/vm/instructions/control_flow.py
+--- a/src/ethereum/forks/bogota/vm/instructions/control_flow.py
++++ b/src/ethereum/forks/bogota/vm/instructions/control_flow.py
+@@ -146,6 +146,44 @@
+     evm.pc += Uint(1)
+ 
+ 
++def state_gas_budget(evm: Evm) -> None:
++    """
++    Push the state gas available to the executing frame that `GAS`
++    does not report (the `RESERVOIR` instruction).
++
++    Under the EIP-8037 reservoir model this is the call frame's state
++    gas reservoir. Inside an EIP-8141 frame transaction it is the
++    executing frame's `state_gas_left` pool, the value `TXPARAM`
++    returns for `TXPARAM_STATE_GAS_LEFT`.
++
++    Parameters
++    ----------
++    evm :
++        The current EVM frame.
++
++    """
++    # STACK
++    pass
++
++    # GAS
++    charge_gas(evm, GasCosts.OPCODE_RESERVOIR)
++
++    # OPERATION
++    frame_context = evm.tx_env.frame_context
++    reservoir = evm.gas_meter.reservoir
++    if frame_context is not None:
++        # EIP-8141 frame transaction: the frame's explicit state pool.
++        value = U256(frame_context.state_gas_left)
++    else:
++        # EIP-8037 reservoir model.
++        assert reservoir is not None
++        value = U256(reservoir.state_gas_left)
++    push(evm.stack, value)
++
++    # PROGRAM COUNTER
++    evm.pc += Uint(1)
++
++
+ def jumpdest(evm: Evm) -> None:
+     """
+     Mark a valid destination for jumps. This is a noop, present only
+diff --git a/tests/bogota/eip_reservoir/__init__.py b/tests/bogota/eip_reservoir/__init__.py
+new file mode 100644
+--- /dev/null
++++ b/tests/bogota/eip_reservoir/__init__.py
+@@ -0,0 +1 @@
++"""Tests for the draft RESERVOIR (0x4d) opcode."""
+diff --git a/tests/bogota/eip_reservoir/test_reservoir.py b/tests/bogota/eip_reservoir/test_reservoir.py
+new file mode 100644
+--- /dev/null
++++ b/tests/bogota/eip_reservoir/test_reservoir.py
+@@ -0,0 +1,567 @@
++"""
++Tests for the draft RESERVOIR opcode (0x4d): the state gas budget that
++GAS does not report. Reservoir-model cases (EIP-8037 transactions) are
++marked `frame_tx_incompatible` because their expected values are
++model-specific; EIP-8141 cases are written as frame transactions.
++"""
++
++import pytest
++from execution_testing import (
++    EOA,
++    Address,
++    Account,
++    Alloc,
++    AuthorizationTuple,
++    Block,
++    BlockchainTestFiller,
++    BuilderDepositRequest,
++    BuilderExitRequest,
++    ConsolidationRequest,
++    Environment,
++    Bytecode,
++    Op,
++    StateTestFiller,
++    Transaction,
++    WithdrawalRequest,
++    compute_create_address,
++    compute_create2_address,
++)
++
++from ..eip8141_frame_transactions.helpers import default_frame, verify_frame
++
++pytestmark = pytest.mark.valid_from("Bogota")
++legacy = pytest.mark.frame_tx_incompatible
++
++TX_MAX = 16_777_216
++CPSB = 1530
++SS = 64 * CPSB          # 97,920  new storage slot
++NEW_ACCOUNT = 120 * CPSB  # 183,600 new account
++AUTH_BASE = 23 * CPSB   # 35,190  delegation indicator
++R = 500_000
++FILL = 0xDEAD           # pre-populated result slots: writes create no state
++SLOTS = {i: FILL for i in range(8)}
++FRESH = 0x100           # a slot that starts empty
++
++TXPARAM_STATE_GAS_LEFT = 0x0C
++
++
++def rec(i: int, value: Bytecode = Op.RESERVOIR) -> Bytecode:
++    return Op.SSTORE(i, value)
++
++
++def returner(prefix: Bytecode = Bytecode()) -> Bytecode:
++    """Child code: run prefix, return RESERVOIR as one word."""
++    return prefix + Op.MSTORE(0, Op.RESERVOIR) + Op.RETURN(0, 32)
++
++
++def call_and_record(op, target, slot_child: int, slot_after: int, value: int = 0,
++                    gas: Bytecode | int = Op.GAS) -> Bytecode:
++    if op in (Op.CALL, Op.CALLCODE):
++        c = op(gas, target, value, 0, 0, 0, 32)
++    else:
++        c = op(gas, target, 0, 0, 0, 32)
++    return Op.MSTORE(0, 0) + Op.POP(c) + rec(slot_child, Op.MLOAD(0)) + rec(slot_after)
++
++
++def legacy_tx(pre: Alloc, to, r: int = R, **kw) -> Transaction:
++    gas = TX_MAX + r if r else 1_000_000
++    return Transaction(sender=pre.fund_eoa(), to=to, gas_limit=gas, **kw)
++
++
++# --------------------------------------------------------------------------
++# EIP-8037 reservoir model
++# --------------------------------------------------------------------------
++@legacy
++@pytest.mark.parametrize("r", [R, 0], ids=["reservoir", "below_cap"])
++def test_read(state_test: StateTestFiller, pre: Alloc, r: int) -> None:
++    probe = pre.deploy_contract(rec(0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe, r),
++               post={probe: Account(storage={**SLOTS, 0: r})})
++
++
++@legacy
++@pytest.mark.parametrize("r,expected", [(R, R - SS), (50_000, 0)], ids=["funded", "spill"])
++def test_new_slot_charge(state_test: StateTestFiller, pre: Alloc, r: int, expected: int) -> None:
++    probe = pre.deploy_contract(Op.SSTORE(FRESH, 1) + rec(0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe, r),
++               post={probe: Account(storage={**SLOTS, 0: expected, FRESH: 1})})
++
++
++@legacy
++def test_same_frame_refill(state_test: StateTestFiller, pre: Alloc) -> None:
++    probe = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.SSTORE(FRESH, 0) + rec(0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: R})})
++
++
++@legacy
++@pytest.mark.parametrize("op", [Op.CALL, Op.CALLCODE, Op.DELEGATECALL, Op.STATICCALL],
++                         ids=["call", "callcode", "delegatecall", "staticcall"])
++def test_child_receives_whole_reservoir(state_test: StateTestFiller, pre: Alloc, op) -> None:
++    child = pre.deploy_contract(returner())
++    probe = pre.deploy_contract(call_and_record(op, child, 1, 0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: R, 1: R})})
++
++
++@legacy
++def test_child_success_charge_persists(state_test: StateTestFiller, pre: Alloc) -> None:
++    child = pre.deploy_contract(returner(Op.SSTORE(FRESH, 1)))
++    probe = pre.deploy_contract(call_and_record(Op.CALL, child, 1, 0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe),
++               post={probe: Account(storage={**SLOTS, 0: R - SS, 1: R - SS}),
++                     child: Account(storage={FRESH: 1})})
++
++
++@legacy
++@pytest.mark.parametrize("ending", ["revert", "invalid"])
++def test_child_failure_restores(state_test: StateTestFiller, pre: Alloc, ending: str) -> None:
++    tail = Op.REVERT(0, 32) if ending == "revert" else Op.INVALID
++    child = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.MSTORE(0, Op.RESERVOIR) + tail)
++    probe = pre.deploy_contract(call_and_record(Op.CALL, child, 1, 0) + Op.STOP, storage=SLOTS)
++    child_seen = R - SS if ending == "revert" else 0
++    state_test(pre=pre, tx=legacy_tx(pre, probe),
++               post={probe: Account(storage={**SLOTS, 0: R, 1: child_seen}),
++                     child: Account(storage={})})
++
++
++@legacy
++def test_call_fails_before_child(state_test: StateTestFiller, pre: Alloc) -> None:
++    child = pre.deploy_contract(returner())
++    probe = pre.deploy_contract(call_and_record(Op.CALL, child, 1, 0, value=1) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: R, 1: 0})})
++
++
++@legacy
++def test_value_call_creates_account(state_test: StateTestFiller, pre: Alloc) -> None:
++    fresh = Address(0x00000000000000000000000000000000DEADBEEF)
++    probe = pre.deploy_contract(Op.POP(Op.CALL(Op.GAS, fresh, 1, 0, 0, 0, 0)) + rec(0) + Op.STOP,
++                                storage=SLOTS, balance=10)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: R - NEW_ACCOUNT})})
++
++
++@legacy
++@pytest.mark.parametrize("gas,ok", [(2, 1), (1, 0)], ids=["exact_cost", "one_short"])
++def test_exact_execution_gas(state_test: StateTestFiller, pre: Alloc, gas: int, ok: int) -> None:
++    child = pre.deploy_contract(Op.RESERVOIR + Op.STOP)
++    probe = pre.deploy_contract(rec(0, Op.CALL(gas, child, 0, 0, 0, 0, 0)) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: ok})})
++
++
++@legacy
++@pytest.mark.parametrize("depth,ok", [(1023, 1), (1024, 0)], ids=["fits", "overflow"])
++def test_stack_overflow(state_test: StateTestFiller, pre: Alloc, depth: int, ok: int) -> None:
++    pushes = Bytecode()
++    for _ in range(depth):
++        pushes += Op.PUSH0
++    child = pre.deploy_contract(pushes + Op.RESERVOIR + Op.STOP)
++    probe = pre.deploy_contract(rec(0, Op.CALL(Op.GAS, child, 0, 0, 0, 0, 0)) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: ok})})
++
++
++DEPLOYED = bytes([0x00]) * 10   # 10 bytes of runtime code
++
++
++def initcode(ending: str) -> Bytecode:
++    body = rec(0)  # value is read before the new slot's own charge
++    if ending == "return":
++        return body + Op.MSTORE(0, 0) + Op.RETURN(0, len(DEPLOYED))
++    return body + Op.REVERT(0, 0)
++
++
++@legacy
++@pytest.mark.parametrize("opcode", ["create", "create2"])
++@pytest.mark.parametrize("ending", ["return", "revert"])
++def test_create_paths(state_test: StateTestFiller, pre: Alloc, opcode: str, ending: str) -> None:
++    ic = initcode(ending)
++    size = len(ic)
++    store_ic = Op.MSTORE(0, Op.PUSH32(bytes(ic).ljust(32, b"\0"))) if size <= 32 else None
++    assert store_ic is not None, size
++    create = Op.CREATE(0, 0, size) if opcode == "create" else Op.CREATE2(0, 0, size, 7)
++    probe = pre.deploy_contract(store_ic + Op.POP(create) + rec(1) + Op.STOP, storage=SLOTS)
++    if opcode == "create":
++        new = compute_create_address(address=probe, nonce=1)
++    else:
++        new = compute_create2_address(address=probe, salt=7, initcode=bytes(ic))
++    if ending == "return":
++        after = R - NEW_ACCOUNT - SS - len(DEPLOYED) * CPSB
++        post = {probe: Account(storage={**SLOTS, 1: after}),
++                new: Account(storage={0: R - NEW_ACCOUNT}, code=DEPLOYED)}
++    else:
++        post = {probe: Account(storage={**SLOTS, 1: R}), new: Account.NONEXISTENT}
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post=post)
++
++
++@legacy
++def test_create_transaction(state_test: StateTestFiller, pre: Alloc) -> None:
++    sender = pre.fund_eoa()
++    tx = Transaction(sender=sender, to=None, data=rec(0) + Op.STOP, gas_limit=TX_MAX + R)
++    new = compute_create_address(address=sender, nonce=0)
++    state_test(pre=pre, tx=tx, post={new: Account(storage={0: R - NEW_ACCOUNT})})
++
++
++@legacy
++@pytest.mark.parametrize(
++    "existing,r,expected",
++    [
++        ([True], R, R - AUTH_BASE),
++        ([False], R, R - AUTH_BASE - NEW_ACCOUNT),
++        ([True], 10_000, 0),
++        ([True, True, False], R, R - 3 * AUTH_BASE - NEW_ACCOUNT),
++    ],
++    ids=["existing", "new_authority", "spill", "three_auths"],
++)
++def test_7702_pre_execution_charges(state_test: StateTestFiller, pre: Alloc,
++                                    existing, r: int, expected: int) -> None:
++    delegate = pre.deploy_contract(rec(0) + Op.STOP)
++    authorities = [pre.fund_eoa() if e else pre.fund_eoa(amount=0) for e in existing]
++    sender = pre.fund_eoa()
++    tx = Transaction(sender=sender, to=authorities[0], gas_limit=TX_MAX + r,
++                     authorization_list=[AuthorizationTuple(address=delegate, nonce=0, signer=a)
++                                         for a in authorities])
++    state_test(pre=pre, tx=tx, post={authorities[0]: Account(storage={0: expected})})
++
++
++@legacy
++@pytest.mark.parametrize("r", [R, 0], ids=["funded", "unfunded"])
++def test_bundler_metering(state_test: StateTestFiller, pre: Alloc, r: int) -> None:
++    """
++    A bundler meters two sub-calls with GAS and with GAS + RESERVOIR.
++    op1 creates a slot in shared contract E, op2 clears it. Stored:
++    slot 0 = op1 reservoir delta (state gas GAS misses),
++    slot 1 = 1 if op2's GAS + RESERVOIR delta is negative.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH))) + Op.STOP)
++    op1 = pre.deploy_contract(Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP)
++    op2 = pre.deploy_contract(Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP)
++    # memory: 0x00 gas_before, 0x20 res_before, 0x40 gas_after, 0x60 res_after (op1)
++    #         0x80.. same for op2
++    def meter(target, base):
++        return (Op.MSTORE(base, Op.GAS) + Op.MSTORE(base + 0x20, Op.RESERVOIR)
++                + Op.POP(Op.CALL(16_000_000, target, 0, 0, 0, 0, 0))
++                + Op.MSTORE(base + 0x40, Op.GAS) + Op.MSTORE(base + 0x60, Op.RESERVOIR))
++    total2 = Op.SUB(Op.ADD(Op.MLOAD(0xC0), Op.MLOAD(0xE0)), Op.ADD(Op.MLOAD(0x80), Op.MLOAD(0xA0)))
++    code = (meter(op1, 0x00) + meter(op2, 0x80)
++            + rec(0, Op.SUB(Op.MLOAD(0x20), Op.MLOAD(0x60)))       # op1 reservoir delta
++            + rec(1, Op.SGT(total2, 0))                              # after - before > 0 <=> negative use
++            + Op.STOP)
++    bundler = pre.deploy_contract(code, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, bundler, r),
++               post={bundler: Account(storage={**SLOTS, 0: SS if r else 0, 1: 1})})
++
++
++# --------------------------------------------------------------------------
++# Portability: one library, both transaction models
++# --------------------------------------------------------------------------
++def portability_wrapper(pre: Alloc):
++    lib_txparam = pre.deploy_contract(Op.MSTORE(0, Op.TXPARAM(TXPARAM_STATE_GAS_LEFT)) + Op.RETURN(0, 32))
++    lib_reservoir = pre.deploy_contract(returner())
++    code = (Op.MSTORE(0, 0) + rec(0, Op.CALL(Op.GAS, lib_txparam, 0, 0, 0, 0, 32)) + rec(1, Op.MLOAD(0))
++            + Op.MSTORE(0, 0) + rec(2, Op.CALL(Op.GAS, lib_reservoir, 0, 0, 0, 0, 32)) + rec(3, Op.MLOAD(0))
++            + Op.STOP)
++    return pre.deploy_contract(code, storage=SLOTS)
++
++
++@legacy
++def test_portability_legacy(state_test: StateTestFiller, pre: Alloc) -> None:
++    """TXPARAM halts outside frame transactions; RESERVOIR works."""
++    w = portability_wrapper(pre)
++    state_test(pre=pre, tx=legacy_tx(pre, w),
++               post={w: Account(storage={**SLOTS, 0: 0, 1: 0, 2: 1, 3: R})})
++
++
++S = 300_000
++
++
++def frame_tx(sender: EOA, *frames) -> Transaction:
++    return Transaction(sender=sender, max_priority_fee_per_gas=7, max_fee=1_000_000_000,
++                       frames=[verify_frame(), *frames])
++
++
++def test_portability_frame(state_test: StateTestFiller, pre: Alloc) -> None:
++    """Inside a frame transaction both return the frame's state_gas_left."""
++    w = portability_wrapper(pre)
++    sender = pre.fund_eoa()
++    tx = frame_tx(sender, default_frame(target=w, gas_limit=500_000, state_gas_limit=S))
++    state_test(pre=pre, tx=tx, post={w: Account(storage={**SLOTS, 0: 1, 1: S, 2: 1, 3: S})})
++
++
++# --------------------------------------------------------------------------
++# EIP-8141 frame transactions
++# --------------------------------------------------------------------------
++def test_frame_read_equals_txparam(state_test: StateTestFiller, pre: Alloc) -> None:
++    probe = pre.deploy_contract(rec(0) + rec(1, Op.TXPARAM(TXPARAM_STATE_GAS_LEFT))
++                                + Op.SSTORE(FRESH, 1) + rec(2) + Op.STOP, storage=SLOTS)
++    tx = frame_tx(pre.fund_eoa(), default_frame(target=probe, gas_limit=500_000, state_gas_limit=S))
++    state_test(pre=pre, tx=tx, post={probe: Account(storage={**SLOTS, 0: S, 1: S, 2: S - SS, FRESH: 1})})
++
++
++def test_frame_nested_refill_revert(state_test: StateTestFiller, pre: Alloc) -> None:
++    """
++    The frame creates state, enters a nested
++    call that creates and clears a slot (refill), creates another and
++    reverts; the caller's view is restored to its pre-call value.
++    """
++    child = pre.deploy_contract(
++        Op.SSTORE(FRESH, 1) + Op.SSTORE(FRESH, 0) + Op.MSTORE(0, Op.RESERVOIR)
++        + Op.SSTORE(FRESH + 1, 1) + Op.MSTORE(0x20, Op.RESERVOIR) + Op.REVERT(0, 64))
++    probe = pre.deploy_contract(
++        Op.SSTORE(FRESH, 1) + rec(0)
++        + Op.POP(Op.CALL(Op.GAS, child, 0, 0, 0, 0, 64))
++        + rec(1, Op.MLOAD(0)) + rec(2, Op.MLOAD(0x20)) + rec(3) + Op.STOP, storage=SLOTS)
++    tx = frame_tx(pre.fund_eoa(), default_frame(target=probe, gas_limit=1_000_000, state_gas_limit=S))
++    state_test(pre=pre, tx=tx, post={
++        probe: Account(storage={**SLOTS, FRESH: 1, 0: S - SS, 1: S - SS, 2: S - 2 * SS, 3: S - SS}),
++        child: Account(storage={})})
++
++
++def test_frame_cross_frame_refill(state_test: StateTestFiller, pre: Alloc) -> None:
++    """
++    Frame 1 creates a slot; frame 2 clears it. The refill is attributed
++    to frame 1's receipt and is not credited to frame 2's pool.
++    """
++    s1, s2 = 300_000, 250_000
++    create_part = Op.SSTORE(FRESH, 1) + rec(0) + Op.STOP
++    head_len = len(Op.JUMPI(0xFF, Op.CALLDATASIZE))
++    dest = head_len + len(create_part)
++    x = pre.deploy_contract(
++        Op.JUMPI(dest, Op.CALLDATASIZE) + create_part
++        + Op.JUMPDEST + Op.SSTORE(FRESH, 0) + rec(1) + Op.STOP, storage=SLOTS)
++    assert len(Op.JUMPI(dest, Op.CALLDATASIZE)) == head_len
++    tx = frame_tx(pre.fund_eoa(),
++                  default_frame(target=x, gas_limit=200_000, state_gas_limit=s1),
++                  default_frame(target=x, gas_limit=200_000, state_gas_limit=s2, data=b"\x01"))
++    state_test(pre=pre, tx=tx, post={x: Account(storage={**SLOTS, 0: s1 - SS, 1: s2})})
++
++
++def test_frame_child_sees_frame_pool(state_test: StateTestFiller, pre: Alloc) -> None:
++    child = pre.deploy_contract(returner(Op.SSTORE(FRESH, 1)))
++    probe = pre.deploy_contract(call_and_record(Op.CALL, child, 1, 0) + Op.STOP, storage=SLOTS)
++    tx = frame_tx(pre.fund_eoa(), default_frame(target=probe, gas_limit=500_000, state_gas_limit=S))
++    state_test(pre=pre, tx=tx, post={probe: Account(storage={**SLOTS, 0: S - SS, 1: S - SS}),
++                                     child: Account(storage={FRESH: 1})})
++
++
++@legacy
++@pytest.mark.parametrize("r,child_seen,caller_after,gas_rose",
++                         [(R, R, R, 0), (0, SS, 0, 1)], ids=["reservoir", "below_cap"])
++def test_cross_frame_refill_merge(state_test: StateTestFiller, pre: Alloc, r: int,
++                                  child_seen: int, caller_after: int, gas_rose: int) -> None:
++    """
++    The caller creates a slot in E (a first call), then calls E again to
++    clear it. The refill lands in the second child's reservoir; on return
++    the EIP-8037 merge step moves it to gas_left when gas_left paid for the
++    slot. Stored: slot 0 = RESERVOIR in the clearing child, slot 1 = the
++    caller's RESERVOIR after it, slot 2 = 1 if the caller's GAS rose across
++    the call, slot 3 = 1 if GAS + RESERVOIR rose across the call.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH)))
++                                 + Op.MSTORE(0, Op.RESERVOIR) + Op.RETURN(0, 32))
++    code = (Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0))
++            + Op.MSTORE(0x20, Op.GAS) + Op.MSTORE(0x40, Op.RESERVOIR)
++            + Op.MSTORE(0, 0) + Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 32))
++            + Op.MSTORE(0x60, Op.GAS) + Op.MSTORE(0x80, Op.RESERVOIR)
++            + rec(0, Op.MLOAD(0)) + rec(1, Op.MLOAD(0x80))
++            + rec(2, Op.GT(Op.MLOAD(0x60), Op.MLOAD(0x20)))
++            + rec(3, Op.GT(Op.ADD(Op.MLOAD(0x60), Op.MLOAD(0x80)),
++                           Op.ADD(Op.MLOAD(0x20), Op.MLOAD(0x40))))
++            + Op.STOP)
++    caller = pre.deploy_contract(code, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, caller, r),
++               post={caller: Account(storage={**SLOTS, 0: child_seen, 1: caller_after,
++                                              2: gas_rose, 3: 1}),
++                     shared: Account(storage={})})
++
++
++# --------------------------------------------------------------------------
++# System calls
++# --------------------------------------------------------------------------
++SYSTEM_RESERVOIR = 16 * SS  # STORAGE_SET x SYSTEM_MAX_SSTORES_PER_CALL
++
++
++@pytest.mark.pre_alloc_mutable
++@pytest.mark.parametrize("system_contract", [
++    pytest.param(0x000F3DF6D732807EF1319FB7B8BB8522D0BEAC02, id="beacon"),
++    pytest.param(0x0000F90827F1C53A10CB7A02335B175320002935, id="history"),
++    pytest.param(WithdrawalRequest.system_contract_address, id="withdrawals"),
++    pytest.param(ConsolidationRequest.system_contract_address, id="consolidations"),
++    pytest.param(BuilderDepositRequest.system_contract_address, id="builder_deposit"),
++    pytest.param(BuilderExitRequest.system_contract_address, id="builder_exit"),
++])
++def test_system_call(blockchain_test: BlockchainTestFiller, pre: Alloc, system_contract: int) -> None:
++    """
++    A system call reads its own reservoir, STORAGE_SET x
++    SYSTEM_MAX_SSTORES_PER_CALL, independently of any transaction. Slot 0 is
++    the first read, slot 1 the read after one new slot is created, slot 2
++    the read in a child frame.
++    """
++    address = Address(system_contract)
++    child = pre.deploy_contract(returner())
++    code = (rec(0) + Op.SSTORE(FRESH, 1) + rec(1)
++            + Op.MSTORE(0, 0) + Op.POP(Op.CALL(Op.GAS, child, 0, 0, 0, 0, 32)) + rec(2, Op.MLOAD(0))
++            + Op.STOP)
++    pre.update_account(address, code=code, storage=SLOTS)
++    probe = pre.deploy_contract(rec(0) + Op.STOP, storage=SLOTS)
++    blockchain_test(
++        pre=pre,
++        genesis_environment=Environment(gas_limit=120_000_000),
++        blocks=[Block(txs=[legacy_tx(pre, probe)])],
++        post={address: Account(storage={**SLOTS, 0: SYSTEM_RESERVOIR, 1: SYSTEM_RESERVOIR - SS,
++                                        2: SYSTEM_RESERVOIR - SS, FRESH: 1}),
++              probe: Account(storage={**SLOTS, 0: R})},
++    )
++
++
++# --------------------------------------------------------------------------
++# Bundle ledger: signed per-operation measurements reconcile
++# --------------------------------------------------------------------------
++OFFSET = 1 << 128  # keeps every stored result non-zero, so instrumentation never clears a slot
++
++
++def enc(x: int) -> int:
++    return x + OFFSET
++
++
++@legacy
++@pytest.mark.parametrize("variant,r,m1,m2", [
++    ("create_clear", R, 116_195, -94_545),
++    ("create_clear", 0, 116_195, -94_545),
++    ("create_keep", R, 116_195, 3_044),
++    ("none", R, 3_044, 3_044),
++], ids=["create_clear", "create_clear_below_cap", "create_keep", "control"])
++def test_bundle_ledger(state_test: StateTestFiller, pre: Alloc, variant: str, r: int,
++                       m1: int, m2: int) -> None:
++    """
++    An EntryPoint-like caller meters two operations with GAS + RESERVOIR and
++    stores the signed deltas. Operation 1 creates a slot in a shared
++    contract; operation 2 clears it. Slots 0..3 hold op1 dGAS, op1
++    dRESERVOIR, op2 dGAS, op2 dRESERVOIR (before minus after, each plus
++    2**128 so that no stored value is zero); slots 4 and 5 hold the
++    per-operation sums with the same offset. The sums are
++    the same with and without a reservoir; only the split differs.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH))) + Op.STOP)
++    call_shared = Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP
++    op1 = pre.deploy_contract(Op.STOP if variant == "none" else call_shared)
++    op2 = pre.deploy_contract(call_shared if variant == "create_clear" else Op.STOP)
++
++    def meter(target, base):
++        return (Op.MSTORE(base, Op.GAS) + Op.MSTORE(base + 0x20, Op.RESERVOIR)
++                + Op.POP(Op.CALL(Op.GAS, target, 0, 0, 0, 0, 0))
++                + Op.MSTORE(base + 0x40, Op.GAS) + Op.MSTORE(base + 0x60, Op.RESERVOIR))
++
++    def d(a, b):
++        return Op.ADD(Op.SUB(Op.MLOAD(a), Op.MLOAD(b)), OFFSET)
++
++    code = (meter(op1, 0x00) + meter(op2, 0x80)
++            + rec(0, d(0x00, 0x40)) + rec(1, d(0x20, 0x60))
++            + rec(2, d(0x80, 0xC0)) + rec(3, d(0xA0, 0xE0))
++            + rec(4, Op.SUB(Op.ADD(Op.SLOAD(0), Op.SLOAD(1)), OFFSET))
++            + rec(5, Op.SUB(Op.ADD(Op.SLOAD(2), Op.SLOAD(3)), OFFSET))
++            + Op.STOP)
++    bundler = pre.deploy_contract(code, storage=SLOTS)
++    if variant == "none":
++        g1, s1, g2, s2 = m1, 0, m2, 0
++    elif variant == "create_keep":
++        g1, s1, g2, s2 = (m1 - SS, SS, m2, 0) if r else (m1, 0, m2, 0)
++    else:
++        g1, s1, g2, s2 = (m1 - SS, SS, m2 + SS, -SS) if r else (m1, 0, m2, 0)
++    state_test(pre=pre, tx=legacy_tx(pre, bundler, r),
++               post={bundler: Account(storage={**SLOTS, 0: enc(g1), 1: enc(s1),
++                                               2: enc(g2), 3: enc(s2),
++                                               4: enc(m1), 5: enc(m2)}),
++                     shared: Account(storage={FRESH: 1} if variant == "create_keep" else {})})
++
++
++# --------------------------------------------------------------------------
++# A caller bounds a child's reservoir use by reverting a wrapper frame
++# --------------------------------------------------------------------------
++@legacy
++def test_bounded_child(state_test: StateTestFiller, pre: Alloc) -> None:
++    """
++    An EntryPoint-like caller runs each operation inside a wrapper frame that
++    reads RESERVOIR before and after the operation and reverts when the
++    decrease exceeds a limit of one slot. The rollback of EIP-8037 restores
++    the reservoir, so the caller sees no change for the rejected operation.
++    Slots: 0 = 2**128 * wrapper success + wrapper output for op A (one slot),
++    1 = caller's RESERVOIR after op A, 2 = the same for op B (two slots;
++    the output is op B's own RESERVOIR reading, passed through the revert),
++    3 = caller's RESERVOIR after op B.
++    """
++    limit = SS
++    op_a = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.STOP)
++    op_b = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.SSTORE(FRESH + 1, 1)
++                               + Op.MSTORE(0, Op.RESERVOIR) + Op.RETURN(0, 32))
++
++    def wrapper_code(dest: int) -> Bytecode:
++        return (Op.MSTORE(0x20, Op.RESERVOIR)
++                + Op.MSTORE(0, 0)
++                + Op.POP(Op.CALL(Op.GAS, Op.CALLDATALOAD(0), 0, 0, 0, 0, 32))
++                + Op.MSTORE(0x60, Op.MLOAD(0))
++                + Op.MSTORE(0x40, Op.SUB(Op.MLOAD(0x20), Op.RESERVOIR))
++                + Op.JUMPI(Op.PUSH2(dest), Op.GT(Op.MLOAD(0x40), limit))
++                + Op.RETURN(0x40, 32)
++                + Op.JUMPDEST + Op.REVERT(0x60, 32))
++
++    dest = len(wrapper_code(0)) - len(Op.JUMPDEST + Op.REVERT(0x60, 32))
++    wrapper = pre.deploy_contract(wrapper_code(dest))
++
++    def run(target, slot_result: int, slot_after: int) -> Bytecode:
++        return (Op.MSTORE(0, target) + Op.MSTORE(0x20, 0)
++                + Op.MSTORE(0x40, Op.CALL(Op.GAS, wrapper, 0, 0, 32, 0x20, 32))
++                + Op.SSTORE(slot_result, Op.ADD(Op.MUL(Op.MLOAD(0x40), 1 << 128), Op.MLOAD(0x20)))
++                + rec(slot_after))
++
++    caller = pre.deploy_contract(run(op_a, 0, 1) + run(op_b, 2, 3) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, caller),
++               post={caller: Account(storage={**SLOTS, 0: (1 << 128) + SS, 1: R - SS,
++                                              2: R - 3 * SS, 3: R - SS}),
++                     op_a: Account(storage={FRESH: 1}), op_b: Account(storage={})})
++
++
++# --------------------------------------------------------------------------
++# Refill visibility by frame depth (EntryPoint-shaped: top -> inner -> op)
++# --------------------------------------------------------------------------
++@legacy
++@pytest.mark.parametrize("r", [R, 0], ids=["reservoir", "below_cap"])
++def test_refill_two_levels(state_test: StateTestFiller, pre: Alloc, r: int) -> None:
++    """
++    A top frame runs each operation through an inner frame that meters it
++    with GAS and RESERVOIR, as an ERC-4337 EntryPoint does in innerHandleOp.
++    Op 1 creates a slot in a shared contract, op 2 clears it. The refill for
++    op 2 is credited where the outstanding charge is: with gas_left funding
++    (R = 0) that is the top frame, so the inner frame sees it only in
++    RESERVOIR and the top frame sees it in GAS after the inner call returns.
++    Slots (offset 2**128): 0 = inner dGAS for op 2, 1 = inner dRESERVOIR for
++    op 2, 2 = top dGAS across the inner call for op 2, 3 = top dRESERVOIR
++    across it.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH))) + Op.STOP)
++    op = pre.deploy_contract(Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP)
++    # inner: meters the op given in calldata, returns (dGAS, dRESERVOIR) + OFFSET
++    inner = pre.deploy_contract(
++        Op.MSTORE(0, Op.GAS) + Op.MSTORE(0x20, Op.RESERVOIR)
++        + Op.POP(Op.CALL(Op.GAS, Op.CALLDATALOAD(0), 0, 0, 0, 0, 0))
++        + Op.MSTORE(0x40, Op.GAS) + Op.MSTORE(0x60, Op.RESERVOIR)
++        + Op.MSTORE(0x80, Op.ADD(Op.SUB(Op.MLOAD(0), Op.MLOAD(0x40)), OFFSET))
++        + Op.MSTORE(0xA0, Op.ADD(Op.SUB(Op.MLOAD(0x20), Op.MLOAD(0x60)), OFFSET))
++        + Op.RETURN(0x80, 64))
++
++    def run(record: bool) -> Bytecode:
++        code = (Op.MSTORE(0, op)
++                + Op.MSTORE(0x20, Op.GAS) + Op.MSTORE(0x40, Op.RESERVOIR)
++                + Op.POP(Op.CALL(Op.GAS, inner, 0, 0, 32, 0x80, 64))
++                + Op.MSTORE(0x60, Op.GAS) + Op.MSTORE(0xC0, Op.RESERVOIR))
++        if record:
++            code += (rec(0, Op.MLOAD(0x80)) + rec(1, Op.MLOAD(0xA0))
++                     + rec(2, Op.ADD(Op.SUB(Op.MLOAD(0x20), Op.MLOAD(0x60)), OFFSET))
++                     + rec(3, Op.ADD(Op.SUB(Op.MLOAD(0x40), Op.MLOAD(0xC0)), OFFSET)))
++        return code
++
++    top = pre.deploy_contract(run(False) + run(True) + Op.STOP, storage=SLOTS)
++    inner_gas = 478   # execution gas of op 2 as seen by the inner frame
++    top_gas = 704     # execution gas of the inner call as seen by the top frame
++    if r:
++        post = {0: enc(inner_gas), 1: enc(-SS), 2: enc(top_gas), 3: enc(-SS)}
++    else:
++        post = {0: enc(inner_gas), 1: enc(-SS), 2: enc(top_gas - SS), 3: enc(0)}
++    state_test(pre=pre, tx=legacy_tx(pre, top, r),
++               post={top: Account(storage={**SLOTS, **post}), shared: Account(storage={})})
+diff --git a/tests/bogota/eip_reservoir/entrypoint_v07.py b/tests/bogota/eip_reservoir/entrypoint_v07.py
+new file mode 100644
+--- /dev/null
++++ b/tests/bogota/eip_reservoir/entrypoint_v07.py
+@@ -0,0 +1,391 @@
++"""
++Runtime bytecode of ERC-4337 EntryPoint v0.7 and helpers, compiled from
++eth-infinitism/account-abstraction tag v0.7.0 (contracts/core/EntryPoint.sol,
++contracts/core/SenderCreator.sol) and from the test contracts in
++assets/eip-8455/entrypoint/MinimalAccount.sol, with solc 0.8.23, optimizer
++enabled (1,000,000 runs), viaIR, as in the repository's hardhat config.
++Immutable references are the byte offsets solc reports; the test fills them
++with the addresses it deploys to.
++"""
++
++ENTRYPOINT_V07 = bytes.fromhex(
++    "60806040526004361015610023575b3615610018575f80fd5b610021336126e7565b005b5f3560e01c806242dc531461"
++    "1ab557806301ffc9a7146119635780630396cb60146116325780630bd28e3b146115ba5780631b2e01b81461152a5780"
++    "63205c28781461139957806322cdde4c1461133357806335567e1a1461127f5780635287ce121461117557806370a082"
++    "3114611113578063765e827f14610e59578063850aaf6214610d9b5780639b249f6914610c4f578063b760faf914610c"
++    "15578063bb9fe6bf14610a49578063c23a5cea146107a9578063dbed18e01461019b5763fc7e286d0361000e57346101"
++    "975760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc3601126101975773ffffff"
++    "ffffffffffffffffffffffffffffffffff610138612247565b165f525f60205260a060405f2065ffffffffffff600182"
++    "5492015460405192835260ff8116151560208401526dffffffffffffffffffffffffffff8160081c16604084015263ff"
++    "ffffff8160781c16606084015260981c166080820152f35b5f80fd5b34610197576101a9366122bf565b906101b26129"
++    "5c565b5f915f5b82811061055f57506101c8849361252d565b5f805b8481106102ed5750507fbb47ee3e183a558b1a2f"
++    "f0874b079f3fc5478b7454eacf2bfc5af2ff5878f9725f80a15f80935f5b81811061023a5761023386865f7f575ff3ac"
++    "add5ab348fe1855e217e0f3678f8d767d7494c9f9fefbee2e17cca4d8180a2613b21565b6001600255005b6102946102"
++    "4882848a612735565b73ffffffffffffffffffffffffffffffffffffffff610269602083016127c9565b167f575ff3ac"
++    "add5ab348fe1855e217e0f3678f8d767d7494c9f9fefbee2e17cca4d5f80a280612775565b905f915b8083106102aa57"
++    "5050506001016101fd565b909194976102e46102de6001926102d88c8b6102d1826102cb8e8b8d61263d565b926125fc"
++    "565b5191613522565b906123af565b996123bc565b95019190610298565b60206102fa828789612735565b6103106103"
++    "078280612775565b939092016127c9565b915f9273ffffffffffffffffffffffffffffffffffffffff8091165b828510"
++    "6103405750505050506001016101cb565b909192939561036f83610368610356848c6125fc565b516103628b898b6126"
++    "3d565b85612995565b9290613d4c565b911684036104fa57610495576103858491613d4c565b9116610430576103a557"
++    "61039a6001916123bc565b96019392919061032c565b60a487604051907f220266b60000000000000000000000000000"
++    "00000000000000000000000000008252600482015260406024820152602160448201527f41413332207061796d617374"
++    "65722065787069726564206f72206e6f7420647560648201527f65000000000000000000000000000000000000000000"
++    "000000000000000000006084820152fd5b608488604051907f220266b600000000000000000000000000000000000000"
++    "0000000000000000008252600482015260406024820152601460448201527f41413334207369676e6174757265206572"
++    "726f720000000000000000000000006064820152fd5b608488604051907f220266b60000000000000000000000000000"
++    "00000000000000000000000000008252600482015260406024820152601760448201527f414132322065787069726564"
++    "206f72206e6f74206475650000000000000000006064820152fd5b608489604051907f220266b6000000000000000000"
++    "000000000000000000000000000000000000008252600482015260406024820152601460448201527f41413234207369"
++    "676e6174757265206572726f720000000000000000000000006064820152fd5b61056a818487612735565b9361057585"
++    "80612775565b919073ffffffffffffffffffffffffffffffffffffffff610598602089016127c9565b16966001908189"
++    "1461074b57886105c7575b50505060019293949550906105be916123af565b939291016101b6565b8060406105d59201"
++    "906127ea565b90893b15610197579290916040519384927f2dd811330000000000000000000000000000000000000000"
++    "00000000000000008452876044850160406004870152526064808501908960051b86010193825f905b8b82106106cc57"
++    "5050505050815f9461066b927ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc868096"
++    "030160248601526126a9565b03818a5afa90816106bd575b506106ad57602486604051907f86a9f75000000000000000"
++    "00000000000000000000000000000000000000000082526004820152fd5b93945084936105be6001896105aa565b6106"
++    "c690612166565b88610677565b919397967fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
++    "ff9c9087929496970301855287357ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffee183"
++    "36030181121561019757602061073986938583940161288b565b99019501920188969795949391610628565b60646040"
++    "517f08c379a0000000000000000000000000000000000000000000000000000000008152602060048201526017602482"
++    "01527f4141393620696e76616c69642061676772656761746f720000000000000000006044820152fd5b346101975760"
++    "20807ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc360112610197576107e1612247"
++    "565b335f525f8252600160405f2001908154916dffffffffffffffffffffffffffff8360081c169283156109eb5765ff"
++    "ffffffffff8160981c16801561098d57421061092f575f9373ffffffffffffffffffffffffffffffffffffffff859485"
++    "947fffffffffffffff000000000000000000000000000000000000000000000000ff86951690556040517fb7c918e0e2"
++    "49f999e965cafeb6c664271b3f4317d296461500e71da39f0cbda33391806108bb8786836020909392919373ffffffff"
++    "ffffffffffffffffffffffffffffffff60408201951681520152565b0390a2165af16108c96123f6565b50156108d157"
++    "005b606490604051907f08c379a000000000000000000000000000000000000000000000000000000000825260048201"
++    "52601860248201527f6661696c656420746f207769746864726177207374616b6500000000000000006044820152fd5b"
++    "606485604051907f08c379a0000000000000000000000000000000000000000000000000000000008252600482015260"
++    "1b60248201527f5374616b65207769746864726177616c206973206e6f742064756500000000006044820152fd5b6064"
++    "86604051907f08c379a00000000000000000000000000000000000000000000000000000000082526004820152601d60"
++    "248201527f6d7573742063616c6c20756e6c6f636b5374616b6528292066697273740000006044820152fd5b60648560"
++    "4051907f08c379a000000000000000000000000000000000000000000000000000000000825260048201526014602482"
++    "01527f4e6f207374616b6520746f2077697468647261770000000000000000000000006044820152fd5b34610197575f"
++    "7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261019757335f525f60205260"
++    "0160405f2001805463ffffffff8160781c16908115610bb75760ff1615610b595765ffffffffffff9081421601918183"
++    "11610b2c5780547fffffffffffffff000000000000ffffffffffffffffffffffffffffffffffff001678ffffffffffff"
++    "00000000000000000000000000000000000000609885901b161790556040519116815233907ffa9b3c14cc825c412c9e"
++    "d81b3ba365a5b459439403f18829e572ed53a4180f0a90602090a2005b7f4e487b710000000000000000000000000000"
++    "00000000000000000000000000005f52601160045260245ffd5b60646040517f08c379a0000000000000000000000000"
++    "00000000000000000000000000000000815260206004820152601160248201527f616c726561647920756e7374616b69"
++    "6e670000000000000000000000000000006044820152fd5b60646040517f08c379a00000000000000000000000000000"
++    "0000000000000000000000000000815260206004820152600a60248201527f6e6f74207374616b656400000000000000"
++    "0000000000000000000000000000006044820152fd5b60207fffffffffffffffffffffffffffffffffffffffffffffff"
++    "fffffffffffffffffc36011261019757610021610c4a612247565b6126e7565b346101975760207fffffffffffffffff"
++    "fffffffffffffffffffffffffffffffffffffffffffffffc3601126101975760043567ffffffffffffffff8111610197"
++    "576020610ca3610cf692369060040161226a565b919073ffffffffffffffffffffffffffffffffffffffff9260405194"
++    "859283927f570e1a36000000000000000000000000000000000000000000000000000000008452856004850152602484"
++    "01916126a9565b03815f857f0000000000000000000000000000000000000000000000000000000000000000165af190"
++    "8115610d90576024925f92610d5f575b50604051917f6ca7b80600000000000000000000000000000000000000000000"
++    "0000000000008352166004820152fd5b610d8291925060203d602011610d89575b610d7a8183612196565b8101906126"
++    "7d565b9083610d2f565b503d610d70565b6040513d5f823e3d90fd5b346101975760407fffffffffffffffffffffffff"
++    "fffffffffffffffffffffffffffffffffffffffc36011261019757610dd2612247565b60243567ffffffffffffffff81"
++    "11610197575f91610df58392369060040161226a565b90816040519283928337810184815203915af4610e106123f656"
++    "5b90610e556040519283927f994105540000000000000000000000000000000000000000000000000000000084521515"
++    "600484015260406024840152604483019061236c565b0390fd5b3461019757610e67366122bf565b610e729291926129"
++    "5c565b610e7b8361252d565b5f5b848110610eef57505f927fbb47ee3e183a558b1a2ff0874b079f3fc5478b7454eacf"
++    "2bfc5af2ff5878f9725f80a15f915b858310610ebf576102338585613b21565b909193600190610ee5610ed387898761"
++    "263d565b610edd88866125fc565b519088613522565b0194019190610eae565b610f1a610f13610f01838597956125fc"
++    "565b51610f0d84898761263d565b84612995565b9190613d4c565b73ffffffffffffffffffffffffffffffffffffffff"
++    "929183166110ae5761104957610f4490613d4c565b9116610fe457610f5957600101929092610e7d565b60a490604051"
++    "907f220266b6000000000000000000000000000000000000000000000000000000008252600482015260406024820152"
++    "602160448201527f41413332207061796d61737465722065787069726564206f72206e6f7420647560648201527f6500"
++    "0000000000000000000000000000000000000000000000000000000000006084820152fd5b608482604051907f220266"
++    "b60000000000000000000000000000000000000000000000000000000082526004820152604060248201526014604482"
++    "01527f41413334207369676e6174757265206572726f720000000000000000000000006064820152fd5b608483604051"
++    "907f220266b6000000000000000000000000000000000000000000000000000000008252600482015260406024820152"
++    "601760448201527f414132322065787069726564206f72206e6f74206475650000000000000000006064820152fd5b60"
++    "8484604051907f220266b600000000000000000000000000000000000000000000000000000000825260048201526040"
++    "6024820152601460448201527f41413234207369676e6174757265206572726f72000000000000000000000000606482"
++    "0152fd5b346101975760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261"
++    "01975773ffffffffffffffffffffffffffffffffffffffff61115f612247565b165f525f602052602060405f20546040"
++    "51908152f35b346101975760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc3601"
++    "126101975773ffffffffffffffffffffffffffffffffffffffff6111c1612247565b5f60806040516111d08161210056"
++    "5b8281528260208201528260408201528260608201520152165f525f60205260a060405f206080604051611202816121"
++    "00565b6001835493848352015490602081019060ff8316151582526dffffffffffffffffffffffffffff604082018185"
++    "60081c16815263ffffffff936060840193858760781c16855265ffffffffffff978891019660981c1686526040519788"
++    "525115156020880152511660408601525116606084015251166080820152f35b346101975760407fffffffffffffffff"
++    "fffffffffffffffffffffffffffffffffffffffffffffffc3601126101975760206112b8612247565b73ffffffffffff"
++    "ffffffffffffffffffffffffffff6112d5612298565b91165f526001825260405f2077ffffffffffffffffffffffffff"
++    "ffffffffffffffffffffff82165f52825260405f20547fffffffffffffffffffffffffffffffffffffffffffffffff00"
++    "000000000000006040519260401b16178152f35b34610197577fffffffffffffffffffffffffffffffffffffffffffff"
++    "fffffffffffffffffffc602081360112610197576004359067ffffffffffffffff821161019757610120908236030112"
++    "61019757611391602091600401612425565b604051908152f35b346101975760407fffffffffffffffffffffffffffff"
++    "fffffffffffffffffffffffffffffffffffc360112610197576113d0612247565b60243590335f525f60205260405f20"
++    "908154918284116114cc575f808573ffffffffffffffffffffffffffffffffffffffff82958395611410848a6123e956"
++    "5b90556040805173ffffffffffffffffffffffffffffffffffffffff831681526020810185905233917fd1c19fbcd455"
++    "1a5edfb66d43d2e337c04837afda3482b42bdf569a8fccdae5fb91a2165af16114666123f6565b501561146e57005b60"
++    "646040517f08c379a0000000000000000000000000000000000000000000000000000000008152602060048201526012"
++    "60248201527f6661696c656420746f20776974686472617700000000000000000000000000006044820152fd5b606460"
++    "40517f08c379a00000000000000000000000000000000000000000000000000000000081526020600482015260196024"
++    "8201527f576974686472617720616d6f756e7420746f6f206c61726765000000000000006044820152fd5b3461019757"
++    "60407ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261019757611561612247"
++    "565b73ffffffffffffffffffffffffffffffffffffffff61157e612298565b91165f52600160205277ffffffffffffff"
++    "ffffffffffffffffffffffffffffffffff60405f2091165f52602052602060405f2054604051908152f35b3461019757"
++    "60207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc3601126101975760043577ffff"
++    "ffffffffffffffffffffffffffffffffffffffffffff811680910361019757335f52600160205260405f20905f526020"
++    "5260405f2061162e81546123bc565b9055005b6020807fffffffffffffffffffffffffffffffffffffffffffffffffff"
++    "fffffffffffffc3601126101975760043563ffffffff9182821680920361019757335f525f815260405f209282156119"
++    "05576001840154908160781c1683106118a7576116b16dffffffffffffffffffffffffffff9182349160081c166123af"
++    "565b938415611849578185116117eb579065ffffffffffff6117ba9254604051906116d982612100565b815284810192"
++    "6001845260408201908816815260608201878152600160808401935f8552335f525f895260405f209051815501945115"
++    "15917fffffffffffffffffffffffffff0000000000000000000000000000000000000060ff72ffffffff000000000000"
++    "0000000000000000006effffffffffffffffffffffffffff008954945160081b16945160781b16941691161717178355"
++    "51167fffffffffffffff000000000000ffffffffffffffffffffffffffffffffffffff78ffffffffffff000000000000"
++    "0000000000000000000000000083549260981b169116179055565b6040519283528201527fa5ae833d0bb1dcd632d98a"
++    "8b70973e8516812898e19bf27b70071ebc8dc52c0160403392a2005b606483604051907f08c379a00000000000000000"
++    "000000000000000000000000000000000000000082526004820152600e60248201527f7374616b65206f766572666c6f"
++    "770000000000000000000000000000000000006044820152fd5b606483604051907f08c379a000000000000000000000"
++    "00000000000000000000000000000000000082526004820152601260248201527f6e6f207374616b6520737065636966"
++    "69656400000000000000000000000000006044820152fd5b606482604051907f08c379a0000000000000000000000000"
++    "0000000000000000000000000000000082526004820152601c60248201527f63616e6e6f742064656372656173652075"
++    "6e7374616b652074696d65000000006044820152fd5b606482604051907f08c379a00000000000000000000000000000"
++    "000000000000000000000000000082526004820152601a60248201527f6d757374207370656369667920756e7374616b"
++    "652064656c61790000000000006044820152fd5b346101975760207fffffffffffffffffffffffffffffffffffffffff"
++    "fffffffffffffffffffffffc360112610197576004357fffffffff000000000000000000000000000000000000000000"
++    "00000000000000811680910361019757807f60fc6b6e0000000000000000000000000000000000000000000000000000"
++    "000060209214908115611a8b575b8115611a61575b8115611a37575b8115611a0d575b506040519015158152f35b7f01"
++    "ffc9a70000000000000000000000000000000000000000000000000000000091501482611a02565b7f3e84f021000000"
++    "00000000000000000000000000000000000000000000000000811491506119fb565b7fcf28ef97000000000000000000"
++    "00000000000000000000000000000000000000811491506119f4565b7f915074d8000000000000000000000000000000"
++    "00000000000000000000000000811491506119ed565b34610197576102007fffffffffffffffffffffffffffffffffff"
++    "fffffffffffffffffffffffffffffc3601126101975767ffffffffffffffff6004358181116101975736602382011215"
++    "61019757611b17903690602481600401359101612211565b7fffffffffffffffffffffffffffffffffffffffffffffff"
++    "ffffffffffffffffdc36016101c081126101975761014060405191611b5383612100565b126101975760405192611b65"
++    "84612149565b60243573ffffffffffffffffffffffffffffffffffffffff811681036101975784526020936044358582"
++    "01526064356040820152608435606082015260a435608082015260c43560a082015260e43560c08201526101043573ff"
++    "ffffffffffffffffffffffffffffffffffffff811681036101975760e082015261012435610100820152610144356101"
++    "208201528252610164358483015260408201906101843582526101a43560608401526101c43560808401526101e43590"
++    "811161019757611c3390369060040161226a565b91905a3033036120a2578451606081015196603f5a0260061c612710"
++    "60a08401518a01011161207b575f9781519182611f9f575b5050505090611c81915a9003608086015101933691612211"
++    "565b935a915f95855194611c9286613c42565b9173ffffffffffffffffffffffffffffffffffffffff60e08801511690"
++    "81155f14611e5b57505073ffffffffffffffffffffffffffffffffffffffff865116945b5a9003019460a06060820151"
++    "910151016080870151860390818111611e47575b505084029051928184105f14611d805750506003811015611d535760"
++    "0203611d2b576113919293508093611d2681613cda565b613c6c565b5050507fdeadaa51000000000000000000000000"
++    "000000000000000000000000000000008152fd5b6024857f4e487b710000000000000000000000000000000000000000"
++    "000000000000000081526021600452fd5b81611d9092979396940390613c11565b506003841015611e1a57507f49628f"
++    "d1471006c1482da88028e9ce4dbb080b815c9b0344d39e5a8e6ec1419f60808683015192519473ffffffffffffffffff"
++    "ffffffffffffffffffffff865116948873ffffffffffffffffffffffffffffffffffffffff60e0890151169701519160"
++    "405192835215898301528760408301526060820152a4611391565b807f4e487b71000000000000000000000000000000"
++    "00000000000000000000000000602492526021600452fd5b6064919003600a0204909401938880611cf3565b81969196"
++    "8151611e6d575b5050611cd3565b6003871015611f72576002870315611e665760a089015191813b1561019757611ed6"
++    "92885f80946040518097819682957f7c627b210000000000000000000000000000000000000000000000000000000084"
++    "52600484015260806024840152608483019061236c565b8b8b0260448301528b60648301520393f19081611f5f575b50"
++    "611f5857888a3d610800808211611f50575b506040519282828501016040528184528284013e610e556040519283927f"
++    "ad7954bc0000000000000000000000000000000000000000000000000000000084526004840152602483019061236c56"
++    "5b905083611f01565b8a80611e66565b611f6a919a50612166565b5f988b611eee565b7f4e487b710000000000000000"
++    "00000000000000000000000000000000000000005f52602160045260245ffd5b915f92918380938d73ffffffffffffff"
++    "ffffffffffffffffffffffffff885116910192f115611fd1575b808080611c67565b611c81929196503d610800808211"
++    "612073575b506040519089818301016040528082525f8a83013e805161200c575b50506001959091611fc9565b7f1c4f"
++    "ada7374c0a9ee8841fc38afe82932dc0f8e69012e927f061a8bae611a2018980890151926120698273ffffffffffffff"
++    "ffffffffffffffffffffffffff87511696015191604080519485948552840152604083019061236c565b0390a3878061"
++    "2000565b905089611fe4565b887fdeaddead000000000000000000000000000000000000000000000000000000005f52"
++    "5ffd5b606487604051907f08c379a0000000000000000000000000000000000000000000000000000000008252600482"
++    "0152601760248201527f4141393220696e7465726e616c2063616c6c206f6e6c790000000000000000006044820152fd"
++    "5b60a0810190811067ffffffffffffffff82111761211c57604052565b7f4e487b710000000000000000000000000000"
++    "00000000000000000000000000005f52604160045260245ffd5b610140810190811067ffffffffffffffff8211176121"
++    "1c57604052565b67ffffffffffffffff811161211c57604052565b6060810190811067ffffffffffffffff8211176121"
++    "1c57604052565b90601f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe09101168101"
++    "90811067ffffffffffffffff82111761211c57604052565b67ffffffffffffffff811161211c57601f017fffffffffff"
++    "ffffffffffffffffffffffffffffffffffffffffffffffffffffe01660200190565b92919261221d826121d7565b9161"
++    "222b6040519384612196565b829481845281830111610197578281602093845f960137010152565b6004359073ffffff"
++    "ffffffffffffffffffffffffffffffffff8216820361019757565b9181601f840112156101975782359167ffffffffff"
++    "ffffff8311610197576020838186019501011161019757565b6024359077ffffffffffffffffffffffffffffffffffff"
++    "ffffffffffff8216820361019757565b9060407fffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
++    "fffffffc8301126101975760043567ffffffffffffffff92838211610197578060238301121561019757816004013593"
++    "84116101975760248460051b8301011161019757602401919060243573ffffffffffffffffffffffffffffffffffffff"
++    "ff811681036101975790565b5f5b83811061235c5750505f910152565b818101518382015260200161234d565b907fff"
++    "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f6020936123a8815180928187528780"
++    "8801910161234b565b0116010190565b91908201809211610b2c57565b7fffffffffffffffffffffffffffffffffffff"
++    "ffffffffffffffffffffffffffff8114610b2c5760010190565b91908203918211610b2c57565b3d15612420573d9061"
++    "2407826121d7565b916124156040519384612196565b82523d5f602084013e565b606090565b60406124338183018361"
++    "27ea565b908183519182372061244860608401846127ea565b90818451918237209260c061246060e08301836127ea56"
++    "5b908186519182372091845195602087019473ffffffffffffffffffffffffffffffffffffffff833516865260208301"
++    "358789015260608801526080870152608081013560a087015260a081013582870152013560e085015261010090818501"
++    "52835261012083019167ffffffffffffffff918484108385111761211c57838252845190206101408501908152306101"
++    "608601524661018086015260608452936101a0019182118383101761211c575251902090565b67ffffffffffffffff81"
++    "1161211c5760051b60200190565b9061253782612515565b6040906125476040519182612196565b8381527fffffffff"
++    "ffffffffffffffffffffffffffffffffffffffffffffffffffffffe06125758295612515565b01915f5b838110612586"
++    "5750505050565b602090825161259481612100565b835161259f81612149565b5f81525f849181838201528187820152"
++    "816060818184015260809282848201528260a08201528260c08201528260e08201528261010082015282610120820152"
++    "865281858701528189870152850152830152828601015201612579565b80518210156126105760209160051b01019056"
++    "5b7f4e487b71000000000000000000000000000000000000000000000000000000005f52603260045260245ffd5b9190"
++    "8110156126105760051b810135907ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffee181"
++    "360301821215610197570190565b90816020910312610197575173ffffffffffffffffffffffffffffffffffffffff81"
++    "1681036101975790565b601f82602094937fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
++    "ffe093818652868601375f8582860101520116010190565b7f2da466a7b24304f47e87fa2e1e5a81b9831ce54fec1905"
++    "5ce277ca2f39ba42c4602073ffffffffffffffffffffffffffffffffffffffff6127293485613c11565b936040519485"
++    "521692a2565b91908110156126105760051b810135907fffffffffffffffffffffffffffffffffffffffffffffffffff"
++    "ffffffffffffa181360301821215610197570190565b9035907fffffffffffffffffffffffffffffffffffffffffffff"
++    "ffffffffffffffffffe181360301821215610197570180359067ffffffffffffffff821161019757602001918160051b"
++    "3603831361019757565b3573ffffffffffffffffffffffffffffffffffffffff811681036101975790565b9035907fff"
++    "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe181360301821215610197570180359067ff"
++    "ffffffffffffff82116101975760200191813603831361019757565b90357fffffffffffffffffffffffffffffffffff"
++    "ffffffffffffffffffffffffffffe18236030181121561019757016020813591019167ffffffffffffffff8211610197"
++    "57813603831361019757565b61012091813573ffffffffffffffffffffffffffffffffffffffff811680910361019757"
++    "6129016128e66129599561293a938552602086013560208601526128d6604087018761283b565b909180604088015286"
++    "01916126a9565b6128f3606086018661283b565b9085830360608701526126a9565b6080840135608084015260a08401"
++    "3560a084015260c084013560c084015261292c60e085018561283b565b9084830360e08601526126a9565b9161294b61"
++    "0100918281019061283b565b9290918185039101526126a9565b90565b600280541461296b5760028055565b60046040"
++    "517f3ee5aeb5000000000000000000000000000000000000000000000000000000008152fd5b925f905a938051948435"
++    "73ffffffffffffffffffffffffffffffffffffffff81168091036101975786526020850135602087015260808501356f"
++    "ffffffffffffffffffffffffffffffff8116606088015260801c604087015260a085013560c087015260c08501356fff"
++    "ffffffffffffffffffffffffffffff811661010088015260801c610120870152612a2c60e08601866127ea565b801561"
++    "350957603481106134ab578060141161019757806024116101975760341161019757602481013560801c60a088015260"
++    "1481013560801c60808801523560601c60e08701525b612a7e85612425565b60208301526040860151946effffffffff"
++    "ffffffffffffffffffff8660c08901511760608901511760808901511760a08901511761010089015117610120890151"
++    "171161344d57604087015160608801510160808801510160a08801510160c0880151016101008801510296835173ffff"
++    "ffffffffffffffffffffffffffffffffffff81511690612b1260408501856127ea565b80613174575b505060e0015173"
++    "ffffffffffffffffffffffffffffffffffffffff16905f8215613141575b6020612b81918b828a01515f868a60405197"
++    "8896879586937f19822f7c00000000000000000000000000000000000000000000000000000000855260048501613d2a"
++    "565b0393f15f918161310d575b50612c33573d8c610800808311612c2b575b5060405191602081840101604052808352"
++    "5f602084013e610e556040519283927f65c8fd4d00000000000000000000000000000000000000000000000000000000"
++    "8452600484015260606024840152600d60648401527f4141323320726576657274656400000000000000000000000000"
++    "000000000000608484015260a0604484015260a483019061236c565b915082612b9e565b9a92939495969798999a9115"
++    "61308a575b509773ffffffffffffffffffffffffffffffffffffffff8351166020840151905f52600160205260405f20"
++    "8160401c5f5260205267ffffffffffffffff60405f2091825492612c92846123bc565b90551603613025575a85031161"
++    "2fc05773ffffffffffffffffffffffffffffffffffffffff60e0606093015116612ce6575b509060a091849596979860"
++    "40608096015260608601520135905a900301910152565b969550505a9683519773ffffffffffffffffffffffffffffff"
++    "ffffffffff60e08a015116805f525f60205260405f208054848110612f5b576080612d6d9a9b9c5f9387809403905501"
++    "5192602089015183604051809d819582947f52b7512c0000000000000000000000000000000000000000000000000000"
++    "000084528c60048501613d2a565b039286f197885f915f9a612ed3575b50612e23573d8b610800808311612e1b575b50"
++    "604051916020818401016040528083525f602084013e610e556040519283927f65c8fd4d000000000000000000000000"
++    "000000000000000000000000000000008452600484015260606024840152600d60648401527f41413333207265766572"
++    "74656400000000000000000000000000000000000000608484015260a0604484015260a483019061236c565b91508261"
++    "2d8e565b9991929394959697989998925a900311612e4857509096959094939291906080612cc4565b60a49060405190"
++    "7f220266b600000000000000000000000000000000000000000000000000000000825260048201526040602482015260"
++    "2760448201527f41413336206f766572207061796d6173746572566572696669636174696f6e4760648201527f61734c"
++    "696d6974000000000000000000000000000000000000000000000000006084820152fd5b915098503d805f833e612ee6"
++    "8183612196565b8101906040818303126101975780519067ffffffffffffffff82116101975782601f83830101121561"
++    "0197578181015191612f20836121d7565b93612f2e6040519586612196565b8385526020848385010101116101975760"
++    "2092612f5291848087019185010161234b565b0151985f612d7c565b60848b604051907f220266b60000000000000000"
++    "00000000000000000000000000000000000000008252600482015260406024820152601e60448201527f414133312070"
++    "61796d6173746572206465706f73697420746f6f206c6f7700006064820152fd5b608490604051907f220266b6000000"
++    "000000000000000000000000000000000000000000000000008252600482015260406024820152601e60448201527f41"
++    "413236206f76657220766572696669636174696f6e4761734c696d697400006064820152fd5b608482604051907f2202"
++    "66b6000000000000000000000000000000000000000000000000000000008252600482015260406024820152601a6044"
++    "8201527f4141323520696e76616c6964206163636f756e74206e6f6e63650000000000006064820152fd5b5f525f6020"
++    "5260405f208054808c116130a8578b900390555f612c44565b608484604051907f220266b60000000000000000000000"
++    "00000000000000000000000000000000008252600482015260406024820152601760448201527f41413231206469646e"
++    "2774207061792070726566756e640000000000000000006064820152fd5b9091506020813d602011613139575b816131"
++    "2960209383612196565b810103126101975751905f612b8c565b3d915061311c565b50805f525f60205260405f20548a"
++    "81115f146131675750612b8160205f5b915050612b3d565b6020612b81918c0361315f565b833b6133e8576040885101"
++    "51602060405180927f570e1a360000000000000000000000000000000000000000000000000000000082528260048301"
++    "52815f816131c160248201898b6126a9565b039273ffffffffffffffffffffffffffffffffffffffff7f000000000000"
++    "00000000000000000000000000000000000000000000000000001690f1908115610d90575f916133c9575b5073ffffff"
++    "ffffffffffffffffffffffffffffffffff811680156133645785036132ff573b1561329a576014116101975773ffffff"
++    "ffffffffffffffffffffffffffffffffff9183887fd51a9c61267aa6196961883ecf5ff2da6619c37dac0fa92122513f"
++    "b32c032d2d604060e0958787602086015195510151168251913560601c82526020820152a391612b18565b60848d6040"
++    "51907f220266b60000000000000000000000000000000000000000000000000000000082526004820152604060248201"
++    "52602060448201527f4141313520696e6974436f6465206d757374206372656174652073656e6465726064820152fd5b"
++    "60848e604051907f220266b6000000000000000000000000000000000000000000000000000000008252600482015260"
++    "406024820152602060448201527f4141313420696e6974436f6465206d7573742072657475726e2073656e6465726064"
++    "820152fd5b60848f604051907f220266b600000000000000000000000000000000000000000000000000000000825260"
++    "0482015260406024820152601b60448201527f4141313320696e6974436f6465206661696c6564206f72204f4f470000"
++    "0000006064820152fd5b6133e2915060203d602011610d8957610d7a8183612196565b5f61320a565b60848d60405190"
++    "7f220266b600000000000000000000000000000000000000000000000000000000825260048201526040602482015260"
++    "1f60448201527f414131302073656e64657220616c726561647920636f6e7374727563746564006064820152fd5b6064"
++    "6040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860"
++    "248201527f41413934206761732076616c756573206f766572666c6f7700000000000000006044820152fd5b60646040"
++    "517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601d602482"
++    "01527f4141393320696e76616c6964207061796d6173746572416e64446174610000006044820152fd5b50505f60e087"
++    "01525f60808701525f60a0870152612a75565b9092915a906060810151915f6040938451977fffffffff000000000000"
++    "000000000000000000000000000000000000000000008961356360608401846127ea565b8660038211613b19575b7f8d"
++    "d7712f000000000000000000000000000000000000000000000000000000009416841487146139c05750505061363d91"
++    "6137289160208801516135c58a5193849360208501528b6024850152606484019061288b565b90604483015203906135"
++    "fd7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe092838101835282612196565b6137"
++    "1c89519485927e42dc530000000000000000000000000000000000000000000000000000000060208501526102006024"
++    "85015261022484019061236c565b6136eb604484018b60806101a091805173ffffffffffffffffffffffffffffffffff"
++    "ffffff808251168652602082015160208701526040820151604087015260608201516060870152838201518487015260"
++    "a082015160a087015260c082015160c087015260e08201511660e0860152610100808201519086015261012080910151"
++    "908501526020810151610140850152604081015161016085015260608101516101808501520151910152565b7fffffff"
++    "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffdc838203016102048401528661236c565b039081"
++    "01835282612196565b6020928184809351910182305af15f5198865215613749575b505050505050565b909192939495"
++    "96505f3d83146139b4575b7fdeaddead0000000000000000000000000000000000000000000000000000000081036137"
++    "e457608487878051917f220266b600000000000000000000000000000000000000000000000000000000835260048301"
++    "526024820152600f60448201527f41413935206f7574206f662067617300000000000000000000000000000000006064"
++    "820152fd5b7fdeadaa510000000000000000000000000000000000000000000000000000000091929395949650145f14"
++    "61384d575050613831613826613840935a906123e9565b6080850151906123af565b9083015183611d268295613cda56"
++    "5b905b5f8080808080613741565b90926138d990848601518651907ff62676f440ff169a3a9afdbf812e89e7f95975ee"
++    "8e5c31214ffdef631c5f479273ffffffffffffffffffffffffffffffffffffffff9780898551169401516138cf3d6108"
++    "008082116139ac575b508a519084818301018c528082525f8583013e8a805194859485528401528a83019061236c565b"
++    "0390a35a906123e9565b916138ea60808601938451906123af565b915a935f938751966138fb88613c42565b938160e0"
++    "8a01511680155f14613999575050875116955b5a9003019560a06060820151910151019051860390818111613985575b"
++    "5050840290850151928184105f1461395f57505080611e1a575090816139599293611d2681613cda565b90613842565b"
++    "61396f9082849397950390613c11565b50611e1a5750908261398092613c6c565b613959565b6064919003600a020490"
++    "9401935f8061392f565b90979150965115613912575f9550613912565b90505f6138a8565b50815f803e5f5161375a56"
++    "5b613b13945082935090613a08917e42dc53000000000000000000000000000000000000000000000000000000006020"
++    "613ae795015261020060248601526102248501916126a9565b613ab6604484018960806101a091805173ffffffffffff"
++    "ffffffffffffffffffffffffffff80825116865260208201516020870152604082015160408701526060820151606087"
++    "0152838201518487015260a082015160a087015260c082015160c087015260e08201511660e086015261010080820151"
++    "908601526101208091015190850152602081015161014085015260408101516101608501526060810151610180850152"
++    "0151910152565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffdc8382030161020484"
++    "01528461236c565b037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe081018a528961"
++    "2196565b87613728565b50813561356d565b73ffffffffffffffffffffffffffffffffffffffff168015613bb3575f80"
++    "809381935af1613b4d6123f6565b5015613b5557565b60646040517f08c379a000000000000000000000000000000000"
++    "000000000000000000000000815260206004820152601f60248201527f41413931206661696c65642073656e6420746f"
++    "2062656e6566696369617279006044820152fd5b60646040517f08c379a0000000000000000000000000000000000000"
++    "00000000000000000000815260206004820152601860248201527f4141393020696e76616c69642062656e6566696369"
++    "61727900000000000000006044820152fd5b73ffffffffffffffffffffffffffffffffffffffff165f525f602052613c"
++    "3c60405f209182546123af565b80915590565b610120610100820151910151808214613c6857480180821015613c6357"
++    "5090565b905090565b5090565b9190917f49628fd1471006c1482da88028e9ce4dbb080b815c9b0344d39e5a8e6ec141"
++    "9f6080602083015192519473ffffffffffffffffffffffffffffffffffffffff946020868851169660e0890151169701"
++    "51916040519283525f602084015260408301526060820152a4565b60208101519051907f67b4fa9642f42120bf031f30"
++    "51d1824b0fe25627945b27b8a6a65d5761d5482e60208073ffffffffffffffffffffffffffffffffffffffff85511694"
++    "0151604051908152a3565b613d426040929594939560608352606083019061288b565b9460208201520152565b801561"
++    "3dd8575f60408051613d608161217a565b828152826020820152015273ffffffffffffffffffffffffffffffffffffff"
++    "ff811690604065ffffffffffff91828160a01c16908115613dd0575b60d01c92825191613dab8361217a565b85835284"
++    "60208401521691829101524211908115613dc857509091565b905042109091565b839150613d9b565b505f905f9056fe"
++    "a2646970667358221220b8ef92bbb1b4ce29e57527ed720b1821bcfda503c2d777f2ed9b4e9d4321300e64736f6c6343"
++    "0008170033"
++)
++ENTRYPOINT_V07_IMMUTABLES = [3324, 12762]  # senderCreator
++
++SENDER_CREATOR_V07 = bytes.fromhex(
++    "6080600436101561000e575f80fd5b5f3560e01c63570e1a3614610021575f80fd5b3461017a5760207fffffffffffff"
++    "fffffffffffffffffffffffffffffffffffffffffffffffffffc36011261017a5767ffffffffffffffff906004358281"
++    "1161017a573660238201121561017a57806004013583811161017a57366024828401011161017a578060141161017a57"
++    "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffec81019084821161014d577fffffffff"
++    "ffffffffffffffffffffffffffffffffffffffffffffffffffffffe0603f81600b840116011684019484861090861117"
++    "61014d5760245f9485600c819460209960405286845289840196603889018837830101525193013560601c5af15f5190"
++    "15610146575b60209073ffffffffffffffffffffffffffffffffffffffff60405191168152f35b505f610125565b7f4e"
++    "487b71000000000000000000000000000000000000000000000000000000005f52604160045260245ffd5b5f80fdfea2"
++    "646970667358221220f1e64d34428ab0db38bfe2b81f8de2e9b04cf62d0c5a98e0b7f42d9ede27cd4364736f6c634300"
++    "08170033"
++)
++
++MINIMAL_ACCOUNT = bytes.fromhex(
++    "6080604052600436101561001a575b3615610018575f80fd5b005b5f3560e01c806319822f7c146100495780631cff79"
++    "cd146100445763b0d691fe0361000e57610152565b6100be565b346100ba577fffffffffffffffffffffffffffffffff"
++    "fffffffffffffffffffffffffffffffc6060813601126100ba576004359067ffffffffffffffff82116100ba57610120"
++    "91360301126100ba576100b66100a66044356102bf565b6040519081529081906020820190565b0390f35b5f80fd5b34"
++    "6100ba5760407ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc3601126100ba576004"
++    "3573ffffffffffffffffffffffffffffffffffffffff811681036100ba576024359067ffffffffffffffff9081831161"
++    "00ba57366023840112156100ba5782600401359182116100ba5736602483850101116100ba5760246100189301906103"
++    "27565b346100ba575f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc3601126100ba"
++    "57602060405173ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000"
++    "000000000000000000000000168152f35b156101c757565b60646040517f08c379a00000000000000000000000000000"
++    "0000000000000000000000000000815260206004820152600e60248201527f6e6f7420456e747279506f696e74000000"
++    "0000000000000000000000000000006044820152fd5b7f4e487b71000000000000000000000000000000000000000000"
++    "000000000000005f52604160045260245ffd5b3d156102ba5767ffffffffffffffff903d8281116102b5576040519260"
++    "1f82017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0908116603f01168401908111"
++    "848210176102b55760405282523d5f602084013e565b610225565b606090565b61030073ffffffffffffffffffffffff"
++    "ffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001633146101c056"
++    "5b8061030b575b505f90565b5f80808093335af161031b610252565b50156100ba575f610306565b5f9283809361036d"
++    "73ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000"
++    "0000000000001633146101c0565b826040519384928337810182815203925af1610387610252565b9015610390575056"
++    "5b602081519101fdfea2646970667358221220d777653860cd90c5d3211eec2c5c8b1b34249f0dd06adfcce904083f71"
++    "1e68f364736f6c63430008170033"
++)
++MINIMAL_ACCOUNT_IMMUTABLES = [412, 729, 838]  # entryPoint
++
++SHARED = bytes.fromhex(
++    "608060405260043610156010575f80fd5b5f3560e01c80631ab06ee51460755763387dd9e914602c575f80fd5b346071"
++    "5760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc3601126071576004355f525f"
++    "602052602060405f2054604051908152f35b5f80fd5b3460715760407fffffffffffffffffffffffffffffffffffffff"
++    "fffffffffffffffffffffffffc3601126071576004355f525f60205260243560405f20555f80f3fea264697066735822"
++    "1220e19286d065ef57f3cadd8cc0aa7c20debd606ca7a52fb40a4fd8c36a84a8f8cb64736f6c63430008170033"
++)
+diff --git a/tests/bogota/eip_reservoir/test_entrypoint.py b/tests/bogota/eip_reservoir/test_entrypoint.py
+new file mode 100644
+--- /dev/null
++++ b/tests/bogota/eip_reservoir/test_entrypoint.py
+@@ -0,0 +1,154 @@
++"""
++Regression test of the two-operation example against the deployed ERC-4337
++EntryPoint v0.7 bytecode under the EIP-8037 reservoir model.
++
++Operation 1 creates a storage slot in a shared contract and operation 2
++clears it, in one `handleOps` bundle. The EntryPoint's own accounting
++(`actualGas` inside `innerHandleOp`) is read back from its `deposits`
++mapping: each account starts with no deposit, pays the prefund during
++validation, and is refunded `prefund - actualGasCost` afterwards.
++"""
++
++import pytest
++from eth_abi import encode
++from eth_utils import keccak
++from execution_testing.test_types.chain_config_types import ChainConfigDefaults
++from execution_testing import (
++    Account,
++    Address,
++    Alloc,
++    StateTestFiller,
++    TransactionLog,
++    TransactionReceipt,
++)
++
++from .entrypoint_v07 import (
++    ENTRYPOINT_V07,
++    ENTRYPOINT_V07_IMMUTABLES,
++    MINIMAL_ACCOUNT,
++    MINIMAL_ACCOUNT_IMMUTABLES,
++    SENDER_CREATOR_V07,
++    SHARED,
++)
++from .test_reservoir import R, SS, legacy_tx
++
++pytestmark = [pytest.mark.valid_from("Bogota"), pytest.mark.frame_tx_incompatible]
++
++GAS_PRICE = 10
++VERIFICATION_GAS = 150_000
++CALL_GAS = 300_000
++PRE_VERIFICATION_GAS = 50_000
++PREFUND = (VERIFICATION_GAS + CALL_GAS + PRE_VERIFICATION_GAS) * GAS_PRICE
++USEROP_TYPE = "(address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes)"
++HANDLE_OPS = keccak(text=f"handleOps({USEROP_TYPE}[],address)")[:4]
++EXECUTE = keccak(text="execute(address,bytes)")[:4]
++USER_OPERATION_EVENT = keccak(
++    text="UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)"
++)
++SET = keccak(text="set(uint256,uint256)")[:4]
++
++
++def with_immutables(code: bytes, offsets, value: Address) -> bytes:
++    out = bytearray(code)
++    for o in offsets:
++        out[o:o + 32] = bytes(12) + bytes(value)
++    return bytes(out)
++
++
++def user_op(sender: Address, nonce: int, target: Address, data: bytes):
++    call_data = EXECUTE + encode(["address", "bytes"], [str(target), data])
++    return (str(sender), nonce, b"", call_data,
++            (VERIFICATION_GAS << 128 | CALL_GAS).to_bytes(32, "big"), PRE_VERIFICATION_GAS,
++            (GAS_PRICE << 128 | GAS_PRICE).to_bytes(32, "big"), b"", b"")
++
++
++def user_op_hash(op, entrypoint: Address) -> bytes:
++    """`getUserOpHash` of EntryPoint v0.7: keccak(abi.encode(hash(op), entryPoint, chainid))."""
++    sender, nonce, init_code, call_data, limits, pre_gas, fees, pm, _sig = op
++    inner = keccak(encode(
++        ["address", "uint256", "bytes32", "bytes32", "bytes32", "uint256", "bytes32", "bytes32"],
++        [sender, nonce, keccak(init_code), keccak(call_data), limits, pre_gas, fees, keccak(pm)]))
++    return keccak(encode(["bytes32", "address", "uint256"], [inner, str(entrypoint), ChainConfigDefaults.chain_id]))
++
++
++def user_op_event(entrypoint: Address, op, account: Address, gas: int) -> TransactionLog:
++    """`UserOperationEvent` with `success = true` and the charged gas."""
++    return TransactionLog(
++        address=entrypoint,
++        topics=[USER_OPERATION_EVENT, user_op_hash(op, entrypoint),
++                bytes(12) + bytes(account), bytes(32)],
++        data=encode(["uint256", "bool", "uint256", "uint256"], [0, True, gas * GAS_PRICE, gas]),
++    )
++
++
++def deposit_key(account: Address) -> int:
++    return int.from_bytes(keccak(bytes(12) + bytes(account) + bytes(32)), "big")
++
++
++def nonce_key(account: Address) -> int:
++    inner = keccak(bytes(12) + bytes(account) + (1).to_bytes(32, "big"))
++    return int.from_bytes(keccak(bytes(32) + inner), "big")
++
++
++@pytest.mark.parametrize("variant,r,gas1,gas2", [
++    ("create_clear", R, 138_225, 124_740),
++    ("create_clear", 0, 324_273, 222_660),
++    ("create_keep", R, 138_225, 124_740),
++    ("control", R, 138_225, 124_740),
++], ids=["create_clear", "create_clear_below_cap", "create_keep", "control"])
++def test_entrypoint_v07_two_ops(state_test: StateTestFiller, pre: Alloc, variant: str, r: int,
++                                gas1: int, gas2: int) -> None:
++    """
++    `gas1` and `gas2` are the `actualGas` values the EntryPoint charges the
++    two accounts, read from `deposits`. In the control both operations write
++    a slot that is already non-zero, so no state gas is charged or refilled.
++    """
++    sender_creator = pre.deploy_contract(SENDER_CREATOR_V07)
++    entrypoint = pre.deploy_contract(
++        with_immutables(ENTRYPOINT_V07, ENTRYPOINT_V07_IMMUTABLES, sender_creator),
++        storage={2: 1},  # ReentrancyGuard NOT_ENTERED, as set by the constructor
++    )
++    account_code = with_immutables(MINIMAL_ACCOUNT, MINIMAL_ACCOUNT_IMMUTABLES, entrypoint)
++    acct1 = pre.deploy_contract(account_code, balance=10**18)
++    acct2 = pre.deploy_contract(account_code, balance=10**18)
++    key = 7
++    slot = int.from_bytes(keccak(key.to_bytes(32, "big") + bytes(32)), "big")
++    shared = pre.deploy_contract(SHARED, storage={slot: 5} if variant == "control" else {})
++    beneficiary = pre.fund_eoa(amount=0)
++
++    def set_call(value: int) -> bytes:
++        return SET + encode(["uint256", "uint256"], [key, value])
++
++    ops = [user_op(acct1, 0, shared, set_call(1 if variant != "control" else 6)),
++           user_op(acct2, 0, shared, set_call(0 if variant == "create_clear" else
++                                              (1 if variant == "create_keep" else 7)))]
++    data = HANDLE_OPS + encode([f"{USEROP_TYPE}[]", "address"], [ops, str(beneficiary)])
++    # Logs: for each account an EIP-7708 Transfer of the prefund and a
++    # Deposited event, then BeforeExecution, one UserOperationEvent per
++    # operation, and the Transfer of the collected fees to the beneficiary.
++    # The two UserOperationEvents are pinned: success, userOpHash, sender,
++    # nonce, actualGasCost and actualGasUsed; the other logs are wildcards.
++    wildcard = TransactionLog()
++    receipt = TransactionReceipt(logs=[
++        wildcard, wildcard, wildcard, wildcard, wildcard,
++        user_op_event(entrypoint, ops[0], acct1, gas1),
++        user_op_event(entrypoint, ops[1], acct2, gas2),
++        wildcard,
++    ])
++    tx = legacy_tx(pre, entrypoint, r, data=data, expected_receipt=receipt)
++
++    final = {"create_clear": {}, "create_keep": {slot: 1}, "control": {slot: 7}}[variant]
++    state_test(
++        pre=pre, tx=tx,
++        post={
++            shared: Account(storage=final),
++            entrypoint: Account(storage={
++                2: 1,
++                deposit_key(acct1): PREFUND - gas1 * GAS_PRICE,
++                deposit_key(acct2): PREFUND - gas2 * GAS_PRICE,
++                nonce_key(acct1): 1,
++                nonce_key(acct2): 1,
++            }),
++            beneficiary: Account(balance=(gas1 + gas2) * GAS_PRICE),
++        },
++    )
