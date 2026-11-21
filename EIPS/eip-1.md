@@ -562,7 +562,7 @@ Emeritus EIP editors are
 
 If you would like to become an EIP editor, please check [EIP-5069](./eip-5069.md).
 
-## EIP Editor Responsibilities
+### EIP Editor Responsibilities
 
 For each new EIP that comes in, an editor does the following:
 
@@ -581,6 +581,18 @@ Once the EIP is ready for the repository, the EIP editor will:
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
 
 The editors don't pass judgment on EIPs. We merely do the administrative & editorial part.
+
+## EIP Coordinators
+
+The current EIP coordinators are
+
+- Pooja Ranjan (@poojaranjan)
+
+### EIP Coordinator Responsibilities
+
+EIP coordinators support the operational and educational side of the EIP process: they help authors find their way through the process, follow up on process-related work, and maintain related documentation. Coordinators do not perform editorial review and do not decide whether a proposal is accepted or rejected.
+
+If you would like to become an EIP coordinator, please check [EIP-5069](./eip-5069.md).
 
 ## Style Guide
 
