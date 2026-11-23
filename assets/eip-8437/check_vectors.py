@@ -23,8 +23,8 @@ MAX_MANIFESTS_PER_REQUEST = 32
 LEANSPHINCS_SCHEME = 0x10
 FRAME_TX_TYPE = b"\x06"
 CELLS_PER_EXT_BLOB = 128
-# Fixed for eth/74, from EIP-8288's 16 leanSPHINCS and 1 leanSTARK dependencies
-# per mode 0 wrapper, so that it does not follow fork rules.
+# Fixed inline-metadata threshold for eth/75, independent of fork-specific
+# dependency limits and enabled schemes.
 MAX_INLINE_TRANSACTIONS = 17
 METADATA_FIELDS = 7
 SYNTHETIC_FRAME_GAS = 100000
@@ -746,7 +746,8 @@ def main():
     assert wrappers_response(7, small) == splice(7, small)
     check_wrapper_response(7, small_hashes, small_metadata, reply_for(7, small_items))
 
-    # Byte-derived transaction count: no independent 4,096-envelope ceiling.
+    # Synthetic transport-size fixture: no independent 4,096-envelope ceiling.
+    # This does not establish EIP-8288 dependency or transaction validity.
     many_envelopes = sorted((transaction(i) for i in range(4097)), key=transaction_hash)
     many = [many_envelopes, 1, mode1[2]]
     many_body = rlp(many)
