@@ -1,0 +1,874 @@
+diff --git a/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_8455.py b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_8455.py
+new file mode 100644
+--- /dev/null
++++ b/packages/testing/src/execution_testing/forks/forks/eips/bogota/eip_8455.py
+@@ -0,0 +1,28 @@
++"""
++EIP-8455: RESERVOIR opcode (0x4d), pushing the state gas budget that GAS
++does not report.
++"""
++
++from typing import Callable, Dict, List
++
++from execution_testing.vm import OpcodeBase, Opcodes
++
++from ....base_fork import BaseFork
++
++
++class EIP8455(BaseFork):
++    """RESERVOIR opcode (EIP-8455)."""
++
++    @classmethod
++    def opcode_gas_map(
++        cls,
++    ) -> Dict[OpcodeBase, int | Callable[[OpcodeBase], int]]:
++        """Add RESERVOIR opcode gas cost."""
++        gas_costs = cls.gas_costs()
++        base_map = super(EIP8455, cls).opcode_gas_map()
++        return {**base_map, Opcodes.RESERVOIR: gas_costs.BASE}
++
++    @classmethod
++    def valid_opcodes(cls) -> List[Opcodes]:
++        """Add RESERVOIR opcode."""
++        return [Opcodes.RESERVOIR] + super(EIP8455, cls).valid_opcodes()
+diff --git a/packages/testing/src/execution_testing/vm/opcodes.py b/packages/testing/src/execution_testing/vm/opcodes.py
+--- a/packages/testing/src/execution_testing/vm/opcodes.py
++++ b/packages/testing/src/execution_testing/vm/opcodes.py
+@@ -2389,6 +2389,22 @@
+     Source: [EIP-7516](https://eips.ethereum.org/EIPS/eip-7516)
+     """
+ 
++    RESERVOIR = Opcode(0x4D, popped_stack_items=0, pushed_stack_items=1)
++    """
++    RESERVOIR() = state_budget
++    ----
++
++    Description
++    ----
++    State gas available to the executing frame that `GAS` does not
++    report: the EIP-8037 reservoir, or the EIP-8141 frame's
++    `state_gas_left` inside a frame transaction (draft EIP).
++
++    Gas
++    ----
++    2
++    """
++
+     SLOTNUM = Opcode(0x4B, popped_stack_items=0, pushed_stack_items=1)
+     """
+     SLOTNUM() = slotNumber
+diff --git a/src/ethereum/forks/bogota/vm/gas.py b/src/ethereum/forks/bogota/vm/gas.py
+--- a/src/ethereum/forks/bogota/vm/gas.py
++++ b/src/ethereum/forks/bogota/vm/gas.py
+@@ -259,6 +259,7 @@
+     OPCODE_MSIZE: Final[ExecutionGas] = BASE
+     OPCODE_PC: Final[ExecutionGas] = BASE
+     OPCODE_GAS: Final[ExecutionGas] = BASE
++    OPCODE_RESERVOIR: Final[ExecutionGas] = BASE
+     OPCODE_ADDRESS: Final[ExecutionGas] = BASE
+     OPCODE_ORIGIN: Final[ExecutionGas] = BASE
+     OPCODE_CALLER: Final[ExecutionGas] = BASE
+diff --git a/src/ethereum/forks/bogota/vm/instructions/__init__.py b/src/ethereum/forks/bogota/vm/instructions/__init__.py
+--- a/src/ethereum/forks/bogota/vm/instructions/__init__.py
++++ b/src/ethereum/forks/bogota/vm/instructions/__init__.py
+@@ -101,6 +101,7 @@
+     BLOBHASH = 0x49
+     BLOBBASEFEE = 0x4A
+     SLOTNUM = 0x4B
++    RESERVOIR = 0x4D
+ 
+     # Control Flow Ops
+     STOP = 0x00
+@@ -268,6 +269,7 @@
+     Ops.GASLIMIT: block_instructions.gas_limit,
+     Ops.CHAINID: block_instructions.chain_id,
+     Ops.SLOTNUM: block_instructions.slot_number,
++    Ops.RESERVOIR: control_flow_instructions.state_gas_budget,
+     Ops.MLOAD: memory_instructions.mload,
+     Ops.MSTORE: memory_instructions.mstore,
+     Ops.MSTORE8: memory_instructions.mstore8,
+diff --git a/src/ethereum/forks/bogota/vm/instructions/control_flow.py b/src/ethereum/forks/bogota/vm/instructions/control_flow.py
+--- a/src/ethereum/forks/bogota/vm/instructions/control_flow.py
++++ b/src/ethereum/forks/bogota/vm/instructions/control_flow.py
+@@ -146,6 +146,44 @@
+     evm.pc += Uint(1)
+ 
+ 
++def state_gas_budget(evm: Evm) -> None:
++    """
++    Push the state gas available to the executing frame that `GAS`
++    does not report (the `RESERVOIR` instruction).
++
++    Under the EIP-8037 reservoir model this is the call frame's state
++    gas reservoir. Inside an EIP-8141 frame transaction it is the
++    executing frame's `state_gas_left` pool, the value `TXPARAM`
++    returns for `TXPARAM_STATE_GAS_LEFT`.
++
++    Parameters
++    ----------
++    evm :
++        The current EVM frame.
++
++    """
++    # STACK
++    pass
++
++    # GAS
++    charge_gas(evm, GasCosts.OPCODE_RESERVOIR)
++
++    # OPERATION
++    frame_context = evm.tx_env.frame_context
++    reservoir = evm.gas_meter.reservoir
++    if frame_context is not None:
++        # EIP-8141 frame transaction: the frame's explicit state pool.
++        value = U256(frame_context.state_gas_left)
++    else:
++        # EIP-8037 reservoir model.
++        assert reservoir is not None
++        value = U256(reservoir.state_gas_left)
++    push(evm.stack, value)
++
++    # PROGRAM COUNTER
++    evm.pc += Uint(1)
++
++
+ def jumpdest(evm: Evm) -> None:
+     """
+     Mark a valid destination for jumps. This is a noop, present only
+diff --git a/tests/bogota/eip_reservoir/__init__.py b/tests/bogota/eip_reservoir/__init__.py
+new file mode 100644
+--- /dev/null
++++ b/tests/bogota/eip_reservoir/__init__.py
+@@ -0,0 +1 @@
++"""Tests for the draft RESERVOIR (0x4d) opcode."""
+diff --git a/tests/bogota/eip_reservoir/test_reservoir.py b/tests/bogota/eip_reservoir/test_reservoir.py
+new file mode 100644
+--- /dev/null
++++ b/tests/bogota/eip_reservoir/test_reservoir.py
+@@ -0,0 +1,567 @@
++"""
++Tests for the draft RESERVOIR opcode (0x4d): the state gas budget that
++GAS does not report. Reservoir-model cases (EIP-8037 transactions) are
++marked `frame_tx_incompatible` because their expected values are
++model-specific; EIP-8141 cases are written as frame transactions.
++"""
++
++import pytest
++from execution_testing import (
++    EOA,
++    Address,
++    Account,
++    Alloc,
++    AuthorizationTuple,
++    Block,
++    BlockchainTestFiller,
++    BuilderDepositRequest,
++    BuilderExitRequest,
++    ConsolidationRequest,
++    Environment,
++    Bytecode,
++    Op,
++    StateTestFiller,
++    Transaction,
++    WithdrawalRequest,
++    compute_create_address,
++    compute_create2_address,
++)
++
++from ..eip8141_frame_transactions.helpers import default_frame, verify_frame
++
++pytestmark = pytest.mark.valid_from("Bogota")
++legacy = pytest.mark.frame_tx_incompatible
++
++TX_MAX = 16_777_216
++CPSB = 1530
++SS = 64 * CPSB          # 97,920  new storage slot
++NEW_ACCOUNT = 120 * CPSB  # 183,600 new account
++AUTH_BASE = 23 * CPSB   # 35,190  delegation indicator
++R = 500_000
++FILL = 0xDEAD           # pre-populated result slots: writes create no state
++SLOTS = {i: FILL for i in range(8)}
++FRESH = 0x100           # a slot that starts empty
++
++TXPARAM_STATE_GAS_LEFT = 0x0C
++
++
++def rec(i: int, value: Bytecode = Op.RESERVOIR) -> Bytecode:
++    return Op.SSTORE(i, value)
++
++
++def returner(prefix: Bytecode = Bytecode()) -> Bytecode:
++    """Child code: run prefix, return RESERVOIR as one word."""
++    return prefix + Op.MSTORE(0, Op.RESERVOIR) + Op.RETURN(0, 32)
++
++
++def call_and_record(op, target, slot_child: int, slot_after: int, value: int = 0,
++                    gas: Bytecode | int = Op.GAS) -> Bytecode:
++    if op in (Op.CALL, Op.CALLCODE):
++        c = op(gas, target, value, 0, 0, 0, 32)
++    else:
++        c = op(gas, target, 0, 0, 0, 32)
++    return Op.MSTORE(0, 0) + Op.POP(c) + rec(slot_child, Op.MLOAD(0)) + rec(slot_after)
++
++
++def legacy_tx(pre: Alloc, to, r: int = R, **kw) -> Transaction:
++    gas = TX_MAX + r if r else 1_000_000
++    return Transaction(sender=pre.fund_eoa(), to=to, gas_limit=gas, **kw)
++
++
++# --------------------------------------------------------------------------
++# EIP-8037 reservoir model
++# --------------------------------------------------------------------------
++@legacy
++@pytest.mark.parametrize("r", [R, 0], ids=["reservoir", "below_cap"])
++def test_read(state_test: StateTestFiller, pre: Alloc, r: int) -> None:
++    probe = pre.deploy_contract(rec(0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe, r),
++               post={probe: Account(storage={**SLOTS, 0: r})})
++
++
++@legacy
++@pytest.mark.parametrize("r,expected", [(R, R - SS), (50_000, 0)], ids=["funded", "spill"])
++def test_new_slot_charge(state_test: StateTestFiller, pre: Alloc, r: int, expected: int) -> None:
++    probe = pre.deploy_contract(Op.SSTORE(FRESH, 1) + rec(0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe, r),
++               post={probe: Account(storage={**SLOTS, 0: expected, FRESH: 1})})
++
++
++@legacy
++def test_same_frame_refill(state_test: StateTestFiller, pre: Alloc) -> None:
++    probe = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.SSTORE(FRESH, 0) + rec(0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: R})})
++
++
++@legacy
++@pytest.mark.parametrize("op", [Op.CALL, Op.CALLCODE, Op.DELEGATECALL, Op.STATICCALL],
++                         ids=["call", "callcode", "delegatecall", "staticcall"])
++def test_child_receives_whole_reservoir(state_test: StateTestFiller, pre: Alloc, op) -> None:
++    child = pre.deploy_contract(returner())
++    probe = pre.deploy_contract(call_and_record(op, child, 1, 0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: R, 1: R})})
++
++
++@legacy
++def test_child_success_charge_persists(state_test: StateTestFiller, pre: Alloc) -> None:
++    child = pre.deploy_contract(returner(Op.SSTORE(FRESH, 1)))
++    probe = pre.deploy_contract(call_and_record(Op.CALL, child, 1, 0) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe),
++               post={probe: Account(storage={**SLOTS, 0: R - SS, 1: R - SS}),
++                     child: Account(storage={FRESH: 1})})
++
++
++@legacy
++@pytest.mark.parametrize("ending", ["revert", "invalid"])
++def test_child_failure_restores(state_test: StateTestFiller, pre: Alloc, ending: str) -> None:
++    tail = Op.REVERT(0, 32) if ending == "revert" else Op.INVALID
++    child = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.MSTORE(0, Op.RESERVOIR) + tail)
++    probe = pre.deploy_contract(call_and_record(Op.CALL, child, 1, 0) + Op.STOP, storage=SLOTS)
++    child_seen = R - SS if ending == "revert" else 0
++    state_test(pre=pre, tx=legacy_tx(pre, probe),
++               post={probe: Account(storage={**SLOTS, 0: R, 1: child_seen}),
++                     child: Account(storage={})})
++
++
++@legacy
++def test_call_fails_before_child(state_test: StateTestFiller, pre: Alloc) -> None:
++    child = pre.deploy_contract(returner())
++    probe = pre.deploy_contract(call_and_record(Op.CALL, child, 1, 0, value=1) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: R, 1: 0})})
++
++
++@legacy
++def test_value_call_creates_account(state_test: StateTestFiller, pre: Alloc) -> None:
++    fresh = Address(0x00000000000000000000000000000000DEADBEEF)
++    probe = pre.deploy_contract(Op.POP(Op.CALL(Op.GAS, fresh, 1, 0, 0, 0, 0)) + rec(0) + Op.STOP,
++                                storage=SLOTS, balance=10)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: R - NEW_ACCOUNT})})
++
++
++@legacy
++@pytest.mark.parametrize("gas,ok", [(2, 1), (1, 0)], ids=["exact_cost", "one_short"])
++def test_exact_execution_gas(state_test: StateTestFiller, pre: Alloc, gas: int, ok: int) -> None:
++    child = pre.deploy_contract(Op.RESERVOIR + Op.STOP)
++    probe = pre.deploy_contract(rec(0, Op.CALL(gas, child, 0, 0, 0, 0, 0)) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: ok})})
++
++
++@legacy
++@pytest.mark.parametrize("depth,ok", [(1023, 1), (1024, 0)], ids=["fits", "overflow"])
++def test_stack_overflow(state_test: StateTestFiller, pre: Alloc, depth: int, ok: int) -> None:
++    pushes = Bytecode()
++    for _ in range(depth):
++        pushes += Op.PUSH0
++    child = pre.deploy_contract(pushes + Op.RESERVOIR + Op.STOP)
++    probe = pre.deploy_contract(rec(0, Op.CALL(Op.GAS, child, 0, 0, 0, 0, 0)) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post={probe: Account(storage={**SLOTS, 0: ok})})
++
++
++DEPLOYED = bytes([0x00]) * 10   # 10 bytes of runtime code
++
++
++def initcode(ending: str) -> Bytecode:
++    body = rec(0)  # value is read before the new slot's own charge
++    if ending == "return":
++        return body + Op.MSTORE(0, 0) + Op.RETURN(0, len(DEPLOYED))
++    return body + Op.REVERT(0, 0)
++
++
++@legacy
++@pytest.mark.parametrize("opcode", ["create", "create2"])
++@pytest.mark.parametrize("ending", ["return", "revert"])
++def test_create_paths(state_test: StateTestFiller, pre: Alloc, opcode: str, ending: str) -> None:
++    ic = initcode(ending)
++    size = len(ic)
++    store_ic = Op.MSTORE(0, Op.PUSH32(bytes(ic).ljust(32, b"\0"))) if size <= 32 else None
++    assert store_ic is not None, size
++    create = Op.CREATE(0, 0, size) if opcode == "create" else Op.CREATE2(0, 0, size, 7)
++    probe = pre.deploy_contract(store_ic + Op.POP(create) + rec(1) + Op.STOP, storage=SLOTS)
++    if opcode == "create":
++        new = compute_create_address(address=probe, nonce=1)
++    else:
++        new = compute_create2_address(address=probe, salt=7, initcode=bytes(ic))
++    if ending == "return":
++        after = R - NEW_ACCOUNT - SS - len(DEPLOYED) * CPSB
++        post = {probe: Account(storage={**SLOTS, 1: after}),
++                new: Account(storage={0: R - NEW_ACCOUNT}, code=DEPLOYED)}
++    else:
++        post = {probe: Account(storage={**SLOTS, 1: R}), new: Account.NONEXISTENT}
++    state_test(pre=pre, tx=legacy_tx(pre, probe), post=post)
++
++
++@legacy
++def test_create_transaction(state_test: StateTestFiller, pre: Alloc) -> None:
++    sender = pre.fund_eoa()
++    tx = Transaction(sender=sender, to=None, data=rec(0) + Op.STOP, gas_limit=TX_MAX + R)
++    new = compute_create_address(address=sender, nonce=0)
++    state_test(pre=pre, tx=tx, post={new: Account(storage={0: R - NEW_ACCOUNT})})
++
++
++@legacy
++@pytest.mark.parametrize(
++    "existing,r,expected",
++    [
++        ([True], R, R - AUTH_BASE),
++        ([False], R, R - AUTH_BASE - NEW_ACCOUNT),
++        ([True], 10_000, 0),
++        ([True, True, False], R, R - 3 * AUTH_BASE - NEW_ACCOUNT),
++    ],
++    ids=["existing", "new_authority", "spill", "three_auths"],
++)
++def test_7702_pre_execution_charges(state_test: StateTestFiller, pre: Alloc,
++                                    existing, r: int, expected: int) -> None:
++    delegate = pre.deploy_contract(rec(0) + Op.STOP)
++    authorities = [pre.fund_eoa() if e else pre.fund_eoa(amount=0) for e in existing]
++    sender = pre.fund_eoa()
++    tx = Transaction(sender=sender, to=authorities[0], gas_limit=TX_MAX + r,
++                     authorization_list=[AuthorizationTuple(address=delegate, nonce=0, signer=a)
++                                         for a in authorities])
++    state_test(pre=pre, tx=tx, post={authorities[0]: Account(storage={0: expected})})
++
++
++@legacy
++@pytest.mark.parametrize("r", [R, 0], ids=["funded", "unfunded"])
++def test_bundler_metering(state_test: StateTestFiller, pre: Alloc, r: int) -> None:
++    """
++    A bundler meters two sub-calls with GAS and with GAS + RESERVOIR.
++    op1 creates a slot in shared contract E, op2 clears it. Stored:
++    slot 0 = op1 reservoir delta (state gas GAS misses),
++    slot 1 = 1 if op2's GAS + RESERVOIR delta is negative.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH))) + Op.STOP)
++    op1 = pre.deploy_contract(Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP)
++    op2 = pre.deploy_contract(Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP)
++    # memory: 0x00 gas_before, 0x20 res_before, 0x40 gas_after, 0x60 res_after (op1)
++    #         0x80.. same for op2
++    def meter(target, base):
++        return (Op.MSTORE(base, Op.GAS) + Op.MSTORE(base + 0x20, Op.RESERVOIR)
++                + Op.POP(Op.CALL(16_000_000, target, 0, 0, 0, 0, 0))
++                + Op.MSTORE(base + 0x40, Op.GAS) + Op.MSTORE(base + 0x60, Op.RESERVOIR))
++    total2 = Op.SUB(Op.ADD(Op.MLOAD(0xC0), Op.MLOAD(0xE0)), Op.ADD(Op.MLOAD(0x80), Op.MLOAD(0xA0)))
++    code = (meter(op1, 0x00) + meter(op2, 0x80)
++            + rec(0, Op.SUB(Op.MLOAD(0x20), Op.MLOAD(0x60)))       # op1 reservoir delta
++            + rec(1, Op.SGT(total2, 0))                              # after - before > 0 <=> negative use
++            + Op.STOP)
++    bundler = pre.deploy_contract(code, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, bundler, r),
++               post={bundler: Account(storage={**SLOTS, 0: SS if r else 0, 1: 1})})
++
++
++# --------------------------------------------------------------------------
++# Portability: one library, both transaction models
++# --------------------------------------------------------------------------
++def portability_wrapper(pre: Alloc):
++    lib_txparam = pre.deploy_contract(Op.MSTORE(0, Op.TXPARAM(TXPARAM_STATE_GAS_LEFT)) + Op.RETURN(0, 32))
++    lib_reservoir = pre.deploy_contract(returner())
++    code = (Op.MSTORE(0, 0) + rec(0, Op.CALL(Op.GAS, lib_txparam, 0, 0, 0, 0, 32)) + rec(1, Op.MLOAD(0))
++            + Op.MSTORE(0, 0) + rec(2, Op.CALL(Op.GAS, lib_reservoir, 0, 0, 0, 0, 32)) + rec(3, Op.MLOAD(0))
++            + Op.STOP)
++    return pre.deploy_contract(code, storage=SLOTS)
++
++
++@legacy
++def test_portability_legacy(state_test: StateTestFiller, pre: Alloc) -> None:
++    """TXPARAM halts outside frame transactions; RESERVOIR works."""
++    w = portability_wrapper(pre)
++    state_test(pre=pre, tx=legacy_tx(pre, w),
++               post={w: Account(storage={**SLOTS, 0: 0, 1: 0, 2: 1, 3: R})})
++
++
++S = 300_000
++
++
++def frame_tx(sender: EOA, *frames) -> Transaction:
++    return Transaction(sender=sender, max_priority_fee_per_gas=7, max_fee=1_000_000_000,
++                       frames=[verify_frame(), *frames])
++
++
++def test_portability_frame(state_test: StateTestFiller, pre: Alloc) -> None:
++    """Inside a frame transaction both return the frame's state_gas_left."""
++    w = portability_wrapper(pre)
++    sender = pre.fund_eoa()
++    tx = frame_tx(sender, default_frame(target=w, gas_limit=500_000, state_gas_limit=S))
++    state_test(pre=pre, tx=tx, post={w: Account(storage={**SLOTS, 0: 1, 1: S, 2: 1, 3: S})})
++
++
++# --------------------------------------------------------------------------
++# EIP-8141 frame transactions
++# --------------------------------------------------------------------------
++def test_frame_read_equals_txparam(state_test: StateTestFiller, pre: Alloc) -> None:
++    probe = pre.deploy_contract(rec(0) + rec(1, Op.TXPARAM(TXPARAM_STATE_GAS_LEFT))
++                                + Op.SSTORE(FRESH, 1) + rec(2) + Op.STOP, storage=SLOTS)
++    tx = frame_tx(pre.fund_eoa(), default_frame(target=probe, gas_limit=500_000, state_gas_limit=S))
++    state_test(pre=pre, tx=tx, post={probe: Account(storage={**SLOTS, 0: S, 1: S, 2: S - SS, FRESH: 1})})
++
++
++def test_frame_nested_refill_revert(state_test: StateTestFiller, pre: Alloc) -> None:
++    """
++    The frame creates state, enters a nested
++    call that creates and clears a slot (refill), creates another and
++    reverts; the caller's view is restored to its pre-call value.
++    """
++    child = pre.deploy_contract(
++        Op.SSTORE(FRESH, 1) + Op.SSTORE(FRESH, 0) + Op.MSTORE(0, Op.RESERVOIR)
++        + Op.SSTORE(FRESH + 1, 1) + Op.MSTORE(0x20, Op.RESERVOIR) + Op.REVERT(0, 64))
++    probe = pre.deploy_contract(
++        Op.SSTORE(FRESH, 1) + rec(0)
++        + Op.POP(Op.CALL(Op.GAS, child, 0, 0, 0, 0, 64))
++        + rec(1, Op.MLOAD(0)) + rec(2, Op.MLOAD(0x20)) + rec(3) + Op.STOP, storage=SLOTS)
++    tx = frame_tx(pre.fund_eoa(), default_frame(target=probe, gas_limit=1_000_000, state_gas_limit=S))
++    state_test(pre=pre, tx=tx, post={
++        probe: Account(storage={**SLOTS, FRESH: 1, 0: S - SS, 1: S - SS, 2: S - 2 * SS, 3: S - SS}),
++        child: Account(storage={})})
++
++
++def test_frame_cross_frame_refill(state_test: StateTestFiller, pre: Alloc) -> None:
++    """
++    Frame 1 creates a slot; frame 2 clears it. The refill is attributed
++    to frame 1's receipt and is not credited to frame 2's pool.
++    """
++    s1, s2 = 300_000, 250_000
++    create_part = Op.SSTORE(FRESH, 1) + rec(0) + Op.STOP
++    head_len = len(Op.JUMPI(0xFF, Op.CALLDATASIZE))
++    dest = head_len + len(create_part)
++    x = pre.deploy_contract(
++        Op.JUMPI(dest, Op.CALLDATASIZE) + create_part
++        + Op.JUMPDEST + Op.SSTORE(FRESH, 0) + rec(1) + Op.STOP, storage=SLOTS)
++    assert len(Op.JUMPI(dest, Op.CALLDATASIZE)) == head_len
++    tx = frame_tx(pre.fund_eoa(),
++                  default_frame(target=x, gas_limit=200_000, state_gas_limit=s1),
++                  default_frame(target=x, gas_limit=200_000, state_gas_limit=s2, data=b"\x01"))
++    state_test(pre=pre, tx=tx, post={x: Account(storage={**SLOTS, 0: s1 - SS, 1: s2})})
++
++
++def test_frame_child_sees_frame_pool(state_test: StateTestFiller, pre: Alloc) -> None:
++    child = pre.deploy_contract(returner(Op.SSTORE(FRESH, 1)))
++    probe = pre.deploy_contract(call_and_record(Op.CALL, child, 1, 0) + Op.STOP, storage=SLOTS)
++    tx = frame_tx(pre.fund_eoa(), default_frame(target=probe, gas_limit=500_000, state_gas_limit=S))
++    state_test(pre=pre, tx=tx, post={probe: Account(storage={**SLOTS, 0: S - SS, 1: S - SS}),
++                                     child: Account(storage={FRESH: 1})})
++
++
++@legacy
++@pytest.mark.parametrize("r,child_seen,caller_after,gas_rose",
++                         [(R, R, R, 0), (0, SS, 0, 1)], ids=["reservoir", "below_cap"])
++def test_cross_frame_refill_merge(state_test: StateTestFiller, pre: Alloc, r: int,
++                                  child_seen: int, caller_after: int, gas_rose: int) -> None:
++    """
++    The caller creates a slot in E (a first call), then calls E again to
++    clear it. The refill lands in the second child's reservoir; on return
++    the EIP-8037 merge step moves it to gas_left when gas_left paid for the
++    slot. Stored: slot 0 = RESERVOIR in the clearing child, slot 1 = the
++    caller's RESERVOIR after it, slot 2 = 1 if the caller's GAS rose across
++    the call, slot 3 = 1 if GAS + RESERVOIR rose across the call.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH)))
++                                 + Op.MSTORE(0, Op.RESERVOIR) + Op.RETURN(0, 32))
++    code = (Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0))
++            + Op.MSTORE(0x20, Op.GAS) + Op.MSTORE(0x40, Op.RESERVOIR)
++            + Op.MSTORE(0, 0) + Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 32))
++            + Op.MSTORE(0x60, Op.GAS) + Op.MSTORE(0x80, Op.RESERVOIR)
++            + rec(0, Op.MLOAD(0)) + rec(1, Op.MLOAD(0x80))
++            + rec(2, Op.GT(Op.MLOAD(0x60), Op.MLOAD(0x20)))
++            + rec(3, Op.GT(Op.ADD(Op.MLOAD(0x60), Op.MLOAD(0x80)),
++                           Op.ADD(Op.MLOAD(0x20), Op.MLOAD(0x40))))
++            + Op.STOP)
++    caller = pre.deploy_contract(code, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, caller, r),
++               post={caller: Account(storage={**SLOTS, 0: child_seen, 1: caller_after,
++                                              2: gas_rose, 3: 1}),
++                     shared: Account(storage={})})
++
++
++# --------------------------------------------------------------------------
++# System calls
++# --------------------------------------------------------------------------
++SYSTEM_RESERVOIR = 16 * SS  # STORAGE_SET x SYSTEM_MAX_SSTORES_PER_CALL
++
++
++@pytest.mark.pre_alloc_mutable
++@pytest.mark.parametrize("system_contract", [
++    pytest.param(0x000F3DF6D732807EF1319FB7B8BB8522D0BEAC02, id="beacon"),
++    pytest.param(0x0000F90827F1C53A10CB7A02335B175320002935, id="history"),
++    pytest.param(WithdrawalRequest.system_contract_address, id="withdrawals"),
++    pytest.param(ConsolidationRequest.system_contract_address, id="consolidations"),
++    pytest.param(BuilderDepositRequest.system_contract_address, id="builder_deposit"),
++    pytest.param(BuilderExitRequest.system_contract_address, id="builder_exit"),
++])
++def test_system_call(blockchain_test: BlockchainTestFiller, pre: Alloc, system_contract: int) -> None:
++    """
++    A system call reads its own reservoir, STORAGE_SET x
++    SYSTEM_MAX_SSTORES_PER_CALL, independently of any transaction. Slot 0 is
++    the first read, slot 1 the read after one new slot is created, slot 2
++    the read in a child frame.
++    """
++    address = Address(system_contract)
++    child = pre.deploy_contract(returner())
++    code = (rec(0) + Op.SSTORE(FRESH, 1) + rec(1)
++            + Op.MSTORE(0, 0) + Op.POP(Op.CALL(Op.GAS, child, 0, 0, 0, 0, 32)) + rec(2, Op.MLOAD(0))
++            + Op.STOP)
++    pre.update_account(address, code=code, storage=SLOTS)
++    probe = pre.deploy_contract(rec(0) + Op.STOP, storage=SLOTS)
++    blockchain_test(
++        pre=pre,
++        genesis_environment=Environment(gas_limit=120_000_000),
++        blocks=[Block(txs=[legacy_tx(pre, probe)])],
++        post={address: Account(storage={**SLOTS, 0: SYSTEM_RESERVOIR, 1: SYSTEM_RESERVOIR - SS,
++                                        2: SYSTEM_RESERVOIR - SS, FRESH: 1}),
++              probe: Account(storage={**SLOTS, 0: R})},
++    )
++
++
++# --------------------------------------------------------------------------
++# Bundle ledger: signed per-operation measurements reconcile
++# --------------------------------------------------------------------------
++OFFSET = 1 << 128  # keeps every stored result non-zero, so instrumentation never clears a slot
++
++
++def enc(x: int) -> int:
++    return x + OFFSET
++
++
++@legacy
++@pytest.mark.parametrize("variant,r,m1,m2", [
++    ("create_clear", R, 116_195, -94_545),
++    ("create_clear", 0, 116_195, -94_545),
++    ("create_keep", R, 116_195, 3_044),
++    ("none", R, 3_044, 3_044),
++], ids=["create_clear", "create_clear_below_cap", "create_keep", "control"])
++def test_bundle_ledger(state_test: StateTestFiller, pre: Alloc, variant: str, r: int,
++                       m1: int, m2: int) -> None:
++    """
++    An EntryPoint-like caller meters two operations with GAS + RESERVOIR and
++    stores the signed deltas. Operation 1 creates a slot in a shared
++    contract; operation 2 clears it. Slots 0..3 hold op1 dGAS, op1
++    dRESERVOIR, op2 dGAS, op2 dRESERVOIR (before minus after, each plus
++    2**128 so that no stored value is zero); slots 4 and 5 hold the
++    per-operation sums with the same offset. The sums are
++    the same with and without a reservoir; only the split differs.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH))) + Op.STOP)
++    call_shared = Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP
++    op1 = pre.deploy_contract(Op.STOP if variant == "none" else call_shared)
++    op2 = pre.deploy_contract(call_shared if variant == "create_clear" else Op.STOP)
++
++    def meter(target, base):
++        return (Op.MSTORE(base, Op.GAS) + Op.MSTORE(base + 0x20, Op.RESERVOIR)
++                + Op.POP(Op.CALL(Op.GAS, target, 0, 0, 0, 0, 0))
++                + Op.MSTORE(base + 0x40, Op.GAS) + Op.MSTORE(base + 0x60, Op.RESERVOIR))
++
++    def d(a, b):
++        return Op.ADD(Op.SUB(Op.MLOAD(a), Op.MLOAD(b)), OFFSET)
++
++    code = (meter(op1, 0x00) + meter(op2, 0x80)
++            + rec(0, d(0x00, 0x40)) + rec(1, d(0x20, 0x60))
++            + rec(2, d(0x80, 0xC0)) + rec(3, d(0xA0, 0xE0))
++            + rec(4, Op.SUB(Op.ADD(Op.SLOAD(0), Op.SLOAD(1)), OFFSET))
++            + rec(5, Op.SUB(Op.ADD(Op.SLOAD(2), Op.SLOAD(3)), OFFSET))
++            + Op.STOP)
++    bundler = pre.deploy_contract(code, storage=SLOTS)
++    if variant == "none":
++        g1, s1, g2, s2 = m1, 0, m2, 0
++    elif variant == "create_keep":
++        g1, s1, g2, s2 = (m1 - SS, SS, m2, 0) if r else (m1, 0, m2, 0)
++    else:
++        g1, s1, g2, s2 = (m1 - SS, SS, m2 + SS, -SS) if r else (m1, 0, m2, 0)
++    state_test(pre=pre, tx=legacy_tx(pre, bundler, r),
++               post={bundler: Account(storage={**SLOTS, 0: enc(g1), 1: enc(s1),
++                                               2: enc(g2), 3: enc(s2),
++                                               4: enc(m1), 5: enc(m2)}),
++                     shared: Account(storage={FRESH: 1} if variant == "create_keep" else {})})
++
++
++# --------------------------------------------------------------------------
++# A caller bounds a child's reservoir use by reverting a wrapper frame
++# --------------------------------------------------------------------------
++@legacy
++def test_bounded_child(state_test: StateTestFiller, pre: Alloc) -> None:
++    """
++    An EntryPoint-like caller runs each operation inside a wrapper frame that
++    reads RESERVOIR before and after the operation and reverts when the
++    decrease exceeds a limit of one slot. The rollback of EIP-8037 restores
++    the reservoir, so the caller sees no change for the rejected operation.
++    Slots: 0 = 2**128 * wrapper success + wrapper output for op A (one slot),
++    1 = caller's RESERVOIR after op A, 2 = the same for op B (two slots;
++    the output is op B's own RESERVOIR reading, passed through the revert),
++    3 = caller's RESERVOIR after op B.
++    """
++    limit = SS
++    op_a = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.STOP)
++    op_b = pre.deploy_contract(Op.SSTORE(FRESH, 1) + Op.SSTORE(FRESH + 1, 1)
++                               + Op.MSTORE(0, Op.RESERVOIR) + Op.RETURN(0, 32))
++
++    def wrapper_code(dest: int) -> Bytecode:
++        return (Op.MSTORE(0x20, Op.RESERVOIR)
++                + Op.MSTORE(0, 0)
++                + Op.POP(Op.CALL(Op.GAS, Op.CALLDATALOAD(0), 0, 0, 0, 0, 32))
++                + Op.MSTORE(0x60, Op.MLOAD(0))
++                + Op.MSTORE(0x40, Op.SUB(Op.MLOAD(0x20), Op.RESERVOIR))
++                + Op.JUMPI(Op.PUSH2(dest), Op.GT(Op.MLOAD(0x40), limit))
++                + Op.RETURN(0x40, 32)
++                + Op.JUMPDEST + Op.REVERT(0x60, 32))
++
++    dest = len(wrapper_code(0)) - len(Op.JUMPDEST + Op.REVERT(0x60, 32))
++    wrapper = pre.deploy_contract(wrapper_code(dest))
++
++    def run(target, slot_result: int, slot_after: int) -> Bytecode:
++        return (Op.MSTORE(0, target) + Op.MSTORE(0x20, 0)
++                + Op.MSTORE(0x40, Op.CALL(Op.GAS, wrapper, 0, 0, 32, 0x20, 32))
++                + Op.SSTORE(slot_result, Op.ADD(Op.MUL(Op.MLOAD(0x40), 1 << 128), Op.MLOAD(0x20)))
++                + rec(slot_after))
++
++    caller = pre.deploy_contract(run(op_a, 0, 1) + run(op_b, 2, 3) + Op.STOP, storage=SLOTS)
++    state_test(pre=pre, tx=legacy_tx(pre, caller),
++               post={caller: Account(storage={**SLOTS, 0: (1 << 128) + SS, 1: R - SS,
++                                              2: R - 3 * SS, 3: R - SS}),
++                     op_a: Account(storage={FRESH: 1}), op_b: Account(storage={})})
++
++
++# --------------------------------------------------------------------------
++# Refill visibility by frame depth (EntryPoint-shaped: top -> inner -> op)
++# --------------------------------------------------------------------------
++@legacy
++@pytest.mark.parametrize("r", [R, 0], ids=["reservoir", "below_cap"])
++def test_refill_two_levels(state_test: StateTestFiller, pre: Alloc, r: int) -> None:
++    """
++    A top frame runs each operation through an inner frame that meters it
++    with GAS and RESERVOIR, as an ERC-4337 EntryPoint does in innerHandleOp.
++    Op 1 creates a slot in a shared contract, op 2 clears it. The refill for
++    op 2 is credited where the outstanding charge is: with gas_left funding
++    (R = 0) that is the top frame, so the inner frame sees it only in
++    RESERVOIR and the top frame sees it in GAS after the inner call returns.
++    Slots (offset 2**128): 0 = inner dGAS for op 2, 1 = inner dRESERVOIR for
++    op 2, 2 = top dGAS across the inner call for op 2, 3 = top dRESERVOIR
++    across it.
++    """
++    shared = pre.deploy_contract(Op.SSTORE(FRESH, Op.ISZERO(Op.SLOAD(FRESH))) + Op.STOP)
++    op = pre.deploy_contract(Op.POP(Op.CALL(Op.GAS, shared, 0, 0, 0, 0, 0)) + Op.STOP)
++    # inner: meters the op given in calldata, returns (dGAS, dRESERVOIR) + OFFSET
++    inner = pre.deploy_contract(
++        Op.MSTORE(0, Op.GAS) + Op.MSTORE(0x20, Op.RESERVOIR)
++        + Op.POP(Op.CALL(Op.GAS, Op.CALLDATALOAD(0), 0, 0, 0, 0, 0))
++        + Op.MSTORE(0x40, Op.GAS) + Op.MSTORE(0x60, Op.RESERVOIR)
++        + Op.MSTORE(0x80, Op.ADD(Op.SUB(Op.MLOAD(0), Op.MLOAD(0x40)), OFFSET))
++        + Op.MSTORE(0xA0, Op.ADD(Op.SUB(Op.MLOAD(0x20), Op.MLOAD(0x60)), OFFSET))
++        + Op.RETURN(0x80, 64))
++
++    def run(record: bool) -> Bytecode:
++        code = (Op.MSTORE(0, op)
++                + Op.MSTORE(0x20, Op.GAS) + Op.MSTORE(0x40, Op.RESERVOIR)
++                + Op.POP(Op.CALL(Op.GAS, inner, 0, 0, 32, 0x80, 64))
++                + Op.MSTORE(0x60, Op.GAS) + Op.MSTORE(0xC0, Op.RESERVOIR))
++        if record:
++            code += (rec(0, Op.MLOAD(0x80)) + rec(1, Op.MLOAD(0xA0))
++                     + rec(2, Op.ADD(Op.SUB(Op.MLOAD(0x20), Op.MLOAD(0x60)), OFFSET))
++                     + rec(3, Op.ADD(Op.SUB(Op.MLOAD(0x40), Op.MLOAD(0xC0)), OFFSET)))
++        return code
++
++    top = pre.deploy_contract(run(False) + run(True) + Op.STOP, storage=SLOTS)
++    inner_gas = 478   # execution gas of op 2 as seen by the inner frame
++    top_gas = 704     # execution gas of the inner call as seen by the top frame
++    if r:
++        post = {0: enc(inner_gas), 1: enc(-SS), 2: enc(top_gas), 3: enc(-SS)}
++    else:
++        post = {0: enc(inner_gas), 1: enc(-SS), 2: enc(top_gas - SS), 3: enc(0)}
++    state_test(pre=pre, tx=legacy_tx(pre, top, r),
++               post={top: Account(storage={**SLOTS, **post}), shared: Account(storage={})})
+diff --git a/tests/bogota/eip_reservoir/test_entrypoint.py b/tests/bogota/eip_reservoir/test_entrypoint.py
+new file mode 100644
+--- /dev/null
++++ b/tests/bogota/eip_reservoir/test_entrypoint.py
+@@ -0,0 +1,154 @@
++"""
++Regression test of the two-operation example against the deployed ERC-4337
++EntryPoint v0.7 bytecode under the EIP-8037 reservoir model.
++
++Operation 1 creates a storage slot in a shared contract and operation 2
++clears it, in one `handleOps` bundle. The EntryPoint's own accounting
++(`actualGas` inside `innerHandleOp`) is read back from its `deposits`
++mapping: each account starts with no deposit, pays the prefund during
++validation, and is refunded `prefund - actualGasCost` afterwards.
++"""
++
++import pytest
++from eth_abi import encode
++from eth_utils import keccak
++from execution_testing.test_types.chain_config_types import ChainConfigDefaults
++from execution_testing import (
++    Account,
++    Address,
++    Alloc,
++    StateTestFiller,
++    TransactionLog,
++    TransactionReceipt,
++)
++
++from .entrypoint_v07 import (
++    ENTRYPOINT_V07,
++    ENTRYPOINT_V07_IMMUTABLES,
++    MINIMAL_ACCOUNT,
++    MINIMAL_ACCOUNT_IMMUTABLES,
++    SENDER_CREATOR_V07,
++    SHARED,
++)
++from .test_reservoir import R, SS, legacy_tx
++
++pytestmark = [pytest.mark.valid_from("Bogota"), pytest.mark.frame_tx_incompatible]
++
++GAS_PRICE = 10
++VERIFICATION_GAS = 150_000
++CALL_GAS = 300_000
++PRE_VERIFICATION_GAS = 50_000
++PREFUND = (VERIFICATION_GAS + CALL_GAS + PRE_VERIFICATION_GAS) * GAS_PRICE
++USEROP_TYPE = "(address,uint256,bytes,bytes,bytes32,uint256,bytes32,bytes,bytes)"
++HANDLE_OPS = keccak(text=f"handleOps({USEROP_TYPE}[],address)")[:4]
++EXECUTE = keccak(text="execute(address,bytes)")[:4]
++USER_OPERATION_EVENT = keccak(
++    text="UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)"
++)
++SET = keccak(text="set(uint256,uint256)")[:4]
++
++
++def with_immutables(code: bytes, offsets, value: Address) -> bytes:
++    out = bytearray(code)
++    for o in offsets:
++        out[o:o + 32] = bytes(12) + bytes(value)
++    return bytes(out)
++
++
++def user_op(sender: Address, nonce: int, target: Address, data: bytes):
++    call_data = EXECUTE + encode(["address", "bytes"], [str(target), data])
++    return (str(sender), nonce, b"", call_data,
++            (VERIFICATION_GAS << 128 | CALL_GAS).to_bytes(32, "big"), PRE_VERIFICATION_GAS,
++            (GAS_PRICE << 128 | GAS_PRICE).to_bytes(32, "big"), b"", b"")
++
++
++def user_op_hash(op, entrypoint: Address) -> bytes:
++    """`getUserOpHash` of EntryPoint v0.7: keccak(abi.encode(hash(op), entryPoint, chainid))."""
++    sender, nonce, init_code, call_data, limits, pre_gas, fees, pm, _sig = op
++    inner = keccak(encode(
++        ["address", "uint256", "bytes32", "bytes32", "bytes32", "uint256", "bytes32", "bytes32"],
++        [sender, nonce, keccak(init_code), keccak(call_data), limits, pre_gas, fees, keccak(pm)]))
++    return keccak(encode(["bytes32", "address", "uint256"], [inner, str(entrypoint), ChainConfigDefaults.chain_id]))
++
++
++def user_op_event(entrypoint: Address, op, account: Address, gas: int) -> TransactionLog:
++    """`UserOperationEvent` with `success = true` and the charged gas."""
++    return TransactionLog(
++        address=entrypoint,
++        topics=[USER_OPERATION_EVENT, user_op_hash(op, entrypoint),
++                bytes(12) + bytes(account), bytes(32)],
++        data=encode(["uint256", "bool", "uint256", "uint256"], [0, True, gas * GAS_PRICE, gas]),
++    )
++
++
++def deposit_key(account: Address) -> int:
++    return int.from_bytes(keccak(bytes(12) + bytes(account) + bytes(32)), "big")
++
++
++def nonce_key(account: Address) -> int:
++    inner = keccak(bytes(12) + bytes(account) + (1).to_bytes(32, "big"))
++    return int.from_bytes(keccak(bytes(32) + inner), "big")
++
++
++@pytest.mark.parametrize("variant,r,gas1,gas2", [
++    ("create_clear", R, 138_225, 124_740),
++    ("create_clear", 0, 324_273, 222_660),
++    ("create_keep", R, 138_225, 124_740),
++    ("control", R, 138_225, 124_740),
++], ids=["create_clear", "create_clear_below_cap", "create_keep", "control"])
++def test_entrypoint_v07_two_ops(state_test: StateTestFiller, pre: Alloc, variant: str, r: int,
++                                gas1: int, gas2: int) -> None:
++    """
++    `gas1` and `gas2` are the `actualGas` values the EntryPoint charges the
++    two accounts, read from `deposits`. In the control both operations write
++    a slot that is already non-zero, so no state gas is charged or refilled.
++    """
++    sender_creator = pre.deploy_contract(SENDER_CREATOR_V07)
++    entrypoint = pre.deploy_contract(
++        with_immutables(ENTRYPOINT_V07, ENTRYPOINT_V07_IMMUTABLES, sender_creator),
++        storage={2: 1},  # ReentrancyGuard NOT_ENTERED, as set by the constructor
++    )
++    account_code = with_immutables(MINIMAL_ACCOUNT, MINIMAL_ACCOUNT_IMMUTABLES, entrypoint)
++    acct1 = pre.deploy_contract(account_code, balance=10**18)
++    acct2 = pre.deploy_contract(account_code, balance=10**18)
++    key = 7
++    slot = int.from_bytes(keccak(key.to_bytes(32, "big") + bytes(32)), "big")
++    shared = pre.deploy_contract(SHARED, storage={slot: 5} if variant == "control" else {})
++    beneficiary = pre.fund_eoa(amount=0)
++
++    def set_call(value: int) -> bytes:
++        return SET + encode(["uint256", "uint256"], [key, value])
++
++    ops = [user_op(acct1, 0, shared, set_call(1 if variant != "control" else 6)),
++           user_op(acct2, 0, shared, set_call(0 if variant == "create_clear" else
++                                              (1 if variant == "create_keep" else 7)))]
++    data = HANDLE_OPS + encode([f"{USEROP_TYPE}[]", "address"], [ops, str(beneficiary)])
++    # Logs: for each account an EIP-7708 Transfer of the prefund and a
++    # Deposited event, then BeforeExecution, one UserOperationEvent per
++    # operation, and the Transfer of the collected fees to the beneficiary.
++    # The two UserOperationEvents are pinned: success, userOpHash, sender,
++    # nonce, actualGasCost and actualGasUsed; the other logs are wildcards.
++    wildcard = TransactionLog()
++    receipt = TransactionReceipt(logs=[
++        wildcard, wildcard, wildcard, wildcard, wildcard,
++        user_op_event(entrypoint, ops[0], acct1, gas1),
++        user_op_event(entrypoint, ops[1], acct2, gas2),
++        wildcard,
++    ])
++    tx = legacy_tx(pre, entrypoint, r, data=data, expected_receipt=receipt)
++
++    final = {"create_clear": {}, "create_keep": {slot: 1}, "control": {slot: 7}}[variant]
++    state_test(
++        pre=pre, tx=tx,
++        post={
++            shared: Account(storage=final),
++            entrypoint: Account(storage={
++                2: 1,
++                deposit_key(acct1): PREFUND - gas1 * GAS_PRICE,
++                deposit_key(acct2): PREFUND - gas2 * GAS_PRICE,
++                nonce_key(acct1): 1,
++                nonce_key(acct2): 1,
++            }),
++            beneficiary: Account(balance=(gas1 + gas2) * GAS_PRICE),
++        },
++    )
