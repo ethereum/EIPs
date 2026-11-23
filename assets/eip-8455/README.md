@@ -8,7 +8,7 @@ This directory contains a reference implementation of the `RESERVOIR` opcode and
 
 `go-ethereum.patch` applies to go-ethereum at commit `2006f0836b30b8f689cd1df5620a9f64421c9f84`. It implements the reservoir model behavior only, since that revision does not include EIP-8141, and adds a `Bogota` entry to the state test forks.
 
-`reproduce.sh` downloads both revisions, applies the patches, fills the fixtures with the execution specifications and, if Go is installed, builds go-ethereum and runs the reservoir model state tests against it.
+`reproduce.sh` downloads both revisions, applies the patches, fills the fixtures with the execution specifications and, if Go is installed, builds go-ethereum and runs the reservoir model state tests against it. If Node.js is installed, it first compiles the EntryPoint v0.7 bytecode used by `test_entrypoint.py` from source; otherwise it skips that test.
 
 ## Usage
 
@@ -18,7 +18,7 @@ This directory contains a reference implementation of the `RESERVOIR` opcode and
 
 The fixtures are written to `reservoir-repro/fixtures`. Filling produces 53 test cases in state test and blockchain test formats.
 
-The blockchain tests for system calls and the EIP-8141 frame transaction cases run on the execution specifications only; `reproduce.sh` skips them for go-ethereum. `test_entrypoint.py` runs the two-operation example against the deployed ERC-4337 EntryPoint v0.7 bytecode; see [`entrypoint/README.md`](./entrypoint/README.md) for how the bytecode is produced.
+The blockchain tests for system calls and the EIP-8141 frame transaction cases run on the execution specifications only; `reproduce.sh` skips them for go-ethereum. `test_entrypoint.py` runs the two-operation example against the deployed ERC-4337 EntryPoint v0.7 bytecode; the bytecode is compiled from the upstream source at fill time and is not committed here; see [`entrypoint/README.md`](./entrypoint/README.md).
 
 ## Execution contexts
 

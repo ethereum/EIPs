@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Fill the RESERVOIR test fixtures with the execution specifications and,
 # when Go is available, run the reservoir model state tests on go-ethereum.
+# When Node.js is available, the EntryPoint v0.7 bytecode for
+# test_entrypoint.py is compiled from source; otherwise that test is skipped.
 set -euo pipefail
 
 EELS_SHA=c9781fa5ac92b3e22becdf05b734917e685d47f8
@@ -10,13 +12,32 @@ WORK="${WORK:-$PWD/reservoir-repro}"
 mkdir -p "$WORK"
 cd "$WORK"
 
+AA_TAG=v0.7.0
+SKIP_ENTRYPOINT=()
+if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+  mkdir -p entrypoint
+  cp "$HERE"/entrypoint/{compile.js,package.json,MinimalAccount.sol} entrypoint/
+  (
+    cd entrypoint
+    curl -sL "https://codeload.github.com/eth-infinitism/account-abstraction/tar.gz/refs/tags/$AA_TAG" | tar xz
+    npm install --silent --no-audit --no-fund
+    node compile.js entrypoint_v07.py
+  )
+else
+  echo "Node.js not found, skipping test_entrypoint.py" >&2
+  SKIP_ENTRYPOINT=(--ignore tests/bogota/eip_reservoir/test_entrypoint.py)
+fi
+
 curl -sL "https://codeload.github.com/ethereum/execution-specs/tar.gz/$EELS_SHA" | tar xz
 cd "execution-specs-$EELS_SHA"
 patch -p1 < "$HERE/execution-specs.patch"
+if [ -f "$WORK/entrypoint/entrypoint_v07.py" ]; then
+  cp "$WORK/entrypoint/entrypoint_v07.py" tests/bogota/eip_reservoir/
+fi
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -q -e . -e packages/testing
-fill tests/bogota/eip_reservoir --fork Bogota --output "$WORK/fixtures" --clean
+fill tests/bogota/eip_reservoir --fork Bogota --output "$WORK/fixtures" --clean "${SKIP_ENTRYPOINT[@]+"${SKIP_ENTRYPOINT[@]}"}"
 deactivate
 cd "$WORK"
 
