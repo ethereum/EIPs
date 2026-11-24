@@ -1,5 +1,5 @@
 ---
-title: eth/76 - Proof Wrapper Aggregation
+title: eth/76 - Aggregated Proof Propagation
 description: Adds aggregate wrapper relay, coverage hints, manifests and compact retrieval to eth/76
 author: Marc Harvey-Hill (@Marchhill), Daniil Ankushin (@AnkushinDaniil), Manuel Arto (@manusw7), Csaba Kiraly (@cskiraly)
 discussions-to: https://ethereum-magicians.org/t/eip-8437-eth-75-proof-wrapper-propagation/29934
