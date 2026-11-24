@@ -229,6 +229,9 @@ void evm_entry(void)
         [0xD6] = &&op_and64, [0xD7] = &&op_or64, [0xD8] = &&op_xor64,
         [0xD9] = &&op_not64, [0xDB] = &&op_shl64, [0xDC] = &&op_shr64,
         [0xE0] = &&op_cdload64, [0xE1] = &&op_mload64, [0xE2] = &&op_mstore64,
+#ifdef PREFIX64
+        [0xC0] = &&op_prefix64,
+#endif
     };
 
     u64 pc = 0, gas = 0, sp = 0, rsp = 0;
@@ -347,6 +350,33 @@ op_callsub: NEED(1); { u64 d = stk[sp-1].w[0];
     rstack[rsp++] = (u32)(pc + 1);
     sp--; pc = d; } goto next;
 op_calldest: pc++; goto next;
+
+#ifdef PREFIX64
+/* EIP-7937 encoding: C0 then the twin's opcode.  `next` has charged the
+ * default 3 for the C0 byte; charge the twin's cost less that, then
+ * dispatch on the second byte.  The handlers advance pc past it. */
+op_prefix64: {
+    static const void *J64[256] = {
+        [0 ... 255] = &&op_bad,
+        [0x01] = &&op_add64, [0x02] = &&op_mul64, [0x03] = &&op_sub64,
+        [0x04] = &&op_div64, [0x06] = &&op_mod64,
+        [0x10] = &&op_lt64, [0x11] = &&op_gt64, [0x12] = &&op_slt64,
+        [0x13] = &&op_sgt64, [0x14] = &&op_eq64, [0x15] = &&op_iszero64,
+        [0x16] = &&op_and64, [0x17] = &&op_or64, [0x18] = &&op_xor64,
+        [0x19] = &&op_not64, [0x1B] = &&op_shl64, [0x1C] = &&op_shr64,
+        [0x35] = &&op_cdload64, [0x51] = &&op_mload64, [0x52] = &&op_mstore64,
+    };
+    static const u8 G64[256] = {
+        [0x01] = 3, [0x02] = 5, [0x03] = 3, [0x04] = 5, [0x06] = 5,
+        [0x10 ... 0x1C] = 3, [0x35] = 3, [0x51] = 3, [0x52] = 3,
+    };
+    pc++;
+    if (pc >= CODE_LEN) __rt_trap("truncated prefix");
+    op = CODE[pc];
+    gas += G64[op] - 3;
+    goto *J64[op];
+}
+#endif
 op_returnsub: if (!rsp) __rt_trap("return stack underflow");
     pc = rstack[--rsp]; goto next;
 
