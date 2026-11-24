@@ -1,6 +1,6 @@
 ---
 title: Variable-Size Blobs
-description: Extends post-quantum PeerDAS with power-of-two blob sizes and size-aware resource accounting
+description: Extends post-quantum PeerDAS with variable-size blobs and byte-based blob-gas accounting
 author: Francesco Risitano (@frisitano)
 discussions-to: https://ethereum-magicians.org/t/eip-8479-post-quantum-peerdas-and-variable-size-blobs/30167
 status: Draft
@@ -12,7 +12,7 @@ requires: 7688, 7732, 7805, 7892, 7918, 8070, 8136, 8141, 8288, 8408, 8479, 8512
 
 ## Abstract
 
-This EIP extends [EIP-8479](./eip-8479.md) Peer Data Availability Sampling (PeerDAS) with variable-size blobs while keeping 128 columns. It introduces signed codeword lengths, length-bound commitments and versioned hashes, size-aware validation and resource accounting. EIP-8479 remains independent of this extension. Fee-transition and activation requirements remain unresolved as specified below.
+This EIP extends [EIP-8479](./eip-8479.md) Peer Data Availability Sampling (PeerDAS) with variable-size blobs while keeping 128 columns. It introduces codeword lengths, length-bound commitments and versioned hashes, size-aware validation and resource accounting. EIP-8479 remains independent of this extension. Fee-transition and activation requirements remain unresolved as specified below.
 
 ## Motivation
 
@@ -84,7 +84,9 @@ EIP-8479's root-only commitment is replaced with the following value in the vari
 
 ```python
 class BlobCommitment:
+    # The Merkle root that commits to the blob data.
     blob_merkle_root: Bytes32
+    # The codeword byte length of the blob.
     blob_byte_length: Uint64
 ```
 
@@ -146,7 +148,16 @@ def derive_blob_commitment(blob: Blob) -> BlobCommitment:
     return BlobCommitment(compute_blob_merkle_root(blob), len(blob))
 ```
 
-A fixed-profile proof cannot establish validity of a differently sized blob. The variable guest accepts a different input language and therefore requires its own reviewed program and verification-key binding. The variable-profile key, EIP-8288 registration/dispatch and scheme compatibility are unresolved; this draft does not allocate a scheme identifier, reuse the fixed key for a new program or claim a working verifier. These choices MUST be resolved before activation. EIP-8288 integration and proof-budget questions deferred by EIP-8479 remain unresolved here.
+In EIP-8479's `run_guest`, commitment derivation is replaced with the following comprehension so that the guest binds both the root and length of each private blob:
+
+```python
+blob_commitments = [
+    derive_blob_commitment(blob)
+    for blob in private_input.blobs
+]
+```
+
+A fixed-profile proof cannot establish validity of a differently sized blob. The variable guest accepts a different input language and therefore requires its own reviewed program and verification-key binding. The variable-profile key, EIP-8288 registration/dispatch and scheme compatibility are unresolved; this draft does not allocate a scheme identifier, reuse the fixed key for a new program or claim a working verifier. These choices MUST be resolved before activation. EIP-8288 integration and proof-budget questions remain unresolved.
 
 ### Frame Transaction and EVM Rules
 
