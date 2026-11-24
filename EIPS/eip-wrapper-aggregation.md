@@ -2,7 +2,7 @@
 title: eth/76 - Aggregated Proof Propagation
 description: Adds aggregate wrapper relay, coverage hints, manifests and compact retrieval to eth/76
 author: Marc Harvey-Hill (@Marchhill), Daniil Ankushin (@AnkushinDaniil), Manuel Arto (@manusw7), Csaba Kiraly (@cskiraly)
-discussions-to: https://ethereum-magicians.org/t/eip-8437-eth-75-proof-wrapper-propagation/29934
+discussions-to: https://ethereum-magicians.org/t/eip-eth-76-proof-wrapper-aggregation/30502
 status: Draft
 type: Standards Track
 category: Networking
@@ -16,7 +16,7 @@ This EIP defines `eth/76`, extending [EIP-8437](./eip-8437.md) with relay of rec
 
 ## Motivation
 
-Aggregators can produce overlapping proofs for the same transactions. Wrapper hashes alone do not identify equivalent coverage when proof bytes differ, and repeatedly transmitting transaction metadata and encodings wastes bandwidth. Aggregate propagation needs coverage-aware discovery and retrieval.
+Relaying reusable aggregates can replace many individual witnesses with one proof and reduce the proving work left to builders during block construction. Aggregators can produce overlapping proofs for the same transactions. Wrapper hashes alone do not identify equivalent coverage when proof bytes differ, and repeatedly transmitting transaction metadata and encodings wastes bandwidth. Aggregate propagation needs coverage-aware discovery and retrieval.
 
 ## Specification
 
@@ -82,6 +82,10 @@ Compact responses reconstruct the same canonical wrapper using encodings previou
 - Requesters MUST resolve references from cached, validated encodings and check their hashes. The complete wrapper determines identity and byte limits; reconstruction MUST stay within the announced length.
 - On a missing encoding, requesters MUST discard the compact item and SHOULD retry with `compact = 0` and a fresh request ID. Cache misses MUST NOT incur penalties.
 
+### Mixed-version peers
+
+While connected to `eth/75` peers, clients SHOULD retain received, validated mode 0 wrappers covering pending transactions and announce them under EIP-8437's rules, even when mode 1 wrappers cover the same transactions. Retention remains subject to local storage budgets and current verification rules.
+
 ### Validation
 
 EIP-8437's validation and peer-penalty rules apply to both modes, with these additional checks:
@@ -105,7 +109,7 @@ Aggregates can overlap, repeating transaction metadata across wrappers. Requeste
 
 On an `eth/75` connection, peers exchange only mode 0 wrappers using EIP-8437's four-field announcements and two-field requests, without manifests or hash omission. On `eth/76`, both modes use the six-field announcements and three-field requests defined here. Message shapes are selected by negotiated version, not wrapper mode.
 
-An aggregate alone does not provide the direct witnesses needed to construct a mode 0 wrapper for an `eth/75` peer. Clients holding those witnesses can continue serving the mode 0 wrapper. Block-proof exchange and consensus validity are unaffected.
+An aggregate alone does not provide the direct witnesses needed to construct a mode 0 wrapper for an `eth/75` peer. Block-proof exchange and consensus validity are unaffected.
 
 ## Test Cases
 
@@ -133,8 +137,9 @@ An aggregate alone does not provide the direct witnesses needed to construct a m
 | Announcement or request encoded for the other negotiated version | Reject the wrong message shape |
 | Mode 1 or manifests selected for an `eth/75` connection | Do not send; mode 0 full retrieval remains available |
 
-Client integration cases:
+Client integration cases require peer and fork state not modeled by the checker:
 
+- Receive and validate a mode 0 wrapper, then obtain a mode 1 aggregate covering its transactions while connected to an `eth/75` peer. Retain the mode 0 wrapper within storage budgets, announce it under EIP-8437's rules and serve it in full to that peer; the aggregate does not replace it.
 - Suppress wrappers covering already-covered transactions unless cheaper or supplying a recursive proof for an inclusion list where the recipient has only direct witnesses.
 - Hints never establish coverage before validation. A correct hint remains consistent across verifier changes; an incorrect hint is penalizable independently of proof failure.
 - Enforce EIP-8437's activation condition for all five wrapper messages and invalidate coverage suppression when verification rules change.
