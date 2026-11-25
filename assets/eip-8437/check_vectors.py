@@ -15,6 +15,7 @@ from rlp import decode
 
 SOFT_RESPONSE_LIMIT = 2097152
 MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
+MAX_ANNOUNCEMENT_BYTES = 2**21
 MAX_ANNOUNCEMENTS = 64
 MAX_WRAPPERS_PER_REQUEST = 32
 LEANSPHINCS_SCHEME = 0x10
@@ -254,6 +255,10 @@ def metadata_for(item):
     return (item[1], len(rlp(item)), inline_metadata(item))
 
 
+def check_announcement_size(payload):
+    assert len(payload) <= MAX_ANNOUNCEMENT_BYTES, "announcement bytes"
+
+
 def check_announcements(entries):
     assert 1 <= len(entries) <= MAX_ANNOUNCEMENTS, "announcement count"
     for entry in entries:
@@ -267,6 +272,7 @@ def check_announcements(entries):
             check_metadata(meta, length)
     hashes = [entry[2] for entry in entries]
     assert hashes == sorted(set(hashes)), "announcement order"
+    check_announcement_size(rlp(entries))
     return [entry for entry in entries if entry[0] == 0]
 
 
@@ -392,6 +398,22 @@ def main():
     widest_entries = [[0, MAX_WRAPPER_BYTES, uint(i + 1, 32), widest] for i in range(64)]
     check_announcements(widest_entries)
     assert len(rlp(widest_entries)) == 197508
+    # Fee-list length is variable, but the entire announcement is byte-bounded.
+    # Synthetic metadata checks transport only, not the transaction's fee layout.
+    large_meta = transaction_metadata([transaction(0)])
+    large_meta[5] = [[2**256 - 1] * 60000]
+    large_entry = [0, MAX_WRAPPER_BYTES, bytes(32), large_meta]
+    remaining = MAX_ANNOUNCEMENT_BYTES - len(rlp([large_entry]))
+    large_meta[5][0].extend([2**256 - 1] * (remaining // 33))
+    large_meta[5][0].extend([1] * (remaining % 33))
+    assert len(rlp([large_entry])) == MAX_ANNOUNCEMENT_BYTES
+    check_announcements([large_entry])
+    large_meta[5][0].append(1)
+    assert len(rlp([large_entry])) == MAX_ANNOUNCEMENT_BYTES + 1
+    expect_error("announcement bytes", check_announcement_size, rlp([large_entry]))
+    expect_error("announcement bytes", check_announcements, [large_entry])
+    large_entry[0] = 2  # Unsupported modes do not bypass the message byte bound.
+    expect_error("announcement bytes", check_announcements, [large_entry])
     items = [mode0, blob0]
     bodies = [rlp(item) for item in items]
     requested = [h(body) for body in bodies]
@@ -430,6 +452,13 @@ def main():
                      {**announced, requested[0]: (0, len(bodies[0]), bad)}, reply_for(7, [mode0]), invalid_proof)
     assert not verification_calls
     expect_error("proof verification", check_wrapper_response, 7, requested, announced, reply_for(7, [mode0]), invalid_proof)
+    # Unknown scheme IDs pass transport decoding, reaching dependency validation.
+    unknown_deps = [bytes(31) + b"\xfe" + dep[32:] for dep in mode0[2][0]]
+    unknown = [mode0[0], 0, [unknown_deps, mode0[2][1]]]
+    unknown_body = rlp(unknown)
+    check_wrapper_shape(unknown)
+    expect_error("proof verification", check_wrapper_response, 7, [h(unknown_body)],
+                 {h(unknown_body): metadata_for(unknown)}, reply_for(7, [unknown]), lambda item: False)
     for fees in ([], [7, 3], [7, 3, 0], [7, 3, 0, 0]):
         payload = transaction_body(2**64 - 1); payload[5] = fees
         item = [[FRAME_TX_TYPE + rlp(payload)], 0, mode0[2]]
