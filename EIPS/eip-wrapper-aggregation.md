@@ -36,7 +36,7 @@ Hash references are transport-only: clients MUST reconstruct the complete wrappe
 
 `[[mode₀: P, length₀: P, hash₀: B_32, deps-hash₀: B_32, txs-hash₀: B_32, txs-meta₀], ...]`
 
-Announce 1–64 held wrappers in strictly ascending hash order. Mode is `0` or `1`; length and hash describe the complete canonical wrapper. EIP-8437's announcement fan-out, on-connection offers, unsupported-mode handling and bounded repeat suppression apply to both modes on `eth/76` connections.
+Announce 1–64 held wrappers in strictly ascending hash order. Mode is `0` or `1`; length and hash describe the complete canonical wrapper. EIP-8437's announcement byte bound, fan-out, on-connection offers, unsupported-mode handling and bounded repeat suppression apply to both modes on `eth/76` connections.
 
 - `deps-hash`: Keccak-256 of the concatenated 96-byte entries in the canonical `deps` list.
 - `txs-hash`: Keccak-256 of the concatenated, ascending consensus transaction hashes.
@@ -44,7 +44,7 @@ Announce 1–64 held wrappers in strictly ascending hash order. Mode is `0` or `
 
 Requesters MAY skip a fetch when both digests match a held wrapper validated under the current rules. Hints alone establish no coverage or validity; matching only `deps-hash` does not identify the transactions.
 
-Under the same verification rules, peers SHOULD suppress wrappers whose transactions are covered by held, validated wrappers exchanged with or announced by the recipient, unless they reduce proof bytes or estimated verification work, or supply a recursive proof for an [EIP-8288 inclusion list](./eip-8288.md#extended-focil-data-structure) where the recipient has only direct witnesses. EIP-8437's bounded records and re-announcement policy apply.
+Peers SHOULD announce a wrapper only if it adds transaction coverage, reduces proof bytes or estimated verification work for the recipient, or supplies a recursive proof for an [EIP-8288 inclusion list](./eip-8288.md#extended-focil-data-structure) where the recipient has only direct witnesses. Compare against the union of held, validated wrappers exchanged with or announced by the recipient under the same verification rules; different proof bytes alone do not justify another announcement. EIP-8437's bounded records and re-announcement policy apply.
 
 The announcement tuple is fixed for `eth/76`. Extending it requires a new protocol version; canonical decoding rejects extra fields.
 
@@ -66,7 +66,7 @@ Responses carry either mode. Requesters MUST reconstruct wrappers as specified u
 
 `[request-id: P, [hash₀: B_32, hash₁: B_32, ...]]`
 
-Request the manifests of 1 to 32 distinct wrappers, each previously announced by the responder on that connection under the same verification rules; responders treat other hashes as GetProofWrappers does. A wrapper's manifest is the metadata of all its transactions, in the `txs-meta` layout, whatever its mode and transaction count.
+Request the manifests of 1 to 32 distinct wrappers, each previously announced by the responder on that connection under the same verification rules; responders treat other hashes as GetProofWrappers does. A wrapper's manifest is the metadata of all its transactions, in the `txs-meta` layout, whatever its mode and transaction count. Requesters SHOULD fetch a manifest only when its metadata may change whether or when they fetch the wrapper; otherwise they SHOULD request the wrapper directly.
 
 #### ProofWrapperManifests (0x1c)
 
@@ -95,7 +95,7 @@ EIP-8437's validation and peer-penalty rules apply to both modes, with these add
 - References in a `compact = 0` response are malformed: clients MUST discard them and MAY impose penalties or disconnect.
 - On arrival, clients MUST check nonempty inline metadata and manifests against EIP-8437's metadata rules, and require their hashes to concatenate to the preimage of the announced `txs-hash`. Inline metadata for mode `1` is malformed. Manifests have no 17-transaction limit, but MUST describe a nonempty list of transactions and fit the announced wrapper length under EIP-8437's size checks.
 - Once the canonical wrapper is reconstructed, clients MUST check, alongside its hash and before proof verification, the announcement digests and metadata, inline or from a manifest, of the peer that served it. Metadata MUST be exactly what the wrapper's transactions give, and inline metadata empty where the rules above require it. A mismatch MUST cause discard and SHOULD cause disconnection, independently of proof validity.
-- Metadata and manifests are kept per peer. One peer's claims MUST NOT cause discard of a wrapper served by another; EIP-8437's checks against held transactions and attribution of false metadata apply equally to manifests.
+- Metadata and manifests are kept per peer. Fetch decisions based only on unverified hints or manifests MUST remain scoped to their sender: they MUST NOT suppress fetching the same wrapper from another announcer or mark its coverage as validated. One peer's claims MUST NOT cause discard of a wrapper served by another; EIP-8437's checks against held transactions and attribution of false metadata apply equally to manifests.
 
 Wrappers validated only under previous verification rules MUST NOT be used for coverage suppression. Hints and manifests never substitute for wrapper validation.
 
@@ -103,7 +103,7 @@ Wrappers validated only under previous verification rules MUST NOT be used for c
 
 Mode distinguishes direct-witness verification from recursive-proof verification; length gives the complete wrapper's encoded size. Dependency and transaction digests identify equivalent coverage despite different proof bytes, avoiding redundant downloads. Compared with a dependency hint alone, `txs-hash` adds 33 encoded bytes per announcement to distinguish different transactions sharing dependencies. The wire dependency digest uses a fixed hash of encoded triples rather than the circuit digest, allowing checks independent of fork verification rules.
 
-Aggregates can overlap, repeating transaction metadata across wrappers. Requested manifests let peers inspect only the wrappers they consider fetching, while small mode 0 wrappers retain inline metadata. Hash omission saves repeated transaction bytes while preserving canonical identity, at the cost of cache tracking and full retries after eviction. Encoding hashes also bind blob metadata.
+Aggregates can overlap, repeating transaction metadata across wrappers. Requested manifests help compare partial overlap with held coverage or schedule by transaction fees, while small mode 0 wrappers retain inline metadata. When metadata would not change the fetch decision, requesting the wrapper directly avoids a round trip. Hash omission saves repeated transaction bytes while preserving canonical identity, at the cost of cache tracking and full retries after eviction. Encoding hashes also bind blob metadata.
 
 ## Backwards Compatibility
 
@@ -119,6 +119,8 @@ An aggregate alone does not provide the direct witnesses needed to construct a m
 | --- | --- |
 | Maximum announcement/request; excess count | 6,851/1,072 encoded bytes for 64 announcements without metadata/32 hashes; reject excess |
 | Unsupported modes, alone or mixed with supported modes | Ignore unsupported entries; still enforce encoding, count, length and ordering |
+| Announcement payload exactly 2 MiB; one byte larger, including metadata for an unsupported mode | Accept the size boundary; reject the oversized payload |
+| Unknown scheme identifiers in structurally valid wrappers | Decode; dependency validation determines support |
 | Metadata fixture: 17 transactions per entry, maximum wire integers and three fee fields | 201,732 encoded bytes for 64 entries |
 | Mode 0 inline metadata; mode 1 without inline metadata | Accept; reject metadata on mode 1 or for more than 17 transactions |
 | Malformed metadata, hashes not matching `txs-hash`, or fields differing from a fetched wrapper | Reject before proof verification; attribute false metadata to its sender |
@@ -140,7 +142,9 @@ An aggregate alone does not provide the direct witnesses needed to construct a m
 Client integration cases require peer and fork state not modeled by the checker:
 
 - Receive and validate a mode 0 wrapper, then obtain a mode 1 aggregate covering its transactions while connected to an `eth/75` peer. Retain the mode 0 wrapper within storage budgets, announce it under EIP-8437's rules and serve it in full to that peer; the aggregate does not replace it.
-- Suppress wrappers covering already-covered transactions unless cheaper or supplying a recursive proof for an inclusion list where the recipient has only direct witnesses.
+- Two validated aggregates have different hashes but the same coverage and no reduction in proof bytes or estimated verification work: suppress the second announcement. Retain the exception for a recursive inclusion-list proof where the recipient has only direct witnesses.
+- Peer A supplies a manifest suggesting no useful coverage; peer B announces the same wrapper with useful metadata. A fetch decision based only on A's manifest does not suppress fetching from B; validate B's response against B's metadata.
+- Without a useful metadata-based filter, fetch the wrapper directly. Held coverage can make overlap filtering useful; fee-based scheduling can justify a manifest even without a held aggregate.
 - Hints never establish coverage before validation. A correct hint remains consistent across verifier changes; an incorrect hint is penalizable independently of proof failure.
 - Enforce EIP-8437's activation condition for all five wrapper messages and invalidate coverage suppression when verification rules change.
 - Validate an aggregate containing a transaction rejected by the pool; EIP-8437's unchanged-relay and per-transaction admission rules still apply.

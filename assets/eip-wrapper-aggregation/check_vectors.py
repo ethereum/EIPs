@@ -45,6 +45,7 @@ expect_error = base.expect_error
 
 SOFT_RESPONSE_LIMIT = 2097152
 MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
+MAX_ANNOUNCEMENT_BYTES = 2**21
 MAX_ANNOUNCEMENTS = 64
 MAX_WRAPPERS_PER_REQUEST = 32
 MAX_MANIFESTS_PER_REQUEST = 32
@@ -145,6 +146,10 @@ def wrapper_vectors():
     return out
 
 
+def check_announcement_size(payload):
+    assert len(payload) <= MAX_ANNOUNCEMENT_BYTES, "announcement bytes"
+
+
 def check_announcements(entries):
     assert 1 <= len(entries) <= MAX_ANNOUNCEMENTS, "announcement count"
     for entry in entries:
@@ -161,6 +166,7 @@ def check_announcements(entries):
             check_metadata(txs_meta, txs_hash, length, MAX_INLINE_TRANSACTIONS)
     hashes = [entry[2] for entry in entries]
     assert hashes == sorted(set(hashes)), "announcement order"
+    check_announcement_size(rlp(entries))
     return [entry for entry in entries if entry[0] in (0, 1)]
 
 
@@ -401,6 +407,22 @@ def main():
                       for i in range(MAX_ANNOUNCEMENTS)]
     check_announcements(widest_entries)
     assert len(rlp(widest_entries)) == 201732
+    # Fee-list length is variable, but the entire announcement is byte-bounded.
+    # Synthetic metadata checks transport only, not the transaction's fee layout.
+    large_meta = transaction_metadata([transaction(0)])
+    large_meta[5] = [[2**256 - 1] * 60000]
+    large_entry = [0, MAX_WRAPPER_BYTES, bytes(32), bytes(32), h(b"".join(large_meta[2])), large_meta]
+    remaining = MAX_ANNOUNCEMENT_BYTES - len(rlp([large_entry]))
+    large_meta[5][0].extend([2**256 - 1] * (remaining // 33))
+    large_meta[5][0].extend([1] * (remaining % 33))
+    assert len(rlp([large_entry])) == MAX_ANNOUNCEMENT_BYTES
+    check_announcements([large_entry])
+    large_meta[5][0].append(1)
+    assert len(rlp([large_entry])) == MAX_ANNOUNCEMENT_BYTES + 1
+    expect_error("announcement bytes", check_announcement_size, rlp([large_entry]))
+    expect_error("announcement bytes", check_announcements, [large_entry])
+    large_entry[0] = 2  # Unsupported modes do not bypass the message byte bound.
+    expect_error("announcement bytes", check_announcements, [large_entry])
 
     # Request bounds, uniqueness and received announcements; IDs need not increase.
     assert rlp([7, 0, [bytes(32)]]).hex() == "e40780e1a0" + "00" * 32
@@ -500,6 +522,15 @@ def main():
     expect_error("proof verification", check_wrapper_response, 7, requested, metadata,
                  reply_for(7, [mode1]), 0, None, invalid_proof)
     assert verification_calls == [mode1]
+    # Unknown schemes remain structurally decodable in either wrapper mode.
+    for original in (mode0, mode1):
+        unknown_deps = [bytes(31) + b"\xfe" + dep[32:] for dep in original[2][0]]
+        unknown = [original[0], original[1], [unknown_deps, original[2][1]]]
+        unknown_body = rlp(unknown)
+        check_wrapper_shape(unknown)
+        expect_error("proof verification", check_wrapper_response, 7, [h(unknown_body)],
+                     {h(unknown_body): metadata_for(unknown)}, reply_for(7, [unknown]),
+                     0, None, lambda item: False)
     # Changing a scheme changes the wire digest, even if claim/key bytes match.
     changed_deps = [bytes(31) + b"\x11" + dep[32:] for dep in mode1[2][0]]
     changed_scheme = [mode1[0], 1, [changed_deps, mode1[2][1]]]
