@@ -90,7 +90,7 @@ While connected to `eth/75` peers, clients SHOULD fetch offered mode 0 wrappers 
 
 EIP-8437's validation and peer-penalty rules apply to both modes, with these additional checks:
 
-- Clients MUST validate wrappers before reaggregation, as well as before announcement, serving or transaction admission.
+- Clients MUST validate wrappers before reaggregation, as well as before announcement, serving or transaction admission. A newly aggregated wrapper MUST cover the dependency union of its selected pool transactions; dependencies shared with retained transactions MUST NOT be discarded.
 - Before decoding or hashing manifests, requesters SHOULD check that the response's request ID is outstanding and its connection open.
 - References in a `compact = 0` response are malformed: clients MUST discard them and MAY impose penalties or disconnect.
 - On arrival, clients MUST check nonempty inline metadata against EIP-8437's metadata rules. A manifest MUST contain a nonempty, strictly ascending list of 32-byte hashes and its RLP encoding MUST be smaller than the announced wrapper length. In either form, the concatenated hashes MUST hash to the sender's announced `txs-hash`. Inline metadata for mode `1` is malformed; manifests have no 17-transaction limit.
@@ -148,6 +148,7 @@ Client integration cases require peer and fork state not modeled by the checker:
 - Hints never establish coverage before validation. A correct hint remains consistent across verifier changes; an incorrect hint is penalizable independently of proof failure.
 - Enforce EIP-8437's activation condition for all five wrapper messages and invalidate coverage suppression when verification rules change.
 - Validate an aggregate containing a transaction rejected by the pool; EIP-8437's unchanged-relay and per-transaction admission rules still apply.
+- A valid wrapper covers A with dependencies `{a, shared}` and B with `{b, shared}`. Admit A and reject B: the original wrapper remains valid and relayable unchanged. Reaggregate A alone with `{a, shared}`; discard only `b`, not `shared`.
 - Resolve a compact reference using a validated encoding received from a different peer; if absent or evicted, retry in full. An equal consensus hash with different blob metadata does not resolve the reference.
 - Exhaust verification budgets with singleton or overlapping mode 1 wrappers. Defer further work without treating budget exhaustion as invalidity or peer misbehavior.
 - Apply EIP-8437's blob availability checks after aggregate validation. Multiple wrappers covering one transaction neither add providers nor reset sampling.
