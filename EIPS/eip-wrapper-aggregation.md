@@ -2,7 +2,7 @@
 title: eth/76 - Aggregated Proof Propagation
 description: Adds aggregate wrapper relay, coverage hints, manifests and compact retrieval to eth/76
 author: Marc Harvey-Hill (@Marchhill), Daniil Ankushin (@AnkushinDaniil), Manuel Arto (@manusw7), Csaba Kiraly (@cskiraly)
-discussions-to: https://ethereum-magicians.org/t/eip-eth-76-proof-wrapper-aggregation/30502
+discussions-to: https://ethereum-magicians.org/t/eip-eth-76-aggregated-proof-propagation/30502
 status: Draft
 type: Standards Track
 category: Networking
