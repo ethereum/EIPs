@@ -32,10 +32,7 @@ blob_transaction = base.blob_transaction
 transaction_hash = base.transaction_hash
 frame_payload = base.frame_payload
 frame_gas = base.frame_gas
-transaction_metadata = base.transaction_metadata
-inline_metadata = base.inline_metadata
 check_claims = base.check_claims
-mismatched_held_transactions = base.mismatched_held_transactions
 reply_for = base.reply_for
 answer_request = base.answer_request
 wrappers_response = base.wrappers_response
@@ -55,8 +52,36 @@ CELLS_PER_EXT_BLOB = 128
 # Inline-metadata threshold inherited from EIP-8437, independent of
 # fork-specific dependency limits and enabled schemes.
 MAX_INLINE_TRANSACTIONS = 17
-METADATA_FIELDS = 7
+METADATA_FIELDS = 5
 SYNTHETIC_FRAME_GAS = 100000
+
+
+def transaction_metadata(envelopes):
+    # All wrappers carry EIP-8141 frame transactions; no type or nonce hint.
+    payloads = [frame_payload(tx) for tx in envelopes]
+    return [[len(tx) for tx in envelopes],
+            [transaction_hash(tx) for tx in envelopes],
+            [payload[2] for payload in payloads],
+            [[int.from_bytes(fee, "big") for fee in payload[5]] for payload in payloads],
+            [frame_gas(payload) for payload in payloads]]
+
+def mismatched_held_transactions(meta, held):
+    # Source, fees and gas are hash-bound; the pooled encoding's size is not.
+    mismatches = []
+    for i, digest in enumerate(meta[1]):
+        if digest not in held:
+            continue
+        envelope = held[digest]
+        assert transaction_hash(envelope) == digest, "held transaction hash"
+        expected = transaction_metadata([envelope])
+        if any(meta[field][i] != expected[field][0] for field in (2, 3, 4)):
+            mismatches.append(digest)
+    return mismatches
+
+def inline_metadata(item):
+    if item[1] == 0 and len(item[0]) <= MAX_INLINE_TRANSACTIONS:
+        return transaction_metadata(item[0])
+    return []
 
 
 def describe(mode, body, deps_hash, txs_hash, txs_meta=()):
@@ -74,17 +99,14 @@ FIXTURE_FEE_FIELDS = 3
 
 def check_metadata(meta, txs_hash, length, limit):
     assert isinstance(meta, list) and len(meta) == METADATA_FIELDS, "metadata fields"
-    types, sizes, hashes, sources, nonces, fees, gas = meta
-    # Manifests have no count limit of their own: limit is None.
-    assert isinstance(types, bytes) and 1 <= len(types) and (limit is None or len(types) <= limit), "metadata count"
-    assert all(isinstance(field, list) and len(field) == len(types) for field in meta[1:]), "metadata lengths"
+    sizes, hashes, sources, fees, gas = meta
+    assert isinstance(hashes, list) and 1 <= len(hashes) and (limit is None or len(hashes) <= limit), "metadata count"
+    assert all(isinstance(field, list) and len(field) == len(hashes) for field in meta), "metadata lengths"
     assert all(isinstance(size, int) and size >= 1 for size in sizes) and sum(sizes) < length, "metadata size"
     assert all(isinstance(digest, bytes) and len(digest) == 32 for digest in hashes), "metadata hash"
     assert hashes == sorted(set(hashes)), "metadata order"
     assert h(b"".join(hashes)) == txs_hash, "metadata transaction hash"
     assert all(isinstance(source, bytes) and len(source) == 20 for source in sources), "metadata source"
-    # Fixed wire bounds, independent of fork-specific transaction validity.
-    assert all(isinstance(nonce, int) and 0 <= nonce < 2**64 for nonce in nonces), "metadata nonce"
     assert all(isinstance(fee, list)
                and all(isinstance(value, int) and 0 <= value < 2**256 for value in fee) for fee in fees), "metadata fees"
     assert all(isinstance(value, int) and 0 <= value < 2**64 for value in gas), "metadata gas"
@@ -113,9 +135,10 @@ def metadata_for(item):
     return (item[1], len(rlp(item)), *coverage(item), inline_metadata(item))
 
 
-def may_skip_fetch(announcement, held_valid_wrappers):
+def may_skip_fetch(announcement, held_valid_wrappers, needs_direct=False):
     # Caller supplies only wrappers valid under the current rules.
-    return any(tuple(announcement[3:5]) == coverage(item) for item in held_valid_wrappers)
+    return any(tuple(announcement[3:5]) == coverage(item)
+               for item in held_valid_wrappers if not (needs_direct and announcement[0] == 0 and item[1] != 0))
 
 
 def wrapper_vectors():
@@ -200,9 +223,9 @@ def check_wrapper_shape(item):
     assert hashes == sorted(set(hashes)), "transaction order"
 
 
-def compact_wrapper(item, delivered):
-    # delivered tracks exact encodings sent in full on this connection.
-    txs = [[h(tx)] if h(tx) in delivered and len(rlp([h(tx)])) < len(rlp(tx)) else tx
+def compact_wrapper(item, expected_known):
+    # Expected cache hits can be inferred from any prior wrapper announcements.
+    txs = [[h(tx)] if h(tx) in expected_known and len(rlp([h(tx)])) < len(rlp(tx)) else tx
            for tx in item[0]]
     return [txs, *item[1:]]
 
@@ -267,7 +290,7 @@ def check_wrapper_response(request_id, requested, announced_metadata, reply, com
         assert actual_txs == txs_hash, "announced transaction hash"
         assert txs_meta == inline_metadata(item), "announced transaction metadata"
         if manifests and digest in manifests:
-            assert manifests[digest] == transaction_metadata(item[0]), "manifest transaction metadata"
+            assert manifests[digest] == [transaction_hash(tx) for tx in item[0]], "manifest transaction hashes"
         if verify is not None:
             assert verify(item), "proof verification"
     return retries
@@ -286,7 +309,7 @@ def manifests_response(request_id, wrappers):
     for item in wrappers:
         if len(rlp([request_id, served])) >= SOFT_RESPONSE_LIMIT:
             break
-        served.append([h(rlp(item)), transaction_metadata(item[0])])
+        served.append([h(rlp(item)), [transaction_hash(tx) for tx in item[0]]])
     return [request_id, served]
 
 
@@ -296,8 +319,7 @@ def answer_manifest_request(request_id, requested, held, announced):
 
 
 def check_manifest_response(request_id, requested, announced_metadata, reply):
-    # Hashes are checked against txs-hash on arrival; other fields only
-    # once the wrapper is fetched.
+    # Check the hash list against the sender's hint, then against the fetched wrapper.
     assert isinstance(reply, list) and len(reply) == 2, "response fields"
     assert reply[0] == request_id, "response id"
     assert isinstance(reply[1], list), "response fields"
@@ -306,12 +328,16 @@ def check_manifest_response(request_id, requested, announced_metadata, reply):
     manifests = {}
     for entry in reply[1]:
         assert isinstance(entry, list) and len(entry) == 2, "response entry"
-        digest, meta = entry
+        digest, txhashes = entry
         assert isinstance(digest, bytes) and digest in positions, "response hash"
         assert positions[digest] > previous, "response order"
         previous = positions[digest]
-        check_metadata(meta, announced_metadata[digest][3], announced_metadata[digest][1], None)
-        manifests[digest] = meta
+        assert isinstance(txhashes, list) and txhashes, "manifest hashes"
+        assert all(isinstance(txhash, bytes) and len(txhash) == 32 for txhash in txhashes), "manifest hash"
+        assert txhashes == sorted(set(txhashes)), "manifest order"
+        assert len(rlp(txhashes)) < announced_metadata[digest][1], "manifest size"
+        assert h(b"".join(txhashes)) == announced_metadata[digest][3], "manifest transaction hash"
+        manifests[digest] = txhashes
     return manifests
 
 
@@ -396,28 +422,26 @@ def main():
 
     # A wide fixture with three fees: no fixed fee-list length limits transport.
     widest_hashes = sorted(h(uint(i, 1)) for i in range(MAX_INLINE_TRANSACTIONS))
-    widest = [FRAME_TX_TYPE * MAX_INLINE_TRANSACTIONS,
-              [(MAX_WRAPPER_BYTES - 1) // MAX_INLINE_TRANSACTIONS] * MAX_INLINE_TRANSACTIONS,
+    widest = [[(MAX_WRAPPER_BYTES - 1) // MAX_INLINE_TRANSACTIONS] * MAX_INLINE_TRANSACTIONS,
               widest_hashes,
               [b"\xff" * 20] * MAX_INLINE_TRANSACTIONS,
-              [2**64 - 1] * MAX_INLINE_TRANSACTIONS,
               [[2**256 - 1] * FIXTURE_FEE_FIELDS] * MAX_INLINE_TRANSACTIONS,
               [2**64 - 1] * MAX_INLINE_TRANSACTIONS]
     widest_entries = [[0, MAX_WRAPPER_BYTES, uint(i + 1, 32), bytes(32), h(b"".join(widest_hashes)), widest]
                       for i in range(MAX_ANNOUNCEMENTS)]
     check_announcements(widest_entries)
-    assert len(rlp(widest_entries)) == 201732
+    assert len(rlp(widest_entries)) == 190660
     # Fee-list length is variable, but the entire announcement is byte-bounded.
     # Synthetic metadata checks transport only, not the transaction's fee layout.
     large_meta = transaction_metadata([transaction(0)])
-    large_meta[5] = [[2**256 - 1] * 60000]
-    large_entry = [0, MAX_WRAPPER_BYTES, bytes(32), bytes(32), h(b"".join(large_meta[2])), large_meta]
+    large_meta[3] = [[2**256 - 1] * 60000]
+    large_entry = [0, MAX_WRAPPER_BYTES, bytes(32), bytes(32), h(b"".join(large_meta[1])), large_meta]
     remaining = MAX_ANNOUNCEMENT_BYTES - len(rlp([large_entry]))
-    large_meta[5][0].extend([2**256 - 1] * (remaining // 33))
-    large_meta[5][0].extend([1] * (remaining % 33))
+    large_meta[3][0].extend([2**256 - 1] * (remaining // 33))
+    large_meta[3][0].extend([1] * (remaining % 33))
     assert len(rlp([large_entry])) == MAX_ANNOUNCEMENT_BYTES
     check_announcements([large_entry])
-    large_meta[5][0].append(1)
+    large_meta[3][0].append(1)
     assert len(rlp([large_entry])) == MAX_ANNOUNCEMENT_BYTES + 1
     expect_error("announcement bytes", check_announcement_size, rlp([large_entry]))
     expect_error("announcement bytes", check_announcements, [large_entry])
@@ -540,15 +564,14 @@ def main():
                            verify=lambda item: True)
     assert wrappers_response(7, encoded) == rlp(reply_for(7, items))
 
-    # Mode 0 entries carry their transactions' metadata; mode 1 entries carry none.
+    # Five metadata lists; all enclosed transactions are frames and nonce hints are absent.
     meta0 = transaction_metadata(mode0[0])
     assert inline_metadata(mode0) == meta0
     assert inline_metadata(mode1) == inline_metadata(blob_mode1) == []
-    assert meta0[1] == [len(tx) for tx in mode0[0]]
-    assert meta0[2] == [transaction_hash(tx) for tx in mode0[0]]
+    assert meta0[0] == [len(tx) for tx in mode0[0]]
+    assert meta0[1] == [transaction_hash(tx) for tx in mode0[0]]
     check_announcements([describe(0, encoded[0], *coverage(mode0), meta0)])
     check_announcements([describe(1, encoded[1], *coverage(mode1))])
-    # The transaction count is unknown until the wrapper arrives.
     check_announcements([describe(0, encoded[0], *coverage(mode0))])
     expect_error("metadata mode", check_announcements, [describe(1, encoded[1], *coverage(mode1), meta0)])
 
@@ -557,25 +580,22 @@ def main():
         meta[index] = value
         return meta
 
-    for meta, reason in [(meta0[:6], "metadata fields"),
-                         (altered(0, meta0[0] * 2), "metadata lengths"),
-                         (altered(1, meta0[1][:1]), "metadata lengths"),
-                         (altered(1, [0] + meta0[1][1:]), "metadata size"),
-                         (altered(1, [len(encoded[0])] + meta0[1][1:]), "metadata size"),
-                         (altered(2, [bytes(31)] + meta0[2][1:]), "metadata hash"),
-                         (altered(2, meta0[2][::-1]), "metadata order"),
-                         (altered(2, meta0[2][:1] * 2), "metadata order"),
-                         (altered(2, sorted([h(b"other 0"), h(b"other 1")])), "metadata transaction hash"),
-                         (altered(3, [bytes(19)] + meta0[3][1:]), "metadata source"),
-                         (altered(4, [2**64] + meta0[4][1:]), "metadata nonce"),
-                         (altered(4, [-1] + meta0[4][1:]), "metadata nonce"),
-                         (altered(5, [b""] + meta0[5][1:]), "metadata fees"),
-                         (altered(5, [[[]]] + meta0[5][1:]), "metadata fees"),
-                         (altered(5, [[-1]] + meta0[5][1:]), "metadata fees"),
-                         (altered(5, [[2**256] + meta0[5][0][1:]] + meta0[5][1:]), "metadata fees"),
-                         (altered(6, [2**64] + meta0[6][1:]), "metadata gas")]:
+    for meta, reason in [(meta0[:4], "metadata fields"),
+                         (altered(1, []), "metadata count"),
+                         (altered(0, meta0[0][:1]), "metadata lengths"),
+                         (altered(0, [0] + meta0[0][1:]), "metadata size"),
+                         (altered(0, [len(encoded[0])] + meta0[0][1:]), "metadata size"),
+                         (altered(1, [bytes(31)] + meta0[1][1:]), "metadata hash"),
+                         (altered(1, meta0[1][::-1]), "metadata order"),
+                         (altered(1, meta0[1][:1] * 2), "metadata order"),
+                         (altered(1, sorted([h(b"other 0"), h(b"other 1")])), "metadata transaction hash"),
+                         (altered(2, [bytes(19)] + meta0[2][1:]), "metadata source"),
+                         (altered(3, [b""] + meta0[3][1:]), "metadata fees"),
+                         (altered(3, [[[]]] + meta0[3][1:]), "metadata fees"),
+                         (altered(3, [[-1]] + meta0[3][1:]), "metadata fees"),
+                         (altered(3, [[2**256]] + meta0[3][1:]), "metadata fees"),
+                         (altered(4, [2**64] + meta0[4][1:]), "metadata gas")]:
         expect_error(reason, check_announcements, [describe(0, encoded[0], *coverage(mode0), meta)])
-    # Fee arity and the transaction nonce rule are not transport validity rules.
     for fee_list in ([], [7, 3], [7, 3, 0], [7, 3, 0, 0]):
         payload = transaction_body(2**64 - 1)
         payload[5] = fee_list
@@ -583,19 +603,10 @@ def main():
         body = rlp(item)
         check_announcements([describe(0, body, *coverage(item), inline_metadata(item))])
         check_wrapper_response(7, [h(body)], {h(body): metadata_for(item)}, reply_for(7, [item]))
-        false_meta = altered(5, [fee_list] + meta0[5][1:])
-        check_announcements([describe(0, encoded[0], *coverage(mode0), false_meta)])
-        expect_error("announced transaction metadata", check_wrapper_response, 7, requested,
-                     {**metadata, requested[0]: (*metadata[requested[0]][:4], false_meta)},
-                     reply_for(7, [mode0]))
-    # Other fields are checked against the wrapper, before proof verification.
-    for index, value in [(0, b"\x02" + meta0[0][1:]),
-                         (1, [meta0[1][0] + 1] + meta0[1][1:]),
-                         (3, [b"\x01" * 20] + meta0[3][1:]),
-                         (4, [meta0[4][0] + 1] + meta0[4][1:]),
-                         (5, [[2, 1, 0]] + meta0[5][1:]),
-                         (6, [meta0[6][0] + 1] + meta0[6][1:]),
-                         (None, [])]:
+    for index, value in [(0, [meta0[0][0] + 1] + meta0[0][1:]),
+                         (2, [b"\x01" * 20] + meta0[2][1:]),
+                         (3, [[2, 1, 0]] + meta0[3][1:]),
+                         (4, [meta0[4][0] + 1] + meta0[4][1:]), (None, [])]:
         false_meta = [] if index is None else altered(index, value)
         if false_meta:
             check_announcements([describe(0, encoded[0], *coverage(mode0), false_meta)])
@@ -603,37 +614,25 @@ def main():
                      {**metadata, requested[0]: (*metadata[requested[0]][:4], false_meta)},
                      reply_for(7, [mode0]), 0, None, invalid_proof)
     assert verification_calls == [mode1]
-    # Fields come from each transaction, in wrapper order.
     sent = transaction_body(5)
     sent[2], sent[5] = b"\x11" * 20, [7, 3, 0]
-    assert len(transaction_body(0)[5]) == FIXTURE_FEE_FIELDS
-    assert transaction_metadata([FRAME_TX_TYPE + rlp(sent)])[3:6] == [[b"\x11" * 20], [5], [[7, 3, 0]]]
-    # A's false metadata leaves the wrapper B serves intact, and counts against A.
+    assert transaction_metadata([FRAME_TX_TYPE + rlp(sent)])[2:4] == [[b"\x11" * 20], [[7, 3, 0]]]
     claims = {"A": altered(4, [meta0[4][0] + 1] + meta0[4][1:]), "B": meta0}
     assert check_claims("B", mode0, claims, inline_metadata) == ["A"]
     expect_error("announced transaction metadata", check_claims, "A", mode0, claims, inline_metadata)
-    # Held transactions expose hash-bound lies before any wrapper fetch or proof check.
     held_transactions = {transaction_hash(tx): tx for tx in mode0[0]}
     assert mismatched_held_transactions(meta0, held_transactions) == []
-    for index, value in [(0, b"\x02" + meta0[0][1:]),
-                         (3, [b"\x01" * 20] + meta0[3][1:]),
-                         (4, [meta0[4][0] + 1] + meta0[4][1:]),
-                         (5, [[2, 1, 0]] + meta0[5][1:]),
-                         (6, [meta0[6][0] + 1] + meta0[6][1:])]:
+    for index, value in [(2, [b"\x01" * 20] + meta0[2][1:]),
+                         (3, [[2, 1, 0]] + meta0[3][1:]),
+                         (4, [meta0[4][0] + 1] + meta0[4][1:])]:
         false_meta = altered(index, value)
-        assert mismatched_held_transactions(false_meta, held_transactions) == [meta0[2][0]]
+        assert mismatched_held_transactions(false_meta, held_transactions) == [meta0[1][0]]
         assert mismatched_held_transactions(false_meta, {}) == []
-    assert {peer: mismatched_held_transactions(meta, held_transactions)
-            for peer, meta in claims.items()} == {"A": [meta0[2][0]], "B": []}
-    # Pooled size is not bound by the consensus hash; sidecars can differ.
-    assert mismatched_held_transactions(altered(1, [meta0[1][0] + 1] + meta0[1][1:]),
-                                        held_transactions) == []
-    expect_error("held transaction hash", mismatched_held_transactions, meta0,
-                 {meta0[2][0]: transaction(1000)})
-    # Mode 0 wrappers list up to 17 transactions inline, and larger ones none.
+    assert mismatched_held_transactions(altered(0, [meta0[0][0] + 1] + meta0[0][1:]), held_transactions) == []
+    expect_error("held transaction hash", mismatched_held_transactions, meta0, {meta0[1][0]: transaction(1000)})
     seventeen, eighteen = ([sorted((transaction(i) for i in range(count)), key=transaction_hash), 0, mode0[2]]
                            for count in (MAX_INLINE_TRANSACTIONS, MAX_INLINE_TRANSACTIONS + 1))
-    assert len(inline_metadata(seventeen)[2]) == MAX_INLINE_TRANSACTIONS and inline_metadata(eighteen) == []
+    assert len(inline_metadata(seventeen)[1]) == MAX_INLINE_TRANSACTIONS and inline_metadata(eighteen) == []
     for item in (seventeen, eighteen):
         body = rlp(item)
         check_announcements([describe(0, body, *coverage(item), inline_metadata(item))])
@@ -643,6 +642,10 @@ def main():
     body = rlp(seventeen)
     expect_error("announced transaction metadata", check_wrapper_response, 7, [h(body)],
                  {h(body): (*metadata_for(seventeen)[:4], [])}, reply_for(7, [seventeen]))
+    direct_offer = describe(0, encoded[0], *coverage(mode0), meta0)
+    assert may_skip_fetch(direct_offer, [mode1])
+    assert not may_skip_fetch(direct_offer, [mode1], needs_direct=True)
+    assert may_skip_fetch(direct_offer, [mode0, mode1], needs_direct=True)
 
     # A full 32-hash request can be satisfied in one response for small wrappers.
     small_items = [[[transaction(i)], 0, mode0[2]] for i in range(32)]
@@ -679,46 +682,44 @@ def main():
     assert answer_manifest_request(9, requested, held_items, {requested[1]}) == manifests_response(9, items[1:2])
     assert answer_manifest_request(9, [bytes(32)], held_items, set(requested)) == [9, []]
     manifests = check_manifest_response(9, requested, metadata, reply)
-    assert manifests == {digest: transaction_metadata(item[0]) for digest, item in zip(requested, items)}
+    assert manifests == {digest: [transaction_hash(tx) for tx in item[0]] for digest, item in zip(requested, items)}
     for returned in (items[:1], items[1:], []):
         check_manifest_response(9, requested, metadata, manifests_response(9, returned))
     check_wrapper_response(7, requested, metadata, reply_for(7, items), manifests=manifests)
     many_manifests = check_manifest_response(9, [h(many_body)], {h(many_body): metadata_for(many)},
                                              manifests_response(9, [many]))
-    assert len(many_manifests[h(many_body)][2]) == 4097
+    assert len(many_manifests[h(many_body)]) == 4097
+    assert len(rlp(many_manifests[h(many_body)])) == 135205
     expect_error("response id", check_manifest_response, 9, requested, metadata, manifests_response(8, items))
     expect_error("response order", check_manifest_response, 9, requested, metadata, [9, reply[1][::-1]])
     expect_error("response order", check_manifest_response, 9, requested, metadata, [9, reply[1][:1] * 2])
-    expect_error("response hash", check_manifest_response, 9, requested, metadata, [9, [[bytes(32), meta0]]])
-    meta1 = transaction_metadata(mode1[0])
-    for meta, reason in [([], "metadata fields"),
-                         ([b""] + [[]] * 6, "metadata count"),
-                         (meta1[:6], "metadata fields"),
-                         (meta1[:1] + [meta1[1][:1]] + meta1[2:], "metadata lengths"),
-                         (meta1[:2] + [meta1[2][::-1]] + meta1[3:], "metadata order"),
-                         (meta1[:2] + [sorted([h(b"other 0"), h(b"other 1")])] + meta1[3:], "metadata transaction hash")]:
-        expect_error(reason, check_manifest_response, 9, requested, metadata, [9, [[requested[1], meta]]])
-    # Other manifest fields are checked against the wrapper, before proof verification.
-    false_manifest = meta1[:4] + [[nonce + 1 for nonce in meta1[4]]] + meta1[5:]
-    check_manifest_response(9, requested, metadata, [9, [[requested[1], false_manifest]]])
-    expect_error("manifest transaction metadata", check_wrapper_response, 7, requested, metadata,
-                 reply_for(7, [mode1]), 0, None, invalid_proof, {requested[1]: false_manifest})
+    expect_error("response hash", check_manifest_response, 9, requested, metadata, [9, [[bytes(32), manifests[requested[0]]]]])
+    txhashes = manifests[requested[1]]
+    false_hashes = sorted([h(b"other 0"), h(b"other 1")])
+    for value, reason in [([], "manifest hashes"), (b"", "manifest hashes"),
+                           ([bytes(31)], "manifest hash"), (txhashes[::-1], "manifest order"),
+                           (txhashes[:1] * 2, "manifest order"), (false_hashes, "manifest transaction hash")]:
+        expect_error(reason, check_manifest_response, 9, requested, metadata, [9, [[requested[1], value]]])
+    # A dishonest peer can align a false manifest and hint, not the wrapper's hash.
+    false_hint = {**metadata, requested[1]: (*metadata[requested[1]][:3], h(b"".join(false_hashes)), [])}
+    check_manifest_response(9, requested, false_hint, [9, [[requested[1], false_hashes]]])
+    expect_error("announced transaction hash", check_wrapper_response, 7, requested, false_hint,
+                 reply_for(7, [mode1]), 0, None, invalid_proof, {requested[1]: false_hashes})
+    expect_error("manifest transaction hashes", check_wrapper_response, 7, requested, metadata,
+                 reply_for(7, [mode1]), 0, None, invalid_proof, {requested[1]: false_hashes})
     assert verification_calls == [mode1]
-    # A's false manifest leaves the wrapper B serves with a correct one intact.
-    check_wrapper_response(7, requested, metadata, reply_for(7, [mode1]), manifests={requested[1]: meta1})
-    manifest_claims = {"A": false_manifest, "B": meta1}
-    assert check_claims("B", mode1, manifest_claims, lambda item: transaction_metadata(item[0])) == ["A"]
-    # Sizes must fit the announced length.
-    tight = {**metadata, requested[1]: (metadata[requested[1]][0], sum(meta1[1]), *metadata[requested[1]][2:])}
-    expect_error("metadata size", check_manifest_response, 9, requested, tight, [9, [[requested[1], meta1]]])
-    # The soft limit constrains the sender, not response validity.
-    big = [[many_envelopes, 1, [mode1[2][0], b"aggregate proof %d" % i]] for i in range(10)]
+    check_wrapper_response(7, requested, metadata, reply_for(7, [mode1]), manifests={requested[1]: txhashes})
+    manifest_claims = {"A": false_hashes, "B": txhashes}
+    assert check_claims("B", mode1, manifest_claims, lambda item: [transaction_hash(tx) for tx in item[0]]) == ["A"]
+    tight = {**metadata, requested[1]: (metadata[requested[1]][0], len(rlp(txhashes)), *metadata[requested[1]][2:])}
+    expect_error("manifest size", check_manifest_response, 9, requested, tight, [9, [[requested[1], txhashes]]])
+    # The soft limit constrains packing; a complete last manifest may cross it.
+    big = [[many_envelopes, 1, [mode1[2][0], b"aggregate proof %d" % i]] for i in range(20)]
     big_hashes = [h(rlp(item)) for item in big]
     packed = manifests_response(9, big)
     assert 1 < len(packed[1]) < len(big)
     assert len(rlp([9, packed[1][:-1]])) < SOFT_RESPONSE_LIMIT <= len(rlp(packed))
-    check_manifest_response(9, big_hashes, {digest: metadata_for(item) for digest, item in zip(big_hashes, big)},
-                            packed)
+    check_manifest_response(9, big_hashes, {digest: metadata_for(item) for digest, item in zip(big_hashes, big)}, packed)
 
     # Five fixtures with 1,000,000-byte synthetic proofs; none is a valid proof.
     large_items = [[mode1[0], 1, [mode1[2][0], bytes([i]) * 1_000_000]] for i in range(5)]
@@ -785,6 +786,14 @@ def main():
         expect_error("cell proof count", transaction_hash, FRAME_TX_TYPE + rlp(blob[:4] + [proofs]))
     expect_error("cell proof encoding", transaction_hash, FRAME_TX_TYPE + rlp(blob[:4] + [[bytes(47)] * len(blob[4])]))
 
+    # Full bytes from peer A populate a node-wide cache used for peer B's aggregate.
+    check_wrapper_response(10, [requested[0]], metadata, reply_for(10, [mode0]))
+    cache_from_a = {h(tx): tx for tx in mode0[0]}
+    compact_from_b = compact_wrapper(mode1, set(cache_from_a))
+    assert check_wrapper_response(11, [requested[1]], metadata,
+                                  [11, [[requested[1], compact_from_b]]], 1, cache_from_a) == []
+    assert check_wrapper_response(11, [requested[1]], metadata,
+                                  [11, [[requested[1], compact_from_b]]], 1, {}) == [requested[1]]
     # Compact transport preserves full identity, including blob metadata.
     for item in (mode0, mode1, blob_mode1):
         cache = {h(tx): tx for tx in item[0]}
