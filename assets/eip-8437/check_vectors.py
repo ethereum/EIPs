@@ -23,7 +23,7 @@ FRAME_TX_TYPE = b"\x06"
 CELLS_PER_EXT_BLOB = 128
 # Fixed transport threshold, independent of EIP-8288 validity limits.
 MAX_INLINE_TRANSACTIONS = 17
-METADATA_FIELDS = 7
+METADATA_FIELDS = 5
 SYNTHETIC_FRAME_GAS = 100000
 FIXTURE_FEE_FIELDS = 3
 
@@ -128,16 +128,13 @@ def frame_gas(payload):
 
 
 def transaction_metadata(envelopes):
-    # EIP-8437 transaction metadata, in wrapper order.
+    # All wrappers carry EIP-8141 frame transactions; no type or nonce hint.
     payloads = [frame_payload(tx) for tx in envelopes]
-    return [b"".join(tx[:1] for tx in envelopes),
-            [len(tx) for tx in envelopes],
+    return [[len(tx) for tx in envelopes],
             [transaction_hash(tx) for tx in envelopes],
             [payload[2] for payload in payloads],
-            [int.from_bytes(payload[1], "big") for payload in payloads],
             [[int.from_bytes(fee, "big") for fee in payload[5]] for payload in payloads],
             [frame_gas(payload) for payload in payloads]]
-
 
 
 def inline_metadata(item):
@@ -157,18 +154,17 @@ def check_claims(serving_peer, item, claims, expected):
 
 
 def mismatched_held_transactions(meta, held):
-    # Only fields bound by the consensus hash can be checked without the wrapper.
+    # Source, fees and gas are hash-bound; the pooled encoding's size is not.
     mismatches = []
-    for i, digest in enumerate(meta[2]):
+    for i, digest in enumerate(meta[1]):
         if digest not in held:
             continue
         envelope = held[digest]
         assert transaction_hash(envelope) == digest, "held transaction hash"
         expected = transaction_metadata([envelope])
-        if any(meta[field][i] != expected[field][0] for field in (0, 3, 4, 5, 6)):
+        if any(meta[field][i] != expected[field][0] for field in (2, 3, 4)):
             mismatches.append(digest)
     return mismatches
-
 
 
 def reply_for(request_id, wrappers):
@@ -219,19 +215,16 @@ def expect_error(reason, fn, *args):
 
 def check_metadata(meta, length, limit=MAX_INLINE_TRANSACTIONS):
     assert isinstance(meta, list) and len(meta) == METADATA_FIELDS, "metadata fields"
-    types, sizes, hashes, sources, nonces, fees, gas = meta
-    assert isinstance(types, bytes) and 1 <= len(types) and (limit is None or len(types) <= limit), "metadata count"
-    assert all(isinstance(field, list) and len(field) == len(types) for field in meta[1:]), "metadata lengths"
+    sizes, hashes, sources, fees, gas = meta
+    assert isinstance(hashes, list) and 1 <= len(hashes) and (limit is None or len(hashes) <= limit), "metadata count"
+    assert all(isinstance(field, list) and len(field) == len(hashes) for field in meta), "metadata lengths"
     assert all(isinstance(size, int) and size >= 1 for size in sizes) and sum(sizes) < length, "metadata size"
     assert all(isinstance(digest, bytes) and len(digest) == 32 for digest in hashes), "metadata hash"
     assert hashes == sorted(set(hashes)), "metadata order"
     assert all(isinstance(source, bytes) and len(source) == 20 for source in sources), "metadata source"
-    # Fixed wire bounds, independent of fork-specific transaction validity.
-    assert all(isinstance(nonce, int) and 0 <= nonce < 2**64 for nonce in nonces), "metadata nonce"
     assert all(isinstance(fee, list)
                and all(isinstance(value, int) and 0 <= value < 2**256 for value in fee) for fee in fees), "metadata fees"
     assert all(isinstance(value, int) and 0 <= value < 2**64 for value in gas), "metadata gas"
-
 
 
 def describe(mode, body, txs_meta=()):
@@ -393,22 +386,22 @@ def main():
         expect_error("announced transaction metadata", check_wrapper_response, 7, [h(body)],
                      {h(body): (0, len(body), wrong_meta)}, reply_for(7, [item]))
     widest_hashes = sorted(h(uint(i, 1)) for i in range(17))
-    widest = [FRAME_TX_TYPE * 17, [(MAX_WRAPPER_BYTES - 1) // 17] * 17, widest_hashes,
-              [b"\xff" * 20] * 17, [2**64 - 1] * 17, [[2**256 - 1] * 3] * 17, [2**64 - 1] * 17]
+    widest = [[(MAX_WRAPPER_BYTES - 1) // 17] * 17, widest_hashes,
+              [b"\xff" * 20] * 17, [[2**256 - 1] * 3] * 17, [2**64 - 1] * 17]
     widest_entries = [[0, MAX_WRAPPER_BYTES, uint(i + 1, 32), widest] for i in range(64)]
     check_announcements(widest_entries)
-    assert len(rlp(widest_entries)) == 197508
+    assert len(rlp(widest_entries)) == 186436
     # Fee-list length is variable, but the entire announcement is byte-bounded.
     # Synthetic metadata checks transport only, not the transaction's fee layout.
     large_meta = transaction_metadata([transaction(0)])
-    large_meta[5] = [[2**256 - 1] * 60000]
+    large_meta[3] = [[2**256 - 1] * 60000]
     large_entry = [0, MAX_WRAPPER_BYTES, bytes(32), large_meta]
     remaining = MAX_ANNOUNCEMENT_BYTES - len(rlp([large_entry]))
-    large_meta[5][0].extend([2**256 - 1] * (remaining // 33))
-    large_meta[5][0].extend([1] * (remaining % 33))
+    large_meta[3][0].extend([2**256 - 1] * (remaining // 33))
+    large_meta[3][0].extend([1] * (remaining % 33))
     assert len(rlp([large_entry])) == MAX_ANNOUNCEMENT_BYTES
     check_announcements([large_entry])
-    large_meta[5][0].append(1)
+    large_meta[3][0].append(1)
     assert len(rlp([large_entry])) == MAX_ANNOUNCEMENT_BYTES + 1
     expect_error("announcement bytes", check_announcement_size, rlp([large_entry]))
     expect_error("announcement bytes", check_announcements, [large_entry])
@@ -437,15 +430,14 @@ def main():
     def invalid_proof(item):
         verification_calls.append(item)
         return False
-    for field, value, reason in [(0, b"", "metadata count"), (1, [0, 1], "metadata size"),
-                                  (2, meta0[2][::-1], "metadata order"), (3, [bytes(19)] * 2, "metadata source"),
-                                  (4, [2**64] * 2, "metadata nonce"), (5, [[2**256]] * 2, "metadata fees"),
-                                  (6, [2**64] * 2, "metadata gas")]:
+    for field, value, reason in [(1, [], "metadata count"), (0, [0, 1], "metadata size"),
+                                  (1, meta0[1][::-1], "metadata order"), (2, [bytes(19)] * 2, "metadata source"),
+                                  (3, [[2**256]] * 2, "metadata fees"), (4, [2**64] * 2, "metadata gas")]:
         bad = list(meta0); bad[field] = value
         expect_error(reason, check_announcements, [describe(0, bodies[0], bad)])
-    for field, value in [(0, b"\x02" * 2), (1, [n + 1 for n in meta0[1]]),
-                         (2, sorted([h(b"other 0"), h(b"other 1")])), (3, [b"\x01" * 20] * 2),
-                         (4, [n + 1 for n in meta0[4]]), (5, [[2, 1, 0]] * 2), (6, [1, 1])]:
+    for field, value in [(0, [n + 1 for n in meta0[0]]),
+                         (1, sorted([h(b"other 0"), h(b"other 1")])), (2, [b"\x01" * 20] * 2),
+                         (3, [[2, 1, 0]] * 2), (4, [1, 1])]:
         bad = list(meta0); bad[field] = value
         check_announcements([describe(0, bodies[0], bad)])
         expect_error("announced transaction metadata", check_wrapper_response, 7, requested,
@@ -466,10 +458,10 @@ def main():
         check_announcements([describe(0, body, inline_metadata(item))])
         check_wrapper_response(7, [h(body)], {h(body): metadata_for(item)}, reply_for(7, [item]))
     held = {transaction_hash(tx): tx for tx in mode0[0]}
-    false_meta = meta0[:4] + [[n + 1 for n in meta0[4]]] + meta0[5:]
+    false_meta = meta0[:4] + [[n + 1 for n in meta0[4]]]
     assert check_claims("B", mode0, {"A": false_meta, "B": meta0}, inline_metadata) == ["A"]
-    assert mismatched_held_transactions(false_meta, held) == meta0[2]
-    assert mismatched_held_transactions(meta0[:1] + [[n + 1 for n in meta0[1]]] + meta0[2:], held) == []
+    assert mismatched_held_transactions(false_meta, held) == meta0[1]
+    assert mismatched_held_transactions([[n + 1 for n in meta0[0]]] + meta0[1:], held) == []
     for bad, reason in [([[], 0, mode0[2]], "wrapper envelopes"),
                         ([[[h(mode0[0][0])]], 0, mode0[2]], "transaction envelope"),
                         ([mode0[0][::-1], 0, mode0[2]], "transaction order"),
