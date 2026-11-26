@@ -316,6 +316,10 @@ def check_wrapper_response(request_id, requested, announced_metadata, reply, ver
         assert item[1] == mode, "announced mode"
         assert len(body) == length, "announced length"
         assert meta == inline_metadata(item), "announced transaction metadata"
+        # Unsupported schemes are discarded after transport checks, without
+        # treating them as malformed or spending work on witness verification.
+        if any(dep[:32] != uint(LEANSPHINCS_SCHEME, 32) for dep in item[2][0]):
+            continue
         if verify is not None:
             assert verify(item), "proof verification"
 
@@ -444,13 +448,26 @@ def main():
                      {**announced, requested[0]: (0, len(bodies[0]), bad)}, reply_for(7, [mode0]), invalid_proof)
     assert not verification_calls
     expect_error("proof verification", check_wrapper_response, 7, requested, announced, reply_for(7, [mode0]), invalid_proof)
-    # Unknown scheme IDs pass transport decoding, reaching dependency validation.
-    unknown_deps = [bytes(31) + b"\xfe" + dep[32:] for dep in mode0[2][0]]
-    unknown = [mode0[0], 0, [unknown_deps, mode0[2][1]]]
-    unknown_body = rlp(unknown)
-    check_wrapper_shape(unknown)
-    expect_error("proof verification", check_wrapper_response, 7, [h(unknown_body)],
-                 {h(unknown_body): metadata_for(unknown)}, reply_for(7, [unknown]), lambda item: False)
+    # Generic, mixed and unknown-scheme wrappers remain structurally decodable,
+    # but eth/75 never invokes their witness verifier, even if it would accept.
+    unsupported_verifications = []
+    def accepting_verifier(item):
+        unsupported_verifications.append(item)
+        return True
+    for scheme in (0x11, 0xfe):
+        for mixed in (False, True):
+            deps = [uint(scheme if i or not mixed else LEANSPHINCS_SCHEME, 32) + dep[32:]
+                    for i, dep in enumerate(mode0[2][0])]
+            unsupported = [mode0[0], 0, [deps, mode0[2][1]]]
+            digest = h(rlp(unsupported))
+            metadata = metadata_for(unsupported)
+            check_wrapper_shape(unsupported)
+            check_wrapper_response(7, [digest], {digest: metadata},
+                                   reply_for(7, [unsupported]), accepting_verifier)
+            expect_error("announced length", check_wrapper_response, 7, [digest],
+                         {digest: (metadata[0], metadata[1] + 1, metadata[2])},
+                         reply_for(7, [unsupported]), accepting_verifier)
+    assert not unsupported_verifications
     for fees in ([], [7, 3], [7, 3, 0], [7, 3, 0, 0]):
         payload = transaction_body(2**64 - 1); payload[5] = fees
         item = [[FRAME_TX_TYPE + rlp(payload)], 0, mode0[2]]
@@ -499,7 +516,7 @@ def main():
         expect_error("blob data elision", transaction_hash, FRAME_TX_TYPE + rlp(blob[:2] + [value] + blob[3:]))
     expect_error("commitment hash", transaction_hash, FRAME_TX_TYPE + rlp(blob[:3] + [blob[3][::-1], blob[4]]))
     expect_error("cell proof count", transaction_hash, FRAME_TX_TYPE + rlp(blob[:4] + [blob[4][:-1]]))
-    print("PASS: eth/75 direct-witness encoding, metadata, full retrieval, ordering, size and blob checks. "
+    print("PASS: eth/75 leanSPHINCS scope, encoding, metadata, full retrieval, ordering, size and blob checks. "
           "Transaction/proof validity, KZG verification and client state are not tested.")
 
 
