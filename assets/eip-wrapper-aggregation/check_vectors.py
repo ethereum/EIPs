@@ -367,8 +367,14 @@ def check_versioned_shape(version, code, message):
         assert code == 0x1a, "message code"
 
 
-def can_send_mode(version, mode):
-    return mode == 0 or (version == 76 and mode == 1)
+def can_send_wrapper(version, item, enabled_schemes):
+    # Protocol eligibility is separate from structural and cryptographic checks.
+    schemes = {int.from_bytes(dep[:32], "big") for dep in item[2][0]}
+    if not schemes <= enabled_schemes:
+        return False
+    if version == 75:
+        return item[1] == 0 and schemes == {LEANSPHINCS_SCHEME}
+    return version == 76 and item[1] in (0, 1)
 
 
 def main():
@@ -853,8 +859,20 @@ def main():
     for code in (0x1b, 0x1c):
         check_versioned_shape(76, code, [7, []])
         expect_error("message version", check_versioned_shape, 75, code, [7, []])
-    assert can_send_mode(75, 0) and not can_send_mode(75, 1)
-    assert can_send_mode(76, 0) and can_send_mode(76, 1)
+    native_only = {LEANSPHINCS_SCHEME}
+    generic_enabled = native_only | {0x11}
+    assert can_send_wrapper(75, mode0, native_only)
+    assert not can_send_wrapper(75, mode1, native_only)
+    for item in (mode0, mode1):
+        assert can_send_wrapper(76, item, native_only)
+        for mixed in (False, True):
+            deps = [uint(0x11 if i or not mixed else LEANSPHINCS_SCHEME, 32) + dep[32:]
+                    for i, dep in enumerate(item[2][0])]
+            generic = [item[0], item[1], [deps, item[2][1]]]
+            check_wrapper_shape(generic)
+            assert not can_send_wrapper(75, generic, generic_enabled)
+            assert not can_send_wrapper(76, generic, native_only)
+            assert can_send_wrapper(76, generic, generic_enabled)
 
     print("PASS: announcement, full-envelope and sparse-blob wrapper encoding vectors; "
           "compact reconstruction and full retries, message counts, ordering, metadata matching, "

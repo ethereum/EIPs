@@ -26,7 +26,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### Wrapper encoding
 
-Both [EIP-8288](./eip-8288.md) wrapper modes are supported: `0` for direct witnesses and `1` for a recursive proof. Mode `1` uses the [EIP-8437 canonical wrapper encoding](./eip-8437.md#wrapper-encoding), with `content = [deps, recursive_stark]`, where `recursive_stark` is one nonempty proof byte string. EIP-8288's applicable dependency limits and enabled schemes apply to both modes.
+Both [EIP-8288](./eip-8288.md) wrapper modes are supported: `0` for direct witnesses and `1` for a recursive proof. Both modes support every dependency scheme enabled by the mempool fork's EIP-8288 rules, including generic proofs. Mode `1` uses the [EIP-8437 canonical wrapper encoding](./eip-8437.md#wrapper-encoding), with `content = [deps, recursive_stark]`, where `recursive_stark` is one nonempty proof byte string. EIP-8288's applicable dependency limits apply to both modes.
 
 Hash references are transport-only: clients MUST reconstruct the complete wrapper before applying `MAX_WRAPPER_BYTES` or computing its hash.
 
@@ -84,7 +84,7 @@ Compact responses reconstruct the same canonical wrapper using locally cached tr
 
 ### Mixed-version peers
 
-While connected to `eth/75` peers, clients SHOULD fetch offered mode 0 wrappers not already covered by retained mode 0 wrappers, even when aggregates cover the same transactions. Clients SHOULD retain validated mode 0 wrappers covering pending transactions and announce them under EIP-8437's rules. Fetching and retention remain subject to local budgets and current verification rules; an aggregate cannot reconstruct missing direct witnesses.
+While connected to `eth/75` peers, clients SHOULD fetch offered mode 0 wrappers not already covered by retained leanSPHINCS-only mode 0 wrappers, even when aggregates cover the same transactions. Clients SHOULD retain validated leanSPHINCS-only mode 0 wrappers while they cover pending transactions and announce them under EIP-8437's rules. Fetching and retention remain subject to local budgets and current verification rules; an aggregate cannot reconstruct missing direct witnesses.
 
 ### Validation
 
@@ -107,7 +107,7 @@ Aggregates can overlap. Hashes-only manifests identify partial overlap without r
 
 ## Backwards Compatibility
 
-On an `eth/75` connection, peers exchange only mode 0 wrappers using EIP-8437's four-field announcements and two-field requests, without manifests or hash omission. On `eth/76`, both modes use the six-field announcements and three-field requests defined here. Message shapes are selected by negotiated version, not wrapper mode.
+On an `eth/75` connection, peers exchange only leanSPHINCS mode 0 wrappers using EIP-8437's four-field announcements and two-field requests, without manifests or hash omission. On `eth/76`, both modes and all fork-enabled schemes use the six-field announcements and three-field requests defined here. Message shapes are selected by negotiated version, not wrapper mode.
 
 An aggregate alone does not provide the direct witnesses needed to construct a mode 0 wrapper for an `eth/75` peer. Block-proof exchange and consensus validity are unaffected.
 
@@ -137,11 +137,12 @@ An aggregate alone does not provide the direct witnesses needed to construct a m
 | Compact form fits the cap but reconstructed wrapper exceeds it | Reject |
 | Blob metadata differs while the consensus transaction hash is unchanged | Encoding hashes differ; do not substitute the other encoding |
 | Announcement or request encoded for the other negotiated version | Reject the wrong message shape |
-| Mode 1 or manifests selected for an `eth/75` connection | Do not send; mode 0 full retrieval remains available |
+| Generic dependencies, mode 1 or manifests selected for an `eth/75` connection | Do not send; leanSPHINCS mode 0 full retrieval remains available |
+| Generic dependencies selected for an `eth/76` connection | Allow in either mode only when the mempool fork enables the scheme |
 
 Client integration cases require peer and fork state not modeled by the checker:
 
-- Hold an aggregate without its direct witnesses while connected to an `eth/75` peer. A mode 0 offer is not suppressed by aggregate coverage: fetch it within local budgets, validate, retain and serve it in full to the older peer. Peers continue announcing mode 0 coverage even when the recipient holds an aggregate.
+- Hold an aggregate without its direct witnesses while connected to an `eth/75` peer. A leanSPHINCS-only mode 0 offer is not suppressed by aggregate coverage: fetch it within local budgets, validate, retain and serve it in full to the older peer. Generic and mixed wrappers are not announced or served to that peer, even when valid under the fork's rules.
 - Two validated aggregates have different hashes but the same coverage and no reduction in proof bytes or estimated verification work: suppress the second announcement. Retain the exception for a recursive inclusion-list proof where the recipient has only direct witnesses.
 - Peer A supplies a manifest suggesting no useful coverage; peer B announces the same wrapper with different hints. A fetch decision based only on A's manifest does not suppress fetching from B; validate B's response against B's hints and manifest.
 - Without held coverage to compare, fetch the wrapper directly rather than requesting its manifest.
