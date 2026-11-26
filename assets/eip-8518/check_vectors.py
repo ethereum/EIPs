@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Check eth/76 aggregate-wrapper encoding fixtures and message rules.
+"""Check EIP-8518 eth/76 aggregate-wrapper encoding fixtures and message rules.
 
 Scalars are represented as Python integers. This checks encoding and blob
 metadata binding, not transaction execution, proof validity or client state.
 
 Requires Python 3.9+, pycryptodome and rlp. Run with:
-    python3 assets/eip-wrapper-aggregation/check_vectors.py
+    python3 assets/eip-8518/check_vectors.py
 """
 
 import json
