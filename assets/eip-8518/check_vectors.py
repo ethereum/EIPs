@@ -13,32 +13,11 @@ from pathlib import Path
 
 from rlp import decode
 
-# Reuse EIP-8437's encoding and transaction helpers; its runner is independent
-# of this extension. No networking or cryptographic validity is simulated here.
-import importlib.util
-
-_base_spec = importlib.util.spec_from_file_location(
-    "eth75_vectors", Path(__file__).parents[1] / "eip-8437" / "check_vectors.py")
-base = importlib.util.module_from_spec(_base_spec)
-_base_spec.loader.exec_module(base)
-h = base.h
-uint = base.uint
-rlp = base.rlp
-pattern = base.pattern
-versioned_hash = base.versioned_hash
-transaction_body = base.transaction_body
-transaction = base.transaction
-blob_transaction = base.blob_transaction
-transaction_hash = base.transaction_hash
-frame_payload = base.frame_payload
-frame_gas = base.frame_gas
-check_claims = base.check_claims
-reply_for = base.reply_for
-answer_request = base.answer_request
-wrappers_response = base.wrappers_response
-splice = base.splice
-rlp_list = base.rlp_list
-expect_error = base.expect_error
+# Wrapper-specific fixtures live with this EIP.
+from encoding import (h, uint, rlp, pattern, versioned_hash, transaction_body,
+                      transaction, blob_transaction, transaction_hash, frame_payload,
+                      frame_gas, check_claims, reply_for, answer_request,
+                      wrappers_response, splice, rlp_list, expect_error)
 
 SOFT_RESPONSE_LIMIT = 2097152
 MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
@@ -49,8 +28,7 @@ MAX_MANIFESTS_PER_REQUEST = 32
 LEANSPHINCS_SCHEME = 0x10
 FRAME_TX_TYPE = b"\x06"
 CELLS_PER_EXT_BLOB = 128
-# Inline-metadata threshold inherited from EIP-8437, independent of
-# fork-specific dependency limits and enabled schemes.
+# Inline-metadata threshold, independent of fork-specific validity limits.
 MAX_INLINE_TRANSACTIONS = 17
 METADATA_FIELDS = 5
 SYNTHETIC_FRAME_GAS = 100000
@@ -355,26 +333,18 @@ def vector(mode, size):
 
 
 def check_versioned_shape(version, code, message):
-    assert version in (75, 76), "protocol version"
+    assert version == 76, "message version"
     if code == 0x18:
-        width = 4 if version == 75 else 6
-        assert isinstance(message, list) and all(isinstance(e, list) and len(e) == width for e in message), "announcement fields"
+        assert isinstance(message, list) and all(isinstance(e, list) and len(e) == 6 for e in message), "announcement fields"
     elif code == 0x19:
-        assert isinstance(message, list) and len(message) == (2 if version == 75 else 3), "request fields"
-    elif code in (0x1b, 0x1c):
-        assert version == 76, "message version"
+        assert isinstance(message, list) and len(message) == 3, "request fields"
     else:
-        assert code == 0x1a, "message code"
+        assert code in (0x1a, 0x1b, 0x1c), "message code"
 
 
 def can_send_wrapper(version, item, enabled_schemes):
-    # Protocol eligibility is separate from structural and cryptographic checks.
     schemes = {int.from_bytes(dep[:32], "big") for dep in item[2][0]}
-    if not schemes <= enabled_schemes:
-        return False
-    if version == 75:
-        return item[1] == 0 and schemes == {LEANSPHINCS_SCHEME}
-    return version == 76 and item[1] in (0, 1)
+    return version == 76 and item[1] in (0, 1) and schemes <= enabled_schemes
 
 
 def main():
@@ -846,23 +816,19 @@ def main():
     expect_error("wrapper length", reconstruct, compact_oversized, 1,
                  {h(tx): tx for tx in oversized[0]}, MAX_WRAPPER_BYTES)
 
-    # Each version selects one wire shape, even when sending mode 0.
+    # eth/75 has no wrapper messages, regardless of scheme or mode.
     for item in (mode0, mode1):
-        entry76 = describe(item[1], rlp(item), *coverage(item), inline_metadata(item))
-        entry75 = entry76[:3] + [entry76[5]]
-        check_versioned_shape(75, 0x18, [entry75])
-        check_versioned_shape(76, 0x18, [entry76])
-        expect_error("announcement fields", check_versioned_shape, 75, 0x18, [entry76])
-        expect_error("announcement fields", check_versioned_shape, 76, 0x18, [entry75])
-    for version, request in [(75, [7, hashes[:1]]), (76, [7, 0, hashes[:1]])]:
-        check_versioned_shape(version, 0x19, request)
-        expect_error("request fields", check_versioned_shape, 151 - version, 0x19, request)
-    for code in (0x1b, 0x1c):
-        check_versioned_shape(76, code, [7, []])
+        entry = describe(item[1], rlp(item), *coverage(item), inline_metadata(item))
+        check_versioned_shape(76, 0x18, [entry])
+        expect_error("message version", check_versioned_shape, 75, 0x18, [entry])
+        expect_error("announcement fields", check_versioned_shape, 76, 0x18, [entry[:4]])
+    check_versioned_shape(76, 0x19, [7, 0, hashes[:1]])
+    expect_error("request fields", check_versioned_shape, 76, 0x19, [7, hashes[:1]])
+    for code in (0x19, 0x1a, 0x1b, 0x1c):
         expect_error("message version", check_versioned_shape, 75, code, [7, []])
     native_only = {LEANSPHINCS_SCHEME}
     generic_enabled = native_only | {0x11}
-    assert can_send_wrapper(75, mode0, native_only)
+    assert not can_send_wrapper(75, mode0, native_only)
     assert not can_send_wrapper(75, mode1, native_only)
     for item in (mode0, mode1):
         assert can_send_wrapper(76, item, native_only)
