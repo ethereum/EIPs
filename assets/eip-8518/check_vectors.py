@@ -42,7 +42,7 @@ expect_error = base.expect_error
 
 SOFT_RESPONSE_LIMIT = 2097152
 MAX_WRAPPER_BYTES = SOFT_RESPONSE_LIMIT
-MAX_ANNOUNCEMENT_BYTES = 2**21
+MAX_ANNOUNCEMENT_BYTES = 2**18
 MAX_ANNOUNCEMENTS = 64
 MAX_WRAPPERS_PER_REQUEST = 32
 MAX_MANIFESTS_PER_REQUEST = 32
@@ -437,10 +437,11 @@ def main():
                       for i in range(MAX_ANNOUNCEMENTS)]
     check_announcements(widest_entries)
     assert len(rlp(widest_entries)) == 190660
+    assert len(rlp(widest_entries)) < MAX_ANNOUNCEMENT_BYTES
     # Fee-list length is variable, but the entire announcement is byte-bounded.
     # Synthetic metadata checks transport only, not the transaction's fee layout.
     large_meta = transaction_metadata([transaction(0)])
-    large_meta[3] = [[2**256 - 1] * 60000]
+    large_meta[3] = [[2**256 - 1] * (MAX_ANNOUNCEMENT_BYTES // 66)]
     large_entry = [0, MAX_WRAPPER_BYTES, bytes(32), bytes(32), h(b"".join(large_meta[1])), large_meta]
     remaining = MAX_ANNOUNCEMENT_BYTES - len(rlp([large_entry]))
     large_meta[3][0].extend([2**256 - 1] * (remaining // 33))
