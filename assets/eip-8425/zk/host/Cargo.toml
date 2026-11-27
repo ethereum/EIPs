@@ -1,0 +1,16 @@
+[package]
+name = "eip8425"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+anyhow = "1"
+hex = "0.4"
+risc0-zkvm = { version = "=3.1.0", default-features = false, features = ["client", "disable-dev-mode"] }
+risc0-circuit-recursion = { version = "=4.1.0", default-features = false }
+risc0-core = { version = "=3.0.2", default-features = false }
+risc0-zkp = { version = "=3.0.6", default-features = false }
+sha3 = "0.10"
+
+[workspace]
