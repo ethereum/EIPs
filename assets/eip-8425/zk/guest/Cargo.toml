@@ -1,0 +1,22 @@
+[package]
+name = "eip8425-seed"
+version = "1.0.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[package.metadata.risc0]
+rustc-flags = ["-Zlocation-detail=none"]
+
+[dependencies]
+risc0-zkvm = { version = "=3.1.0", default-features = false, features = ["std"] }
+hmac = "=0.12.1"
+sha2 = "=0.10.9"
+sha3 = "=0.10.8"
+k256 = { version = "=0.13.4", default-features = false, features = ["arithmetic"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true

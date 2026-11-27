@@ -1,0 +1,4 @@
+__pycache__/
+target/
+zk/guest/elfs/
+zk/vectors/*.bin
