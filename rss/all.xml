@@ -10,6 +10,9 @@ layout: null
     <atom:link href="{{ site.url }}/all.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
     {% assign eips = site.pages | sort: 'eip' %}
+
+    {% include rssnotice.xml %}
+
     {% for eip in eips %}
       <item>
         <title>{{ eip.title | xml_escape }}</title>
