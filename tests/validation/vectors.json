@@ -1,0 +1,41 @@
+{
+  "schema": "eip-validation-vectors-1",
+  "specification": "eip-validation-v1",
+  "cases": [
+    {
+      "id": "valid-minimal-eip",
+      "repository_kind": "eip",
+      "source": "tests/validation/fixtures/valid-eip.md",
+      "expected": "pass",
+      "expected_rules": []
+    },
+    {
+      "id": "invalid-missing-discussions-to",
+      "repository_kind": "eip",
+      "source": "tests/validation/fixtures/invalid-missing-discussions-to.md",
+      "expected": "fail",
+      "expected_rules": ["preamble-discussions-to"]
+    },
+    {
+      "id": "erc-valid-boundary",
+      "repository_kind": "erc",
+      "source": "tests/validation/fixtures/valid-erc.md",
+      "expected": "pass",
+      "expected_rules": []
+    },
+    {
+      "id": "missing-merged-repository",
+      "repository_kind": "erc",
+      "source": "tests/validation/fixtures/missing-repository-file.md",
+      "expected": "error",
+      "expected_rules": ["cross-repository-source"]
+    },
+    {
+      "id": "conflicting-shared-manifest",
+      "repository_kind": "erc",
+      "source": "tests/validation/fixtures/conflicting-manifest.json",
+      "expected": "error",
+      "expected_rules": ["shared-manifest-version"]
+    }
+  ]
+}
