@@ -23,7 +23,7 @@ The function map\_to\_curve\_simple\_swu(u) implements a simplification
 of the Shallue-van de Woestijne-Ulas mapping described by Brier et
 al., which they call the "simplified SWU" map. Wahby and Boneh generalize and optimize this mapping.
 
-Preconditions: A Weierstrass curve y^2 = g(x) x^3 + A * x + B where A != 0 and B != 0.
+Preconditions: A Weierstrass curve y^2 = g(x) = x^3 + A * x + B where A != 0 and B != 0.
 
 Constants:
 
@@ -82,7 +82,7 @@ the isogeny map to that point to get a point on E.
 
 Note that iso\_map is a group homomorphism, meaning that point addition
 commutes with iso\_map.
-Thus, when using this mapping in the hash\_to\_curve construction of {{roadmap}},
+Thus, when using this mapping in the hash\_to\_curve construction of RFC 9380, Section 3,
 one can effect a small optimization by first mapping u0 and u1 to E', adding
 the resulting points on E', and then applying iso\_map to the sum.
 This gives the same result while requiring only one evaluation of iso\_map.
