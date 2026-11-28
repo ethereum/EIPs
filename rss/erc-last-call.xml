@@ -7,7 +7,7 @@ layout: null
     <title>Ethereum EIPs - Last Call Review</title>
     <description>All EIPs which are in the "last call" status, please help review these and provide your feedback!</description>
     <link>{{ site.url }}</link>
-    <atom:link href="{{ site.url }}/rss/last-call.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="{{ site.url }}/rss/erc-last-call.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
     {% assign eips = site.pages | sort: 'eip' %}
     {% for eip in eips %}
