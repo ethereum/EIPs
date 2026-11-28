@@ -1,0 +1,19 @@
+---
+layout: null
+permalink: /search-index.json
+---
+{% comment %} Generate a search index of all EIPs with metadata and content previews {% endcomment %}
+{% assign eips = site.pages | where_exp: "page", "page.url contains '/EIPS/'" | sort: "eip" %}
+[
+{% for page in eips %}{% capture content_body %}{{ page.content | strip_html | normalize_whitespace | escape | strip }}{% endcapture %}{
+  "eip": {{ page.eip | jsonify }},
+  "title": {{ page.title | jsonify }},
+  "description": {{ page.description | default: "" | jsonify }},
+  "status": {{ page.status | jsonify }},
+  "type": {{ page.type | jsonify }},
+  "category": {{ page.category | default: "" | jsonify }},
+  "author": {{ page.author | default: "" | jsonify }},
+  "url": {{ page.url | relative_url | jsonify }},
+  "content": {{ content_body | jsonify }}
+}{% unless forloop.last %},{% endunless %}{% endfor %}
+]

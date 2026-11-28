@@ -32,6 +32,7 @@ header_pages:
  - erc.html
  - meta.html
  - informational.html
+ - search.html
 
 # Build settings
 highlighter: rouge
