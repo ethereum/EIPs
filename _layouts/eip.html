@@ -164,3 +164,48 @@ https://schema.org/TechArticle
     "copyrightYear": "{{ page.created | date: "%Y" }}"
   }
 </script>
+<script type="text/javascript">
+  // Show the title of cross-referenced EIPs/ERCs when hovering over links to them.
+  document.addEventListener("DOMContentLoaded", async () => {
+    const eipsBase = "{{ '/EIPS/' | relative_url }}";
+    const currentEip = "{{ page.eip }}";
+    const links = [];
+    for (const link of document.querySelectorAll(".home a[href]")) {
+      if (link.title || link.origin !== location.origin || !link.pathname.startsWith(eipsBase)) {
+        continue;
+      }
+      const match = link.pathname.slice(eipsBase.length).match(/^eip-(\d+)(?:\.html)?$/);
+      if (match && match[1] !== currentEip) {
+        links.push({ link, number: match[1] });
+      }
+    }
+    if (links.length === 0) {
+      return;
+    }
+
+    let eips;
+    try {
+      const response = await fetch("{{ '/eips.json' | relative_url }}");
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      eips = await response.json();
+    } catch (e) {
+      console.error("unable to load EIP titles", e);
+      return;
+    }
+
+    for (const { link, number } of links) {
+      const eip = eips[number];
+      if (!eip) {
+        continue;
+      }
+      const prefix = eip.category === "ERC" ? "ERC" : "EIP";
+      let title = `${prefix}-${number}: ${eip.title}`;
+      if (eip.status !== "Living" && eip.status !== "Final") {
+        title += ` [${eip.status.toUpperCase()}]`;
+      }
+      new bootstrap.Tooltip(link, { title });
+    }
+  });
+</script>
