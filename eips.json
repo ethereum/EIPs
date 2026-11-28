@@ -1,0 +1,9 @@
+---
+layout: null
+---
+{%- assign eips = site.pages | where_exp: "page", "page.url contains '/EIPS/'" | where_exp: "page", "page.status != 'Moved'" | sort: "eip" -%}
+{
+{%- for eip in eips %}
+  "{{ eip.eip }}": {"title": {{ eip.title | jsonify }}, "status": {{ eip.status | jsonify }}{% if eip.category %}, "category": {{ eip.category | jsonify }}{% endif %}}{% unless forloop.last %},{% endunless %}
+{%- endfor %}
+}
