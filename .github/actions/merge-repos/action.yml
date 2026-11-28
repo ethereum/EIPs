@@ -11,14 +11,29 @@ runs:
     - name: Merge Repos
       shell: bash
       run: |
-        mkdir -p $GITHUB_WORKSPACE/ERCs/ERCS
-        mkdir -p $GITHUB_WORKSPACE/ERCs/EIPS
-        cp -rp $GITHUB_WORKSPACE/ERCs/ERCS/. $GITHUB_WORKSPACE/EIPS
-        cp -rp $GITHUB_WORKSPACE/ERCs/EIPS/. $GITHUB_WORKSPACE/EIPS
-        cp -rp $GITHUB_WORKSPACE/ERCs/assets/. $GITHUB_WORKSPACE/assets
-        cd $GITHUB_WORKSPACE/EIPS
+        set -euo pipefail
+
+        mkdir -p "$GITHUB_WORKSPACE/ERCs/ERCS"
+        mkdir -p "$GITHUB_WORKSPACE/ERCs/EIPS"
+
+        # ERCS may contain compatibility copies of EIP files; protect canonical EIP-1.
+        canonical_eip_1="$GITHUB_WORKSPACE/EIPS/eip-1.md"
+        canonical_eip_1_sha="$(sha256sum "$canonical_eip_1" | awk '{print $1}')"
+
+        find "$GITHUB_WORKSPACE/ERCs/ERCS" -maxdepth 1 -type f -name "erc-*.md" \
+          -exec cp -p {} "$GITHUB_WORKSPACE/EIPS/" \;
+        cp -rp "$GITHUB_WORKSPACE/ERCs/EIPS/." "$GITHUB_WORKSPACE/EIPS"
+        cp -rp "$GITHUB_WORKSPACE/ERCs/assets/." "$GITHUB_WORKSPACE/assets"
+        cd "$GITHUB_WORKSPACE/EIPS"
         find . -name "erc-*.md" -type f -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
-        cd $GITHUB_WORKSPACE/assets
+
+        merged_eip_1_sha="$(sha256sum "$canonical_eip_1" | awk '{print $1}')"
+        if [[ "$canonical_eip_1_sha" != "$merged_eip_1_sha" ]]; then
+          echo "::error::Merge changed canonical EIPS/eip-1.md (before: $canonical_eip_1_sha, after: $merged_eip_1_sha)"
+          exit 1
+        fi
+
+        cd "$GITHUB_WORKSPACE/assets"
         find . -depth -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
-        cd $GITHUB_WORKSPACE
+        cd "$GITHUB_WORKSPACE"
         rm -rf ERCs
